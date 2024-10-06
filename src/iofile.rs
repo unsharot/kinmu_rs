@@ -1,7 +1,7 @@
 use std::fs::{read_to_string};
 use std::io::{Result};
 
-use crate::kata::{HyouProp};
+use crate::kata::{HyouProp, AnnealingConfig};
 
 
 /*
@@ -25,36 +25,48 @@ pub fn load_main_config(path: &FilePath) -> Result<Vec<FilePath>> {
     Ok(ans)
 }
 
-// pub fn load_data(_path: &FilePath) -> Result<HyouProp> {
-//     let hp = HyouProp {
-//         workers: Vec::new(),
-//         ng_list: Vec::new(),
-//         bounds: (0, 0),
-//         days: Vec::new(),
-//         buffer: 0,
-//         kibou: Vec::new(),
-//         k_counts: Vec::new(),
-//         i_counts: Vec::new(),
-//         o_counts: Vec::new(),
-//         h_counts: Vec::new(),
-//         i_ninzuu: Vec::new(),
-//     };
-//     Ok(hp)
-// }
-
 ///勤務表で使う値を読み込む
-pub fn load_hyou_prop(path: &FilePath) -> Result<HyouProp> {
+pub fn load_config(path: &FilePath) -> Result<(HyouProp, Vec<FilePath>, String)> {
     let contents = read_contents(path)?;
 
+    //フィールドごとに区切る
+    let mut temp: Vec<String> = Vec::new();
+    let mut ss: Vec<String> = Vec::new();
     for line in contents {
-        
+        if line.ends_with(": ") || line.ends_with(":") || line.starts_with("--") {
+            ss.push(temp.join("\n"));
+            temp = Vec::new();
+        } else {
+            temp.push(line);
+        }
     }
+
+    let hp = HyouProp {
+        workers: read_workers(ss[0])?,
+        ng_list: read_ng_list(ss[1])?,
+        bounds: (read_int(ss[2])?, read_int(ss[3])?),
+        days: read_days(ss[4])?,
+        buffer: read_int(ss[5])?,
+        kibou: read_hyou(ss[6])?,
+        k_counts: read_ints(ss[7])?,
+        i_counts: read_ints(ss[8])?,
+        o_counts: read_ints(ss[9])?,
+        h_counts: read_ints(ss[10])?,
+        i_ninzuu: read_ints(ss[11])?,
+        seed: read_int(ss[13])?,
+        score_prop: read_score_prop(ss[15])?,
+    };
+    let fs = ss[14].lines();
+    let ff = ss[12];
+
+    Ok((hp, fs, ff))
+    
 }
 
-///焼きなましの段階ごとの設定を読み込む
-pub fn load_annealing_config(path: &FilePath) -> Result<AnnealingConfig> {
-    let contents = read_contents(path)?;
-}
+// ///焼きなましの段階ごとの設定を読み込む
+// pub fn load_annealing_config(path: &FilePath) -> Result<AnnealingConfig> {
+//     let contents = read_contents(path)?;
+// }
 
 /*
 HyouPropのなかでもstep,seed,score_propは
@@ -84,3 +96,4 @@ fn read_contents(path: &FilePath) -> Result<Vec<String>> {
 
     Ok(ans)
 }
+

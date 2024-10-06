@@ -124,12 +124,14 @@ pub struct HyouProp {
     pub o_counts: OCounts,
     pub h_counts: HCounts,
     pub i_ninzuu: Vec<Int>,
+    pub seed: Int, //fill関数のシード値
     pub score_prop: Vec<ScoreProp>, //結果表示のためのスコア
 }
+//下2つはここにあるべきじゃない気がする
 
 ///焼きなましの段階ごとの設定
 pub struct AnnealingConfig {
-    pub step: Int,
-    pub seed: Int,
+    pub step: Int, //焼きなましのステップ数
+    pub seed: Int, //焼きなましのupdate関数のシード
     pub score_prop: Vec<ScoreProp>, //焼きなましのためのスコア
 }
