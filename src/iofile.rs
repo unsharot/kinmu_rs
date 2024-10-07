@@ -1,5 +1,5 @@
 use std::fs::{read_to_string};
-use std::io::{Result};
+use std::io;
 
 // use crate::kata::{HyouProp, AnnealingConfig, Int};
 use crate::kata::{HyouProp, Int, Waku, Worker, NGList, Days, DayST, Hyou, ScoreProp};
@@ -11,7 +11,7 @@ FilePath -> Stringの変換にはread_to_stringを使う
 
 type FilePath = String;
 
-pub fn load_main_config(path: &FilePath) -> Result<Vec<FilePath>> {
+pub fn load_main_config(path: &FilePath) -> io::Result<Vec<FilePath>> {
 
     let contents = read_contents(path)?;
 
@@ -27,7 +27,7 @@ pub fn load_main_config(path: &FilePath) -> Result<Vec<FilePath>> {
 }
 
 ///勤務表で使う値を読み込む
-pub fn load_config(path: &FilePath) -> Result<(HyouProp, Vec<FilePath>, String)> {
+pub fn load_config(path: &FilePath) -> io::Result<(HyouProp, Vec<FilePath>, String)> {
     let contents = read_contents(path)?;
 
     //フィールドごとに区切る
@@ -76,7 +76,7 @@ HyouPropのなかでもstep,seed,score_propは
 */
 
 ///ファイルを読み込んで文字列の行ごとの配列を返す関数
-fn read_contents(path: &FilePath) -> Result<Vec<String>> {
+fn read_contents(path: &FilePath) -> io::Result<Vec<String>> {
 
     //ファイルの全文をStringとして読み込む
     let contents = read_to_string(path)?;
@@ -99,19 +99,17 @@ fn read_contents(path: &FilePath) -> Result<Vec<String>> {
 }
 
 
-//read関数はtryにしたい
 
-
-fn read_int(text: &str) -> Result<Int> {
+fn read_int(text: &str) -> io::Result<Int> {
     let ans: Int = text.parse::<Int>().unwrap();
     Ok(ans)
 }
 
-fn read_ints(text: &str) -> Result<Vec<Int>> {
+fn read_ints(text: &str) -> io::Result<Vec<Int>> {
     Ok(text.split_whitespace().map(|x| x.parse::<Int>().unwrap()).collect())
 }
 
-fn read_workers(text: &str) -> Result<Vec<Worker>> {
+fn read_workers(text: &str) -> io::Result<Vec<Worker>> {
     let mut ans: Vec<Worker> = Vec::new();
     for line in text.lines() {
         ans.push(read_worker(&line)?);
@@ -119,13 +117,14 @@ fn read_workers(text: &str) -> Result<Vec<Worker>> {
     Ok(ans)
 }
 
-fn read_worker(text: &str) -> Result<Worker> {
-    let ws: Vec<String> = text.split_whitespace().collect();
-    let worker: Worker = Worker {name: ws[0], ability: ws[1]}?;
+fn read_worker(text: &str) -> io::Result<Worker> {
+    // TODO: もうちょっと安全にアクセスしたい
+    let ws: Vec<String> = text.split_whitespace().map(|s| s.to_string()).collect();
+    let worker: Worker = Worker {name: ws[0].clone(), ability: read_int(&ws[1])?};
     Ok(worker)
 }
 
-fn read_ng_list(text: &str) -> Result<NGList> {
+fn read_ng_list(text: &str) -> io::Result<NGList> {
     let mut ans: NGList = Vec::new();
     for line in text.lines() {
         let a: Vec<Int> = line.split_whitespace().map(|x| read_int(x).unwrap()).collect();
@@ -134,7 +133,7 @@ fn read_ng_list(text: &str) -> Result<NGList> {
     Ok(ans)
 }
 
-fn read_days(text: &str) -> Result<Days> {
+fn read_days(text: &str) -> io::Result<Days> {
     Ok(text.chars().map(|c| match c {
         'W' => Ok(DayST::Weekday),
         'H' => Ok(DayST::Holiday),
@@ -145,7 +144,7 @@ fn read_days(text: &str) -> Result<Days> {
     }.unwrap()).collect())
 }
 
-fn read_hyou(text: &str) -> Result<Hyou> {
+fn read_hyou(text: &str) -> io::Result<Hyou> {
     let mut ans: Hyou = Vec::new();
     for line in text.lines() {
         let a: Vec<Waku> = line.chars().map(|c| match c {
@@ -165,7 +164,7 @@ fn read_hyou(text: &str) -> Result<Hyou> {
     Ok(ans)
 }
 
-fn read_score_props(text: &str) -> Result<Vec<ScoreProp>> {
+fn read_score_props(text: &str) -> io::Result<Vec<ScoreProp>> {
     let list: Vec<String> = read_list(text)?;
     let mut ans: Vec<ScoreProp> = Vec::new();
     for line in list {
@@ -174,11 +173,11 @@ fn read_score_props(text: &str) -> Result<Vec<ScoreProp>> {
     Ok(ans)
 }
 
-fn read_score_prop(text: &str) -> Result<ScoreProp> {
-
+fn read_score_prop(_text: &str) -> io::Result<ScoreProp> {
+    todo!("ここにScorePropの読み込み");
 }
 
-fn read_list(text: &str) -> Result<Vec<String>> {
+fn read_list(text: &str) -> io::Result<Vec<String>> {
     let list: Vec<String> = text
         .trim_matches(|c| c == '[' || c == ']')
         .split(",")
