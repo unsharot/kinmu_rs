@@ -1,5 +1,5 @@
 
-type Int = isize;
+pub type Int = isize;
 
 pub enum Waku {
     N,
@@ -13,7 +13,7 @@ pub enum Waku {
     U,
 }
 
-type Hyou = Vec<Vec<Waku>>;
+pub type Hyou = Vec<Vec<Waku>>;
 
 pub type HyouRow = Vec<Waku>;
 
@@ -66,9 +66,9 @@ pub enum ScoreProp {
     ONrenzoku(Score),
     NHrenzoku(Score),
     OHrenzoku(Score),
-    Renkin4(Score, Score),
-    Renkin5(Score, Score),
-    Renkin6(Score, Score),
+    Renkin4((Score, Score)),
+    Renkin5((Score, Score)),
+    Renkin6((Score, Score)),
     Renkyuu(Score),
     Renkyuu2(Score),
     OsoHaya(Int),
@@ -81,14 +81,14 @@ pub enum ScoreProp {
     HayaCount(Int),
     Fukouhei(Int),
     YakinNinzuu(Score),
-    NikkinNinzuu((Int,Int),(Int,Int),(Int,Int),(Int,Int),(Int,Int)),
+    NikkinNinzuu(((Int,Int),(Int,Int),(Int,Int),(Int,Int),(Int,Int))),
     NG(Score),
-    OsoNinzuu(Int,Int),
-    HayaNinzuu(Int,Int),
-    Leader(Score,Int),
-    YakinWorker(Score,Int),
+    OsoNinzuu((Int,Int)),
+    HayaNinzuu((Int,Int)),
+    Leader((Score,Int)),
+    YakinWorker((Score,Int)),
     YakinAloneFuro(Score),
-    HeyaMoti(Score, Int, Int),
+    HeyaMoti((Score, Int, Int)),
     NoUndef(Int),
     NoSamePair(Score),
 }
