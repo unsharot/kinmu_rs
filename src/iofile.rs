@@ -55,7 +55,7 @@ pub fn load_config(path: &FilePath) -> Result<(HyouProp, Vec<FilePath>, String)>
         h_counts: read_ints(&ss[10])?,
         i_ninzuu: read_ints(&ss[11])?,
         seed: read_int(&ss[13])?,
-        score_prop: read_score_prop(&ss[15])?,
+        score_prop: read_score_props(&ss[15])?,
     };
     let fs = ss[14].lines().map(|s| s.to_string()).collect();
     let ff = ss[12].clone();
@@ -112,7 +112,17 @@ fn read_ints(text: &str) -> Result<Vec<Int>> {
 }
 
 fn read_workers(text: &str) -> Result<Vec<Worker>> {
-    // Ok(text.)
+    let mut ans: Vec<Worker> = Vec::new();
+    for line in text.lines() {
+        ans.push(read_worker(&line)?);
+    }
+    Ok(ans)
+}
+
+fn read_worker(text: &str) -> Result<Worker> {
+    let ws: Vec<String> = text.split_whitespace().collect();
+    let worker: Worker = Worker {name: ws[0], ability: ws[1]}?;
+    Ok(worker)
 }
 
 fn read_ng_list(text: &str) -> Result<NGList> {
@@ -155,6 +165,24 @@ fn read_hyou(text: &str) -> Result<Hyou> {
     Ok(ans)
 }
 
-fn read_score_prop(text: &str) -> Result<Vec<ScoreProp>> {
+fn read_score_props(text: &str) -> Result<Vec<ScoreProp>> {
+    let list: Vec<String> = read_list(text)?;
+    let mut ans: Vec<ScoreProp> = Vec::new();
+    for line in list {
+        ans.push(read_score_prop(&line)?);
+    }
+    Ok(ans)
+}
 
+fn read_score_prop(text: &str) -> Result<ScoreProp> {
+
+}
+
+fn read_list(text: &str) -> Result<Vec<String>> {
+    let list: Vec<String> = text
+        .trim_matches(|c| c == '[' || c == ']')
+        .split(",")
+        .map(|s| s.trim().to_string())
+        .collect();
+    Ok(list)
 }
