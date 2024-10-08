@@ -2,6 +2,8 @@
 pub type Int = isize;
 
 #[derive(Debug)]
+#[derive(Clone)]
+#[derive(PartialEq)]
 pub enum Waku {
     N,
     K,
@@ -22,6 +24,7 @@ pub type HyouColumn = Vec<Waku>;
 
 pub type Score = f32;
 
+#[derive(PartialEq)]
 pub enum WakuST {
     Absolute,
     Kibo,

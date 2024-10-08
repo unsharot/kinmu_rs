@@ -2,9 +2,8 @@ pub mod test_lib;
 pub mod annealing;
 pub mod iofile;
 // pub mod score;
-
+pub mod update;
 pub mod kata;
-use kata::{AnnealingConfig};
 
 // use crate::test_lib::test_lib::test_func;
 use rand::Rng;
@@ -64,29 +63,28 @@ fn sub(p: &str) -> io::Result<()> {
     // todo!("作りかけ");
     let Ok((hp, fs, ff)) = iofile::load_config(p) else { todo!() };
 
-    let acs: Vec<AnnealingConfig> = fs.iter().map(|s| iofile::load_annealing_config(s).unwrap()).collect();
+    let acs: Vec<kata::AnnealingConfig> = fs.iter().map(|s| iofile::load_annealing_config(s).unwrap()).collect();
 
-    // TODO: 更新関数を
-    let update_func = fs;
+    let hst: HyouST = ;
 
-    // let mut model = hp.kibou;
-    // let mut score;
-    // for ac in acs {
-    //     (score, model) = annealing::annealing(
-    //         10000000000,
-    //         model,
-    //         ac.step,
-    //         update_func,
-    //         |m| score::assess_score(hp, m),
-    //         ac.max_temp,
-    //         ac.min_temp,
-    //         annealing::basic_temp_func,
-    //         annealing::basic_prob_func,
-    //     );
-    // }
+    let mut model = hp.kibou;
+    let mut score;
+    for ac in acs {
+        (score, model) = annealing::annealing(
+            10000000000,
+            model,
+            ac.step,
+            |h| (update::read_update_func(&ac.update_func))(hst, h), //update関数にhstの束縛を行いたい
+            |m| score::assess_score(hp, m),
+            ac.max_temp,
+            ac.min_temp,
+            annealing::basic_temp_func,
+            annealing::basic_prob_func,
+        );
+    }
     
-    // println!("{:?}", model);
-    // println!("{}", score);
+    println!("{:?}", model);
+    println!("{}", score);
 
     Ok(())
 }
