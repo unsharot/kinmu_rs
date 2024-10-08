@@ -54,5 +54,20 @@ fn main() -> io::Result<()> {
 
     ps.iter().for_each(|s| println!("{}",s));
 
+    ps.iter().for_each(|p| sub(p)?);
+
+    Ok(())
+}
+
+fn sub(p: &str) -> io::Result<()> {
+    todo!("作りかけ");
+    let (hp, fs, ff) = load_config(p);
+
+    let acs: Vec<AnnealingConfig> = fs.iter().map(|s| load_annealing_config(s)?).collect();
+
+    fold annealing();
+
+    print({:?})
+
     Ok(())
 }
