@@ -23,7 +23,7 @@ pub fn load_main_config(path: &FilePath) -> io::Result<Vec<FilePath>> {
 }
 
 ///勤務表で使う値を読み込む
-pub fn load_config(path: &FilePath) -> io::Result<(HyouProp, Vec<FilePath>, String)> {
+pub fn load_config(path: &str) -> io::Result<(HyouProp, Vec<FilePath>, String)> {
     let contents = read_contents(path)?;
 
     //フィールドごとに区切る
@@ -61,7 +61,7 @@ pub fn load_config(path: &FilePath) -> io::Result<(HyouProp, Vec<FilePath>, Stri
 }
 
 ///焼きなましの段階ごとの設定を読み込む
-pub fn load_annealing_config(path: &FilePath) -> Result<AnnealingConfig> {
+pub fn load_annealing_config(path: &str) -> io::Result<AnnealingConfig> {
     let contents = read_contents(path)?;
 
     //フィールドごとに区切る
@@ -81,7 +81,7 @@ pub fn load_annealing_config(path: &FilePath) -> Result<AnnealingConfig> {
         step: read_int(&ss[0])?, //ここのindexてきとう
         seed: read_int(&ss[1])?,
         score_prop: read_score_props(&ss[2])?,
-    }
+    };
 
     Ok(ac)
 }
@@ -93,7 +93,7 @@ HyouPropのなかでもstep,seed,score_propは
 */
 
 ///ファイルを読み込んで文字列の行ごとの配列を返す関数
-fn read_contents(path: &FilePath) -> io::Result<Vec<String>> {
+fn read_contents(path: &str) -> io::Result<Vec<String>> {
 
     //ファイルの全文をStringとして読み込む
     let contents = read_to_string(path)?;
