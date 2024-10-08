@@ -3,7 +3,7 @@ pub mod annealing;
 pub mod iofile;
 
 pub mod kata;
-// use kata::*;
+use kata::{AnnealingConfig};
 
 // use crate::test_lib::test_lib::test_func;
 use rand::Rng;
@@ -54,20 +54,20 @@ fn main() -> io::Result<()> {
 
     ps.iter().for_each(|s| println!("{}",s));
 
-    ps.iter().for_each(|p| sub(p)?);
+    ps.iter().for_each(|p| { let _ = sub(p); });
 
     Ok(())
 }
 
 fn sub(p: &str) -> io::Result<()> {
-    todo!("作りかけ");
-    let (hp, fs, ff) = load_config(p);
+    // todo!("作りかけ");
+    let Ok((hp, fs, ff)) = iofile::load_config(p) else { todo!() };
 
-    let acs: Vec<AnnealingConfig> = fs.iter().map(|s| load_annealing_config(s)?).collect();
+    let acs: Vec<AnnealingConfig> = fs.iter().map(|s| iofile::load_annealing_config(s).unwrap()).collect();
 
-    fold annealing();
+    // fold annealing();
 
-    print({:?})
+    // print({:?})
 
     Ok(())
 }
