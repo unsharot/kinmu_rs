@@ -1,13 +1,9 @@
 use std::fs::{read_to_string};
 use std::io;
 
-// use crate::kata::{HyouProp, AnnealingConfig, Int};
-use crate::kata::{HyouProp, Int, Waku, Worker, NGList, Days, DayST, Hyou, ScoreProp};
+use crate::kata::{HyouProp, AnnealingConfig, Int, Waku, Worker, NGList, Days, DayST, Hyou, ScoreProp};
 
 
-/*
-FilePath -> Stringの変換にはread_to_stringを使う
-*/
 
 type FilePath = String;
 
@@ -64,10 +60,31 @@ pub fn load_config(path: &FilePath) -> io::Result<(HyouProp, Vec<FilePath>, Stri
     
 }
 
-// ///焼きなましの段階ごとの設定を読み込む
-// pub fn load_annealing_config(path: &FilePath) -> Result<AnnealingConfig> {
-//     let contents = read_contents(path)?;
-// }
+///焼きなましの段階ごとの設定を読み込む
+pub fn load_annealing_config(path: &FilePath) -> Result<AnnealingConfig> {
+    let contents = read_contents(path)?;
+
+    //フィールドごとに区切る
+    //ここ、関数にしてもいい
+    let mut temp: Vec<String> = Vec::new();
+    let mut ss: Vec<String> = Vec::new();
+    for line in contents {
+        if line.ends_with(": ") || line.ends_with(":") || line.starts_with("--") {
+            ss.push(temp.join("\n"));
+            temp = Vec::new();
+        } else {
+            temp.push(line);
+        }
+    }
+
+    let ac = AnnealingConfig {
+        step: read_int(&ss[0])?, //ここのindexてきとう
+        seed: read_int(&ss[1])?,
+        score_prop: read_score_props(&ss[2])?,
+    }
+
+    Ok(ac)
+}
 
 /*
 HyouPropのなかでもstep,seed,score_propは
