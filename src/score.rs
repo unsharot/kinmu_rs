@@ -1,5 +1,4 @@
-mod kata;
-use kata::{
+use crate::kata::{
     Waku,
     Hyou,
     HyouRow,
@@ -9,8 +8,10 @@ use kata::{
     NG,
     NGList,
     ScoreProp,
+    ScoreProp::*,
     HyouProp,
     Worker,
+    Int,
 };
 
 
@@ -64,21 +65,21 @@ fn osohaya(m: &isize, xs: &HyouRow) -> Score {
 
 }
 
-fn yakinBaransu()
+fn yakinBaransu() {}
 
-fn kokyuCountP()
+fn kokyuCountP() {}
 
 
 //これはdayp(Waku,Int,Int)にしたい
 //NikkinNinzuuも(Waku,Int,Int)に
-fn dayP()
+fn dayP() {}
 
 
 //これはWorkerとHyouColumnの連携が必須
 //結局合計をここで計算する必要あり
 fn heyaMoti(s: &Score, i: &Int, m: &Int, ws: &Vec<Worker>, xs: &HyouColumn) -> Score {
     let mut c = 0;
-    for i in 0..xs.len() {
+    for _ in 0..xs.len() {
         if (ws[c].ability % m != 0) && (xs[c] == Waku::N) {
             c += 1;
         }
@@ -89,10 +90,10 @@ fn heyaMoti(s: &Score, i: &Int, m: &Int, ws: &Vec<Worker>, xs: &HyouColumn) -> S
 
 //これもHashMapつかう？
 //NGリストをHashMapとして保持して、タプルで検索
-fn ng()
+fn ng() {}
 
 //特殊かも
-fn yakinAloneFuro()
+fn yakinAloneFuro() {}
 
 //日ごとにペアを出して、その重複を調べる
 //HashMap使えそう
