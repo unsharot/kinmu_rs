@@ -1,6 +1,7 @@
 
 pub type Int = isize;
 
+#[derive(Debug)]
 pub enum Waku {
     N,
     K,
@@ -134,4 +135,7 @@ pub struct AnnealingConfig {
     pub step: Int, //焼きなましのステップ数
     pub seed: Int, //焼きなましのupdate関数のシード
     pub score_prop: Vec<ScoreProp>, //焼きなましのためのスコア
+    pub update_func: String,
+    pub max_temp: f32,
+    pub min_temp: f32, 
 }

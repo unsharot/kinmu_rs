@@ -54,7 +54,7 @@ pub fn load_config(path: &str) -> io::Result<(HyouProp, Vec<FilePath>, String)> 
         score_prop: read_score_props(&ss[15])?,
     };
     let fs = ss[14].lines().map(|s| s.to_string()).collect();
-    let ff = ss[12].clone();
+    let ff = ss[12].clone(); //fillの関数
 
     Ok((hp, fs, ff))
     
@@ -81,6 +81,9 @@ pub fn load_annealing_config(path: &str) -> io::Result<AnnealingConfig> {
         step: read_int(&ss[0])?, //ここのindexてきとう
         seed: read_int(&ss[1])?,
         score_prop: read_score_props(&ss[2])?,
+        update_func: ss[3].clone(),
+        max_temp: read_float(&ss[4])?,
+        min_temp: read_float(&ss[5])?,
     };
 
     Ok(ac)
@@ -124,6 +127,11 @@ fn read_int(text: &str) -> io::Result<Int> {
 
 fn read_ints(text: &str) -> io::Result<Vec<Int>> {
     Ok(text.split_whitespace().map(|x| x.parse::<Int>().unwrap()).collect())
+}
+
+fn read_float(text: &str) -> io::Result<f32> {
+    let ans: f32 = text.parse::<f32>().unwrap();
+    Ok(ans)
 }
 
 fn read_workers(text: &str) -> io::Result<Vec<Worker>> {
