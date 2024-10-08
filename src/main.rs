@@ -1,6 +1,7 @@
 pub mod test_lib;
 pub mod annealing;
 pub mod iofile;
+// pub mod score;
 
 pub mod kata;
 use kata::{AnnealingConfig};
@@ -65,9 +66,27 @@ fn sub(p: &str) -> io::Result<()> {
 
     let acs: Vec<AnnealingConfig> = fs.iter().map(|s| iofile::load_annealing_config(s).unwrap()).collect();
 
-    // fold annealing();
+    // TODO: 更新関数を
+    let update_func = fs;
 
-    // print({:?})
+    // let mut model = hp.kibou;
+    // let mut score;
+    // for ac in acs {
+    //     (score, model) = annealing::annealing(
+    //         10000000000,
+    //         model,
+    //         ac.step,
+    //         update_func,
+    //         |m| score::assess_score(hp, m),
+    //         ac.max_temp,
+    //         ac.min_temp,
+    //         annealing::basic_temp_func,
+    //         annealing::basic_prob_func,
+    //     );
+    // }
+    
+    // println!("{:?}", model);
+    // println!("{}", score);
 
     Ok(())
 }
