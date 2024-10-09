@@ -65,7 +65,7 @@ fn sub(p: &str) -> io::Result<()> {
 
     let acs: Vec<kata::AnnealingConfig> = fs.iter().map(|s| iofile::load_annealing_config(s).unwrap()).collect();
 
-    let hst: HyouST = ;
+    let hst = hp.hyou_st;
 
     let mut model = hp.kibou;
     let mut score;

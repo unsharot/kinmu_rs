@@ -4,6 +4,7 @@ pub type Int = isize;
 #[derive(Debug)]
 #[derive(Clone)]
 #[derive(PartialEq)]
+#[derive(Copy)]
 pub enum Waku {
     N,
     K,
