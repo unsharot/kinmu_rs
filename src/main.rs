@@ -4,6 +4,7 @@ pub mod iofile;
 // pub mod score;
 pub mod update;
 pub mod kata;
+pub mod show_hyou;
 
 // use crate::test_lib::test_lib::test_func;
 use rand::Rng;
@@ -84,7 +85,8 @@ fn sub(p: &str) -> io::Result<()> {
         );
     }
     
-    println!("{:?}", model);
+    // println!("{:?}", model);
+    show_hyou::show(&model);
     println!("{}", score);
 
     Ok(())
