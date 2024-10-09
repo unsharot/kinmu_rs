@@ -35,11 +35,8 @@ pub fn load_main_config(path: &FilePath) -> io::Result<Vec<FilePath>> {
     Ok(ans)
 }
 
-///勤務表で使う値を読み込む
-pub fn load_config(path: &str) -> io::Result<(HyouProp, Vec<FilePath>, String)> {
-    let contents = read_contents(path)?;
-
-    //フィールドごとに区切る
+///フィールドごとに区切る
+fn sep_by_fields(contents: &Vec<String>) -> Vec<String> {
     let mut temp: Vec<String> = Vec::new();
     let mut ss: Vec<String> = Vec::new();
     for line in contents {
@@ -47,9 +44,18 @@ pub fn load_config(path: &str) -> io::Result<(HyouProp, Vec<FilePath>, String)> 
             ss.push(temp.join("\n"));
             temp = Vec::new();
         } else {
-            temp.push(line);
+            temp.push(line.to_string());
         }
     }
+    ss.push(temp.join("\n"));
+    ss
+}
+
+///勤務表で使う値を読み込む
+pub fn load_config(path: &str) -> io::Result<(HyouProp, Vec<FilePath>, String)> {
+    let contents = read_contents(path)?;
+
+    let ss = sep_by_fields(&contents);
 
     let hyou = read_hyou(&ss[7])?;
 
@@ -80,18 +86,7 @@ pub fn load_config(path: &str) -> io::Result<(HyouProp, Vec<FilePath>, String)> 
 pub fn load_annealing_config(path: &str) -> io::Result<AnnealingConfig> {
     let contents = read_contents(path)?;
 
-    //フィールドごとに区切る
-    //ここ、関数にしてもいい
-    let mut temp: Vec<String> = Vec::new();
-    let mut ss: Vec<String> = Vec::new();
-    for line in contents {
-        if line.ends_with(": ") || line.ends_with(":") || line.starts_with("--") {
-            ss.push(temp.join("\n"));
-            temp = Vec::new();
-        } else {
-            temp.push(line);
-        }
-    }
+    let ss = sep_by_fields(&contents);
 
     let ac = AnnealingConfig {
         step: read_int(&ss[0])?, //ここのindexてきとう
@@ -160,8 +155,8 @@ fn read_workers(text: &str) -> io::Result<Vec<Worker>> {
 
 fn read_worker(text: &str) -> io::Result<Worker> {
     // TODO: もうちょっと安全にアクセスしたい
-    let ws: Vec<String> = text.split_whitespace().map(|s| s.to_string()).collect();
-    let worker: Worker = Worker {name: ws[0].clone(), ability: read_int(&ws[1])?};
+    let words: Vec<String> = text.split_whitespace().map(|s| s.to_string()).collect();
+    let worker: Worker = Worker {name: words[0].clone(), ability: read_int(&words[1])?};
     Ok(worker)
 }
 
@@ -189,7 +184,6 @@ fn read_hyou(text: &str) -> io::Result<Hyou> {
     let mut ans: Hyou = Vec::new();
     for line in text.lines() {
         println!("{}",line);
-        println!("aaa");
         let a: Vec<Waku> = line.chars().map(|c| match c {
             'N' => Ok(Waku::N),
             'K' => Ok(Waku::K),
@@ -217,8 +211,15 @@ fn read_score_props(text: &str) -> io::Result<Vec<ScoreProp>> {
     Ok(ans)
 }
 
-fn read_score_prop(_text: &str) -> io::Result<ScoreProp> {
-    todo!("ここにScorePropの読み込み");
+fn read_score_prop(text: &str) -> io::Result<ScoreProp> {
+    // todo!("ここにScorePropの読み込み");
+    let words: Vec<&str> = text.split_whitespace().map(|s| s).collect();
+    let prop: ScoreProp = match (words[0], words[1]) {
+        ("IAKrenzoku", s) => ScoreProp::IAKrenzoku(read_float(s)?),
+        // ("KIAre")
+        _ => ScoreProp::NoUndef(0),
+    };
+    Ok(prop)
 }
 
 fn read_list(text: &str) -> io::Result<Vec<String>> {
