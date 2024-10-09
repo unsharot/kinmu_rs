@@ -89,12 +89,12 @@ pub fn load_annealing_config(path: &str) -> io::Result<AnnealingConfig> {
     let ss = sep_by_fields(&contents);
 
     let ac = AnnealingConfig {
-        step: read_int(&ss[0])?, //ここのindexてきとう
-        seed: read_int(&ss[1])?,
-        score_prop: read_score_props(&ss[2])?,
-        update_func: ss[3].clone(),
-        max_temp: read_float(&ss[4])?,
-        min_temp: read_float(&ss[5])?,
+        step: read_int(&ss[1])?, //ここのindexてきとう
+        seed: read_int(&ss[2])?,
+        score_prop: read_score_props(&ss[3])?,
+        update_func: ss[4].clone(),
+        max_temp: read_float(&ss[5])?,
+        min_temp: read_float(&ss[6])?,
     };
 
     Ok(ac)
@@ -203,9 +203,8 @@ fn read_hyou(text: &str) -> io::Result<Hyou> {
 }
 
 fn read_score_props(text: &str) -> io::Result<Vec<ScoreProp>> {
-    let list: Vec<String> = read_list(text)?;
     let mut ans: Vec<ScoreProp> = Vec::new();
-    for line in list {
+    for line in text.lines() {
         ans.push(read_score_prop(&line)?);
     }
     Ok(ans)
@@ -213,7 +212,9 @@ fn read_score_props(text: &str) -> io::Result<Vec<ScoreProp>> {
 
 fn read_score_prop(text: &str) -> io::Result<ScoreProp> {
     // todo!("ここにScorePropの読み込み");
-    let words: Vec<&str> = text.split_whitespace().map(|s| s).collect();
+    let words: Vec<&str> = text.split_whitespace().collect();
+    println!("0: {}",words[0]);
+    println!("1: {}",words[1]);
     let prop: ScoreProp = match (words[0], words[1]) {
         ("IAKrenzoku", s) => ScoreProp::IAKrenzoku(read_float(s)?),
         // ("KIAre")
@@ -222,14 +223,6 @@ fn read_score_prop(text: &str) -> io::Result<ScoreProp> {
     Ok(prop)
 }
 
-fn read_list(text: &str) -> io::Result<Vec<String>> {
-    let list: Vec<String> = text
-        .trim_matches(|c| c == '[' || c == ']')
-        .split(",")
-        .map(|s| s.trim().to_string())
-        .collect();
-    Ok(list)
-}
 
 
 
