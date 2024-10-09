@@ -36,7 +36,8 @@ pub fn update_randomly4(hst: &HyouST, h: &Hyou) -> Hyou {
     let rx: usize = rng.gen_range(0..h.len());
     let ry: usize = rng.gen_range(0..h[0].len());
     let b1 = hst[rx][ry] != WakuST::Absolute;
-    let b2 = h[rx][ry] == Waku::N || h[rx][ry] == Waku::O || h[rx][ry] == Waku::H;
+    // let b2 = h[rx][ry] == Waku::N || h[rx][ry] == Waku::O || h[rx][ry] == Waku::H;
+    let b2 = h[rx][ry] == Waku::N || h[rx][ry] == Waku::O || h[rx][ry] == Waku::H || h[rx][ry] == Waku::U;
     if b1 && b2 {
         newh[rx][ry] = [Waku::N, Waku::O, Waku::H][rng.gen_range(0..3)];
         newh
