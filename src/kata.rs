@@ -123,6 +123,7 @@ pub struct HyouProp {
     pub days: Days,
     pub buffer: Int,
     pub kibou: Hyou,
+    pub hyou_st: HyouST,
     pub k_counts: KCounts,
     pub i_counts: ICounts,
     pub o_counts: OCounts,
