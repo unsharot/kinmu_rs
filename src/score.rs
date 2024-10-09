@@ -4,9 +4,9 @@ use crate::kata::{
     HyouRow,
     HyouColumn,
     Score,
-    DayST,
-    NG,
-    NGList,
+    // DayST,
+    // NG,
+    // NGList,
     ScoreProp,
     ScoreProp::*,
     HyouProp,
@@ -16,6 +16,7 @@ use crate::kata::{
 
 
 
+use std::cmp;
 
 
 
@@ -24,11 +25,20 @@ pub fn assess_score(hp: &HyouProp, h: &Hyou) -> Score {
 }
 
 pub fn show_score(hp: &HyouProp, h: &Hyou) -> String {
-    let sps = hp.score_prop;
+    let sps = &hp.score_prop;
     let sl = get_score_list(hp, h);
-    let ss = sps.iter().map(|x| show(x)).collect();
-    let zipped = ss.iter().zip(sl.iter()).collect();
-    show(zipped)
+    let ss: Vec<String> = sps.iter().map(|x| x.show()).collect();
+    let zipped: Vec<String> = ss.iter().zip(sl.iter()).map(|(x,y)| x.to_string() + &y.to_string()).collect();
+    zipped.join("\n")
+}
+
+impl ScoreProp {
+    fn show(&self) -> String {
+        match self {
+            IAKrenzoku(s) => "IAKrenzoku ".to_owned() + &s.to_string(),
+            _ => "NO WAY!!!".to_string(),
+        }
+    }
 }
 
 fn get_score_list(hp: &HyouProp, h: &Hyou) -> Vec<Score> {
@@ -84,7 +94,7 @@ fn heyaMoti(s: &Score, i: &Int, m: &Int, ws: &Vec<Worker>, xs: &HyouColumn) -> S
             c += 1;
         }
     }
-    let d = max(i - c, 0);
+    let d: f32 = cmp::max(i - c as isize, 0) as f32;
     return s * d * d;
 }
 
