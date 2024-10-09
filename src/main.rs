@@ -1,4 +1,3 @@
-pub mod test_lib;
 pub mod annealing;
 pub mod iofile;
 // pub mod score;
@@ -20,11 +19,6 @@ fn evalf(x: &f32) -> f32{
 }
 
 fn main() -> io::Result<()> {
-    println!("Hello, world!");
-    test_lib::test_lib::test_func();
-    // test_func();
-    test_lib::m::test_func();
-    test_lib::test_func();
 
     let best_score: f32;
     let best_model: f32;
@@ -52,8 +46,6 @@ fn main() -> io::Result<()> {
     }
 
     let ps = iofile::load_main_config(&config_path)?;
-
-    ps.iter().for_each(|s| println!("{}",s));
 
     ps.iter().for_each(|p| { let _ = sub(p); });
 

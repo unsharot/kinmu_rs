@@ -211,10 +211,9 @@ fn read_score_props(text: &str) -> io::Result<Vec<ScoreProp>> {
 }
 
 fn read_score_prop(text: &str) -> io::Result<ScoreProp> {
-    // todo!("ここにScorePropの読み込み");
     let words: Vec<&str> = text.split_whitespace().collect();
-    println!("0: {}",words[0]);
-    println!("1: {}",words[1]);
+    // println!("0: {}",words[0]);
+    // println!("1: {}",words[1]);
     let prop: ScoreProp = match (words[0], words[1]) {
         ("IAKrenzoku", s) => ScoreProp::IAKrenzoku(read_float(s)?),
         // ("KIAre")
