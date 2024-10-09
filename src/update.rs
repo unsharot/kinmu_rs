@@ -9,8 +9,10 @@ use crate::kata::{
 use rand::Rng;
 
 
-pub fn read_update_func(text: &str) -> Box<dyn FnMut((&HyouST, &Hyou)) -> Hyou> {
-    |hst, h| update_randomly4(hst, h)
+pub fn gen_update_func(text: &str, hst: HyouST) -> Box<dyn FnMut(&Hyou) -> Hyou> {
+    match text {
+        _ => Box::new(move |h| update_randomly4(&hst, h))
+    }
 }
 
 //元の表を更新するか、新たなものを構成するかは考える必要がある

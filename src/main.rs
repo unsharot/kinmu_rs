@@ -68,13 +68,13 @@ fn sub(p: &str) -> io::Result<()> {
     let hst = hp.hyou_st;
 
     let mut model = hp.kibou;
-    let mut score;
+    let mut score: f32;
     for ac in acs {
         (score, model) = annealing::annealing(
-            10000000000,
+            10000000000.0,
             model,
             ac.step,
-            |h| (update::read_update_func(&ac.update_func))(hst, h), //update関数にhstの束縛を行いたい
+            update::gen_update_func(&ac.update_func, hst), //update関数にhstの束縛を行いたい
             |m| score::assess_score(hp, m),
             ac.max_temp,
             ac.min_temp,
