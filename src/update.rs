@@ -9,9 +9,9 @@ use crate::kata::{
 use rand::Rng;
 
 
-pub fn gen_update_func(text: &str, hst: HyouST) -> Box<dyn FnMut(&Hyou) -> Hyou> {
+pub fn gen_update_func<'a>(text: &str, hst: &'a HyouST) -> Box<dyn FnMut(&Hyou) -> Hyou + 'a> {
     match text {
-        _ => Box::new(move |h| update_randomly4(&hst, h))
+        _ => Box::new(move |h| update_randomly4(hst, h))
     }
 }
 
