@@ -1,7 +1,20 @@
 use std::fs::{read_to_string};
 use std::io;
 
-use crate::kata::{HyouProp, AnnealingConfig, Int, Waku, Worker, NGList, Days, DayST, Hyou, ScoreProp};
+use crate::kata::{
+    HyouProp,
+    AnnealingConfig,
+    Int,
+    Waku,
+    Worker,
+    NGList,
+    Days,
+    DayST,
+    Hyou,
+    ScoreProp,
+    HyouST,
+    WakuST,
+};
 
 
 
@@ -38,13 +51,16 @@ pub fn load_config(path: &str) -> io::Result<(HyouProp, Vec<FilePath>, String)> 
         }
     }
 
+    let hyou = read_hyou(&ss[6])?;
+
     let hp = HyouProp {
         workers: read_workers(&ss[0])?,
         ng_list: read_ng_list(&ss[1])?,
         bounds: (read_int(&ss[2])?, read_int(&ss[3])?),
         days: read_days(&ss[4])?,
         buffer: read_int(&ss[5])?,
-        kibou: read_hyou(&ss[6])?,
+        kibou: hyou,
+        hyou_st: make_hyou_st(&hyou),
         k_counts: read_ints(&ss[7])?,
         i_counts: read_ints(&ss[8])?,
         o_counts: read_ints(&ss[9])?,
@@ -209,4 +225,17 @@ fn read_list(text: &str) -> io::Result<Vec<String>> {
         .map(|s| s.trim().to_string())
         .collect();
     Ok(list)
+}
+
+
+
+fn make_hyou_st(h: &Hyou) -> HyouST {
+    let mut ans: HyouST = Vec::new();
+    for line in h {
+        ans.push(line.iter().map(|w| match w {
+            Waku::U => WakuST::Random,
+            _ => WakuST::Absolute, //Kibouってつかってないんだっけ？
+        }).collect());
+    }
+    ans
 }
