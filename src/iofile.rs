@@ -59,7 +59,7 @@ pub fn load_config(path: &str) -> io::Result<(HyouProp, Vec<FilePath>, String)> 
         bounds: (read_int(&ss[2])?, read_int(&ss[3])?),
         days: read_days(&ss[4])?,
         buffer: read_int(&ss[5])?,
-        kibou: hyou,
+        kibou: hyou.clone(),
         hyou_st: make_hyou_st(&hyou),
         k_counts: read_ints(&ss[7])?,
         i_counts: read_ints(&ss[8])?,

@@ -29,7 +29,7 @@ pub fn read_update_func(text: &str) -> Box<dyn FnMut((&HyouST, &Hyou)) -> Hyou> 
 // }
 
 pub fn update_randomly4(hst: &HyouST, h: &Hyou) -> Hyou {
-    let newh = h.clone();
+    let mut newh = h.clone();
     let mut rng = rand::thread_rng();
     let rx: usize = rng.gen_range(0..h.len());
     let ry: usize = rng.gen_range(0..h[0].len());
@@ -39,7 +39,7 @@ pub fn update_randomly4(hst: &HyouST, h: &Hyou) -> Hyou {
         newh[rx][ry] = [Waku::N, Waku::O, Waku::H][rng.gen_range(0..3)];
         newh
     } else {
-        update_randomly4(&hst, &mut h)
+        update_randomly4(&hst, &h)
     }
 }
 
