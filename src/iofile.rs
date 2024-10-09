@@ -51,26 +51,26 @@ pub fn load_config(path: &str) -> io::Result<(HyouProp, Vec<FilePath>, String)> 
         }
     }
 
-    let hyou = read_hyou(&ss[6])?;
+    let hyou = read_hyou(&ss[7])?;
 
     let hp = HyouProp {
-        workers: read_workers(&ss[0])?,
-        ng_list: read_ng_list(&ss[1])?,
-        bounds: (read_int(&ss[2])?, read_int(&ss[3])?),
-        days: read_days(&ss[4])?,
-        buffer: read_int(&ss[5])?,
+        workers: read_workers(&ss[1])?,
+        ng_list: read_ng_list(&ss[2])?,
+        bounds: (read_int(&ss[3])?, read_int(&ss[4])?),
+        days: read_days(&ss[5])?,
+        buffer: read_int(&ss[6])?,
         kibou: hyou.clone(),
         hyou_st: make_hyou_st(&hyou),
-        k_counts: read_ints(&ss[7])?,
-        i_counts: read_ints(&ss[8])?,
-        o_counts: read_ints(&ss[9])?,
-        h_counts: read_ints(&ss[10])?,
-        i_ninzuu: read_ints(&ss[11])?,
-        seed: read_int(&ss[13])?,
-        score_prop: read_score_props(&ss[15])?,
+        k_counts: read_ints(&ss[8])?,
+        i_counts: read_ints(&ss[9])?,
+        o_counts: read_ints(&ss[10])?,
+        h_counts: read_ints(&ss[11])?,
+        i_ninzuu: read_ints(&ss[12])?,
+        seed: read_int(&ss[14])?,
+        score_prop: read_score_props(&ss[16])?,
     };
-    let fs = ss[14].lines().map(|s| s.to_string()).collect();
-    let ff = ss[12].clone(); //fillの関数
+    let fs = ss[15].lines().map(|s| s.to_string()).collect();
+    let ff = ss[13].clone(); //fillの関数
 
     Ok((hp, fs, ff))
     
@@ -188,6 +188,8 @@ fn read_days(text: &str) -> io::Result<Days> {
 fn read_hyou(text: &str) -> io::Result<Hyou> {
     let mut ans: Hyou = Vec::new();
     for line in text.lines() {
+        println!("{}",line);
+        println!("aaa");
         let a: Vec<Waku> = line.chars().map(|c| match c {
             'N' => Ok(Waku::N),
             'K' => Ok(Waku::K),
@@ -198,6 +200,7 @@ fn read_hyou(text: &str) -> io::Result<Hyou> {
             'Y' => Ok(Waku::Y),
             'D' => Ok(Waku::D),
             'U' => Ok(Waku::U),
+            ' ' => Ok(Waku::U),
             _ => Err("MATCH sinai WAKU desu!!!")
         }.unwrap()).collect();
         ans.push(a);
