@@ -1,9 +1,10 @@
 use crate::kata::{
     Hyou,
     Waku::*,
+    HyouProp
 };
 
-pub fn show(h: &Hyou, buffer: isize) {
+pub fn show(h: &Hyou, hp: &HyouProp) {
     for row in h { 
         let mut i = 0;
         for w in row {
@@ -19,7 +20,7 @@ pub fn show(h: &Hyou, buffer: isize) {
                 U => "U",
             });
             i += 1;
-            if i == buffer {
+            if i == hp.buffer {
                 print!("|");
             }
         }

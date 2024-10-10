@@ -23,7 +23,7 @@ fn main() -> io::Result<()> {
     let best_score: f32;
     let best_model: f32;
 
-    (best_score, best_model) = annealing::annealing(10000.0, 0.0, 100000, updatef, evalf, 10.0, 0.0, annealing::basic_temp_func, annealing::basic_prob_func);
+    (best_score, best_model) = annealing::annealing(10000.0, &0.0, 100000, updatef, evalf, 10.0, 0.0, annealing::basic_temp_func, annealing::basic_prob_func);
     
     println!("{}", best_score);
     println!("{}", best_model);
@@ -58,16 +58,16 @@ fn sub(p: &str) -> io::Result<()> {
 
     let acs: Vec<kata::AnnealingConfig> = fs.iter().map(|s| iofile::load_annealing_config(s).unwrap()).collect();
 
-    let hst = hp.hyou_st;
+    let hst_p = &hp.hyou_st;
 
-    let mut model = hp.kibou; //fillしないとだめ
+    let mut model = hp.kibou.clone(); //fillしないとだめ
     let mut score: f32 = 0.0;
     for ac in acs {
         (score, model) = annealing::annealing(
             10000000000.0,
-            model,
+            &model,
             ac.step,
-            update::gen_update_func(&ac.update_func, &hst), //update関数にhstの束縛を行いたい
+            update::gen_update_func(&ac.update_func, hst_p), //update関数にhstの束縛を行いたい
             // |m| score::assess_score(hp, m),
             |_| 0.0,
             ac.max_temp,
@@ -78,8 +78,8 @@ fn sub(p: &str) -> io::Result<()> {
     }
     
     // println!("{:?}", model);
-    show_hyou::show(&model, hp.buffer);
     println!("{}", score);
+    show_hyou::show(&model, &hp);
 
     // println!("{}", score::show_score(&hp, &model));
 
