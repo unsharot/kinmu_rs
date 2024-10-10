@@ -18,7 +18,7 @@ use rand::Rng;
 pub fn annealing<M, S, U, E, T, P>(
     initial_score: S,
     initial_model: &M,
-    loop_count: isize,
+    loop_count: usize,
     mut update: U,
     mut eval: E,
     temp_max: f32,
@@ -31,7 +31,7 @@ where
     S: std::cmp::PartialOrd + Copy,
     U: FnMut(&M) -> M,
     E: FnMut(&M) -> S,
-    T: FnMut(f32, f32, isize, isize) -> f32,
+    T: FnMut(f32, f32, usize, usize) -> f32,
     P: FnMut(S, S, f32) -> f32,
 {
     let mut best_model = initial_model.clone();
@@ -63,7 +63,7 @@ where
 }
 
 
-pub fn basic_temp_func(temp_max: f32, temp_min: f32, loop_end: isize, loop_now: isize) -> f32 {
+pub fn basic_temp_func(temp_max: f32, temp_min: f32, loop_end: usize, loop_now: usize) -> f32 {
     let r: f32 = (loop_end - loop_now) as f32 / loop_end as f32;
     temp_max - ((temp_max - temp_min) * r)
 }

@@ -33,10 +33,10 @@ pub type HyouST = Vec<Vec<WakuST>>;
 
 pub struct Worker {
     pub name: String,
-    pub ability: isize,
+    pub ability: usize,
 }
 
-pub type ID = isize;
+pub type ID = usize;
 
 pub enum DayST {
     Weekday,
@@ -48,13 +48,13 @@ pub enum DayST {
 
 pub type Days = Vec<DayST>;
 
-pub type NG = (isize, isize);
+pub type NG = (usize, usize);
 
 pub type NGList = Vec<NG>;
 
-pub type KCounts = Vec<isize>;
+pub type KCounts = Vec<usize>;
 
-pub type ICounts = Vec<isize>;
+pub type ICounts = Vec<usize>;
 
 pub type OCounts = Vec<isize>;
 
@@ -73,42 +73,42 @@ pub enum ScoreProp {
     Renkin6((Score, Score)),
     Renkyuu(Score),
     Renkyuu2(Score),
-    OsoHaya(isize),
-    YakinBaransu(isize),
-    OsoBaransu(isize),
-    HayaBaransu(isize),
-    KokyuCount(isize),
-    YakinCount(isize),
-    OsoCount(isize),
-    HayaCount(isize),
-    Fukouhei(isize),
+    OsoHaya(usize),
+    YakinBaransu(usize),
+    OsoBaransu(usize),
+    HayaBaransu(usize),
+    KokyuCount(usize),
+    YakinCount(usize),
+    OsoCount(usize),
+    HayaCount(usize),
+    Fukouhei(usize),
     YakinNinzuu(Score),
-    NikkinNinzuu(((isize,isize),(isize,isize),(isize,isize),(isize,isize),(isize,isize))),
+    NikkinNinzuu(((usize,usize),(usize,usize),(usize,usize),(usize,usize),(usize,usize))),
     NG(Score),
-    OsoNinzuu((isize,isize)),
-    HayaNinzuu((isize,isize)),
-    Leader((Score,isize)),
-    YakinWorker((Score,isize)),
+    OsoNinzuu((usize,usize)),
+    HayaNinzuu((usize,usize)),
+    Leader((Score,usize)),
+    YakinWorker((Score,usize)),
     YakinAloneFuro(Score),
-    HeyaMoti((Score, isize, isize)),
-    NoUndef(isize),
+    HeyaMoti((Score, usize, usize)),
+    NoUndef(usize),
     NoSamePair(Score),
 }
 
 // pub struct HyouProp {
 //     pub workers: Vec<Worker>,
 //     pub ng_list: NGList,
-//     pub bounds: (isize, isize),
+//     pub bounds: (usize, usize),
 //     pub days: Days,
-//     pub buffer: isize,
+//     pub buffer: usize,
 //     pub kibou: Hyou,
 //     pub k_counts: KCounts,
 //     pub i_counts: ICounts,
 //     pub o_counts: OCounts,
 //     pub h_counts: HCounts,
-//     pub i_ninzuu: Vec<isize>,
-//     pub step: isize,
-//     pub seed: isize,
+//     pub i_ninzuu: Vec<usize>,
+//     pub step: usize,
+//     pub seed: usize,
 //     pub score_prop: Vec<ScoreProp>,
 // }
 
@@ -117,25 +117,25 @@ pub enum ScoreProp {
 pub struct HyouProp {
     pub workers: Vec<Worker>,
     pub ng_list: NGList,
-    pub bounds: (isize, isize),
+    pub bounds: (usize, usize),
     pub days: Days,
-    pub buffer: isize,
+    pub buffer: usize,
     pub kibou: Hyou,
     pub hyou_st: HyouST,
     pub k_counts: KCounts,
     pub i_counts: ICounts,
     pub o_counts: OCounts,
     pub h_counts: HCounts,
-    pub i_ninzuu: Vec<isize>,
-    pub seed: isize, //fill関数のシード値
+    pub i_ninzuu: Vec<usize>,
+    pub seed: usize, //fill関数のシード値
     pub score_prop: Vec<ScoreProp>, //結果表示のためのスコア
 }
 //下2つはここにあるべきじゃない気がする
 
 ///焼きなましの段階ごとの設定
 pub struct AnnealingConfig {
-    pub step: isize, //焼きなましのステップ数
-    pub seed: isize, //焼きなましのupdate関数のシード
+    pub step: usize, //焼きなましのステップ数
+    pub seed: usize, //焼きなましのupdate関数のシード
     pub score_prop: Vec<ScoreProp>, //焼きなましのためのスコア
     pub update_func: String,
     pub max_temp: f32,
