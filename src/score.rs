@@ -11,7 +11,6 @@ use crate::kata::{
     ScoreProp::*,
     HyouProp,
     Worker,
-    Int,
 };
 
 
@@ -80,14 +79,14 @@ fn yakinBaransu() {}
 fn kokyuCountP() {}
 
 
-//これはdayp(Waku,Int,Int)にしたい
-//NikkinNinzuuも(Waku,Int,Int)に
+//これはdayp(Waku,isize,isize)にしたい
+//NikkinNinzuuも(Waku,isize,isize)に
 fn dayP() {}
 
 
 //これはWorkerとHyouColumnの連携が必須
 //結局合計をここで計算する必要あり
-fn heyaMoti(s: &Score, i: &Int, m: &Int, ws: &Vec<Worker>, xs: &HyouColumn) -> Score {
+fn heyaMoti(s: &Score, i: &isize, m: &isize, ws: &Vec<Worker>, xs: &HyouColumn) -> Score {
     let mut c = 0;
     for _ in 0..xs.len() {
         if (ws[c].ability % m != 0) && (xs[c] == Waku::N) {
