@@ -77,7 +77,8 @@ fn sub(p: &str) -> io::Result<()> {
         );
     }
     
-    // println!("{:?}", model);
+    println!();
+
     println!("{}", score);
     show_hyou::show(&model, &hp);
 
