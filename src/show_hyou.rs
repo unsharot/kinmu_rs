@@ -44,8 +44,7 @@ pub fn show(h: &Hyou, hp: &HyouProp) {
 
 ///Wakuの行を出力
 fn print_waku_row(row: &Vec<Waku>, buffer: usize) {
-    let mut i = 0;
-    for w in row {
+    for (i, w) in row.iter().enumerate() {
         print!("{}",match w {
             N => "N",
             K => "K",
@@ -57,8 +56,7 @@ fn print_waku_row(row: &Vec<Waku>, buffer: usize) {
             D => "D",
             U => "U",
         });
-        i += 1;
-        if i == buffer {
+        if i + 1 == buffer {
             print!("|");
         }
     }
@@ -78,8 +76,7 @@ fn print_waku_count_row(row: &Vec<Waku>, target_w: Waku) {
 
 ///曜日を表示
 fn print_days(days: &Vec<DayST>, buffer: usize) {
-    let mut i = 0;
-    for d in days {
+    for (i, d) in days.iter().enumerate() {
         print!("{}", match d {
             DayST::Weekday => "W",
             DayST::Holiday => "H",
@@ -88,8 +85,7 @@ fn print_days(days: &Vec<DayST>, buffer: usize) {
             DayST::Weight => "G",
             // _ => "UNDEFINED!!!!",
         });
-        i += 1;
-        if i == buffer {
+        if i + 1 == buffer {
             print!("|");
         }
     }
