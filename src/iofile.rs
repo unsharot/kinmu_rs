@@ -61,17 +61,17 @@ pub fn load_config(path: &str) -> io::Result<(HyouProp, Vec<FilePath>, String)> 
     let hp = HyouProp {
         workers: read_workers(&ss[1])?,
         ng_list: read_ng_list(&ss[2])?,
-        bounds: (read_isize(&ss[3])?, read_isize(&ss[4])?),
+        bounds: (read_usize(&ss[3])?, read_usize(&ss[4])?),
         days: read_days(&ss[5])?,
-        buffer: read_isize(&ss[6])?,
+        buffer: read_usize(&ss[6])?,
         kibou: hyou.clone(),
         hyou_st: make_hyou_st(&hyou),
-        k_counts: read_isizes(&ss[8])?,
-        i_counts: read_isizes(&ss[9])?,
+        k_counts: read_usizes(&ss[8])?,
+        i_counts: read_usizes(&ss[9])?,
         o_counts: read_isizes(&ss[10])?,
         h_counts: read_isizes(&ss[11])?,
-        i_ninzuu: read_isizes(&ss[12])?,
-        seed: read_isize(&ss[14])?,
+        i_ninzuu: read_usizes(&ss[12])?,
+        seed: read_usize(&ss[14])?,
         score_prop: read_score_props(&ss[16])?,
     };
     let fs = ss[15].lines().map(|s| s.to_string()).collect();
@@ -88,8 +88,8 @@ pub fn load_annealing_config(path: &str) -> io::Result<AnnealingConfig> {
     let ss = sep_by_fields(&contents);
 
     let ac = AnnealingConfig {
-        step: read_isize(&ss[1])?, //ここのindexてきとう
-        seed: read_isize(&ss[2])?,
+        step: read_usize(&ss[1])?, //ここのindexてきとう
+        seed: read_usize(&ss[2])?,
         score_prop: read_score_props(&ss[3])?,
         update_func: ss[4].clone(),
         max_temp: read_float(&ss[5])?,
@@ -130,10 +130,19 @@ fn read_contents(path: &str) -> io::Result<Vec<String>> {
 
 
 
-fn read_isize(text: &str) -> io::Result<isize> {
-    let ans: isize = text.parse::<isize>().unwrap();
+fn read_usize(text: &str) -> io::Result<usize> {
+    let ans: usize = text.parse::<usize>().unwrap();
     Ok(ans)
 }
+
+fn read_usizes(text: &str) -> io::Result<Vec<usize>> {
+    Ok(text.split_whitespace().map(|x| x.parse::<usize>().unwrap()).collect())
+}
+
+// fn read_isize(text: &str) -> io::Result<isize> {
+//     let ans: isize = text.parse::<isize>().unwrap();
+//     Ok(ans)
+// }
 
 fn read_isizes(text: &str) -> io::Result<Vec<isize>> {
     Ok(text.split_whitespace().map(|x| x.parse::<isize>().unwrap()).collect())
@@ -155,14 +164,14 @@ fn read_workers(text: &str) -> io::Result<Vec<Worker>> {
 fn read_worker(text: &str) -> io::Result<Worker> {
     // TODO: もうちょっと安全にアクセスしたい
     let words: Vec<String> = text.split_whitespace().map(|s| s.to_string()).collect();
-    let worker: Worker = Worker {name: words[0].clone(), ability: read_isize(&words[1])?};
+    let worker: Worker = Worker {name: words[0].clone(), ability: read_usize(&words[1])?};
     Ok(worker)
 }
 
 fn read_ng_list(text: &str) -> io::Result<NGList> {
     let mut ans: NGList = Vec::new();
     for line in text.lines() {
-        let a: Vec<isize> = line.split_whitespace().map(|x| read_isize(x).unwrap()).collect();
+        let a: Vec<usize> = line.split_whitespace().map(|x| read_usize(x).unwrap()).collect();
         ans.push((a[0], a[1]));
     }
     Ok(ans)
@@ -211,8 +220,8 @@ fn read_score_props(text: &str) -> io::Result<Vec<ScoreProp>> {
 
 fn read_score_prop(text: &str) -> io::Result<ScoreProp> {
     let words: Vec<&str> = text.split_whitespace().collect();
-    // prisizeln!("0: {}",words[0]);
-    // prisizeln!("1: {}",words[1]);
+    // prusizeln!("0: {}",words[0]);
+    // prusizeln!("1: {}",words[1]);
     let prop: ScoreProp = match (words[0], words[1]) {
         ("IAKrenzoku", s) => ScoreProp::IAKrenzoku(read_float(s)?),
         // ("KIAre")

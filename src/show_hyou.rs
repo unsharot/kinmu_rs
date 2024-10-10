@@ -43,7 +43,7 @@ pub fn show(h: &Hyou, hp: &HyouProp) {
 }
 
 ///Wakuの行を出力
-fn print_waku_row(row: &Vec<Waku>, buffer: isize) {
+fn print_waku_row(row: &Vec<Waku>, buffer: usize) {
     let mut i = 0;
     for w in row {
         print!("{}",match w {
@@ -77,7 +77,7 @@ fn print_waku_count_row(row: &Vec<Waku>, target_w: Waku) {
 
 
 ///曜日を表示
-fn print_days(days: &Vec<DayST>, buffer: isize) {
+fn print_days(days: &Vec<DayST>, buffer: usize) {
     let mut i = 0;
     for d in days {
         print!("{}", match d {
@@ -97,7 +97,7 @@ fn print_days(days: &Vec<DayST>, buffer: isize) {
 }
 
 ///指定した枠の縦の和を表示
-fn print_waku_count_column(h: &Hyou, buffer: isize, target_w: Waku) {
+fn print_waku_count_column(h: &Hyou, buffer: usize, target_w: Waku) {
     for j in 0..h[0].len() {
         let mut sum = 0;
         for i in 0..h.len() {
