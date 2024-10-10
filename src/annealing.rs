@@ -17,7 +17,7 @@ use rand::Rng;
 // TODO: seed: i32を追加する
 pub fn annealing<M, S, U, E, T, P>(
     initial_score: S,
-    initial_model: M,
+    initial_model: &M,
     loop_count: isize,
     mut update: U,
     mut eval: E,
@@ -35,18 +35,16 @@ where
     P: FnMut(S, S, f32) -> f32,
 {
     let mut best_model = initial_model.clone();
-    let mut current_model = initial_model;
-    let mut next_model;
+    let mut current_model = initial_model.clone();
 
     let mut best_score = initial_score;
     let mut current_score = initial_score;
-    let mut next_score;
 
     let mut temp;
 
     for loop_value in 0..loop_count {
-        next_model = update(&current_model);
-        next_score = eval(&next_model);
+        let next_model = update(&current_model);
+        let next_score = eval(&next_model);
         temp = temp_func(temp_max, temp_min, loop_count, loop_value);
 
         if next_score <= best_score {
