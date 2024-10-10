@@ -3,6 +3,7 @@ use crate::kata::{
     Waku,
     Waku::*,
     HyouProp,
+    DayST,
 };
 
 ///表を出力
@@ -22,8 +23,15 @@ pub fn show(h: &Hyou, hp: &HyouProp) {
         //名前
         print!(" {}", hp.workers[row_index].name);
 
-        print!("\n");
+        println!();
     }
+
+    println!();
+
+    //曜日を表示
+    print_days(&hp.days, hp.buffer);
+
+    //日ごとの統計を表示
 }
 
 ///Wakuの行を出力
@@ -57,4 +65,25 @@ fn print_waku_count(row: &Vec<Waku>, target_w: Waku) {
         }
     }
     print!(" {:>2}", sum);
+}
+
+
+///曜日を表示
+fn print_days(days: &Vec<DayST>, buffer: isize) {
+    let mut i = 0;
+    for d in days {
+        print!("{}", match d {
+            DayST::Weekday => "W",
+            DayST::Holiday => "H",
+            DayST::Furo => "F",
+            DayST::Furo2 => "2",
+            DayST::Weight => "G",
+            // _ => "UNDEFINED!!!!",
+        });
+        i += 1;
+        if i == buffer {
+            print!("|");
+        }
+    }
+    println!();
 }

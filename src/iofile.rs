@@ -182,7 +182,7 @@ fn read_days(text: &str) -> io::Result<Days> {
 fn read_hyou(text: &str) -> io::Result<Hyou> {
     let mut ans: Hyou = Vec::new();
     for line in text.lines() {
-        println!("{}",line);
+        // println!("{}",line);
         let a: Vec<Waku> = line.chars().map(|c| match c {
             'N' => Ok(Waku::N),
             'K' => Ok(Waku::K),
