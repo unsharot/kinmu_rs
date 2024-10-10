@@ -1,6 +1,6 @@
 pub mod annealing;
 pub mod iofile;
-// pub mod score;
+pub mod score;
 pub mod update;
 pub mod kata;
 pub mod show_hyou;
@@ -78,8 +78,10 @@ fn sub(p: &str) -> io::Result<()> {
     }
     
     // println!("{:?}", model);
-    show_hyou::show(&model);
+    show_hyou::show(&model, hp.buffer);
     println!("{}", score);
+
+    // println!("{}", score::show_score(&hp, &model));
 
     Ok(())
 }

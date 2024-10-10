@@ -3,8 +3,9 @@ use crate::kata::{
     Waku::*,
 };
 
-pub fn show(h: &Hyou) {
+pub fn show(h: &Hyou, buffer: isize) {
     for row in h { 
+        let mut i = 0;
         for w in row {
             print!("{}",match w {
                 N => "N",
@@ -17,6 +18,10 @@ pub fn show(h: &Hyou) {
                 D => "D",
                 U => "U",
             });
+            i += 1;
+            if i == buffer {
+                print!("|");
+            }
         }
         print!("\n");
     }
