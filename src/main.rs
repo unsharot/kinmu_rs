@@ -68,8 +68,8 @@ fn sub(p: &str) -> io::Result<()> {
             &model,
             ac.step,
             update::gen_update_func(&ac.update_func, hst_p), //update関数にhstの束縛を行いたい
-            // |m| score::assess_score(hp, m),
-            |_| 0.0,
+            |m| score::assess_score(&hp, m),
+            // |_| 0.0,
             ac.max_temp,
             ac.min_temp,
             annealing::basic_temp_func,
@@ -80,6 +80,7 @@ fn sub(p: &str) -> io::Result<()> {
     println!();
 
     println!("{}", score);
+    // println!("{}", score::assess_score(&hp, &model));
     show_hyou::show(&model, &hp);
 
     // println!("{}", score::show_score(&hp, &model));

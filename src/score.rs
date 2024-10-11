@@ -60,6 +60,14 @@ fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp) -> Score {
 
     match sp {
         IAKrenzoku(p) => check_rows!(renzoku, hp, h, p),
+        KIArenzoku(p) => 0.0, //check_rows!(renzoku, hp, h, p),
+        KNIArenzoku(p) => 0.0, //check_rows!(renzoku, hp, h, p)
+        NNIArenzoku(p) => 0.0, //check_rows!(renzoku, hp, h, p)
+        
+        //略
+        
+        OsoHaya(p) => check_rows!(osohaya, hp, h, p),
+
         _ => 0.0,
     }
 }
@@ -71,6 +79,9 @@ fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp) -> Score {
 //まとめて実行できたら早いかも
 //木は初回実行時に構築して保持する
 fn renzoku(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
+    // for i in 0..hp.day_count {
+    //     h[r][i]
+    // }
     0.0
 }
 
@@ -78,8 +89,18 @@ fn renzoku(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
 //HashMapをつかえそう
 //やっても早くなるかはわからない
 //HashMapの構築に時間とメモリかかるかも
-fn osohaya(m: &usize, xs: &HyouRow) -> Score {
-    0.0
+fn osohaya(hp: &HyouProp, h: &Hyou, r: usize, m: &isize) -> Score {
+    let mut oso: isize = 0;
+    let mut haya: isize = 0;
+    for i in 0..hp.day_count {
+        if h[r][i] == Waku::O {
+            oso += 1;
+        } else if h[r][i] == Waku::H {
+            haya += 1;
+        }
+    }
+    let d = (haya - oso).abs();
+    (d * *m) as Score
 }
 
 fn yakinBaransu() {}
@@ -122,14 +143,14 @@ fn noSamePair(s: &Score, cs: &Vec<HyouColumn>) -> Score {
 /*
 この形式を使うことにする
 
-fn basic_row_score_func(h: &Hyou, r: usize, p: ?) {
-    for i {
+fn basic_row_score_func(hp: &HyouProp, h: &Hyou, r: usize, p: &T) -> Score {
+    for i in 0..hp.day_count {
         h[r][i]
     }
 }
 
-fn basic_column_score_func(h: &Hyou, c: usize, p: ?) {
-    for i {
+fn basic_column_score_func(hp: &HyouProp, h: &Hyou, c: usize, p: &T) -> Score {
+    for i in 0..hp.worker_count {
         h[i][c]
     }
 }
