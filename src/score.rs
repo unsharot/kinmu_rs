@@ -1,8 +1,8 @@
 use crate::kata::{
     Waku,
     Hyou,
-    HyouRow,
-    HyouColumn,
+    // HyouRow,
+    // HyouColumn,
     Score,
     // DayST,
     // NG,
@@ -10,12 +10,12 @@ use crate::kata::{
     ScoreProp,
     ScoreProp::*,
     HyouProp,
-    Worker,
+    // Worker,
 };
 
 
 
-use std::cmp;
+// use std::cmp;
 
 
 macro_rules! check_rows {
@@ -59,16 +59,21 @@ fn get_score_list(hp: &HyouProp, h: &Hyou) -> Vec<Score> {
 fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp) -> Score {
 
     match sp {
-        IAKrenzoku(p) => check_rows!(renzoku, hp, h, p),
-        KIArenzoku(p) => 0.0, //check_rows!(renzoku, hp, h, p),
-        KNIArenzoku(p) => 0.0, //check_rows!(renzoku, hp, h, p)
-        NNIArenzoku(p) => 0.0, //check_rows!(renzoku, hp, h, p)
+        // IAKrenzoku(p) => check_rows!(renzoku, hp, h, p),
+        // KIArenzoku(p) => 0.0, //check_rows!(renzoku, hp, h, p),
+        // KNIArenzoku(p) => 0.0, //check_rows!(renzoku, hp, h, p)
+        // NNIArenzoku(p) => 0.0, //check_rows!(renzoku, hp, h, p)
         
         //略
         
         OsoHayaBaransu(p) => check_rows!(osohaya, hp, h, p),
 
+        //略
+
+        KokyuCount(p) => check_rows!(kokyu_count, hp, h, p),
+
         _ => 0.0,
+        // _ => {println!("MATCH SINAI SP DESU!!! (score)"); 0.0},
     }
 }
 //hpのパラメータはhp._でとる
@@ -78,12 +83,12 @@ fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp) -> Score {
 //trie木を使って連続パターンを検出したい
 //まとめて実行できたら早いかも
 //木は初回実行時に構築して保持する
-fn renzoku(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
-    // for i in 0..hp.day_count {
-    //     h[r][i]
-    // }
-    0.0
-}
+// fn renzoku(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
+//     // for i in 0..hp.day_count {
+//     //     h[r][i]
+//     // }
+//     0.0
+// }
 
 //カウントするタイプのスコアもまとめて実行してから計算したい
 //HashMapをつかえそう
@@ -103,41 +108,52 @@ fn osohaya(hp: &HyouProp, h: &Hyou, r: usize, m: &isize) -> Score {
     (d * *m) as Score
 }
 
-fn yakinBaransu() {}
+// fn yakinBaransu() {}
 
-fn kokyuCountP() {}
+fn kokyu_count(hp: &HyouProp, h: &Hyou, r: usize, m: &isize) -> Score {
+    let mut cnt: isize = 0;
+    for i in hp.buffer..hp.day_count {
+        if h[r][i] == Waku::K {
+            cnt += 1;
+        }
+    }
+    let kc = hp.k_counts[r] as isize;
+    let d = (cnt - kc).abs();
+    let a = d * m;
+    (a * a) as Score
+}
 
 
 //これはdayp(Waku,usize,usize)にしたい
 //NikkinNinzuuも(Waku,usize,usize)に
-fn dayP() {}
+// fn dayP() {}
 
 
 //これはWorkerとHyouColumnの連携が必須
 //結局合計をここで計算する必要あり
-fn heyaMoti(s: &Score, i: &usize, m: &usize, ws: &Vec<Worker>, xs: &HyouColumn) -> Score {
-    let mut c = 0;
-    for _ in 0..xs.len() {
-        if (ws[c].ability % m != 0) && (xs[c] == Waku::N) {
-            c += 1;
-        }
-    }
-    let d: f32 = cmp::max(i - c as usize, 0) as f32;
-    return s * d * d;
-}
+// fn heyaMoti(s: &Score, i: &usize, m: &usize, ws: &Vec<Worker>, xs: &HyouColumn) -> Score {
+//     let mut c = 0;
+//     for _ in 0..xs.len() {
+//         if (ws[c].ability % m != 0) && (xs[c] == Waku::N) {
+//             c += 1;
+//         }
+//     }
+//     let d: f32 = cmp::max(i - c as usize, 0) as f32;
+//     return s * d * d;
+// }
 
 //これもHashMapつかう？
 //NGリストをHashMapとして保持して、タプルで検索
-fn ng() {}
+// fn ng() {}
 
 //特殊かも
-fn yakinAloneFuro() {}
+// fn yakinAloneFuro() {}
 
 //日ごとにペアを出して、その重複を調べる
 //HashMap使えそう
-fn noSamePair(s: &Score, cs: &Vec<HyouColumn>) -> Score {
-    0.0
-}
+// fn noSamePair(s: &Score, cs: &Vec<HyouColumn>) -> Score {
+    // 0.0
+// }
 
 
 /*
