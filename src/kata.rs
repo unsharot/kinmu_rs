@@ -73,7 +73,7 @@ pub enum ScoreProp {
     Renkin6((Score, Score)),
     Renkyuu(Score),
     Renkyuu2(Score),
-    OsoHaya(isize),
+    OsoHayaBaransu(isize),
     YakinBaransu(usize),
     OsoBaransu(usize),
     HayaBaransu(usize),

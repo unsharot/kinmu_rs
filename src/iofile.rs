@@ -141,10 +141,10 @@ fn read_usizes(text: &str) -> io::Result<Vec<usize>> {
     Ok(text.split_whitespace().map(|x| x.parse::<usize>().unwrap()).collect())
 }
 
-// fn read_isize(text: &str) -> io::Result<isize> {
-//     let ans: isize = text.parse::<isize>().unwrap();
-//     Ok(ans)
-// }
+fn read_isize(text: &str) -> io::Result<isize> {
+    let ans: isize = text.parse::<isize>().unwrap();
+    Ok(ans)
+}
 
 fn read_isizes(text: &str) -> io::Result<Vec<isize>> {
     Ok(text.split_whitespace().map(|x| x.parse::<isize>().unwrap()).collect())
@@ -225,9 +225,38 @@ fn read_score_prop(text: &str) -> io::Result<ScoreProp> {
     // prusizeln!("0: {}",words[0]);
     // prusizeln!("1: {}",words[1]);
     let prop: ScoreProp = match (words[0], words[1]) {
-        ("IAKrenzoku", s) => ScoreProp::IAKrenzoku(read_float(s)?),
-        // ("KIAre")
-        _ => ScoreProp::NoUndef(0),
+        ("IAKrenzoku", p) => ScoreProp::IAKrenzoku(read_float(p)?),
+        ("KIArenzoku", p) => ScoreProp::KIArenzoku(read_float(p)?),
+        ("KNIArenzoku", p) => ScoreProp::KNIArenzoku(read_float(p)?),
+        ("ONrenzoku", p) => ScoreProp::ONrenzoku(read_float(p)?),
+        ("NHrenzoku", p) => ScoreProp::NHrenzoku(read_float(p)?),
+        ("OHrenzoku", p) => ScoreProp::OHrenzoku(read_float(p)?),
+        // ("Renkin4", p) => ScoreProp::Renkin4(read_float_pair(p)?),
+        // ("Renkin5", p) => ScoreProp::Renkin5(read_float_pair(p)?),
+        // ("Renkin6", p) => ScoreProp::Renkin6(read_float_pair(p)?),
+        ("Renkyuu", p) => ScoreProp::Renkyuu(read_float(p)?),
+        ("Renkyuu2", p) => ScoreProp::Renkyuu2(read_float(p)?),
+        ("OsoHayaBaransu", p) => ScoreProp::OsoHayaBaransu(read_isize(p)?),
+        ("YakinBaransu", p) => ScoreProp::YakinBaransu(read_usize(p)?),
+        ("OsoBaransu", p) => ScoreProp::OsoBaransu(read_usize(p)?),
+        ("HayaBaransu", p) => ScoreProp::HayaBaransu(read_usize(p)?),
+        ("KokyuCount", p) => ScoreProp::KokyuCount(read_usize(p)?),
+        ("YakinCount", p) => ScoreProp::YakinCount(read_usize(p)?),
+        ("OsoCount", p) => ScoreProp::OsoCount(read_usize(p)?),
+        ("HayaCount", p) => ScoreProp::HayaCount(read_usize(p)?),
+        ("Fukouhei", p) => ScoreProp::Fukouhei(read_usize(p)?),
+        ("YakinNinzuu", p) => ScoreProp::YakinNinzuu(read_float(p)?),
+        // ("NikkinNinzuu", p) => ScoreProp::YakinNinzuu(read_pairs(p)?),
+        ("NG", p) => ScoreProp::NG(read_float(p)?),
+        // ("OsoNinzuu", p) => ScoreProp::OsoNinzuu(read_usize_pair(p)?),
+        // ("HayaNinzuu", p) => ScoreProp::HayaNinzuu(read_usize_pair(p)?),
+        // ("Leader", p) => ScoreProp::Leader(read_float_usize(p)?),
+        // ("YakinWorker", p) => ScoreProp::YakinWorker(read_float_usize(p)?),
+        ("YakinAloneFuro", p) => ScoreProp::YakinAloneFuro(read_float(p)?),
+        // ("HeyaMoti", p) => ScoreProp::HeyaMoti(read_float_usize_usize(p)?),
+        ("NoUndef", p) => ScoreProp::NoUndef(read_usize(p)?),
+        ("NoSamePair", p) => ScoreProp::NoSamePair(read_float(p)?),
+        (s, p) => {println!("MATCH SINAI SCORE PROP DESU!!!!: {} {}",s,p); ScoreProp::NoUndef(0)},
     };
     Ok(prop)
 }
