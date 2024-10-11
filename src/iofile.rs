@@ -61,7 +61,9 @@ pub fn load_config(path: &str) -> io::Result<(HyouProp, Vec<FilePath>, String)> 
     let hp = HyouProp {
         workers: read_workers(&ss[1])?,
         ng_list: read_ng_list(&ss[2])?,
-        bounds: (read_usize(&ss[3])?, read_usize(&ss[4])?),
+        // bounds: (read_usize(&ss[3])?, read_usize(&ss[4])?),
+        worker_count: read_usize(&ss[3])?,
+        day_count: read_usize(&ss[4])?,
         days: read_days(&ss[5])?,
         buffer: read_usize(&ss[6])?,
         kibou: hyou.clone(),
