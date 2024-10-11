@@ -63,15 +63,15 @@ fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp, rs: &Vec<HyouRow>, cs: &Ve
 //まとめて実行できたら早いかも
 //木は初回実行時に構築して保持する
 fn renzoku(s: &Score, r: &HyouRow) -> Score {
-
+    0.0
 }
 
 //カウントするタイプのスコアもまとめて実行してから計算したい
 //HashMapをつかえそう
 //やっても早くなるかはわからない
 //HashMapの構築に時間とメモリかかるかも
-fn osohaya(m: &isize, xs: &HyouRow) -> Score {
-
+fn osohaya(m: &usize, xs: &HyouRow) -> Score {
+    0.0
 }
 
 fn yakinBaransu() {}
@@ -79,21 +79,21 @@ fn yakinBaransu() {}
 fn kokyuCountP() {}
 
 
-//これはdayp(Waku,isize,isize)にしたい
-//NikkinNinzuuも(Waku,isize,isize)に
+//これはdayp(Waku,usize,usize)にしたい
+//NikkinNinzuuも(Waku,usize,usize)に
 fn dayP() {}
 
 
 //これはWorkerとHyouColumnの連携が必須
 //結局合計をここで計算する必要あり
-fn heyaMoti(s: &Score, i: &isize, m: &isize, ws: &Vec<Worker>, xs: &HyouColumn) -> Score {
+fn heyaMoti(s: &Score, i: &usize, m: &usize, ws: &Vec<Worker>, xs: &HyouColumn) -> Score {
     let mut c = 0;
     for _ in 0..xs.len() {
         if (ws[c].ability % m != 0) && (xs[c] == Waku::N) {
             c += 1;
         }
     }
-    let d: f32 = cmp::max(i - c as isize, 0) as f32;
+    let d: f32 = cmp::max(i - c as usize, 0) as f32;
     return s * d * d;
 }
 
@@ -107,5 +107,23 @@ fn yakinAloneFuro() {}
 //日ごとにペアを出して、その重複を調べる
 //HashMap使えそう
 fn noSamePair(s: &Score, cs: &Vec<HyouColumn>) -> Score {
-
+    0.0
 }
+
+
+/*
+この形式を使うことにする
+
+fn basic_row_score_func(h: &Hyou, r: usize, p: ?) {
+    for i {
+        h[r][i]
+    }
+}
+
+fn basic_column_score_func(h: &Hyou, c: usize, p: ?) {
+    for i {
+        h[i][c]
+    }
+}
+
+*/
