@@ -18,6 +18,15 @@ use crate::kata::{
 use std::cmp;
 
 
+macro_rules! check_rows {
+    ($check:expr, $hp: expr, $h:expr, $p:expr) => {{
+        let mut sum = 0.0;
+        for r in 0..$hp.bounds.0 {
+            sum += $check($hp, $h, r, $p);
+        }
+        sum
+    }};
+}
 
 pub fn assess_score(hp: &HyouProp, h: &Hyou) -> Score {
     get_score_list(hp, h).iter().sum()
@@ -41,18 +50,17 @@ impl ScoreProp {
 }
 
 fn get_score_list(hp: &HyouProp, h: &Hyou) -> Vec<Score> {
-    let sps = hp.score_prop;
-    let rs = sepToRow(h);
-    let cs = sepToColumn(h);
-    sps.iter().map(|sp| get_score(hp, h, sp, rs, cs)).collect()
+    let sps = &hp.score_prop;
+    sps.iter().map(|sp| get_score(hp, h, sp)).collect()
 }
 
 //Hyou[日][人]とHyou2[人][日]両方保持するのありかも
 
-fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp, rs: &Vec<HyouRow>, cs: &Vec<HyouColumn>) -> Score {
+fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp) -> Score {
 
     match sp {
-        IAKrenzoku(s) => checkRow()
+        IAKrenzoku(p) => check_rows!(renzoku, hp, h, p),
+        _ => 0.0,
     }
 }
 //hpのパラメータはhp._でとる
@@ -62,7 +70,7 @@ fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp, rs: &Vec<HyouRow>, cs: &Ve
 //trie木を使って連続パターンを検出したい
 //まとめて実行できたら早いかも
 //木は初回実行時に構築して保持する
-fn renzoku(s: &Score, r: &HyouRow) -> Score {
+fn renzoku(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
     0.0
 }
 
