@@ -77,7 +77,7 @@ pub enum ScoreProp {
     YakinBaransu(usize),
     OsoBaransu(usize),
     HayaBaransu(usize),
-    KokyuCount(usize),
+    KokyuCount(isize),
     YakinCount(usize),
     OsoCount(usize),
     HayaCount(usize),

@@ -85,5 +85,7 @@ fn sub(p: &str) -> io::Result<()> {
 
     // println!("{}", score::show_score(&hp, &model));
 
+    println!();
+
     Ok(())
 }
