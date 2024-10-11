@@ -66,7 +66,7 @@ fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp) -> Score {
         
         //略
         
-        OsoHaya(p) => check_rows!(osohaya, hp, h, p),
+        OsoHayaBaransu(p) => check_rows!(osohaya, hp, h, p),
 
         _ => 0.0,
     }
