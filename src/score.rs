@@ -21,7 +21,7 @@ use std::cmp;
 macro_rules! check_rows {
     ($check:expr, $hp: expr, $h:expr, $p:expr) => {{
         let mut sum = 0.0;
-        for r in 0..$hp.bounds.0 {
+        for r in 0..$hp.worker_count {
             sum += $check($hp, $h, r, $p);
         }
         sum

@@ -117,7 +117,9 @@ pub enum ScoreProp {
 pub struct HyouProp {
     pub workers: Vec<Worker>,
     pub ng_list: NGList,
-    pub bounds: (usize, usize),
+    // pub bounds: (usize, usize),
+    pub worker_count: usize,
+    pub day_count: usize,
     pub days: Days,
     pub buffer: usize,
     pub kibou: Hyou,
