@@ -85,7 +85,9 @@ fn sub(p: &str) -> io::Result<()> {
     // println!("{}", score::assess_score(&hp, &model));
     show_hyou::show(&model, &hp);
 
-    // println!("{}", score::show_score(&hp, &model));
+    println!();
+
+    println!("{}", score::show_score(&hp.score_props, &hp, &model));
 
     println!();
 
