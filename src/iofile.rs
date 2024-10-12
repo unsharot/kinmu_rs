@@ -74,7 +74,7 @@ pub fn load_config(path: &str) -> io::Result<(HyouProp, Vec<FilePath>, String)> 
         h_counts: read_isizes(&ss[11])?,
         i_ninzuu: read_usizes(&ss[12])?,
         seed: read_usize(&ss[14])?,
-        score_prop: read_score_props(&ss[16])?,
+        score_props: read_score_props(&ss[16])?,
     };
     let fs = ss[15].lines().map(|s| s.to_string()).collect();
     let ff = ss[13].clone(); //fillの関数
@@ -92,7 +92,7 @@ pub fn load_annealing_config(path: &str) -> io::Result<AnnealingConfig> {
     let ac = AnnealingConfig {
         step: read_usize(&ss[1])?, //ここのindexてきとう
         seed: read_usize(&ss[2])?,
-        score_prop: read_score_props(&ss[3])?,
+        score_props: read_score_props(&ss[3])?,
         update_func: ss[4].clone(),
         max_temp: read_float(&ss[5])?,
         min_temp: read_float(&ss[6])?,
