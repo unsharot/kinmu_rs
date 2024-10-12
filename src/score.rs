@@ -28,6 +28,16 @@ macro_rules! check_rows {
     }};
 }
 
+macro_rules! check_columns {
+    ($check:expr, $hp: expr, $h:expr, $p:expr) => {{
+        let mut sum = 0.0;
+        for c in $hp.buffer..$hp.day_count {
+            sum += $check($hp, $h, c, $p);
+        }
+        sum
+    }};
+}
+
 pub fn assess_score(sps: &Vec<ScoreProp>, hp: &HyouProp, h: &Hyou) -> Score {
     get_score_list(sps, hp, h).iter().sum()
 }
@@ -63,6 +73,10 @@ fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp) -> Score {
         YakinCount(p) => check_rows!(yakin_count, hp, h, p),
         OsoCount(p) => check_rows!(oso_count, hp, h, p),
         HayaCount(p) => check_rows!(haya_count, hp, h, p),
+
+        //略
+
+        YakinNinzuu(p) => check_columns!(yakin_ninzuu, hp, h, p),
 
         _ => 0.0,
         // _ => {println!("MATCH SINAI SP DESU!!! (score)"); 0.0},
@@ -114,50 +128,77 @@ macro_rules! count_waku_row {
     }};
 }
 
-fn kokyu_count(hp: &HyouProp, h: &Hyou, r: usize, m: &Score) -> Score {
+fn kokyu_count(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
     let cnt_needed = hp.k_counts[r] as isize;
     let cnt = count_waku_row!(Waku::K, hp, h, r);
     let d = (cnt - cnt_needed).abs() as Score;
-    let a = d * m;
+    let a = d * s;
     a * a
 }
 
-fn yakin_count(hp: &HyouProp, h: &Hyou, r: usize, m: &Score) -> Score {
+fn yakin_count(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
     let cnt_needed = hp.i_counts[r] as isize;
     let cnt = count_waku_row!(Waku::I, hp, h, r);
     let d = (cnt - cnt_needed).abs() as Score;
-    let a = d * m;
+    let a = d * s;
     a * a
 }
 
-fn oso_count(hp: &HyouProp, h: &Hyou, r: usize, m: &Score) -> Score {
+fn oso_count(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
     let cnt_needed = hp.o_counts[r] as isize;
     if cnt_needed == -1 {
         0.0
     } else {
         let cnt = count_waku_row!(Waku::O, hp, h, r);
         let d = (cnt - cnt_needed).abs() as Score;
-        let a = d * m;
+        let a = d * s;
         a * a
     }
 }
 
-fn haya_count(hp: &HyouProp, h: &Hyou, r: usize, m: &Score) -> Score {
+fn haya_count(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
     let cnt_needed = hp.h_counts[r] as isize;
     if cnt_needed == -1 {
         0.0
     } else {
         let cnt = count_waku_row!(Waku::H, hp, h, r);
         let d = (cnt - cnt_needed).abs() as Score;
-        let a = d * m;
+        let a = d * s;
         a * a
     }
+}
+
+macro_rules! count_waku_column {
+    ($w:expr, $hp: expr, $h:expr, $c:expr) => {{
+        let mut cnt: isize = 0;
+        for i in 0..$hp.worker_count {
+            if $h[i][$c] == $w {
+                cnt += 1;
+            }
+        }
+        cnt
+    }};
+}
+
+fn yakin_ninzuu(hp: &HyouProp, h: &Hyou, c: usize, s: &Score) -> Score {
+    let cnt_needed = hp.i_ninzuu[c - hp.buffer] as isize;
+    let cnt = count_waku_column!(Waku::I, hp, h, c);
+    let d = (cnt - cnt_needed).abs() as Score;
+    let a = d * s;
+    a * a
 }
 
 //これはdayp(Waku,usize,usize)にしたい
 //NikkinNinzuuも(Waku,usize,usize)に
 // fn dayP() {}
 
+
+//これもHashMapつかう？
+//NGリストをHashMapとして保持して、タプルで検索
+// fn ng() {}
+
+//特殊かも
+// fn yakinAloneFuro() {}
 
 //これはWorkerとHyouColumnの連携が必須
 //結局合計をここで計算する必要あり
@@ -171,13 +212,6 @@ fn haya_count(hp: &HyouProp, h: &Hyou, r: usize, m: &Score) -> Score {
 //     let d: f32 = cmp::max(i - c as usize, 0) as f32;
 //     return s * d * d;
 // }
-
-//これもHashMapつかう？
-//NGリストをHashMapとして保持して、タプルで検索
-// fn ng() {}
-
-//特殊かも
-// fn yakinAloneFuro() {}
 
 //日ごとにペアを出して、その重複を調べる
 //HashMap使えそう
