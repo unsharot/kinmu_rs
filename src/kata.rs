@@ -130,7 +130,7 @@ pub struct HyouProp {
     pub h_counts: HCounts,
     pub i_ninzuu: Vec<usize>,
     pub seed: usize, //fill関数のシード値
-    pub score_prop: Vec<ScoreProp>, //結果表示のためのスコア
+    pub score_props: Vec<ScoreProp>, //結果表示のためのスコア
 }
 //下2つはここにあるべきじゃない気がする
 
@@ -138,7 +138,7 @@ pub struct HyouProp {
 pub struct AnnealingConfig {
     pub step: usize, //焼きなましのステップ数
     pub seed: usize, //焼きなましのupdate関数のシード
-    pub score_prop: Vec<ScoreProp>, //焼きなましのためのスコア
+    pub score_props: Vec<ScoreProp>, //焼きなましのためのスコア
     pub update_func: String,
     pub max_temp: f32,
     pub min_temp: f32, 

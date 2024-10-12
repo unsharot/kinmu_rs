@@ -28,13 +28,12 @@ macro_rules! check_rows {
     }};
 }
 
-pub fn assess_score(hp: &HyouProp, h: &Hyou) -> Score {
-    get_score_list(hp, h).iter().sum()
+pub fn assess_score(sps: &Vec<ScoreProp>, hp: &HyouProp, h: &Hyou) -> Score {
+    get_score_list(sps, hp, h).iter().sum()
 }
 
-pub fn show_score(hp: &HyouProp, h: &Hyou) -> String {
-    let sps = &hp.score_prop;
-    let sl = get_score_list(hp, h);
+pub fn show_score(sps: &Vec<ScoreProp>, hp: &HyouProp, h: &Hyou) -> String {
+    let sl = get_score_list(sps, hp, h);
     let ss: Vec<String> = sps.iter().map(|x| x.show()).collect();
     let zipped: Vec<String> = ss.iter().zip(sl.iter()).map(|(x,y)| x.to_string() + &y.to_string()).collect();
     zipped.join("\n")
@@ -49,8 +48,7 @@ impl ScoreProp {
     }
 }
 
-fn get_score_list(hp: &HyouProp, h: &Hyou) -> Vec<Score> {
-    let sps = &hp.score_prop;
+fn get_score_list(sps: &Vec<ScoreProp>, hp: &HyouProp, h: &Hyou) -> Vec<Score> {
     sps.iter().map(|sp| get_score(hp, h, sp)).collect()
 }
 
