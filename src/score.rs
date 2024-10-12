@@ -71,6 +71,9 @@ fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp) -> Score {
         //略
 
         KokyuCount(p) => check_rows!(kokyu_count, hp, h, p),
+        YakinCount(p) => check_rows!(yakin_count, hp, h, p),
+        OsoCount(p) => check_rows!(oso_count, hp, h, p),
+        HayaCount(p) => check_rows!(haya_count, hp, h, p),
 
         _ => 0.0,
         // _ => {println!("MATCH SINAI SP DESU!!! (score)"); 0.0},
@@ -110,19 +113,57 @@ fn osohaya(hp: &HyouProp, h: &Hyou, r: usize, m: &isize) -> Score {
 
 // fn yakinBaransu() {}
 
-fn kokyu_count(hp: &HyouProp, h: &Hyou, r: usize, m: &isize) -> Score {
-    let mut cnt: isize = 0;
-    for i in hp.buffer..hp.day_count {
-        if h[r][i] == Waku::K {
-            cnt += 1;
+macro_rules! count_waku_row {
+    ($w:expr, $hp: expr, $h:expr, $r:expr) => {{
+        let mut cnt: isize = 0;
+        for i in $hp.buffer..$hp.day_count {
+            if $h[$r][i] == $w {
+                cnt += 1;
+            }
         }
-    }
-    let kc = hp.k_counts[r] as isize;
-    let d = (cnt - kc).abs();
-    let a = d * m;
-    (a * a) as Score
+        cnt
+    }};
 }
 
+fn kokyu_count(hp: &HyouProp, h: &Hyou, r: usize, m: &Score) -> Score {
+    let cnt_needed = hp.k_counts[r] as isize;
+    let cnt = count_waku_row!(Waku::K, hp, h, r);
+    let d = (cnt - cnt_needed).abs() as Score;
+    let a = d * m;
+    a * a
+}
+
+fn yakin_count(hp: &HyouProp, h: &Hyou, r: usize, m: &Score) -> Score {
+    let cnt_needed = hp.i_counts[r] as isize;
+    let cnt = count_waku_row!(Waku::I, hp, h, r);
+    let d = (cnt - cnt_needed).abs() as Score;
+    let a = d * m;
+    a * a
+}
+
+fn oso_count(hp: &HyouProp, h: &Hyou, r: usize, m: &Score) -> Score {
+    let cnt_needed = hp.o_counts[r] as isize;
+    if cnt_needed == -1 {
+        0.0
+    } else {
+        let cnt = count_waku_row!(Waku::O, hp, h, r);
+        let d = (cnt - cnt_needed).abs() as Score;
+        let a = d * m;
+        a * a
+    }
+}
+
+fn haya_count(hp: &HyouProp, h: &Hyou, r: usize, m: &Score) -> Score {
+    let cnt_needed = hp.h_counts[r] as isize;
+    if cnt_needed == -1 {
+        0.0
+    } else {
+        let cnt = count_waku_row!(Waku::H, hp, h, r);
+        let d = (cnt - cnt_needed).abs() as Score;
+        let a = d * m;
+        a * a
+    }
+}
 
 //これはdayp(Waku,usize,usize)にしたい
 //NikkinNinzuuも(Waku,usize,usize)に
