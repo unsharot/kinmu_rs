@@ -272,7 +272,7 @@ fn k_renzoku2_no_buffer(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
 //HashMapをつかえそう
 //やっても早くなるかはわからない
 //HashMapの構築に時間とメモリかかるかも
-fn osohaya(hp: &HyouProp, h: &Hyou, r: usize, m: &isize) -> Score {
+fn osohaya(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
     let mut oso: isize = 0;
     let mut haya: isize = 0;
     for i in hp.buffer..hp.day_count {
@@ -282,8 +282,8 @@ fn osohaya(hp: &HyouProp, h: &Hyou, r: usize, m: &isize) -> Score {
             haya += 1;
         }
     }
-    let d = (haya - oso).abs();
-    (d * *m) as Score
+    let d = (haya - oso).abs() as Score;
+    d * *s
 }
 
 // fn yakinBaransu() {}
