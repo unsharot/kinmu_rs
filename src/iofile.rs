@@ -141,10 +141,10 @@ fn read_usizes(text: &str) -> io::Result<Vec<usize>> {
     Ok(text.split_whitespace().map(|x| x.parse::<usize>().unwrap()).collect())
 }
 
-fn read_isize(text: &str) -> io::Result<isize> {
-    let ans: isize = text.parse::<isize>().unwrap();
-    Ok(ans)
-}
+// fn read_isize(text: &str) -> io::Result<isize> {
+//     let ans: isize = text.parse::<isize>().unwrap();
+//     Ok(ans)
+// }
 
 fn read_isizes(text: &str) -> io::Result<Vec<isize>> {
     Ok(text.split_whitespace().map(|x| x.parse::<isize>().unwrap()).collect())
@@ -228,6 +228,7 @@ fn read_score_prop(text: &str) -> io::Result<ScoreProp> {
         ("IAKrenzoku", p) => ScoreProp::IAKrenzoku(read_float(p)?),
         ("KIArenzoku", p) => ScoreProp::KIArenzoku(read_float(p)?),
         ("KNIArenzoku", p) => ScoreProp::KNIArenzoku(read_float(p)?),
+        ("NNIArenzoku", p) => ScoreProp::NNIArenzoku(read_float(p)?),
         ("ONrenzoku", p) => ScoreProp::ONrenzoku(read_float(p)?),
         ("NHrenzoku", p) => ScoreProp::NHrenzoku(read_float(p)?),
         ("OHrenzoku", p) => ScoreProp::OHrenzoku(read_float(p)?),
@@ -237,7 +238,7 @@ fn read_score_prop(text: &str) -> io::Result<ScoreProp> {
         ("Renkyuu", p) => ScoreProp::Renkyuu(read_float(p)?),
         ("Renkyuu2", p) => ScoreProp::Renkyuu2(read_float(p)?),
         ("Renkyuu2NoBf", p) => ScoreProp::Renkyuu2NoBf(read_float(p)?),
-        ("OsoHayaBaransu", p) => ScoreProp::OsoHayaBaransu(read_isize(p)?),
+        ("OsoHayaBaransu", p) => ScoreProp::OsoHayaBaransu(read_float(p)?),
         ("YakinBaransu", p) => ScoreProp::YakinBaransu(read_usize(p)?),
         ("OsoBaransu", p) => ScoreProp::OsoBaransu(read_usize(p)?),
         ("HayaBaransu", p) => ScoreProp::HayaBaransu(read_usize(p)?),

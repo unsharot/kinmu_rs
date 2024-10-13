@@ -11,6 +11,7 @@ use rand::Rng;
 
 pub fn gen_update_func<'a>(text: &str, hp: &'a HyouProp, hst: &'a HyouST) -> Box<dyn FnMut(&Hyou) -> Hyou + 'a> {
     match text {
+        "update1" => Box::new(move |h| update_randomly1(hp, hst, h)),
         "update4" => Box::new(move |h| update_randomly4(hp, hst, h)),
         _ => Box::new(move |h| update_randomly4(hp, hst, h)),
     }
@@ -31,7 +32,21 @@ pub fn gen_update_func<'a>(text: &str, hp: &'a HyouProp, hst: &'a HyouST) -> Box
 
 // }
 
-pub fn update_randomly4(hp: &HyouProp, hst: &HyouST, h: &Hyou) -> Hyou {
+fn update_randomly1(hp: &HyouProp, hst: &HyouST, h: &Hyou) -> Hyou {
+    let mut newh = h.clone();
+    let mut rng = rand::thread_rng();
+    let rx: usize = rng.gen_range(0..hp.worker_count);
+    let ry: usize = rng.gen_range(0..hp.day_count);
+    if hst[rx][ry] != WakuST::Absolute {
+        newh[rx][ry] = [Waku::N, Waku::K, Waku::I, Waku::A, Waku::O, Waku::H][rng.gen_range(0..3)];
+        newh
+    } else {
+        update_randomly1(&hp, &hst, &h)
+    }
+}
+
+
+fn update_randomly4(hp: &HyouProp, hst: &HyouST, h: &Hyou) -> Hyou {
     let mut newh = h.clone();
     let mut rng = rand::thread_rng();
     let rx: usize = rng.gen_range(0..hp.worker_count);
@@ -44,6 +59,7 @@ pub fn update_randomly4(hp: &HyouProp, hst: &HyouST, h: &Hyou) -> Hyou {
         newh
     } else {
         update_randomly4(&hp, &hst, &h)
+        //合わない場合表を何個も生成することになるが、このオーバーヘッドはいかほどか
     }
 }
 
