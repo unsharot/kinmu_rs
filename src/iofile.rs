@@ -68,11 +68,11 @@ pub fn load_config(path: &str) -> io::Result<(HyouProp, Vec<FilePath>, String)> 
         buffer: read_usize(&ss[6])?,
         kibou: hyou.clone(),
         hyou_st: make_hyou_st(&hyou),
-        k_counts: read_usizes(&ss[8])?,
-        i_counts: read_usizes(&ss[9])?,
+        k_counts: read_isizes(&ss[8])?,
+        i_counts: read_isizes(&ss[9])?,
         o_counts: read_isizes(&ss[10])?,
         h_counts: read_isizes(&ss[11])?,
-        i_ninzuu: read_usizes(&ss[12])?,
+        i_ninzuu: read_isizes(&ss[12])?,
         seed: read_usize(&ss[14])?,
         score_props: read_score_props(&ss[16])?,
     };
@@ -137,9 +137,9 @@ fn read_usize(text: &str) -> io::Result<usize> {
     Ok(ans)
 }
 
-fn read_usizes(text: &str) -> io::Result<Vec<usize>> {
-    Ok(text.split_whitespace().map(|x| x.parse::<usize>().unwrap()).collect())
-}
+// fn read_usizes(text: &str) -> io::Result<Vec<usize>> {
+//     Ok(text.split_whitespace().map(|x| x.parse::<usize>().unwrap()).collect())
+// }
 
 // fn read_isize(text: &str) -> io::Result<isize> {
 //     let ans: isize = text.parse::<isize>().unwrap();
