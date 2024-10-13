@@ -155,6 +155,15 @@ fn read_float(text: &str) -> io::Result<f32> {
     Ok(ans)
 }
 
+fn read_float_pair(text: &str) -> io::Result<(f32, f32)> {
+    let ns: Vec<f32> = text
+                        .trim_matches(|c| c == '(' || c == ')')
+                        .split(',')
+                        .map(|x| x.parse::<f32>().unwrap())
+                        .collect();
+    Ok((ns[0], ns[1]))
+}
+
 fn read_workers(text: &str) -> io::Result<Vec<Worker>> {
     let mut ans: Vec<Worker> = Vec::new();
     for line in text.lines() {
@@ -232,9 +241,9 @@ fn read_score_prop(text: &str) -> io::Result<ScoreProp> {
         ("ONrenzoku", p) => ScoreProp::ONrenzoku(read_float(p)?),
         ("NHrenzoku", p) => ScoreProp::NHrenzoku(read_float(p)?),
         ("OHrenzoku", p) => ScoreProp::OHrenzoku(read_float(p)?),
-        // ("Renkin4", p) => ScoreProp::Renkin4(read_float_pair(p)?),
-        // ("Renkin5", p) => ScoreProp::Renkin5(read_float_pair(p)?),
-        // ("Renkin6", p) => ScoreProp::Renkin6(read_float_pair(p)?),
+        ("Renkin4", p) => ScoreProp::Renkin4(read_float_pair(p)?),
+        ("Renkin5", p) => ScoreProp::Renkin5(read_float_pair(p)?),
+        ("Renkin6", p) => ScoreProp::Renkin6(read_float_pair(p)?),
         ("Renkyuu", p) => ScoreProp::Renkyuu(read_float(p)?),
         ("Renkyuu2", p) => ScoreProp::Renkyuu2(read_float(p)?),
         ("Renkyuu2NoBf", p) => ScoreProp::Renkyuu2NoBf(read_float(p)?),

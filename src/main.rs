@@ -53,7 +53,6 @@ fn main() -> io::Result<()> {
 }
 
 fn sub(p: &str) -> io::Result<()> {
-    // todo!("作りかけ");
     let Ok((hp, fs, _ff)) = iofile::load_config(p) else { todo!() };
 
     let acs: Vec<kata::AnnealingConfig> = fs.iter().map(|s| iofile::load_annealing_config(s).unwrap()).collect();
@@ -67,7 +66,7 @@ fn sub(p: &str) -> io::Result<()> {
             10000000000.0,
             &model,
             ac.step,
-            update::gen_update_func(&ac.update_func, &hp, hst_p), //update関数にhstの束縛を行いたい
+            update::gen_update_func(&ac.update_func, &hp, hst_p),
             |m| score::assess_score(&ac.score_props, &hp, m),
             // |_| 0.0,
             ac.max_temp,
