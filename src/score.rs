@@ -1,5 +1,6 @@
 use crate::kata::{
-    Waku,
+    // Waku,
+    Waku::*,
     Hyou,
     // HyouRow,
     // HyouColumn,
@@ -58,10 +59,10 @@ fn get_score_list(sps: &Vec<ScoreProp>, hp: &HyouProp, h: &Hyou) -> Vec<Score> {
 fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp) -> Score {
 
     match sp {
-        // IAKrenzoku(p) => check_rows!(renzoku, hp, h, p),
-        // KIArenzoku(p) => 0.0, //check_rows!(renzoku, hp, h, p),
-        // KNIArenzoku(p) => 0.0, //check_rows!(renzoku, hp, h, p)
-        // NNIArenzoku(p) => 0.0, //check_rows!(renzoku, hp, h, p)
+        IAKrenzoku(p) => check_rows!(iak_renzoku, hp, h, p),
+        KIArenzoku(p) => check_rows!(kia_renzoku, hp, h, p),
+        KNIArenzoku(p) => check_rows!(knia_renzoku, hp, h, p),
+        NNIArenzoku(p) => check_rows!(nnia_renzoku, hp, h, p),
         
         //略
         
@@ -86,6 +87,17 @@ fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp) -> Score {
 //遅延評価がデフォじゃないので
 
 
+
+
+
+
+
+
+
+
+
+
+
 //trie木を使って連続パターンを検出したい
 //まとめて実行できたら早いかも
 //木は初回実行時に構築して保持する
@@ -96,6 +108,74 @@ fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp) -> Score {
 //     0.0
 // }
 
+fn iak_renzoku(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
+    let mut ans = 0.0;
+    for i in 0..(hp.day_count - 1) {
+        // if (h[r][i] == I) && (h[r][i+1] != A) {
+        //     ans += *s;
+        // } else if (h[r][i] == A) && !((h[r][i+1] == K) || (h[r][i+1] == Y)) {
+        //     ans += *s;
+        // } else if (h[r][i] != I) && (h[r][i+1] == A) {
+        //     ans += *s;
+        // }
+        ans += match (h[r][i], h[r][i+1]) {
+            (A, K) => 0.0,
+            (A, Y) => 0.0,
+            (A, _) => *s,
+            (I, A) => 0.0,
+            (I, _) => *s,
+            (_, A) => *s,
+            _ => 0.0,
+        }
+    }
+    ans
+}
+
+fn kia_renzoku(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
+    let mut ans = 0.0;
+    for i in 0..(hp.day_count - 1) {
+        // if (h[r][i] == K) && (h[r][i+1] == I) {
+        //     ans += *s;
+        // } else if (h[r][i] == Y) && (h[r][i+1] == I) {
+        //     ans += *s;
+        // }
+        ans += match (h[r][i], h[r][i+1]) {
+            (K, I) => *s,
+            (Y, I) => *s,
+            _ => 0.0,
+        }
+    }
+    ans
+}
+
+fn knia_renzoku(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
+    let mut ans = 0.0;
+    for i in 0..(hp.day_count - 2) {
+        ans += match (h[r][i], h[r][i+1], h[r][i+2]) {
+            (K, N, I) => *s,
+            (K, O, I) => *s,
+            (K, H, I) => *s,
+            _ => 0.0,
+        }
+    }
+    ans
+}
+
+fn nnia_renzoku(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
+    let mut ans = 0.0;
+    for i in 0..(hp.day_count - 2) {
+        ans += match (h[r][i], h[r][i+1], h[r][i+2]) {
+            (N, N, I) => *s,
+            (N, O, I) => *s,
+            (O, O, I) => *s,
+            (H, H, I) => *s,
+            (H, N, I) => *s,
+            _ => 0.0,
+        }
+    }
+    ans
+}
+
 //カウントするタイプのスコアもまとめて実行してから計算したい
 //HashMapをつかえそう
 //やっても早くなるかはわからない
@@ -103,10 +183,10 @@ fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp) -> Score {
 fn osohaya(hp: &HyouProp, h: &Hyou, r: usize, m: &isize) -> Score {
     let mut oso: isize = 0;
     let mut haya: isize = 0;
-    for i in 0..hp.day_count {
-        if h[r][i] == Waku::O {
+    for i in hp.buffer..hp.day_count {
+        if h[r][i] == O {
             oso += 1;
-        } else if h[r][i] == Waku::H {
+        } else if h[r][i] == H {
             haya += 1;
         }
     }
@@ -130,7 +210,7 @@ macro_rules! count_waku_row {
 
 fn kokyu_count(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
     let cnt_needed = hp.k_counts[r] as isize;
-    let cnt = count_waku_row!(Waku::K, hp, h, r);
+    let cnt = count_waku_row!(K, hp, h, r);
     let d = (cnt - cnt_needed).abs() as Score;
     let a = d * s;
     a * a
@@ -138,7 +218,7 @@ fn kokyu_count(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
 
 fn yakin_count(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
     let cnt_needed = hp.i_counts[r] as isize;
-    let cnt = count_waku_row!(Waku::I, hp, h, r);
+    let cnt = count_waku_row!(I, hp, h, r);
     let d = (cnt - cnt_needed).abs() as Score;
     let a = d * s;
     a * a
@@ -149,7 +229,7 @@ fn oso_count(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
     if cnt_needed == -1 {
         0.0
     } else {
-        let cnt = count_waku_row!(Waku::O, hp, h, r);
+        let cnt = count_waku_row!(O, hp, h, r);
         let d = (cnt - cnt_needed).abs() as Score;
         let a = d * s;
         a * a
@@ -161,7 +241,7 @@ fn haya_count(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
     if cnt_needed == -1 {
         0.0
     } else {
-        let cnt = count_waku_row!(Waku::H, hp, h, r);
+        let cnt = count_waku_row!(H, hp, h, r);
         let d = (cnt - cnt_needed).abs() as Score;
         let a = d * s;
         a * a
@@ -182,7 +262,7 @@ macro_rules! count_waku_column {
 
 fn yakin_ninzuu(hp: &HyouProp, h: &Hyou, c: usize, s: &Score) -> Score {
     let cnt_needed = hp.i_ninzuu[c - hp.buffer] as isize;
-    let cnt = count_waku_column!(Waku::I, hp, h, c);
+    let cnt = count_waku_column!(I, hp, h, c);
     let d = (cnt - cnt_needed).abs() as Score;
     let a = d * s;
     a * a
@@ -205,7 +285,7 @@ fn yakin_ninzuu(hp: &HyouProp, h: &Hyou, c: usize, s: &Score) -> Score {
 // fn heyaMoti(s: &Score, i: &usize, m: &usize, ws: &Vec<Worker>, xs: &HyouColumn) -> Score {
 //     let mut c = 0;
 //     for _ in 0..xs.len() {
-//         if (ws[c].ability % m != 0) && (xs[c] == Waku::N) {
+//         if (ws[c].ability % m != 0) && (xs[c] == N) {
 //             c += 1;
 //         }
 //     }
