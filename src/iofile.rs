@@ -61,7 +61,6 @@ pub fn load_config(path: &str) -> io::Result<(HyouProp, Vec<FilePath>, String)> 
     let hp = HyouProp {
         workers: read_workers(&ss[1])?,
         ng_list: read_ng_list(&ss[2])?,
-        // bounds: (read_usize(&ss[3])?, read_usize(&ss[4])?),
         worker_count: read_usize(&ss[3])?,
         day_count: read_usize(&ss[4])?,
         days: read_days(&ss[5])?,
@@ -157,11 +156,21 @@ fn read_float(text: &str) -> io::Result<f32> {
 
 fn read_float_pair(text: &str) -> io::Result<(f32, f32)> {
     let ns: Vec<f32> = text
-                        .trim_matches(|c| c == '(' || c == ')')
-                        .split(',')
-                        .map(|x| x.parse::<f32>().unwrap())
-                        .collect();
+        .trim_matches(|c| c == '(' || c == ')')
+        .split(',')
+        .map(|x| x.parse::<f32>().unwrap())
+        .collect();
     Ok((ns[0], ns[1]))
+}
+
+fn read_isize_float(text: &str) -> io::Result<(isize, f32)> {
+    let ns: Vec<_> = text
+        .trim_matches(|c| c == '(' || c == ')')
+        .split(',')
+        .collect();
+    let i = ns[0].parse::<isize>().unwrap();
+    let f = ns[1].parse::<f32>().unwrap();
+    Ok((i, f))
 }
 
 fn read_workers(text: &str) -> io::Result<Vec<Worker>> {
@@ -231,8 +240,6 @@ fn read_score_props(text: &str) -> io::Result<Vec<ScoreProp>> {
 
 fn read_score_prop(text: &str) -> io::Result<ScoreProp> {
     let words: Vec<&str> = text.split_whitespace().collect();
-    // prusizeln!("0: {}",words[0]);
-    // prusizeln!("1: {}",words[1]);
     let prop: ScoreProp = match (words[0], words[1]) {
         ("IAKrenzoku", p) => ScoreProp::IAKrenzoku(read_float(p)?),
         ("KIArenzoku", p) => ScoreProp::KIArenzoku(read_float(p)?),
@@ -258,8 +265,8 @@ fn read_score_prop(text: &str) -> io::Result<ScoreProp> {
         ("Fukouhei", p) => ScoreProp::Fukouhei(read_usize(p)?),
         ("YakinNinzuu", p) => ScoreProp::YakinNinzuu(read_float(p)?),
         // ("NikkinNinzuu", p) => ScoreProp::YakinNinzuu(read_pairs(p)?),
-        // ("OsoNinzuu", p) => ScoreProp::OsoNinzuu(read_usize_pair(p)?),
-        // ("HayaNinzuu", p) => ScoreProp::HayaNinzuu(read_usize_pair(p)?),
+        ("OsoNinzuu", p) => ScoreProp::OsoNinzuu(read_isize_float(p)?),
+        ("HayaNinzuu", p) => ScoreProp::HayaNinzuu(read_isize_float(p)?),
         ("NG", p) => ScoreProp::NG(read_float(p)?),
         // ("Leader", p) => ScoreProp::Leader(read_float_usize(p)?),
         // ("YakinWorker", p) => ScoreProp::YakinWorker(read_float_usize(p)?),
