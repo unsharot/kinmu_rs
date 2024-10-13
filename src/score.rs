@@ -63,9 +63,15 @@ fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp) -> Score {
         KIArenzoku(p) => check_rows!(kia_renzoku, hp, h, p),
         KNIArenzoku(p) => check_rows!(knia_renzoku, hp, h, p),
         NNIArenzoku(p) => check_rows!(nnia_renzoku, hp, h, p),
+        ONrenzoku(p) => check_rows!(on_renzoku, hp, h, p),
+        NHrenzoku(p) => check_rows!(nh_renzoku, hp, h, p),
+        OHrenzoku(p) => check_rows!(oh_renzoku, hp, h, p),
         
         //略
         
+        Renkyuu(p) => check_rows!(k_renzoku, hp, h, p),
+        Renkyuu2(p) => check_rows!(k_renzoku2, hp, h, p),
+        Renkyuu2NoBf(p) => check_rows!(k_renzoku2_no_buffer, hp, h, p),
         OsoHayaBaransu(p) => check_rows!(osohaya, hp, h, p),
 
         //略
@@ -173,8 +179,94 @@ fn nnia_renzoku(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
             _ => 0.0,
         }
     }
+    -ans
+}
+
+fn on_renzoku(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
+    let mut ans = 0.0;
+    for i in 0..(hp.day_count - 1) {
+        ans += match (h[r][i], h[r][i+1]) {
+            (O, N) => *s,
+            _ => 0.0,
+        }
+    }
     ans
 }
+
+fn nh_renzoku(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
+    let mut ans = 0.0;
+    for i in 0..(hp.day_count - 1) {
+        ans += match (h[r][i], h[r][i+1]) {
+            (N, H) => *s,
+            _ => 0.0,
+        }
+    }
+    ans
+}
+
+fn oh_renzoku(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
+    let mut ans = 0.0;
+    for i in 0..(hp.day_count - 1) {
+        ans += match (h[r][i], h[r][i+1]) {
+            (O, H) => *s,
+            _ => 0.0,
+        }
+    }
+    ans
+}
+
+//略
+
+fn k_renzoku(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
+    let mut ans = 0.0;
+    for i in 0..(hp.day_count - 1) {
+        ans += match (h[r][i], h[r][i+1]) {
+            (K, K) => *s,
+            (K, Y) => *s,
+            (Y, K) => *s,
+            (Y, Y) => *s,
+            _ => 0.0,
+        }
+    }
+    -ans
+}
+
+fn k_renzoku2(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
+    let mut check = false;
+    for i in 0..(hp.day_count - 1) {
+        check = check || match (h[r][i], h[r][i+1]) {
+            (K, K) => true,
+            (K, Y) => true,
+            (Y, K) => true,
+            (Y, Y) => true,
+            _ => false,
+        }
+    }
+    if check {
+        0.0
+    } else {
+        *s
+    }
+}
+
+fn k_renzoku2_no_buffer(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
+    let mut check = false;
+    for i in hp.buffer..(hp.day_count - 1) {
+        check = check || match (h[r][i], h[r][i+1]) {
+            (K, K) => true,
+            (K, Y) => true,
+            (Y, K) => true,
+            (Y, Y) => true,
+            _ => false,
+        }
+    }
+    if check {
+        0.0
+    } else {
+        *s
+    }
+}
+
 
 //カウントするタイプのスコアもまとめて実行してから計算したい
 //HashMapをつかえそう
