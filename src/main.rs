@@ -67,7 +67,7 @@ fn sub(p: &str) -> io::Result<()> {
             10000000000.0,
             &model,
             ac.step,
-            update::gen_update_func(&ac.update_func, hst_p), //update関数にhstの束縛を行いたい
+            update::gen_update_func(&ac.update_func, &hp, hst_p), //update関数にhstの束縛を行いたい
             |m| score::assess_score(&ac.score_props, &hp, m),
             // |_| 0.0,
             ac.max_temp,
