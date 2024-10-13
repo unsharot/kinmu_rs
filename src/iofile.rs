@@ -236,6 +236,7 @@ fn read_score_prop(text: &str) -> io::Result<ScoreProp> {
         // ("Renkin6", p) => ScoreProp::Renkin6(read_float_pair(p)?),
         ("Renkyuu", p) => ScoreProp::Renkyuu(read_float(p)?),
         ("Renkyuu2", p) => ScoreProp::Renkyuu2(read_float(p)?),
+        ("Renkyuu2NoBf", p) => ScoreProp::Renkyuu2NoBf(read_float(p)?),
         ("OsoHayaBaransu", p) => ScoreProp::OsoHayaBaransu(read_isize(p)?),
         ("YakinBaransu", p) => ScoreProp::YakinBaransu(read_usize(p)?),
         ("OsoBaransu", p) => ScoreProp::OsoBaransu(read_usize(p)?),
