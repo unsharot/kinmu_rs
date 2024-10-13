@@ -84,8 +84,9 @@ pub enum ScoreProp {
     YakinWorker((Score,usize)),
     YakinAloneFuro(Score),
     HeyaMoti((Score, usize, usize)),
-    NoUndef(usize),
     NoSamePair(Score),
+    NoSamePair2(Score),
+    NoUndef(Score),
 }
 
 impl ScoreProp {
@@ -122,8 +123,9 @@ impl ScoreProp {
             ScoreProp::YakinWorker(p) => format!("YakinWorker({:?})", p),
             ScoreProp::YakinAloneFuro(p) => format!("YakinAloneFuro({:?})", p),
             ScoreProp::HeyaMoti(p) => format!("HeyaMoti({:?})", p),
-            ScoreProp::NoUndef(p) => format!("NoUndef({:?})", p),
             ScoreProp::NoSamePair(p) => format!("NoSamePair({:?})", p),
+            ScoreProp::NoSamePair2(p) => format!("NoSamePair2({:?})", p),
+            ScoreProp::NoUndef(p) => format!("NoUndef({:?})", p),
             // _ => "NO WAY!!!".to_string(),
         }
     }

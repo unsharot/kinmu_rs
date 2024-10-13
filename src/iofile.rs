@@ -272,9 +272,10 @@ fn read_score_prop(text: &str) -> io::Result<ScoreProp> {
         // ("YakinWorker", p) => ScoreProp::YakinWorker(read_float_usize(p)?),
         ("YakinAloneFuro", p) => ScoreProp::YakinAloneFuro(read_float(p)?),
         // ("HeyaMoti", p) => ScoreProp::HeyaMoti(read_float_usize_usize(p)?),
-        ("NoUndef", p) => ScoreProp::NoUndef(read_usize(p)?),
         ("NoSamePair", p) => ScoreProp::NoSamePair(read_float(p)?),
-        (s, p) => {println!("MATCH SINAI SCORE PROP DESU!!!!: {} {}",s,p); ScoreProp::NoUndef(0)},
+        ("NoSamePair2", p) => ScoreProp::NoSamePair2(read_float(p)?),
+        ("NoUndef", p) => ScoreProp::NoUndef(read_float(p)?),
+        (s, p) => {println!("MATCH SINAI SCORE PROP DESU!!!!: {} {}",s,p); ScoreProp::NoUndef(0.0)},
     };
     Ok(prop) //マッチしない場合、Errを返してリストに追加しないようにしたいかも
 }

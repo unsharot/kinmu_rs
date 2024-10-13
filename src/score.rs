@@ -88,6 +88,8 @@ fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp) -> Score {
 
         //略
 
+        NoUndef(p) => check_columns!(no_undef, hp, h, p),
+        
         _ => 0.0,
         // _ => {println!("MATCH SINAI SP DESU!!! (score)"); 0.0},
     }
@@ -514,26 +516,15 @@ fn haya_ninzuu(hp: &HyouProp, h: &Hyou, c: usize, (cnt_needed, s): &(isize,Score
 //     return s * d * d;
 // }
 
+fn no_undef(hp: &HyouProp, h: &Hyou, c: usize, s: &Score) -> Score {
+    let cnt = count_waku_column!(U, hp, h, c);
+    let d = cnt as Score;
+    let a = d * *s;
+    a * a
+}
+
 //日ごとにペアを出して、その重複を調べる
 //HashMap使えそう
 // fn noSamePair(s: &Score, cs: &Vec<HyouColumn>) -> Score {
     // 0.0
 // }
-
-
-/*
-この形式を使うことにする
-
-fn basic_row_score_func(hp: &HyouProp, h: &Hyou, r: usize, p: &T) -> Score {
-    for i in 0..hp.day_count {
-        h[r][i]
-    }
-}
-
-fn basic_column_score_func(hp: &HyouProp, h: &Hyou, c: usize, p: &T) -> Score {
-    for i in 0..hp.worker_count {
-        h[i][c]
-    }
-}
-
-*/
