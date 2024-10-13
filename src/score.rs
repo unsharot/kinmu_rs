@@ -72,7 +72,10 @@ fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp) -> Score {
         Renkyuu(p) => check_rows!(k_renzoku, hp, h, p),
         Renkyuu2(p) => check_rows!(k_renzoku2, hp, h, p),
         Renkyuu2NoBf(p) => check_rows!(k_renzoku2_no_buffer, hp, h, p),
-        OsoHayaBaransu(p) => check_rows!(osohaya, hp, h, p),
+        OsoHayaBaransu(p) => check_rows!(osohaya_baransu, hp, h, p),
+        YakinBaransu(p) => check_rows!(yakin_baransu, hp, h, p),
+        OsoBaransu(p) => check_rows!(oso_baransu, hp, h, p),
+        HayaBaransu(p) => check_rows!(haya_baransu, hp, h, p),
 
         //略
 
@@ -274,7 +277,7 @@ fn k_renzoku2_no_buffer(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
 //HashMapをつかえそう
 //やっても早くなるかはわからない
 //HashMapの構築に時間とメモリかかるかも
-fn osohaya(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
+fn osohaya_baransu(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
     let mut oso: isize = 0;
     let mut haya: isize = 0;
     for i in hp.buffer..hp.day_count {
@@ -285,7 +288,62 @@ fn osohaya(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
         }
     }
     let d = (haya - oso).abs() as Score;
-    d * *s
+    let a = d * *s;
+    a * a
+}
+
+fn yakin_baransu(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
+    let mut cf: isize = 0;
+    let mut cl: isize = 0;
+    for i in hp.buffer..((hp.day_count - hp.buffer) / 2) {
+        if h[r][i] == I {
+            cf += 1;
+        }
+    }
+    for i in ((hp.day_count - hp.buffer) / 2)..hp.day_count {
+        if h[r][i] == I {
+            cl += 1;
+        }
+    }
+    let d = (cf - cl).abs() as Score;
+    let a = d * *s;
+    a * a
+}
+
+fn oso_baransu(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
+    let mut cf: isize = 0;
+    let mut cl: isize = 0;
+    for i in hp.buffer..((hp.day_count - hp.buffer) / 2) {
+        if h[r][i] == O {
+            cf += 1;
+        }
+    }
+    for i in ((hp.day_count - hp.buffer) / 2)..hp.day_count {
+        if h[r][i] == O {
+            cl += 1;
+        }
+    }
+    let d = (cf - cl).abs() as Score;
+    let a = d * *s;
+    a * a
+}
+
+fn haya_baransu(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
+    let mut cf: isize = 0;
+    let mut cl: isize = 0;
+    for i in hp.buffer..((hp.day_count - hp.buffer) / 2) {
+        if h[r][i] == H {
+            cf += 1;
+        }
+    }
+    for i in ((hp.day_count - hp.buffer) / 2)..hp.day_count {
+        if h[r][i] == H {
+            cl += 1;
+        }
+    }
+    let d = (cf - cl).abs() as Score;
+    let a = d * *s;
+    a * a
 }
 
 // fn yakinBaransu() {}
