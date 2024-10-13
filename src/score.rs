@@ -54,7 +54,6 @@ fn get_score_list(sps: &Vec<ScoreProp>, hp: &HyouProp, h: &Hyou) -> Vec<Score> {
     sps.iter().map(|sp| get_score(hp, h, sp)).collect()
 }
 
-//Hyou[日][人]とHyou2[人][日]両方保持するのありかも
 
 fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp) -> Score {
 
@@ -66,9 +65,9 @@ fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp) -> Score {
         ONrenzoku(p) => check_rows!(on_renzoku, hp, h, p),
         NHrenzoku(p) => check_rows!(nh_renzoku, hp, h, p),
         OHrenzoku(p) => check_rows!(oh_renzoku, hp, h, p),
-        
-        //略
-        
+        Renkin4(p) => check_rows!(renkin4, hp, h, p),
+        Renkin5(p) => check_rows!(renkin5, hp, h, p),
+        Renkin6(p) => check_rows!(renkin6, hp, h, p),
         Renkyuu(p) => check_rows!(k_renzoku, hp, h, p),
         Renkyuu2(p) => check_rows!(k_renzoku2, hp, h, p),
         Renkyuu2NoBf(p) => check_rows!(k_renzoku2_no_buffer, hp, h, p),
@@ -76,19 +75,18 @@ fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp) -> Score {
         YakinBaransu(p) => check_rows!(yakin_baransu, hp, h, p),
         OsoBaransu(p) => check_rows!(oso_baransu, hp, h, p),
         HayaBaransu(p) => check_rows!(haya_baransu, hp, h, p),
-
-        //略
-
         KokyuCount(p) => check_rows!(kokyu_count, hp, h, p),
         YakinCount(p) => check_rows!(yakin_count, hp, h, p),
         OsoCount(p) => check_rows!(oso_count, hp, h, p),
         HayaCount(p) => check_rows!(haya_count, hp, h, p),
 
-        //略
+        // Fukouhei(p) => check_rows!(fukouhei, hp, h, p),
 
         YakinNinzuu(p) => check_columns!(yakin_ninzuu, hp, h, p),
         OsoNinzuu(p) => check_columns!(oso_ninzuu, hp, h, p),
         HayaNinzuu(p) => check_columns!(haya_ninzuu, hp, h, p),
+
+        //略
 
         _ => 0.0,
         // _ => {println!("MATCH SINAI SP DESU!!! (score)"); 0.0},
@@ -220,7 +218,50 @@ fn oh_renzoku(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
     ans
 }
 
-//略
+fn renkin4(hp: &HyouProp, h: &Hyou, r: usize, (s1, s2): &(Score, Score)) -> Score {
+    let mut ans = 0.0;
+    let ws = [N, O, H, I];
+    for i in 0..(hp.day_count - 3) {
+        if ws.contains(&h[r][i]) && ws.contains(&h[r][i+1]) && ws.contains(&h[r][i+2]) && ws.contains(&h[r][i+3]) {
+            if h[r][i+3] == I {
+                ans += s1;
+            } else {
+                ans += s2;
+            }
+        }
+    }
+    ans
+}
+
+fn renkin5(hp: &HyouProp, h: &Hyou, r: usize, (s1, s2): &(Score, Score)) -> Score {
+    let mut ans = 0.0;
+    let ws = [N, O, H, I];
+    for i in 0..(hp.day_count - 4) {
+        if ws.contains(&h[r][i]) && ws.contains(&h[r][i+1]) && ws.contains(&h[r][i+2]) && ws.contains(&h[r][i+3]) && ws.contains(&h[r][i+4]) {
+            if h[r][i+4] == I {
+                ans += s1;
+            } else {
+                ans += s2;
+            }
+        }
+    }
+    ans
+}
+
+fn renkin6(hp: &HyouProp, h: &Hyou, r: usize, (s1, s2): &(Score, Score)) -> Score {
+    let mut ans = 0.0;
+    let ws = [N, O, H, I];
+    for i in 0..(hp.day_count - 5) {
+        if ws.contains(&h[r][i]) && ws.contains(&h[r][i+1]) && ws.contains(&h[r][i+2]) && ws.contains(&h[r][i+3]) && ws.contains(&h[r][i+4]) && ws.contains(&h[r][i+5]) {
+            if h[r][i+5] == I {
+                ans += s1;
+            } else {
+                ans += s2;
+            }
+        }
+    }
+    ans
+}
 
 fn k_renzoku(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
     let mut ans = 0.0;
@@ -400,6 +441,18 @@ fn haya_count(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
     }
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
 macro_rules! count_waku_column {
     ($w:expr, $hp: expr, $h:expr, $c:expr) => {{
         let mut cnt: isize = 0;
@@ -427,16 +480,14 @@ fn yakin_ninzuu(hp: &HyouProp, h: &Hyou, c: usize, s: &Score) -> Score {
 
 // }
 
-fn oso_ninzuu(hp: &HyouProp, h: &Hyou, c: usize, p: &(isize,Score)) -> Score {
-    let (cnt_needed, s) = p;
+fn oso_ninzuu(hp: &HyouProp, h: &Hyou, c: usize, (cnt_needed, s): &(isize,Score)) -> Score {
     let cnt = count_waku_column!(O, hp, h, c);
     let d = (cnt - *cnt_needed).abs() as Score;
     let a = d * *s;
     a * a
 }
 
-fn haya_ninzuu(hp: &HyouProp, h: &Hyou, c: usize, p: &(isize,Score)) -> Score {
-    let (cnt_needed, s) = p;
+fn haya_ninzuu(hp: &HyouProp, h: &Hyou, c: usize, (cnt_needed, s): &(isize,Score)) -> Score {
     let cnt = count_waku_column!(H, hp, h, c);
     let d = (cnt - *cnt_needed).abs() as Score;
     let a = d * *s;
