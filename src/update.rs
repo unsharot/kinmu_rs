@@ -3,15 +3,16 @@ use crate::kata::{
     Hyou,
     WakuST,
     HyouST,
-    // HyouProp,
+    HyouProp,
 };
 
 use rand::Rng;
 
 
-pub fn gen_update_func<'a>(text: &str, hst: &'a HyouST) -> Box<dyn FnMut(&Hyou) -> Hyou + 'a> {
+pub fn gen_update_func<'a>(text: &str, hp: &'a HyouProp, hst: &'a HyouST) -> Box<dyn FnMut(&Hyou) -> Hyou + 'a> {
     match text {
-        _ => Box::new(move |h| update_randomly4(hst, h))
+        "update4" => Box::new(move |h| update_randomly4(hp, hst, h)),
+        _ => Box::new(move |h| update_randomly4(hp, hst, h)),
     }
 }
 
@@ -30,11 +31,11 @@ pub fn gen_update_func<'a>(text: &str, hst: &'a HyouST) -> Box<dyn FnMut(&Hyou) 
 
 // }
 
-pub fn update_randomly4(hst: &HyouST, h: &Hyou) -> Hyou {
+pub fn update_randomly4(hp: &HyouProp, hst: &HyouST, h: &Hyou) -> Hyou {
     let mut newh = h.clone();
     let mut rng = rand::thread_rng();
-    let rx: usize = rng.gen_range(0..h.len());
-    let ry: usize = rng.gen_range(0..h[0].len());
+    let rx: usize = rng.gen_range(0..hp.worker_count);
+    let ry: usize = rng.gen_range(0..hp.day_count);
     let b1 = hst[rx][ry] != WakuST::Absolute;
     // let b2 = h[rx][ry] == Waku::N || h[rx][ry] == Waku::O || h[rx][ry] == Waku::H;
     let b2 = h[rx][ry] == Waku::N || h[rx][ry] == Waku::O || h[rx][ry] == Waku::H || h[rx][ry] == Waku::U;
@@ -42,7 +43,7 @@ pub fn update_randomly4(hst: &HyouST, h: &Hyou) -> Hyou {
         newh[rx][ry] = [Waku::N, Waku::O, Waku::H][rng.gen_range(0..3)];
         newh
     } else {
-        update_randomly4(&hst, &h)
+        update_randomly4(&hp, &hst, &h)
     }
 }
 
