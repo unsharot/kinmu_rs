@@ -52,14 +52,6 @@ pub type NG = (usize, usize);
 
 pub type NGList = Vec<NG>;
 
-pub type KCounts = Vec<usize>;
-
-pub type ICounts = Vec<usize>;
-
-pub type OCounts = Vec<isize>;
-
-pub type HCounts = Vec<isize>;
-
 pub enum ScoreProp {
     IAKrenzoku(Score),
     KIArenzoku(Score),
@@ -85,8 +77,8 @@ pub enum ScoreProp {
     Fukouhei(usize),
     YakinNinzuu(Score),
     NikkinNinzuu(((usize,usize),(usize,usize),(usize,usize),(usize,usize),(usize,usize))),
-    OsoNinzuu((usize,usize)),
-    HayaNinzuu((usize,usize)),
+    OsoNinzuu((isize,Score)),
+    HayaNinzuu((isize,Score)),
     NG(Score),
     Leader((Score,usize)),
     YakinWorker((Score,usize)),
@@ -149,11 +141,11 @@ pub struct HyouProp {
     pub buffer: usize,
     pub kibou: Hyou,
     pub hyou_st: HyouST,
-    pub k_counts: KCounts,
-    pub i_counts: ICounts,
-    pub o_counts: OCounts,
-    pub h_counts: HCounts,
-    pub i_ninzuu: Vec<usize>,
+    pub k_counts: Vec<isize>,
+    pub i_counts: Vec<isize>,
+    pub o_counts: Vec<isize>,
+    pub h_counts: Vec<isize>,
+    pub i_ninzuu: Vec<isize>,
     pub seed: usize, //fill関数のシード値
     pub score_props: Vec<ScoreProp>, //結果表示のためのスコア
 }

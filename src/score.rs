@@ -84,6 +84,8 @@ fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp) -> Score {
         //略
 
         YakinNinzuu(p) => check_columns!(yakin_ninzuu, hp, h, p),
+        OsoNinzuu(p) => check_columns!(oso_ninzuu, hp, h, p),
+        HayaNinzuu(p) => check_columns!(haya_ninzuu, hp, h, p),
 
         _ => 0.0,
         // _ => {println!("MATCH SINAI SP DESU!!! (score)"); 0.0},
@@ -301,7 +303,7 @@ macro_rules! count_waku_row {
 }
 
 fn kokyu_count(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
-    let cnt_needed = hp.k_counts[r] as isize;
+    let cnt_needed = hp.k_counts[r];
     let cnt = count_waku_row!(K, hp, h, r);
     let d = (cnt - cnt_needed).abs() as Score;
     let a = d * s;
@@ -309,7 +311,7 @@ fn kokyu_count(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
 }
 
 fn yakin_count(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
-    let cnt_needed = hp.i_counts[r] as isize;
+    let cnt_needed = hp.i_counts[r];
     let cnt = count_waku_row!(I, hp, h, r);
     let d = (cnt - cnt_needed).abs() as Score;
     let a = d * s;
@@ -317,7 +319,7 @@ fn yakin_count(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
 }
 
 fn oso_count(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
-    let cnt_needed = hp.o_counts[r] as isize;
+    let cnt_needed = hp.o_counts[r];
     if cnt_needed == -1 {
         0.0
     } else {
@@ -329,7 +331,7 @@ fn oso_count(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
 }
 
 fn haya_count(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
-    let cnt_needed = hp.h_counts[r] as isize;
+    let cnt_needed = hp.h_counts[r];
     if cnt_needed == -1 {
         0.0
     } else {
@@ -353,7 +355,7 @@ macro_rules! count_waku_column {
 }
 
 fn yakin_ninzuu(hp: &HyouProp, h: &Hyou, c: usize, s: &Score) -> Score {
-    let cnt_needed = hp.i_ninzuu[c - hp.buffer] as isize;
+    let cnt_needed = hp.i_ninzuu[c - hp.buffer];
     let cnt = count_waku_column!(I, hp, h, c);
     let d = (cnt - cnt_needed).abs() as Score;
     let a = d * s;
@@ -363,7 +365,25 @@ fn yakin_ninzuu(hp: &HyouProp, h: &Hyou, c: usize, s: &Score) -> Score {
 //これはdayp(Waku,usize,usize)にしたい
 //NikkinNinzuuも(Waku,usize,usize)に
 // fn dayP() {}
+// fn nikkin_ninzuu(hp: &HyouProp, h: &Hyou, c: usize, s: &((usize,usize),(usize,usize),(usize,usize),(usize,usize),(usize,usize))) -> Score {
 
+// }
+
+fn oso_ninzuu(hp: &HyouProp, h: &Hyou, c: usize, p: &(isize,Score)) -> Score {
+    let (cnt_needed, s) = p;
+    let cnt = count_waku_column!(O, hp, h, c);
+    let d = (cnt - *cnt_needed).abs() as Score;
+    let a = d * *s;
+    a * a
+}
+
+fn haya_ninzuu(hp: &HyouProp, h: &Hyou, c: usize, p: &(isize,Score)) -> Score {
+    let (cnt_needed, s) = p;
+    let cnt = count_waku_column!(H, hp, h, c);
+    let d = (cnt - *cnt_needed).abs() as Score;
+    let a = d * *s;
+    a * a
+}
 
 //これもHashMapつかう？
 //NGリストをHashMapとして保持して、タプルで検索
