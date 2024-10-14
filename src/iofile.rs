@@ -268,7 +268,7 @@ fn read_score_prop(text: &str) -> io::Result<ScoreProp> {
         ("OsoNinzuu", p) => ScoreProp::OsoNinzuu(read_isize_float(p)?),
         ("HayaNinzuu", p) => ScoreProp::HayaNinzuu(read_isize_float(p)?),
         ("NG", p) => ScoreProp::NG(read_float(p)?),
-        // ("Leader", p) => ScoreProp::Leader(read_float_usize(p)?),
+        ("Leader", p) => ScoreProp::Leader(read_isize_float(p)?),
         ("YakinAloneWorker", p) => ScoreProp::YakinAloneWorker(read_isize_float(p)?),
         ("YakinAloneFuro", p) => ScoreProp::YakinAloneFuro(read_float(p)?),
         // ("HeyaMoti", p) => ScoreProp::HeyaMoti(read_float_usize_usize(p)?),
