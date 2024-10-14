@@ -90,7 +90,7 @@ fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp) -> Score {
 
         Leader(p) => check_columns!(leader_ability, hp, h, p),
         YakinAloneWorker(p) => check_columns!(yakin_alone_worker, hp, h, p),
-        YakinAloneFuro(p) => check_columns!(yakin_alone_before_furo, hp, h, p),
+        YakinAloneBeforeFuro(p) => check_columns!(yakin_alone_before_furo, hp, h, p),
 
         //略
 
