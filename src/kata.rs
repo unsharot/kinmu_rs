@@ -84,7 +84,7 @@ pub enum ScoreProp {
     Leader((isize,Score)),
     YakinAloneWorker((isize,Score)),
     YakinAloneBeforeFuro(Score),
-    HeyaMoti((Score, usize, usize)),
+    HeyaMoti((isize,isize,Score)),
     NoSamePair(Score),
     NoSamePair2(Score),
     NoUndef(Score),
@@ -161,5 +161,5 @@ pub struct AnnealingConfig {
     pub score_props: Vec<ScoreProp>, //焼きなましのためのスコア
     pub update_func: String,
     pub max_temp: f32,
-    pub min_temp: f32, 
+    pub min_temp: f32,
 }

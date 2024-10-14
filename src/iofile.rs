@@ -173,6 +173,17 @@ fn read_isize_float(text: &str) -> io::Result<(isize, f32)> {
     Ok((i, f))
 }
 
+fn read_isize_isize_float(text: &str) -> io::Result<(isize, isize, f32)> {
+    let ns: Vec<_> = text
+        .trim_matches(|c| c == '(' || c == ')')
+        .split(',')
+        .collect();
+    let i1 = ns[0].parse::<isize>().unwrap();
+    let i2 = ns[1].parse::<isize>().unwrap();
+    let f = ns[2].parse::<f32>().unwrap();
+    Ok((i1, i2, f))
+}
+
 fn read_workers(text: &str) -> io::Result<Vec<Worker>> {
     let mut ans: Vec<Worker> = Vec::new();
     for line in text.lines() {
@@ -271,7 +282,7 @@ fn read_score_prop(text: &str) -> io::Result<ScoreProp> {
         ("Leader", p) => ScoreProp::Leader(read_isize_float(p)?),
         ("YakinAloneWorker", p) => ScoreProp::YakinAloneWorker(read_isize_float(p)?),
         ("YakinAloneBeforeFuro", p) => ScoreProp::YakinAloneBeforeFuro(read_float(p)?),
-        // ("HeyaMoti", p) => ScoreProp::HeyaMoti(read_float_usize_usize(p)?),
+        ("HeyaMoti", p) => ScoreProp::HeyaMoti(read_isize_isize_float(p)?),
         ("NoSamePair", p) => ScoreProp::NoSamePair(read_float(p)?),
         ("NoSamePair2", p) => ScoreProp::NoSamePair2(read_float(p)?),
         ("NoUndef", p) => ScoreProp::NoUndef(read_float(p)?),

@@ -88,8 +88,8 @@ fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp) -> Score {
         Leader(p) => check_columns!(leader_ability, hp, h, p),
         YakinAloneWorker(p) => check_columns!(yakin_alone_worker, hp, h, p),
         YakinAloneBeforeFuro(p) => check_columns!(yakin_alone_before_furo, hp, h, p),
-        // HeyaMoti(p) => 0.0,
-        // NoSamePair(p) => 0.0,
+        HeyaMoti(p) => check_columns!(heyamoti_ability, hp, h, p),
+        // NoSamePair(p) => no_same_pair(hp, h, p),
         // NoSamePair2(p) => 0.0,
         NoUndef(p) => check_columns!(no_undef, hp, h, p),
         
@@ -574,15 +574,29 @@ fn yakin_alone_before_furo(hp: &HyouProp, h: &Hyou, c: usize, s: &Score) -> Scor
 
 //これはWorkerとHyouColumnの連携が必須
 //結局合計をここで計算する必要あり
-// fn heyaMoti(s: &Score, i: &usize, m: &usize, ws: &Vec<Worker>, xs: &HyouColumn) -> Score {
-//     let mut c = 0;
-//     for _ in 0..xs.len() {
-//         if (ws[c].ability % m != 0) && (xs[c] == N) {
-//             c += 1;
-//         }
+fn heyamoti_ability(hp: &HyouProp, h: &Hyou, c: usize, (cnt_needed, ab, s): &(isize,isize,Score)) -> Score {
+    let mut a_cnt = 0;
+    for r in 0..hp.worker_count {
+        if (h[r][c] == N) && ((hp.workers[r].ability % ab) != 0) {
+                a_cnt += 1;
+        }
+    }
+    let d = if cnt_needed > a_cnt {
+        (cnt_needed - a_cnt) as Score
+    } else {
+        0.0
+    };
+    *s * d * d
+}
+
+//日ごとにペアを出して、その重複を調べる
+//HashMap使えそう
+// fn no_same_pair(hp: &HyouProp, h: &Hyou, s: &Score) -> Score {
+//     let mut sum = 0.0;
+//     for c in hp.buffer..hp.day_count {
+//         sum += ;
 //     }
-//     let d: f32 = cmp::max(i - c as usize, 0) as f32;
-//     return s * d * d;
+//     sum
 // }
 
 fn no_undef(hp: &HyouProp, h: &Hyou, c: usize, s: &Score) -> Score {
@@ -591,9 +605,3 @@ fn no_undef(hp: &HyouProp, h: &Hyou, c: usize, s: &Score) -> Score {
     let a = d * *s;
     a * a
 }
-
-//日ごとにペアを出して、その重複を調べる
-//HashMap使えそう
-// fn noSamePair(s: &Score, cs: &Vec<HyouColumn>) -> Score {
-    // 0.0
-// }
