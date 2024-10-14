@@ -88,6 +88,10 @@ fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp) -> Score {
 
         //略
 
+        YakinAloneWorker(p) => check_columns!(yakin_alone_worker, hp, h, p),
+
+        //略
+
         NoUndef(p) => check_columns!(no_undef, hp, h, p),
         
         _ => 0.0,
@@ -499,6 +503,27 @@ fn haya_ninzuu(hp: &HyouProp, h: &Hyou, c: usize, (cnt_needed, s): &(isize,Score
 //これもHashMapつかう？
 //NGリストをHashMapとして保持して、タプルで検索
 // fn ng() {}
+
+//略
+
+///一人で夜勤できるワーカー
+fn yakin_alone_worker(hp: &HyouProp, h: &Hyou, c: usize, (ab, s): &(isize,Score)) -> Score {
+    let mut i_cnt = 0;
+    let mut a_cnt = 0;
+    for r in 0..hp.worker_count {
+        if h[r][c] == I {
+            i_cnt += 1;
+            if (hp.workers[r].ability % ab) != 0 {
+                a_cnt += 1;
+            }
+        }
+    }
+    if (i_cnt == 1) && (a_cnt == 0) {
+        *s
+    } else {
+        0.0
+    }
+}
 
 //特殊かも
 // fn yakinAloneFuro() {}

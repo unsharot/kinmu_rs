@@ -140,10 +140,10 @@ fn read_usize(text: &str) -> io::Result<usize> {
 //     Ok(text.split_whitespace().map(|x| x.parse::<usize>().unwrap()).collect())
 // }
 
-// fn read_isize(text: &str) -> io::Result<isize> {
-//     let ans: isize = text.parse::<isize>().unwrap();
-//     Ok(ans)
-// }
+fn read_isize(text: &str) -> io::Result<isize> {
+    let ans: isize = text.parse::<isize>().unwrap();
+    Ok(ans)
+}
 
 fn read_isizes(text: &str) -> io::Result<Vec<isize>> {
     Ok(text.split_whitespace().map(|x| x.parse::<isize>().unwrap()).collect())
@@ -184,7 +184,7 @@ fn read_workers(text: &str) -> io::Result<Vec<Worker>> {
 fn read_worker(text: &str) -> io::Result<Worker> {
     // TODO: もうちょっと安全にアクセスしたい
     let words: Vec<String> = text.split_whitespace().map(|s| s.to_string()).collect();
-    let worker: Worker = Worker {name: words[0].clone(), ability: read_usize(&words[1])?};
+    let worker: Worker = Worker {name: words[0].clone(), ability: read_isize(&words[1])?};
     Ok(worker)
 }
 
@@ -269,7 +269,7 @@ fn read_score_prop(text: &str) -> io::Result<ScoreProp> {
         ("HayaNinzuu", p) => ScoreProp::HayaNinzuu(read_isize_float(p)?),
         ("NG", p) => ScoreProp::NG(read_float(p)?),
         // ("Leader", p) => ScoreProp::Leader(read_float_usize(p)?),
-        // ("YakinWorker", p) => ScoreProp::YakinWorker(read_float_usize(p)?),
+        ("YakinAloneWorker", p) => ScoreProp::YakinAloneWorker(read_isize_float(p)?),
         ("YakinAloneFuro", p) => ScoreProp::YakinAloneFuro(read_float(p)?),
         // ("HeyaMoti", p) => ScoreProp::HeyaMoti(read_float_usize_usize(p)?),
         ("NoSamePair", p) => ScoreProp::NoSamePair(read_float(p)?),

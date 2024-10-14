@@ -33,7 +33,7 @@ pub type HyouST = Vec<Vec<WakuST>>;
 
 pub struct Worker {
     pub name: String,
-    pub ability: usize,
+    pub ability: isize,
 }
 
 pub type ID = usize;
@@ -81,7 +81,7 @@ pub enum ScoreProp {
     HayaNinzuu((isize,Score)),
     NG(Score),
     Leader((Score,usize)),
-    YakinWorker((Score,usize)),
+    YakinAloneWorker((isize,Score)),
     YakinAloneFuro(Score),
     HeyaMoti((Score, usize, usize)),
     NoSamePair(Score),
@@ -120,7 +120,7 @@ impl ScoreProp {
             ScoreProp::HayaNinzuu(p) => format!("HayaNinzuu({:?})", p),
             ScoreProp::NG(p) => format!("NG({:?})", p),
             ScoreProp::Leader(p) => format!("Leader({:?})", p),
-            ScoreProp::YakinWorker(p) => format!("YakinWorker({:?})", p),
+            ScoreProp::YakinAloneWorker(p) => format!("YakinAloneWorker({:?})", p),
             ScoreProp::YakinAloneFuro(p) => format!("YakinAloneFuro({:?})", p),
             ScoreProp::HeyaMoti(p) => format!("HeyaMoti({:?})", p),
             ScoreProp::NoSamePair(p) => format!("NoSamePair({:?})", p),
