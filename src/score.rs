@@ -17,6 +17,8 @@ use crate::kata::{
 
 
 // use std::cmp;
+// use std::hash::Hash;
+use std::collections::HashMap;
 
 
 macro_rules! check_rows {
@@ -89,8 +91,8 @@ fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp) -> Score {
         YakinAloneWorker(p) => check_columns!(yakin_alone_worker, hp, h, p),
         YakinAloneBeforeFuro(p) => check_columns!(yakin_alone_before_furo, hp, h, p),
         HeyaMoti(p) => check_columns!(heyamoti_ability, hp, h, p),
-        // NoSamePair(p) => no_same_pair(hp, h, p),
-        // NoSamePair2(p) => 0.0,
+        NoSamePair3(p) => no_same_pair3(hp, h, p),
+        NoSamePair2(p) => no_same_pair2(hp, h, p),
         NoUndef(p) => check_columns!(no_undef, hp, h, p),
         
         _ => 0.0,
@@ -572,15 +574,53 @@ fn heyamoti_ability(hp: &HyouProp, h: &Hyou, c: usize, (cnt_needed, ab, s): &(is
     *s * d * d
 }
 
-//日ごとにペアを出して、その重複を調べる
-//HashMap使えそう
-// fn no_same_pair(hp: &HyouProp, h: &Hyou, s: &Score) -> Score {
-//     let mut sum = 0.0;
-//     for c in hp.buffer..hp.day_count {
-//         sum += ;
-//     }
-//     sum
-// }
+///3回以上同じペアなら発火するスコア
+fn no_same_pair3(hp: &HyouProp, h: &Hyou, s: &Score) -> Score {
+    let mut map: HashMap<Vec<usize>, isize> = HashMap::new();
+    for c in hp.buffer..hp.day_count {
+        let mut i_list: Vec<usize> = Vec::new();
+        for r in 0..hp.worker_count {
+            if matches!(h[r][c], I) {
+                i_list.push(r)
+            }
+        }
+        if i_list.len() > 1 {
+            *map.entry(i_list).or_insert(0) += 1;
+        }
+    }
+    let mut ans = 0.0;
+    for (_, cnt) in &map {
+        let a = *cnt - 2;
+        if a > 0 {
+            ans += (a as Score) * *s
+        }
+    }
+    ans
+}
+
+///2回以上同じペアなら発火するスコア
+fn no_same_pair2(hp: &HyouProp, h: &Hyou, s: &Score) -> Score {
+    let mut map: HashMap<Vec<usize>, isize> = HashMap::new();
+    for c in hp.buffer..hp.day_count {
+        let mut i_list: Vec<usize> = Vec::new();
+        for r in 0..hp.worker_count {
+            if matches!(h[r][c], I) {
+                i_list.push(r)
+            }
+        }
+        if i_list.len() > 1 {
+            *map.entry(i_list).or_insert(0) += 1;
+        }
+    }
+    let mut ans = 0.0;
+    for (_, cnt) in &map {
+        let a = *cnt - 1;
+        if a > 0 {
+            ans += (a as Score) * *s
+        }
+    }
+    ans
+}
 
 fn no_undef(hp: &HyouProp, h: &Hyou, c: usize, s: &Score) -> Score {
     let cnt = count_waku_column!(U, hp, h, c);
