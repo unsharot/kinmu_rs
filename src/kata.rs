@@ -38,6 +38,7 @@ pub struct Worker {
 
 pub type ID = usize;
 
+#[derive(PartialEq)]
 pub enum DayST {
     Weekday,
     Holiday,
