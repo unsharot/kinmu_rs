@@ -80,7 +80,7 @@ pub enum ScoreProp {
     OsoNinzuu((isize,Score)),
     HayaNinzuu((isize,Score)),
     NG(Score),
-    Leader((Score,usize)),
+    Leader((isize,Score)),
     YakinAloneWorker((isize,Score)),
     YakinAloneFuro(Score),
     HeyaMoti((Score, usize, usize)),
