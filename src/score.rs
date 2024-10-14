@@ -90,6 +90,7 @@ fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp) -> Score {
 
         Leader(p) => check_columns!(leader_ability, hp, h, p),
         YakinAloneWorker(p) => check_columns!(yakin_alone_worker, hp, h, p),
+        YakinAloneFuro(p) => check_columns!(yakin_alone_before_furo, hp, h, p),
 
         //略
 
@@ -508,8 +509,9 @@ fn haya_ninzuu(hp: &HyouProp, h: &Hyou, c: usize, (cnt_needed, s): &(isize,Score
 //略
 
 fn leader_ability(hp: &HyouProp, h: &Hyou, c: usize, (ab, s): &(isize,Score)) -> Score {
-    // if hp.days[c - hp.buffer] == DayST::Holiday {
-    if let DayST::Holiday = hp.days[c - hp.buffer] {
+    // if hp.days[c] == DayST::Holiday {
+    // if let DayST::Holiday = hp.days[c] {
+    if matches!(hp.days[c], DayST::Holiday) {
         let mut a_cnt = 0;
         for r in 0..hp.worker_count {
             if (h[r][c] == N) && ((hp.workers[r].ability % ab) != 0) {
@@ -545,8 +547,23 @@ fn yakin_alone_worker(hp: &HyouProp, h: &Hyou, c: usize, (ab, s): &(isize,Score)
     }
 }
 
-//特殊かも
-// fn yakinAloneFuro() {}
+fn yakin_alone_before_furo(hp: &HyouProp, h: &Hyou, c: usize, s: &Score) -> Score {
+    if hp.days[c - 1] == DayST::Furo {
+        let mut i_cnt = 0;
+        for r in 0..hp.worker_count {
+            if h[r][c] == I {
+                    i_cnt += 1;
+            }
+        }
+        if i_cnt <= 1 {
+            *s
+        } else {
+            0.0
+        }
+    } else {
+        0.0
+    }
+}
 
 //これはWorkerとHyouColumnの連携が必須
 //結局合計をここで計算する必要あり
