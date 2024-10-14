@@ -283,7 +283,7 @@ fn read_score_prop(text: &str) -> io::Result<ScoreProp> {
         ("YakinAloneWorker", p) => ScoreProp::YakinAloneWorker(read_isize_float(p)?),
         ("YakinAloneBeforeFuro", p) => ScoreProp::YakinAloneBeforeFuro(read_float(p)?),
         ("HeyaMoti", p) => ScoreProp::HeyaMoti(read_isize_isize_float(p)?),
-        ("NoSamePair", p) => ScoreProp::NoSamePair(read_float(p)?),
+        ("NoSamePair3", p) => ScoreProp::NoSamePair3(read_float(p)?),
         ("NoSamePair2", p) => ScoreProp::NoSamePair2(read_float(p)?),
         ("NoUndef", p) => ScoreProp::NoUndef(read_float(p)?),
         (s, p) => {println!("MATCH SINAI SCORE PROP DESU!!!!: {} {}",s,p); ScoreProp::NoUndef(0.0)},
