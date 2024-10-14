@@ -79,21 +79,18 @@ fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp) -> Score {
         YakinCount(p) => check_rows!(yakin_count, hp, h, p),
         OsoCount(p) => check_rows!(oso_count, hp, h, p),
         HayaCount(p) => check_rows!(haya_count, hp, h, p),
-
         // Fukouhei(p) => check_rows!(fukouhei, hp, h, p),
-
         YakinNinzuu(p) => check_columns!(yakin_ninzuu, hp, h, p),
+        // NikkinNinzuu(p) => 0.0,
         OsoNinzuu(p) => check_columns!(oso_ninzuu, hp, h, p),
         HayaNinzuu(p) => check_columns!(haya_ninzuu, hp, h, p),
-
-        //略
-
+        NGPair(p) => check_columns!(ng_pair, hp, h, p),
         Leader(p) => check_columns!(leader_ability, hp, h, p),
         YakinAloneWorker(p) => check_columns!(yakin_alone_worker, hp, h, p),
         YakinAloneBeforeFuro(p) => check_columns!(yakin_alone_before_furo, hp, h, p),
-
-        //略
-
+        // HeyaMoti(p) => 0.0,
+        // NoSamePair(p) => 0.0,
+        // NoSamePair2(p) => 0.0,
         NoUndef(p) => check_columns!(no_undef, hp, h, p),
         
         _ => 0.0,
@@ -504,7 +501,17 @@ fn haya_ninzuu(hp: &HyouProp, h: &Hyou, c: usize, (cnt_needed, s): &(isize,Score
 
 //これもHashMapつかう？
 //NGリストをHashMapとして保持して、タプルで検索
-// fn ng() {}
+//NGリストに今回のペアが含まれるか or NGリストにあるペアがIかどうか確認
+fn ng_pair(hp: &HyouProp, h: &Hyou, c: usize, s: &Score) -> Score {
+    let mut ans = 0.0;
+    for i in 0..hp.ng_list.len() {
+        let (a, b) = hp.ng_list[i];
+        if (h[a-1][c] == I && h[b-1][c] == I) || (h[a-1][c] == A && h[b-1][c] == A) {
+            ans += *s;
+        }
+    }
+    ans
+}
 
 //略
 
