@@ -125,13 +125,6 @@ fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp) -> Score {
 fn iak_renzoku(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
     let mut ans = 0.0;
     for i in 0..(hp.day_count - 1) {
-        // if (h[r][i] == I) && (h[r][i+1] != A) {
-        //     ans += *s;
-        // } else if (h[r][i] == A) && !((h[r][i+1] == K) || (h[r][i+1] == Y)) {
-        //     ans += *s;
-        // } else if (h[r][i] != I) && (h[r][i+1] == A) {
-        //     ans += *s;
-        // }
         ans += match (h[r][i], h[r][i+1]) {
             (A, K) => 0.0,
             (A, Y) => 0.0,
@@ -148,11 +141,6 @@ fn iak_renzoku(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
 fn kia_renzoku(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
     let mut ans = 0.0;
     for i in 0..(hp.day_count - 1) {
-        // if (h[r][i] == K) && (h[r][i+1] == I) {
-        //     ans += *s;
-        // } else if (h[r][i] == Y) && (h[r][i+1] == I) {
-        //     ans += *s;
-        // }
         ans += match (h[r][i], h[r][i+1]) {
             (K, I) => *s,
             (Y, I) => *s,
@@ -392,8 +380,6 @@ fn haya_baransu(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
     a * a
 }
 
-// fn yakinBaransu() {}
-
 macro_rules! count_waku_row {
     ($w:expr, $hp: expr, $h:expr, $r:expr) => {{
         let mut cnt: isize = 0;
@@ -499,9 +485,9 @@ fn haya_ninzuu(hp: &HyouProp, h: &Hyou, c: usize, (cnt_needed, s): &(isize,Score
     a * a
 }
 
-//これもHashMapつかう？
-//NGリストをHashMapとして保持して、タプルで検索
+//NGリストをHashMapとして保持して、タプルで検索?
 //NGリストに今回のペアが含まれるか or NGリストにあるペアがIかどうか確認
+//後者の方針で
 fn ng_pair(hp: &HyouProp, h: &Hyou, c: usize, s: &Score) -> Score {
     let mut ans = 0.0;
     for i in 0..hp.ng_list.len() {
@@ -512,8 +498,6 @@ fn ng_pair(hp: &HyouProp, h: &Hyou, c: usize, s: &Score) -> Score {
     }
     ans
 }
-
-//略
 
 fn leader_ability(hp: &HyouProp, h: &Hyou, c: usize, (ab, s): &(isize,Score)) -> Score {
     // if hp.days[c] == DayST::Holiday {
@@ -572,7 +556,6 @@ fn yakin_alone_before_furo(hp: &HyouProp, h: &Hyou, c: usize, s: &Score) -> Scor
     }
 }
 
-//これはWorkerとHyouColumnの連携が必須
 //結局合計をここで計算する必要あり
 fn heyamoti_ability(hp: &HyouProp, h: &Hyou, c: usize, (cnt_needed, ab, s): &(isize,isize,Score)) -> Score {
     let mut a_cnt = 0;
@@ -581,8 +564,8 @@ fn heyamoti_ability(hp: &HyouProp, h: &Hyou, c: usize, (cnt_needed, ab, s): &(is
                 a_cnt += 1;
         }
     }
-    let d = if cnt_needed > a_cnt {
-        (cnt_needed - a_cnt) as Score
+    let d = if *cnt_needed > a_cnt {
+        (*cnt_needed - a_cnt) as Score
     } else {
         0.0
     };
