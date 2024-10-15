@@ -13,6 +13,7 @@ pub fn gen_update_func<'a>(text: &str, hp: &'a HyouProp, hst: &'a HyouST) -> Box
     println!("{}", text);
     match text {
         "update1" => Box::new(move |h| update_randomly1(hp, hst, h)),
+        "update2" => Box::new(move |h| update_randomly2(hp, hst, h)),
         "update4" => Box::new(move |h| update_randomly4(hp, hst, h)),
         _ => Box::new(move |h| update_randomly4(hp, hst, h)),
     }
@@ -33,6 +34,7 @@ pub fn gen_update_func<'a>(text: &str, hp: &'a HyouProp, hst: &'a HyouST) -> Box
 
 // }
 
+/// ランダムな1つの枠をランダムな枠に変えるAbsoluteの場合繰り返す
 fn update_randomly1(hp: &HyouProp, hst: &HyouST, h: &Hyou) -> Hyou {
     let mut newh = h.clone();
     let mut rng = rand::thread_rng();
@@ -46,7 +48,19 @@ fn update_randomly1(hp: &HyouProp, hst: &HyouST, h: &Hyou) -> Hyou {
     }
 }
 
+/// ランダムな1つの枠をランダムな枠に変える
+fn update_randomly2(hp: &HyouProp, hst: &HyouST, h: &Hyou) -> Hyou {
+    let mut newh = h.clone();
+    let mut rng = rand::thread_rng();
+    let rx: usize = rng.gen_range(0..hp.worker_count);
+    let ry: usize = rng.gen_range(0..hp.day_count);
+    if hst[rx][ry] != WakuST::Absolute {
+        newh[rx][ry] = [Waku::N, Waku::K, Waku::I, Waku::A, Waku::O, Waku::H][rng.gen_range(0..6)];
+    }
+    newh
+}
 
+/// ランダムな1つの枠をN,O,Hのうちランダムな枠に変える Absoluteなら繰り返す
 fn update_randomly4(hp: &HyouProp, hst: &HyouST, h: &Hyou) -> Hyou {
     let mut newh = h.clone();
     let mut rng = rand::thread_rng();
@@ -64,4 +78,7 @@ fn update_randomly4(hp: &HyouProp, hst: &HyouST, h: &Hyou) -> Hyou {
     }
 }
 
-// pub fn update_randomly5() {}
+// fn update_randomly5(hp: &HyouProp, hst: &HyouST, h: &Hyou) -> Hyou {
+//     let mut newh = h.clone();
+//     let mut rng = rand::thread_rng();
+// }
