@@ -78,7 +78,67 @@ fn update_randomly4(hp: &HyouProp, hst: &HyouST, h: &Hyou) -> Hyou {
     }
 }
 
-// fn update_randomly5(hp: &HyouProp, hst: &HyouST, h: &Hyou) -> Hyou {
-//     let mut newh = h.clone();
-//     let mut rng = rand::thread_rng();
-// }
+/*
+各行について
+1.  Iが入っていることを確認
+2.  ランダムなIを取り除き、Nを代わりに置く
+3.  孤立したAを取り除き、Nを代わりに置く
+4.  ランダムなKを取り除き、Aを代わりに置く
+5.  Iをランダムな位置に追加する
+6.  Aを必要なら追加する (適当なものを置き換える あらゆる可能性あり)
+7.  ランダムなNをKで置き換える
+8.  K,Iの数が変わっていないことを確かめる
+9.  Iの後にAが来ているか調べる
+10. Absoluteが動いていないか調べる
+*/
+
+macro_rules! count_waku_row {
+    ($w:expr, $hp: expr, $h:expr, $r:expr) => {{
+        let mut cnt: isize = 0;
+        for i in $hp.buffer..$hp.day_count {
+            if $h[$r][i] == $w {
+                cnt += 1;
+            }
+        }
+        cnt
+    }};
+}
+
+fn remove_random(w: Waku, r: usize, newh: &mut Hyou, rng: &mut dyn Rng){
+    // ここbufferを除きたい
+    let is: Vec<usize> = newh[r].iter()
+        .enumerate()
+        .filter(|(_, v)| v == w)
+        .map(|(i, _)| i)
+        .collect();
+    let rnd = rng.gen_range(0..is.len());
+    newh[r][is[rnd]] = Waku::N;
+}
+
+/// IAKを破壊せずに入れ替える
+fn update_randomly5(hp: &HyouProp, hst: &HyouST, h: &Hyou) -> Hyou {
+    let mut newh = h.clone();
+    let mut rng = rand::thread_rng();
+    for r in 0..hp.worker_count {
+        let i_cnt = count_waku_row!(Waku::I, hp, h, r);
+        if i_cnt == 0 {
+            remove_random(Waku::K, r, &mut newh, rand);
+            // add_random(Waku::K)
+        } else {
+            remove_random(Waku::I, r, &mut newh, rand);
+            // remove_proper_a()
+            remove_random(Waku::K, r, &mut newh, rand);
+            // add_random(Waku::I)
+            // add_proper_a()
+            // add_random(Waku::K)
+        }
+
+        // if !check() {
+            // 戻す
+            for c in 0..hp.day_count {
+                newh[r][c] = h[r][c];
+            }
+        // }
+    }
+    newh
+}
