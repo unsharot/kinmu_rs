@@ -324,7 +324,7 @@ fn osohaya_baransu(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
         }
     }
     let d = (haya - oso).abs() as Score;
-    let a = d * *s;
+    let a = d * s;
     a * a
 }
 
@@ -342,7 +342,7 @@ fn yakin_baransu(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
         }
     }
     let d = (cf - cl).abs() as Score;
-    let a = d * *s;
+    let a = d * s;
     a * a
 }
 
@@ -360,7 +360,7 @@ fn oso_baransu(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
         }
     }
     let d = (cf - cl).abs() as Score;
-    let a = d * *s;
+    let a = d * s;
     a * a
 }
 
@@ -378,7 +378,7 @@ fn haya_baransu(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
         }
     }
     let d = (cf - cl).abs() as Score;
-    let a = d * *s;
+    let a = d * s;
     a * a
 }
 
@@ -470,7 +470,7 @@ fn nikkin_ninzuu(hp: &HyouProp, h: &Hyou, c: usize, (d,cnt_needed,s): &(DayST,is
     if hp.days[c] == *d {
         let cnt = count_waku_column!(N, hp, h, c);
         let d = (cnt - cnt_needed).abs() as Score;
-        let a = d * *s;
+        let a = d * s;
         a * a
     } else {
         0.0
@@ -480,14 +480,14 @@ fn nikkin_ninzuu(hp: &HyouProp, h: &Hyou, c: usize, (d,cnt_needed,s): &(DayST,is
 fn oso_ninzuu(hp: &HyouProp, h: &Hyou, c: usize, (cnt_needed, s): &(isize,Score)) -> Score {
     let cnt = count_waku_column!(O, hp, h, c);
     let d = (cnt - *cnt_needed).abs() as Score;
-    let a = d * *s;
+    let a = d * s;
     a * a
 }
 
 fn haya_ninzuu(hp: &HyouProp, h: &Hyou, c: usize, (cnt_needed, s): &(isize,Score)) -> Score {
     let cnt = count_waku_column!(H, hp, h, c);
     let d = (cnt - *cnt_needed).abs() as Score;
-    let a = d * *s;
+    let a = d * s;
     a * a
 }
 
@@ -499,7 +499,7 @@ fn ng_pair(hp: &HyouProp, h: &Hyou, c: usize, s: &Score) -> Score {
     for i in 0..hp.ng_list.len() {
         let (a, b) = hp.ng_list[i];
         if (h[a-1][c] == I && h[b-1][c] == I) || (h[a-1][c] == A && h[b-1][c] == A) {
-            ans += *s;
+            ans += s;
         }
     }
     ans
@@ -575,7 +575,7 @@ fn heyamoti_ability(hp: &HyouProp, h: &Hyou, c: usize, (cnt_needed, ab, s): &(is
     } else {
         0.0
     };
-    *s * d * d
+    s * d * d
 }
 
 ///3回以上同じペアなら発火するスコア
@@ -596,7 +596,7 @@ fn no_same_pair3(hp: &HyouProp, h: &Hyou, s: &Score) -> Score {
     for (_, cnt) in &map {
         let a = *cnt - 2;
         if a > 0 {
-            ans += (a as Score) * *s
+            ans += (a as Score) * s
         }
     }
     ans
@@ -620,7 +620,7 @@ fn no_same_pair2(hp: &HyouProp, h: &Hyou, s: &Score) -> Score {
     for (_, cnt) in &map {
         let a = *cnt - 1;
         if a > 0 {
-            ans += (a as Score) * *s
+            ans += (a as Score) * s
         }
     }
     ans
@@ -629,6 +629,6 @@ fn no_same_pair2(hp: &HyouProp, h: &Hyou, s: &Score) -> Score {
 fn no_undef(hp: &HyouProp, h: &Hyou, c: usize, s: &Score) -> Score {
     let cnt = count_waku_column!(U, hp, h, c);
     let d = cnt as Score;
-    let a = d * *s;
+    let a = d * s;
     a * a
 }
