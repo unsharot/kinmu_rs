@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 #[derive(Debug)]
 #[derive(Clone)]
 #[derive(PartialEq)]
@@ -38,6 +40,7 @@ pub struct Worker {
 
 pub type ID = usize;
 
+#[derive(Debug)]
 #[derive(PartialEq)]
 pub enum DayST {
     Weekday,
@@ -45,6 +48,26 @@ pub enum DayST {
     Furo,
     Furo2,
     Weight,
+}
+
+// #[derive(Debug, PartialEq, Eq)]
+// struct ParseDaySTError;
+
+impl FromStr for DayST {
+    // type Err = ParseDaySTError;
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let ans = match s {
+            "W" => Ok(DayST::Weekday),
+            "H" => Ok(DayST::Holiday),
+            "F" => Ok(DayST::Furo),
+            "2" => Ok(DayST::Furo2),
+            "G" => Ok(DayST::Weight),
+            _ => Err(format!("Failed to parse DayST: {}", s))
+        };
+        ans
+    }
 }
 
 pub type Days = Vec<DayST>;
@@ -77,7 +100,7 @@ pub enum ScoreProp {
     HayaCount(Score),
     Fukouhei(usize),
     YakinNinzuu(Score),
-    NikkinNinzuu(((usize,usize),(usize,usize),(usize,usize),(usize,usize),(usize,usize))),
+    NikkinNinzuu((DayST,isize,Score)),
     OsoNinzuu((isize,Score)),
     HayaNinzuu((isize,Score)),
     NGPair(Score),

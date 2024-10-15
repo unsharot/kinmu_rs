@@ -184,6 +184,17 @@ fn read_isize_isize_float(text: &str) -> io::Result<(isize, isize, f32)> {
     Ok((i1, i2, f))
 }
 
+fn read_dayst_isize_float(text: &str) -> io::Result<(DayST, isize, f32)> {
+    let ns: Vec<_> = text
+        .trim_matches(|c| c == '(' || c == ')')
+        .split(',')
+        .collect();
+    let d = ns[0].parse::<DayST>().unwrap();
+    let i = ns[1].parse::<isize>().unwrap();
+    let f = ns[2].parse::<f32>().unwrap();
+    Ok((d, i, f))
+}
+
 fn read_workers(text: &str) -> io::Result<Vec<Worker>> {
     let mut ans: Vec<Worker> = Vec::new();
     for line in text.lines() {
@@ -275,7 +286,7 @@ fn read_score_prop(text: &str) -> io::Result<ScoreProp> {
         ("HayaCount", p) => ScoreProp::HayaCount(read_float(p)?),
         ("Fukouhei", p) => ScoreProp::Fukouhei(read_usize(p)?),
         ("YakinNinzuu", p) => ScoreProp::YakinNinzuu(read_float(p)?),
-        // ("NikkinNinzuu", p) => ScoreProp::YakinNinzuu(read_pairs(p)?),
+        ("NikkinNinzuu", p) => ScoreProp::NikkinNinzuu(read_dayst_isize_float(p)?),
         ("OsoNinzuu", p) => ScoreProp::OsoNinzuu(read_isize_float(p)?),
         ("HayaNinzuu", p) => ScoreProp::HayaNinzuu(read_isize_float(p)?),
         ("NGPair", p) => ScoreProp::NGPair(read_float(p)?),

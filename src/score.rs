@@ -83,7 +83,7 @@ fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp) -> Score {
         HayaCount(p) => check_rows!(haya_count, hp, h, p),
         // Fukouhei(p) => check_rows!(fukouhei, hp, h, p),
         YakinNinzuu(p) => check_columns!(yakin_ninzuu, hp, h, p),
-        // NikkinNinzuu(p) => 0.0,
+        NikkinNinzuu(p) => check_columns!(nikkin_ninzuu, hp, h, p),
         OsoNinzuu(p) => check_columns!(oso_ninzuu, hp, h, p),
         HayaNinzuu(p) => check_columns!(haya_ninzuu, hp, h, p),
         NGPair(p) => check_columns!(ng_pair, hp, h, p),
@@ -466,12 +466,16 @@ fn yakin_ninzuu(hp: &HyouProp, h: &Hyou, c: usize, s: &Score) -> Score {
     a * a
 }
 
-//これはdayp(Waku,usize,usize)にしたい
-//NikkinNinzuuも(Waku,usize,usize)に
-// fn dayP() {}
-// fn nikkin_ninzuu(hp: &HyouProp, h: &Hyou, c: usize, s: &((usize,usize),(usize,usize),(usize,usize),(usize,usize),(usize,usize))) -> Score {
-
-// }
+fn nikkin_ninzuu(hp: &HyouProp, h: &Hyou, c: usize, (d,cnt_needed,s): &(DayST,isize,Score)) -> Score {
+    if hp.days[c] == *d {
+        let cnt = count_waku_column!(N, hp, h, c);
+        let d = (cnt - cnt_needed).abs() as Score;
+        let a = d * *s;
+        a * a
+    } else {
+        0.0
+    }
+}
 
 fn oso_ninzuu(hp: &HyouProp, h: &Hyou, c: usize, (cnt_needed, s): &(isize,Score)) -> Score {
     let cnt = count_waku_column!(O, hp, h, c);
