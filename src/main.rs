@@ -8,6 +8,7 @@ pub mod show_hyou;
 // use crate::test_lib::test_lib::test_func;
 use rand::Rng;
 use std::io;
+use std::time::Instant;
 
 fn updatef(x: &f32) -> f32{
     // x + 0.01
@@ -61,8 +62,10 @@ fn sub(p: &str) -> io::Result<()> {
 
     let mut model = hp.kibou.clone(); //fillしないとだめ
     // let mut score: f32;
+    let mut temp_score;
     for ac in acs {
-        (_, model) = annealing::annealing(
+        let start = Instant::now();
+        (temp_score, model) = annealing::annealing(
             10000000000.0,
             &model,
             ac.step,
@@ -74,6 +77,8 @@ fn sub(p: &str) -> io::Result<()> {
             annealing::basic_temp_func,
             annealing::basic_prob_func,
         );
+        println!("score: {}", temp_score);
+        println!("time: {:?}", start.elapsed());
     }
     
     println!();
