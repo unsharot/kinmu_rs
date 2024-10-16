@@ -4,6 +4,7 @@ use crate::kata::{
     WakuST,
     HyouST,
     HyouProp,
+    Score,
 };
 
 use rand::Rng;
@@ -85,8 +86,8 @@ fn update_randomly4(hp: &HyouProp, hst: &HyouST, h: &Hyou) -> Hyou {
 1.  Iが入っていることを確認
 2.  ランダムなIを取り除き、Nを代わりに置く
 3.  孤立したAを取り除き、Nを代わりに置く
-4.  ランダムなKを取り除き、Aを代わりに置く
-5.  Iをランダムな位置に追加する
+4.  ランダムなKを取り除き、Nを代わりに置く
+5.  ランダムなNをIで置き換える
 6.  Aを必要なら追加する (適当なものを置き換える あらゆる可能性あり)
 7.  ランダムなNをKで置き換える
 8.  K,Iの数が変わっていないことを確かめる
@@ -106,7 +107,7 @@ macro_rules! count_waku_row {
     }};
 }
 
-fn remove_random(w: Waku, r: usize, hp: &HyouProp, newh: &mut Hyou, rng: &mut ThreadRng) {
+fn remove_random(w: Waku, hp: &HyouProp, newh: &mut Hyou, r: usize, rng: &mut ThreadRng) {
     let mut is: Vec<usize> = Vec::new();
     for c in hp.buffer..hp.day_count {
         if newh[r][c] == w {
@@ -117,9 +118,10 @@ fn remove_random(w: Waku, r: usize, hp: &HyouProp, newh: &mut Hyou, rng: &mut Th
     newh[r][is[rnd]] = Waku::N;
 }
 
-fn add_random(w: Waku, r:usize, hp: &HyouProp, newh: &mut Hyou, rng: &mut ThreadRng) {
+fn add_random(w: Waku, hp: &HyouProp, newh: &mut Hyou, r:usize, rng: &mut ThreadRng) {
     let mut is: Vec<usize> = Vec::new();
     for c in hp.buffer..hp.day_count {
+        // if newh[r][c] == Waku::N || newh[r][c] == Waku::U {
         if newh[r][c] == Waku::N {
             is.push(c);
         }
@@ -128,29 +130,101 @@ fn add_random(w: Waku, r:usize, hp: &HyouProp, newh: &mut Hyou, rng: &mut Thread
     newh[r][is[rnd]] = w;
 }
 
+fn iak_renzoku(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
+    let mut ans = 0.0;
+    for i in 0..(hp.day_count - 1) {
+        ans += match (h[r][i], h[r][i+1]) {
+            (Waku::A, Waku::K) => 0.0,
+            (Waku::A, Waku::Y) => 0.0,
+            (Waku::A, _) => *s,
+            (Waku::I, Waku::A) => 0.0,
+            (Waku::I, _) => *s,
+            (_, Waku::A) => *s,
+            _ => 0.0,
+        }
+    }
+    ans
+}
+
+fn remove_improper_a(hp: &HyouProp, newh: &mut Hyou, r: usize) {
+    for c in hp.buffer..hp.day_count {
+        if newh[r][c] == Waku::A && newh[r][c-1] != Waku::I {
+            newh[r][c] = Waku::N;
+        }
+    }
+}
+
+fn add_proper_a(hp: &HyouProp, newh: &mut Hyou, r: usize) {
+    for c in hp.buffer..hp.day_count {
+        if newh[r][c] != Waku::A && newh[r][c-1] == Waku::I {
+            newh[r][c] = Waku::A;
+        }
+    }
+}
+
 /// IAKを破壊せずに入れ替える
-fn update_randomly5(hp: &HyouProp, _hst: &HyouST, h: &Hyou) -> Hyou {
+/// 前提として、Absolute以外はI,A,K,Nで、AbsoluteでないO,Hはないことが条件
+fn update_randomly5(hp: &HyouProp, hst: &HyouST, h: &Hyou) -> Hyou {
     let mut newh = h.clone();
     let mut rng = rand::thread_rng();
     for r in 0..hp.worker_count {
+        // Iが入っていることを確認
         let i_cnt = count_waku_row!(Waku::I, hp, h, r);
         if i_cnt == 0 {
-            remove_random(Waku::K, r, &hp, &mut newh, &mut rng);
-            add_random(Waku::K, r, &hp, &mut newh, &mut rng);
+            // ランダムなKを取り除き、Nを代わりに置く
+            remove_random(Waku::K, &hp, &mut newh, r, &mut rng);
+            // ランダムなNをKで置き換える
+            add_random(Waku::K, &hp, &mut newh, r, &mut rng);
         } else {
-            remove_random(Waku::I, r, &hp, &mut newh, &mut rng);
-            // remove_proper_a()
-            remove_random(Waku::K, r, &hp, &mut newh, &mut rng);
-            add_random(Waku::I, r, &hp, &mut newh, &mut rng);
-            // add_proper_a()
+            // ランダムなIを取り除き、Nを代わりに置く
+            remove_random(Waku::I, &hp, &mut newh, r, &mut rng);
+            // 孤立したAを取り除き、Nを代わりに置く
+            remove_improper_a(&hp, &mut newh, r);
+            // ランダムなKを取り除き、Nを代わりに置く
+            remove_random(Waku::K, &hp, &mut newh, r, &mut rng);
+            // ランダムなNをIで置き換える
+            add_random(Waku::I, &hp, &mut newh, r, &mut rng);
+            // Aを必要なら追加する (適当なものを置き換える あらゆる可能性あり)
+            add_proper_a(&hp, &mut newh, r);
+            // ランダムなNをKで置き換える
+            add_random(Waku::K, &hp, &mut newh, r, &mut rng);
         }
 
-        // if !check() {
+        //条件に合うかのチェック
+
+        //無駄あり
+        let ic1 = count_waku_row!(Waku::I, hp, h, r);
+        let ic2 = count_waku_row!(Waku::I, hp, newh, r);
+        let kc1 = count_waku_row!(Waku::K, hp, h, r);
+        let kc2 = count_waku_row!(Waku::K, hp, newh, r);
+
+        // Iの数に変化ないか
+        let b1 = ic1 == ic2;
+        
+        // Kの数に変化ないか
+        let b2 = kc1 == kc2;
+        
+        // IAKの連続が崩れていないか
+        let b3 = iak_renzoku(hp, h, r, &1000.0) >= iak_renzoku(hp, &newh, r, &1000.0);
+        
+        // Absoluteが変化していないか
+        let b4 = {
+            let mut ans = true;
+            for c in hp.buffer..hp.day_count {
+                if hst[r][c] == WakuST::Absolute {
+                    ans = ans && h[r][c] == newh[r][c];
+                }
+            }
+            ans
+        };
+
+        // もし変化が不適切なら
+        if ! (b1 && b2 && b3 && b4) {
             // 戻す
             for c in 0..hp.day_count {
                 newh[r][c] = h[r][c];
             }
-        // }
+        }
     }
     newh
 }
