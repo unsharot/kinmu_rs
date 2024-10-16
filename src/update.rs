@@ -7,6 +7,7 @@ use crate::kata::{
 };
 
 use rand::Rng;
+use rand::rngs::ThreadRng;
 
 
 pub fn gen_update_func<'a>(text: &str, hp: &'a HyouProp, hst: &'a HyouST) -> Box<dyn FnMut(&Hyou) -> Hyou + 'a> {
@@ -15,6 +16,7 @@ pub fn gen_update_func<'a>(text: &str, hp: &'a HyouProp, hst: &'a HyouST) -> Box
         "update1" => Box::new(move |h| update_randomly1(hp, hst, h)),
         "update2" => Box::new(move |h| update_randomly2(hp, hst, h)),
         "update4" => Box::new(move |h| update_randomly4(hp, hst, h)),
+        "update5" => Box::new(move |h| update_randomly5(hp, hst, h)),
         _ => Box::new(move |h| update_randomly4(hp, hst, h)),
     }
 }
@@ -104,15 +106,26 @@ macro_rules! count_waku_row {
     }};
 }
 
-fn remove_random<R: Rng + ?Sized>(w: Waku, r: usize, newh: &mut Hyou, rng: &mut R){
-    // ここbufferを除きたい
-    let is: Vec<usize> = newh[r].iter()
-        .enumerate()
-        .filter(|(_, v)| **v == w)
-        .map(|(i, _)| i)
-        .collect();
+fn remove_random(w: Waku, r: usize, hp: &HyouProp, newh: &mut Hyou, rng: &mut ThreadRng) {
+    let mut is: Vec<usize> = Vec::new();
+    for c in hp.buffer..hp.day_count {
+        if newh[r][c] == w {
+            is.push(c);
+        }
+    }
     let rnd = rng.gen_range(0..is.len());
     newh[r][is[rnd]] = Waku::N;
+}
+
+fn add_random(w: Waku, r:usize, hp: &HyouProp, newh: &mut Hyou, rng: &mut ThreadRng) {
+    let mut is: Vec<usize> = Vec::new();
+    for c in hp.buffer..hp.day_count {
+        if newh[r][c] == Waku::N {
+            is.push(c);
+        }
+    }
+    let rnd = rng.gen_range(0..is.len());
+    newh[r][is[rnd]] = w;
 }
 
 /// IAKを破壊せずに入れ替える
@@ -122,15 +135,14 @@ fn update_randomly5(hp: &HyouProp, _hst: &HyouST, h: &Hyou) -> Hyou {
     for r in 0..hp.worker_count {
         let i_cnt = count_waku_row!(Waku::I, hp, h, r);
         if i_cnt == 0 {
-            remove_random(Waku::K, r, &mut newh, &mut rng);
-            // add_random(Waku::K)
+            remove_random(Waku::K, r, &hp, &mut newh, &mut rng);
+            add_random(Waku::K, r, &hp, &mut newh, &mut rng);
         } else {
-            remove_random(Waku::I, r, &mut newh, &mut rng);
+            remove_random(Waku::I, r, &hp, &mut newh, &mut rng);
             // remove_proper_a()
-            remove_random(Waku::K, r, &mut newh, &mut rng);
-            // add_random(Waku::I)
+            remove_random(Waku::K, r, &hp, &mut newh, &mut rng);
+            add_random(Waku::I, r, &hp, &mut newh, &mut rng);
             // add_proper_a()
-            // add_random(Waku::K)
         }
 
         // if !check() {
