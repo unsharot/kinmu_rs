@@ -104,11 +104,11 @@ macro_rules! count_waku_row {
     }};
 }
 
-fn remove_random(w: Waku, r: usize, newh: &mut Hyou, rng: &mut dyn Rng){
+fn remove_random<R: Rng + ?Sized>(w: Waku, r: usize, newh: &mut Hyou, rng: &mut R){
     // ここbufferを除きたい
     let is: Vec<usize> = newh[r].iter()
         .enumerate()
-        .filter(|(_, v)| v == w)
+        .filter(|(_, v)| **v == w)
         .map(|(i, _)| i)
         .collect();
     let rnd = rng.gen_range(0..is.len());
@@ -116,18 +116,18 @@ fn remove_random(w: Waku, r: usize, newh: &mut Hyou, rng: &mut dyn Rng){
 }
 
 /// IAKを破壊せずに入れ替える
-fn update_randomly5(hp: &HyouProp, hst: &HyouST, h: &Hyou) -> Hyou {
+fn update_randomly5(hp: &HyouProp, _hst: &HyouST, h: &Hyou) -> Hyou {
     let mut newh = h.clone();
     let mut rng = rand::thread_rng();
     for r in 0..hp.worker_count {
         let i_cnt = count_waku_row!(Waku::I, hp, h, r);
         if i_cnt == 0 {
-            remove_random(Waku::K, r, &mut newh, rand);
+            remove_random(Waku::K, r, &mut newh, &mut rng);
             // add_random(Waku::K)
         } else {
-            remove_random(Waku::I, r, &mut newh, rand);
+            remove_random(Waku::I, r, &mut newh, &mut rng);
             // remove_proper_a()
-            remove_random(Waku::K, r, &mut newh, rand);
+            remove_random(Waku::K, r, &mut newh, &mut rng);
             // add_random(Waku::I)
             // add_proper_a()
             // add_random(Waku::K)
