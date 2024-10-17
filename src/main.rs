@@ -6,7 +6,6 @@ pub mod kata;
 pub mod show_hyou;
 pub mod fill;
 
-// use crate::test_lib::test_lib::test_func;
 use rand::Rng;
 use std::io;
 use std::time::Instant;
