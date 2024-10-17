@@ -4,6 +4,7 @@ pub mod score;
 pub mod update;
 pub mod kata;
 pub mod show_hyou;
+pub mod fill;
 
 // use crate::test_lib::test_lib::test_func;
 use rand::Rng;
@@ -54,13 +55,14 @@ fn main() -> io::Result<()> {
 }
 
 fn sub(p: &str) -> io::Result<()> {
-    let Ok((hp, fs, _ff)) = iofile::load_config(p) else { todo!() };
+    let Ok((hp, fs, ff)) = iofile::load_config(p) else { todo!() };
 
     let acs: Vec<kata::AnnealingConfig> = fs.iter().map(|s| iofile::load_annealing_config(s).unwrap()).collect();
 
     let hst_p = &hp.hyou_st;
 
-    let mut model = hp.kibou.clone(); //fillしないとだめ
+    let mut model = fill::run(&ff, &hp);
+
     // let mut score: f32;
     let mut temp_score;
     for ac in acs {

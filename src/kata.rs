@@ -27,7 +27,7 @@ pub type Score = f32;
 #[derive(PartialEq)]
 pub enum WakuST {
     Absolute,
-    Kibo,
+    // Kibo,
     Random,
 }
 
