@@ -24,26 +24,20 @@ pub fn gen_update_func<'a, R: Rng>(text: &str, hp: &'a HyouProp, hst: &'a HyouST
     }
 }
 
-//元の表を更新するか、新たなものを構成するかは考える必要がある
-//とりあえず元の表を更新する方針で
-//annealing.rsは新たなモデルを渡す方針なのでどちらか変える必要あり
-//元の表を更新する方針だと採用されなかった場合に戻せないかも
-//変更箇所のログを返す必要がある
-//変更をログをもとに戻す関数を与える必要がある
-// pub fn update_randomly(hst: &HyouST, h: &mut Hyou) {
+/*
+元の表を更新するか、新たなものを構成するかは議論の余地あり
+元の表を更新する場合、採用されなかった場合に備えて変更箇所のログを返す
+変更をログをもとに戻す関数を与える必要がある
 
-// }
+現状クローンして新たな表を返している
+*/
 
-//上の方法でなければこれ
-// pub fn update_randomly(hst: &HyouST, h: &Hyou) -> Hyou {
-
-// }
-
-/// ランダムな1つの枠をランダムな枠に変えるAbsoluteの場合繰り返す
+/// ランダムな1つの枠をランダムな枠に変える
+/// Absoluteの場合繰り返す
 fn update_randomly1<R: Rng>(hp: &HyouProp, hst: &HyouST, h: &Hyou, rng: &mut R) -> Hyou {
     let mut newh = h.clone();
     let rx: usize = rng.gen_range(0..hp.worker_count);
-    let ry: usize = rng.gen_range(0..hp.day_count);
+    let ry: usize = rng.gen_range(hp.buffer..hp.day_count);
     if hst[rx][ry] != WakuST::Absolute {
         newh[rx][ry] = [Waku::N, Waku::K, Waku::I, Waku::A, Waku::O, Waku::H][rng.gen_range(0..6)];
         newh
@@ -56,7 +50,7 @@ fn update_randomly1<R: Rng>(hp: &HyouProp, hst: &HyouST, h: &Hyou, rng: &mut R) 
 fn update_randomly2<R: Rng>(hp: &HyouProp, hst: &HyouST, h: &Hyou, rng: &mut R) -> Hyou {
     let mut newh = h.clone();
     let rx: usize = rng.gen_range(0..hp.worker_count);
-    let ry: usize = rng.gen_range(0..hp.day_count);
+    let ry: usize = rng.gen_range(hp.buffer..hp.day_count);
     if hst[rx][ry] != WakuST::Absolute {
         newh[rx][ry] = [Waku::N, Waku::K, Waku::I, Waku::A, Waku::O, Waku::H][rng.gen_range(0..6)];
     }
@@ -67,16 +61,17 @@ fn update_randomly2<R: Rng>(hp: &HyouProp, hst: &HyouST, h: &Hyou, rng: &mut R) 
 fn update_randomly4<R: Rng>(hp: &HyouProp, hst: &HyouST, h: &Hyou, rng: &mut R) -> Hyou {
     let mut newh = h.clone();
     let rx: usize = rng.gen_range(0..hp.worker_count);
-    let ry: usize = rng.gen_range(0..hp.day_count);
+    let ry: usize = rng.gen_range(hp.buffer..hp.day_count);
     let b1 = hst[rx][ry] != WakuST::Absolute;
-    // let b2 = h[rx][ry] == Waku::N || h[rx][ry] == Waku::O || h[rx][ry] == Waku::H;
     let b2 = h[rx][ry] == Waku::N || h[rx][ry] == Waku::O || h[rx][ry] == Waku::H || h[rx][ry] == Waku::U;
     if b1 && b2 {
         newh[rx][ry] = [Waku::N, Waku::O, Waku::H][rng.gen_range(0..3)];
         newh
     } else {
         update_randomly4(&hp, &hst, &h, rng)
-        //合わない場合表を何個も生成することになるが、このオーバーヘッドはいかほどか
+        // 合わない場合表を何個も生成することになる
+        // 更新確率をpとすると、更新に必要な平均の呼び出し回数は1/p回なのでそれほど問題はない
+        // むしろ何も更新せずに評価するほうが問題
     }
 }
 
