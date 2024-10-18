@@ -6,7 +6,7 @@ pub mod kata;
 pub mod show_hyou;
 pub mod fill;
 
-use rand::{Rng, SeedableRng};
+use rand::{Rng, SeedableRng, RngCore};
 use rand::rngs::StdRng;
 use std::io;
 use std::time::Instant;
@@ -55,6 +55,14 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
+fn gen_rng_from_seed(seed: usize) -> Box<dyn RngCore> {
+    if seed == 0 {
+        Box::new(rand::thread_rng())
+    } else {
+        Box::new(StdRng::seed_from_u64(seed as u64))
+    }
+}
+
 fn sub(p: &str) -> io::Result<()> {
     let Ok((hp, fs, ff)) = iofile::load_config(p) else { todo!() };
 
@@ -62,8 +70,7 @@ fn sub(p: &str) -> io::Result<()> {
 
     let hst_p = &hp.hyou_st;
 
-    // let mut rng = rand::thread_rng();
-    let mut rng = StdRng::seed_from_u64(0);
+    let mut rng = gen_rng_from_seed(hp.seed);
 
     let mut model = fill::run(&ff, &hp, &mut rng);
 
@@ -71,6 +78,7 @@ fn sub(p: &str) -> io::Result<()> {
     let mut temp_score;
     for ac in acs {
         let start = Instant::now();
+        rng = gen_rng_from_seed(ac.seed);
         (temp_score, model) = annealing::annealing(
             10000000000.0,
             &model,
