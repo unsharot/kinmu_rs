@@ -8,10 +8,9 @@ use crate::kata::{
 };
 
 use rand::Rng;
-use rand::rngs::ThreadRng;
 
 
-pub fn gen_update_func<'a>(text: &str, hp: &'a HyouProp, hst: &'a HyouST) -> Box<dyn FnMut(&Hyou, &mut ThreadRng) -> Hyou + 'a> {
+pub fn gen_update_func<'a, R: Rng>(text: &str, hp: &'a HyouProp, hst: &'a HyouST) -> Box<dyn FnMut(&Hyou, &mut R) -> Hyou + 'a> {
     println!("{}", text);
     match text {
         "update1" => Box::new(move |h, rng| update_randomly1(hp, hst, h, rng)),
@@ -41,7 +40,7 @@ pub fn gen_update_func<'a>(text: &str, hp: &'a HyouProp, hst: &'a HyouST) -> Box
 // }
 
 /// ランダムな1つの枠をランダムな枠に変えるAbsoluteの場合繰り返す
-fn update_randomly1(hp: &HyouProp, hst: &HyouST, h: &Hyou, rng: &mut ThreadRng) -> Hyou {
+fn update_randomly1<R: Rng>(hp: &HyouProp, hst: &HyouST, h: &Hyou, rng: &mut R) -> Hyou {
     let mut newh = h.clone();
     let rx: usize = rng.gen_range(0..hp.worker_count);
     let ry: usize = rng.gen_range(0..hp.day_count);
@@ -54,7 +53,7 @@ fn update_randomly1(hp: &HyouProp, hst: &HyouST, h: &Hyou, rng: &mut ThreadRng) 
 }
 
 /// ランダムな1つの枠をランダムな枠に変える
-fn update_randomly2(hp: &HyouProp, hst: &HyouST, h: &Hyou, rng: &mut ThreadRng) -> Hyou {
+fn update_randomly2<R: Rng>(hp: &HyouProp, hst: &HyouST, h: &Hyou, rng: &mut R) -> Hyou {
     let mut newh = h.clone();
     let rx: usize = rng.gen_range(0..hp.worker_count);
     let ry: usize = rng.gen_range(0..hp.day_count);
@@ -65,7 +64,7 @@ fn update_randomly2(hp: &HyouProp, hst: &HyouST, h: &Hyou, rng: &mut ThreadRng) 
 }
 
 /// ランダムな1つの枠をN,O,Hのうちランダムな枠に変える Absoluteなら繰り返す
-fn update_randomly4(hp: &HyouProp, hst: &HyouST, h: &Hyou, rng: &mut ThreadRng) -> Hyou {
+fn update_randomly4<R: Rng>(hp: &HyouProp, hst: &HyouST, h: &Hyou, rng: &mut R) -> Hyou {
     let mut newh = h.clone();
     let rx: usize = rng.gen_range(0..hp.worker_count);
     let ry: usize = rng.gen_range(0..hp.day_count);
@@ -107,7 +106,7 @@ macro_rules! count_waku_row {
     }};
 }
 
-fn remove_random(w: Waku, hp: &HyouProp, newh: &mut Hyou, r: usize, rng: &mut ThreadRng) {
+fn remove_random<R: Rng>(w: Waku, hp: &HyouProp, newh: &mut Hyou, r: usize, rng: &mut R) {
     let mut is: Vec<usize> = Vec::new();
     for c in hp.buffer..hp.day_count {
         if newh[r][c] == w {
@@ -118,7 +117,7 @@ fn remove_random(w: Waku, hp: &HyouProp, newh: &mut Hyou, r: usize, rng: &mut Th
     newh[r][is[rnd]] = Waku::N;
 }
 
-fn add_random(w: Waku, hp: &HyouProp, newh: &mut Hyou, r:usize, rng: &mut ThreadRng) {
+fn add_random<R: Rng>(w: Waku, hp: &HyouProp, newh: &mut Hyou, r:usize, rng: &mut R) {
     let mut is: Vec<usize> = Vec::new();
     for c in hp.buffer..hp.day_count {
         // if newh[r][c] == Waku::N || newh[r][c] == Waku::U {
@@ -164,7 +163,7 @@ fn add_proper_a(hp: &HyouProp, newh: &mut Hyou, r: usize) {
 
 /// IAKを破壊せずに入れ替える
 /// 前提として、Absolute以外はI,A,K,Nで、AbsoluteでないO,Hはないことが条件
-fn update_randomly5(hp: &HyouProp, hst: &HyouST, h: &Hyou, rng: &mut ThreadRng) -> Hyou {
+fn update_randomly5<R: Rng>(hp: &HyouProp, hst: &HyouST, h: &Hyou, rng: &mut R) -> Hyou {
     let mut newh = h.clone();
     for r in 0..hp.worker_count {
         // Iが入っていることを確認

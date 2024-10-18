@@ -1,22 +1,8 @@
 // use rand::rngs::StdRng;
 use rand::Rng;
-use rand::rngs::ThreadRng;
-
-// struct ANProp<Model, Score> {
-//     get_eval_f: fn(&Model) -> Score,
-//     get_update_f: fn(&Model, &mut StdRng) -> Model,
-//     get_initial_v: Model,
-//     get_loop_v: i32,
-//     get_prob_f: fn(Score, Score, f64) -> f64,
-//     get_temp_f: fn(f64, f64, f64, f64) -> f64,
-//     get_initial_s: StdRng,
-//     get_max_temp: f64,
-//     get_min_temp: f64,
-// }
-
 
 // TODO: seed: i32を追加する
-pub fn annealing<M, S, U, E, T, P>(
+pub fn annealing<M, S, U, E, T, P, R>(
     initial_score: S,
     initial_model: &M,
     loop_count: usize,
@@ -26,14 +12,16 @@ pub fn annealing<M, S, U, E, T, P>(
     temp_min: f32,
     mut temp_func: T,
     mut prob_func: P,
+    rng: &mut R,
 ) -> (S, M)
 where
     M: Clone,
     S: std::cmp::PartialOrd + Copy,
-    U: FnMut(&M, &mut ThreadRng) -> M,
+    U: FnMut(&M, &mut R) -> M,
     E: FnMut(&M) -> S,
     T: FnMut(f32, f32, usize, usize) -> f32,
     P: FnMut(S, S, f32) -> f32,
+    R: Rng
 {
     let mut best_model = initial_model.clone();
     let mut current_model = initial_model.clone();
@@ -42,10 +30,10 @@ where
     let mut current_score = initial_score;
 
     let mut temp;
-    let mut rng = rand::thread_rng();
+    // let mut rng = rand::thread_rng();
 
     for loop_value in 0..loop_count {
-        let next_model = update(&current_model, &mut rng);
+        let next_model = update(&current_model, rng);
         let next_score = eval(&next_model);
         temp = temp_func(temp_max, temp_min, loop_count, loop_value);
 
