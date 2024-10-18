@@ -11,21 +11,22 @@ use crate::kata::{
 };
 
 use rand::Rng;
-use rand::rngs::ThreadRng;
 
-pub fn run(text: &str, hp: &HyouProp) -> Hyou {
+pub fn run<R: Rng>(text: &str, hp: &HyouProp, rng: &mut R) -> Hyou {
     println!("{}", text);
     match text {
-        "fill1" => fill_randomly1(hp),
-        "fill2" => fill_randomly2(hp),
-        _ => fill_randomly1(hp),
+        "fill1" => fill_randomly1(hp, rng),
+        "fill2" => fill_randomly2(hp, rng),
+        _ => {
+            println!("MATCH SINAI FILL FUNC DESU!!! {}", text);
+            fill_randomly1(hp, rng)
+        },
     }
 }
 
 
-fn fill_randomly1(hp: &HyouProp) -> Hyou {
+fn fill_randomly1<R: Rng>(hp: &HyouProp, rng: &mut R) -> Hyou {
     let mut h = hp.kibou.clone();
-    let mut rng = rand::thread_rng();
     for r in 0..hp.worker_count {
         for c in hp.buffer..hp.day_count {
             if hp.hyou_st[r][c] != WakuST::Absolute && h[r][c] == Waku::U {
@@ -67,7 +68,7 @@ macro_rules! count_waku_row {
     }};
 }
 
-fn remove_random(w: Waku, hp: &HyouProp, newh: &mut Hyou, r: usize, rng: &mut ThreadRng) {
+fn remove_random<R: Rng>(w: Waku, hp: &HyouProp, newh: &mut Hyou, r: usize, rng: &mut R) {
     let mut is: Vec<usize> = Vec::new();
     for c in hp.buffer..hp.day_count {
         if newh[r][c] == w {
@@ -86,7 +87,7 @@ fn remove_improper_a(hp: &HyouProp, newh: &mut Hyou, r: usize) {
     }
 }
 
-fn add_random(w: Waku, hp: &HyouProp, newh: &mut Hyou, r:usize, rng: &mut ThreadRng) {
+fn add_random<R: Rng>(w: Waku, hp: &HyouProp, newh: &mut Hyou, r:usize, rng: &mut R) {
     let mut is: Vec<usize> = Vec::new();
     for c in hp.buffer..hp.day_count {
         // if newh[r][c] == Waku::N || newh[r][c] == Waku::U {
@@ -98,9 +99,8 @@ fn add_random(w: Waku, hp: &HyouProp, newh: &mut Hyou, r:usize, rng: &mut Thread
     newh[r][is[rnd]] = w;
 }
 
-fn fill_randomly2(hp: &HyouProp) -> Hyou {
+fn fill_randomly2<R: Rng>(hp: &HyouProp, rng: &mut R) -> Hyou {
     let mut h = hp.kibou.clone();
-    let mut rng = rand::thread_rng();
     for r in 0..hp.worker_count {
 
         // 直接IAKN構築する
@@ -131,7 +131,7 @@ fn fill_randomly2(hp: &HyouProp) -> Hyou {
 
         // 余分なIをランダムに消す
         for _ in 0..i_dif {
-            remove_random(Waku::I, &hp, &mut h, r, &mut rng);
+            remove_random(Waku::I, &hp, &mut h, r, rng);
         }
 
         // 孤立したAを消す
@@ -143,7 +143,7 @@ fn fill_randomly2(hp: &HyouProp) -> Hyou {
         if k_dif > 0 {
             // 不足したKをランダムに足す
             for _ in 0..k_dif {
-                add_random(Waku::K, &hp, &mut h, r, &mut rng);
+                add_random(Waku::K, &hp, &mut h, r, rng);
             }
         } else {
             // 余分なKを消した中で、最もIAKrenzokuが低いものを採用
