@@ -6,12 +6,12 @@ pub mod kata;
 pub mod show_hyou;
 pub mod fill;
 
-use rand::Rng;
-use rand::rngs::ThreadRng;
+use rand::{Rng, SeedableRng};
+use rand::rngs::StdRng;
 use std::io;
 use std::time::Instant;
 
-fn updatef(x: &f32, rng: &mut ThreadRng) -> f32{
+fn updatef<R: Rng>(x: &f32, rng: &mut R) -> f32{
     // x + 0.01
     x + rng.gen::<f32>() / 100.0
 }
@@ -25,7 +25,10 @@ fn main() -> io::Result<()> {
     let best_score: f32;
     let best_model: f32;
 
-    (best_score, best_model) = annealing::annealing(10000.0, &0.0, 100000, updatef, evalf, 10.0, 0.0, annealing::basic_temp_func, annealing::basic_prob_func);
+    (best_score, best_model) = annealing::annealing(10000.0, &0.0, 100000, updatef, evalf, 10.0, 0.0, annealing::basic_temp_func, annealing::basic_prob_func,
+        &mut rand::thread_rng(),
+        // &mut StdRng::seed_from_u64(0),
+    );
     
     println!("{}", best_score);
     println!("{}", best_model);
@@ -76,6 +79,8 @@ fn sub(p: &str) -> io::Result<()> {
             ac.min_temp,
             annealing::basic_temp_func,
             annealing::basic_prob_func,
+            // &mut rand::thread_rng(),
+            &mut StdRng::seed_from_u64(0),
         );
         println!("score: {}", temp_score);
         println!("time: {:?}", start.elapsed());
