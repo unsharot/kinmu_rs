@@ -7,12 +7,13 @@ pub mod show_hyou;
 pub mod fill;
 
 use rand::Rng;
+use rand::rngs::ThreadRng;
 use std::io;
 use std::time::Instant;
 
-fn updatef(x: &f32) -> f32{
+fn updatef(x: &f32, rng: &mut ThreadRng) -> f32{
     // x + 0.01
-    x + rand::thread_rng().gen::<f32>() / 100.0
+    x + rng.gen::<f32>() / 100.0
 }
 
 fn evalf(x: &f32) -> f32{
@@ -28,8 +29,6 @@ fn main() -> io::Result<()> {
     
     println!("{}", best_score);
     println!("{}", best_model);
-    
-    println!("{}",updatef(&5.0));
 
 
 

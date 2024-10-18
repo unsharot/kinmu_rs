@@ -1,5 +1,6 @@
 // use rand::rngs::StdRng;
 use rand::Rng;
+use rand::rngs::ThreadRng;
 
 // struct ANProp<Model, Score> {
 //     get_eval_f: fn(&Model) -> Score,
@@ -29,7 +30,7 @@ pub fn annealing<M, S, U, E, T, P>(
 where
     M: Clone,
     S: std::cmp::PartialOrd + Copy,
-    U: FnMut(&M) -> M,
+    U: FnMut(&M, &mut ThreadRng) -> M,
     E: FnMut(&M) -> S,
     T: FnMut(f32, f32, usize, usize) -> f32,
     P: FnMut(S, S, f32) -> f32,
@@ -41,9 +42,10 @@ where
     let mut current_score = initial_score;
 
     let mut temp;
+    let mut rng = rand::thread_rng();
 
     for loop_value in 0..loop_count {
-        let next_model = update(&current_model);
+        let next_model = update(&current_model, &mut rng);
         let next_score = eval(&next_model);
         temp = temp_func(temp_max, temp_min, loop_count, loop_value);
 
@@ -53,7 +55,7 @@ where
 
             current_model = next_model.clone();
             current_score = next_score;
-        } else if rand::thread_rng().gen::<f32>() < prob_func(current_score, next_score, temp) {
+        } else if rng.gen::<f32>() < prob_func(current_score, next_score, temp) {
             current_model = next_model.clone();
             current_score = next_score;
         }
