@@ -5,6 +5,7 @@ pub mod update;
 pub mod kata;
 pub mod show_hyou;
 pub mod fill;
+pub mod check;
 
 use rand::{Rng, SeedableRng, RngCore};
 use rand::rngs::StdRng;
@@ -66,6 +67,18 @@ fn gen_rng_from_seed(seed: usize) -> Box<dyn RngCore> {
 fn sub(p: &str) -> io::Result<()> {
     let Ok((hp, fs, ff)) = iofile::load_config(p) else { todo!() };
 
+    if check::absolute_ok(&hp) {
+        println!("ABSOLUTE CHECK PASSED");
+    } else {
+        println!("ABSOLUTE CHECK FAILED");
+    }
+
+    if check::iak_ok(&hp) {
+        println!("IAK CHECK PASSED");
+    } else {
+        println!("IAK CHECK FAILED");
+    }
+
     let acs: Vec<kata::AnnealingConfig> = fs.iter().map(|s| iofile::load_annealing_config(s).unwrap()).collect();
 
     let hst_p = &hp.hyou_st;
@@ -73,6 +86,12 @@ fn sub(p: &str) -> io::Result<()> {
     let mut rng = gen_rng_from_seed(hp.seed);
 
     let mut model = fill::run(&ff, &hp, &mut rng);
+
+    if check::fill_ok(&hp, &model) {
+        println!("FILL CHECK PASSED");
+    } else {
+        println!("FILL CHECK FAILED");
+    }
 
     // let mut score: f32;
     let mut temp_score;
