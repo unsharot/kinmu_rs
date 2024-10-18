@@ -62,7 +62,10 @@ fn sub(p: &str) -> io::Result<()> {
 
     let hst_p = &hp.hyou_st;
 
-    let mut model = fill::run(&ff, &hp);
+    // let mut rng = rand::thread_rng();
+    let mut rng = StdRng::seed_from_u64(0);
+
+    let mut model = fill::run(&ff, &hp, &mut rng);
 
     // let mut score: f32;
     let mut temp_score;
@@ -79,8 +82,7 @@ fn sub(p: &str) -> io::Result<()> {
             ac.min_temp,
             annealing::basic_temp_func,
             annealing::basic_prob_func,
-            // &mut rand::thread_rng(),
-            &mut StdRng::seed_from_u64(0),
+            &mut rng,
         );
         println!("score: {}", temp_score);
         println!("time: {:?}", start.elapsed());
