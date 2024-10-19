@@ -32,12 +32,12 @@ pub fn show(h: &Hyou, hp: &HyouProp) {
     print_days(&hp.days, hp.buffer);
 
     //日ごとの統計を表示
-    print_waku_count_column(&h, hp.buffer, N);
-    print_waku_count_column(&h, hp.buffer, I);
-    print_waku_count_column(&h, hp.buffer, A);
-    print_waku_count_column(&h, hp.buffer, K);
-    print_waku_count_column(&h, hp.buffer, O);
-    print_waku_count_column(&h, hp.buffer, H);
+    print_waku_count_column(&h, hp, N);
+    print_waku_count_column(&h, hp, I);
+    print_waku_count_column(&h, hp, A);
+    print_waku_count_column(&h, hp, K);
+    print_waku_count_column(&h, hp, O);
+    print_waku_count_column(&h, hp, H);
 
     //スコア表示
 }
@@ -92,30 +92,48 @@ fn print_days(days: &Vec<DayST>, buffer: usize) {
     println!();
 }
 
-///指定した枠の縦の和を表示
-fn print_waku_count_column(h: &Hyou, buffer: usize, target_w: Waku) {
-    for j in 0..h[0].len() {
+/// 指定した枠の列の和を表示
+fn print_waku_count_column(h: &Hyou, hp: &HyouProp, target_w: Waku) {
+    let mut v: Vec<String> = Vec::new();
+    let mut max_length = 0;
+    for c in 0..hp.day_count {
         let mut sum = 0;
-        for i in 0..h.len() {
-            if h[i][j] == target_w {
+        for r in 0..hp.worker_count {
+            if h[r][c] == target_w {
                 sum += 1;
             }
         }
-        print!("{}", sum); //2桁以上ある場合はずれるので修正必要
-        if j + 1 == buffer.try_into().unwrap() { //はじめからusize使いたい
-            print!("|");
+        let s = sum.to_string();
+        v.push(s.clone());
+        if max_length < s.len() {
+            max_length = s.len();
         }
     }
-    print!(" {}", match target_w {
-        N => "N",
-        K => "K",
-        I => "I",
-        A => "A",
-        O => "O",
-        H => "H",
-        Y => "Y",
-        D => "D",
-        U => "U",
-    });
-    println!();
+    
+    for l in 0..max_length {
+        for c in 0..hp.day_count {
+            if l < v[c].len() {
+                print!("{}", &v[c][l..l+1]);
+            } else {
+                print!(" ");
+            }
+            if c + 1 == hp.buffer {
+                print!("|");
+            }
+        }
+        if l == 0 {
+            print!(" {}", match target_w {
+                N => "N",
+                K => "K",
+                I => "I",
+                A => "A",
+                O => "O",
+                H => "H",
+                Y => "Y",
+                D => "D",
+                U => "U",
+            });
+        }
+        println!();
+    }
 }
