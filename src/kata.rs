@@ -36,6 +36,10 @@ pub type HyouST = Vec<Vec<WakuST>>;
 pub struct Worker {
     pub name: String,
     pub ability: isize,
+    pub k_count: isize,
+    pub i_count: isize,
+    pub o_count: isize,
+    pub h_count: isize,
 }
 
 pub type ID = usize;
@@ -167,10 +171,6 @@ pub struct HyouProp {
     pub buffer: usize,
     pub kibou: Hyou,
     pub hyou_st: HyouST,
-    pub k_counts: Vec<isize>,
-    pub i_counts: Vec<isize>,
-    pub o_counts: Vec<isize>,
-    pub h_counts: Vec<isize>,
     pub i_ninzuu: Vec<isize>,
     pub seed: usize, //fill関数のシード値
     pub score_props: Vec<ScoreProp>, //結果表示のためのスコア

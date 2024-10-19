@@ -127,7 +127,7 @@ fn fill_randomly2<R: Rng>(hp: &HyouProp, rng: &mut R) -> Hyou {
         }
 
         // Iの差分を計算
-        let i_dif = count_waku_row!(Waku::I, hp, h, r) - hp.i_counts[r];
+        let i_dif = count_waku_row!(Waku::I, hp, h, r) - hp.workers[r].i_count;
 
         // 余分なIをランダムに消す
         for _ in 0..i_dif {
@@ -138,7 +138,7 @@ fn fill_randomly2<R: Rng>(hp: &HyouProp, rng: &mut R) -> Hyou {
         remove_improper_a(&hp, &mut h, r);
 
         // Kの差分を計算
-        let k_dif = hp.k_counts[r] - count_waku_row!(Waku::K, hp, h, r);
+        let k_dif = hp.workers[r].k_count - count_waku_row!(Waku::K, hp, h, r);
 
         if k_dif > 0 {
             // 不足したKをランダムに足す

@@ -395,7 +395,7 @@ macro_rules! count_waku_row {
 }
 
 fn kokyu_count(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
-    let cnt_needed = hp.k_counts[r];
+    let cnt_needed = hp.workers[r].k_count;
     let cnt = count_waku_row!(K, hp, h, r);
     let d = (cnt - cnt_needed).abs() as Score;
     let a = d * s;
@@ -403,7 +403,7 @@ fn kokyu_count(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
 }
 
 fn yakin_count(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
-    let cnt_needed = hp.i_counts[r];
+    let cnt_needed = hp.workers[r].i_count;
     let cnt = count_waku_row!(I, hp, h, r);
     let d = (cnt - cnt_needed).abs() as Score;
     let a = d * s;
@@ -411,7 +411,7 @@ fn yakin_count(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
 }
 
 fn oso_count(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
-    let cnt_needed = hp.o_counts[r];
+    let cnt_needed = hp.workers[r].o_count;
     if cnt_needed == -1 {
         0.0
     } else {
@@ -423,7 +423,7 @@ fn oso_count(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
 }
 
 fn haya_count(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
-    let cnt_needed = hp.h_counts[r];
+    let cnt_needed = hp.workers[r].h_count;
     if cnt_needed == -1 {
         0.0
     } else {
