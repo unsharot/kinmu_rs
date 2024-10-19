@@ -67,12 +67,12 @@ pub fn load_config(path: &str) -> io::Result<(HyouProp, Vec<FilePath>, String)> 
         buffer: read_usize(&ss[6])?,
         kibou: hyou.clone(),
         hyou_st: make_hyou_st(&hyou),
-        i_ninzuu: read_isizes(&ss[12])?,
-        seed: read_usize(&ss[14])?,
-        score_props: read_score_props(&ss[16])?,
+        i_ninzuu: read_isizes(&ss[8])?,
+        seed: read_usize(&ss[10])?,
+        score_props: read_score_props(&ss[12])?,
     };
-    let fs = ss[15].lines().map(|s| s.to_string()).collect();
-    let ff = ss[13].clone(); //fillの関数
+    let fs = ss[11].lines().map(|s| s.to_string()).collect();
+    let ff = ss[9].clone(); //fillの関数
 
     Ok((hp, fs, ff))
     
