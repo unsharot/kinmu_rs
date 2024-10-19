@@ -13,6 +13,7 @@ use crate::kata::{
     ScoreProp,
     HyouST,
     WakuST,
+    FillConfig,
 };
 
 
@@ -51,7 +52,7 @@ fn sep_by_fields(contents: &Vec<String>) -> Vec<String> {
 }
 
 ///勤務表で使う値を読み込む
-pub fn load_config(path: &str) -> io::Result<(HyouProp, Vec<FilePath>, String)> {
+pub fn load_config(path: &str) -> io::Result<(HyouProp, Vec<FilePath>, FillConfig)> {
     let contents = read_contents(path)?;
 
     let ss = sep_by_fields(&contents);
@@ -68,14 +69,15 @@ pub fn load_config(path: &str) -> io::Result<(HyouProp, Vec<FilePath>, String)> 
         kibou: hyou.clone(),
         hyou_st: make_hyou_st(&hyou),
         i_ninzuu: read_isizes(&ss[8])?,
-        seed: read_usize(&ss[10])?,
         score_props: read_score_props(&ss[12])?,
     };
     let fs = ss[11].lines().map(|s| s.to_string()).collect();
-    let ff = ss[9].clone(); //fillの関数
+    let fc = FillConfig {
+        name: ss[9].clone(), 
+        seed: read_usize(&ss[10])?,
+    };
 
-    Ok((hp, fs, ff))
-    
+    Ok((hp, fs, fc))
 }
 
 ///焼きなましの段階ごとの設定を読み込む

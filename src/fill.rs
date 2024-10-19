@@ -8,18 +8,21 @@ use crate::kata::{
     Hyou,
     WakuST,
     Waku,
+    FillConfig,
 };
+use crate::seed;
 
 use rand::Rng;
 
-pub fn run<R: Rng>(text: &str, hp: &HyouProp, rng: &mut R) -> Hyou {
-    println!("{}", text);
-    match text {
-        "fill1" => fill_randomly1(hp, rng),
-        "fill2" => fill_randomly2(hp, rng),
+pub fn run(fc: &FillConfig, hp: &HyouProp) -> Hyou {
+    println!("{}", fc.name);
+    let mut rng = seed::gen_rng_from_seed(fc.seed);
+    match fc.name.as_str() {
+        "fill1" => fill_randomly1(hp, &mut rng),
+        "fill2" => fill_randomly2(hp, &mut rng),
         _ => {
-            println!("MATCH SINAI FILL FUNC DESU!!! {}", text);
-            fill_randomly1(hp, rng)
+            println!("MATCH SINAI FILL FUNC DESU!!! {}", fc.name);
+            fill_randomly1(hp, &mut rng)
         },
     }
 }
