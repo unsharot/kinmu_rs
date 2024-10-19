@@ -172,10 +172,13 @@ pub struct HyouProp {
     pub kibou: Hyou,
     pub hyou_st: HyouST,
     pub i_ninzuu: Vec<isize>,
-    pub seed: usize, //fill関数のシード値
     pub score_props: Vec<ScoreProp>, //結果表示のためのスコア
 }
-//下2つはここにあるべきじゃない気がする
+
+pub struct FillConfig {
+    pub name: String,
+    pub seed: usize,
+}
 
 ///焼きなましの段階ごとの設定
 pub struct AnnealingConfig {

@@ -6,9 +6,9 @@ pub mod kata;
 pub mod show_hyou;
 pub mod fill;
 pub mod check;
+pub mod seed;
 
-use rand::{Rng, SeedableRng, RngCore};
-use rand::rngs::StdRng;
+use rand::Rng;
 use std::io;
 use std::time::Instant;
 
@@ -56,16 +56,8 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-fn gen_rng_from_seed(seed: usize) -> Box<dyn RngCore> {
-    if seed == 0 {
-        Box::new(rand::thread_rng())
-    } else {
-        Box::new(StdRng::seed_from_u64(seed as u64))
-    }
-}
-
 fn sub(p: &str) -> io::Result<()> {
-    let Ok((hp, fs, ff)) = iofile::load_config(p) else { todo!() };
+    let Ok((hp, fs, fc)) = iofile::load_config(p) else { todo!() };
 
     if check::absolute_ok(&hp) {
         println!("ABSOLUTE CHECK PASSED");
@@ -83,9 +75,8 @@ fn sub(p: &str) -> io::Result<()> {
 
     let hst_p = &hp.hyou_st;
 
-    let mut rng = gen_rng_from_seed(hp.seed);
 
-    let mut model = fill::run(&ff, &hp, &mut rng);
+    let mut model = fill::run(&fc, &hp);
 
     if check::fill_ok(&hp, &model) {
         println!("FILL CHECK PASSED");
@@ -97,7 +88,7 @@ fn sub(p: &str) -> io::Result<()> {
     let mut temp_score;
     for ac in acs {
         let start = Instant::now();
-        rng = gen_rng_from_seed(ac.seed);
+        let mut rng = seed::gen_rng_from_seed(ac.seed);
         (temp_score, model) = annealing::annealing(
             10000000000.0,
             &model,
