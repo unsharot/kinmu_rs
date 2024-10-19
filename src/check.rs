@@ -55,10 +55,10 @@ pub fn fill_ok(hp: &HyouProp, h: &Hyou) -> bool {
     for r in 0..hp.worker_count {
         let k_cnt = count_waku_row!(Waku::K, hp, h, r);
         let i_cnt = count_waku_row!(Waku::I, hp, h, r);
-        if hp.k_counts[r] != k_cnt {
+        if hp.workers[r].k_count != k_cnt {
             return false;
         }
-        if hp.i_counts[r] != i_cnt {
+        if hp.workers[r].i_count != i_cnt {
             return false;
         }
     }

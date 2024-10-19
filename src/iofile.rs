@@ -58,10 +58,8 @@ pub fn load_config(path: &str) -> io::Result<(HyouProp, Vec<FilePath>, String)> 
 
     let hyou = read_hyou(&ss[7])?;
 
-    let (ws, ks, is, os, hs) = read_workers_counts(&ss[1])?;
-
     let hp = HyouProp {
-        workers: ws,
+        workers: read_workers(&ss[1])?,
         ng_list: read_ng_list(&ss[2])?,
         worker_count: read_usize(&ss[3])?,
         day_count: read_usize(&ss[4])?,
@@ -69,10 +67,6 @@ pub fn load_config(path: &str) -> io::Result<(HyouProp, Vec<FilePath>, String)> 
         buffer: read_usize(&ss[6])?,
         kibou: hyou.clone(),
         hyou_st: make_hyou_st(&hyou),
-        k_counts: ks,
-        i_counts: is,
-        o_counts: os,
-        h_counts: hs,
         i_ninzuu: read_isizes(&ss[12])?,
         seed: read_usize(&ss[14])?,
         score_props: read_score_props(&ss[16])?,
@@ -197,32 +191,27 @@ fn read_dayst_isize_float(text: &str) -> io::Result<(DayST, isize, f32)> {
     Ok((d, i, f))
 }
 
-fn read_workers_counts(text: &str) -> io::Result<(Vec<Worker>, Vec<isize>, Vec<isize>, Vec<isize>, Vec<isize>)> {
+fn read_workers(text: &str) -> io::Result<Vec<Worker>> {
     let mut workers: Vec<Worker> = Vec::new();
-    let mut k_cnts: Vec<isize> = Vec::new();
-    let mut i_cnts: Vec<isize> = Vec::new();
-    let mut o_cnts: Vec<isize> = Vec::new();
-    let mut h_cnts: Vec<isize> = Vec::new();
     for line in text.lines() {
-        let (w, k, i, o, h) = read_worker_count(&line)?;
+        let w = read_worker(&line)?;
         workers.push(w);
-        k_cnts.push(k);
-        i_cnts.push(i);
-        o_cnts.push(o);
-        h_cnts.push(h);
     }
-    Ok((workers, k_cnts, i_cnts, o_cnts, h_cnts))
+    Ok(workers)
 }
 
-fn read_worker_count(text: &str) -> io::Result<(Worker, isize, isize, isize, isize)> {
+fn read_worker(text: &str) -> io::Result<Worker> {
     // TODO: もうちょっと安全にアクセスしたい
     let words: Vec<String> = text.split_whitespace().map(|s| s.to_string()).collect();
-    let worker: Worker = Worker {name: words[5].clone(), ability: read_isize(&words[0])?};
-    let k_cnt: isize = read_isize(&words[1])?;
-    let i_cnt: isize = read_isize(&words[2])?;
-    let o_cnt: isize = read_isize(&words[3])?;
-    let h_cnt: isize = read_isize(&words[4])?;
-    Ok((worker, k_cnt, i_cnt, o_cnt, h_cnt))
+    let worker: Worker = Worker {
+        name: words[5].clone(),
+        ability: read_isize(&words[0])?,
+        k_count: read_isize(&words[1])?,
+        i_count: read_isize(&words[2])?,
+        o_count: read_isize(&words[3])?,
+        h_count: read_isize(&words[4])?,
+    };
+    Ok(worker)
 }
 
 fn read_ng_list(text: &str) -> io::Result<NGList> {
