@@ -214,7 +214,7 @@ fn update_randomly5<R: Rng>(hp: &HyouProp, hst: &HyouST, h: &Hyou, rng: &mut R) 
         // もし変化が不適切なら
         if ! (b1 && b2 && b3 && b4) {
             // 戻す
-            for c in 0..hp.day_count {
+            for c in hp.buffer..hp.day_count {
                 newh[r][c] = h[r][c];
             }
         }
