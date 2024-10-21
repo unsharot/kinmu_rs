@@ -108,14 +108,23 @@ fn fill_randomly2<R: Rng>(hp: &HyouProp, rng: &mut R) -> Hyou {
 
         // 直接IAKN構築する
         let mut r_cnt = 0;
-        for c in hp.buffer..hp.day_count {
-            if hp.hyou_st[r][c] == WakuST::Random {
+        for c in hp.buffer..(hp.day_count + 1) {
+            // Randomが途切れることを検知して、途切れるなら入るだけIAKを入れる
+            // なお、最後は途切れないとしてIAKが埋まるだけ埋める
+            if c != hp.day_count && hp.hyou_st[r][c] == WakuST::Random {
                 r_cnt += 1;
                 if r_cnt == 3 {
                     r_cnt = 0;
                     h[r][c-2] = Waku::I;
                     h[r][c-1] = Waku::A;
                     h[r][c] = Waku::K;
+                }
+            } else if c == hp.day_count {
+                if r_cnt == 1 {
+                    h[r][c-1] = Waku::I;
+                } else if r_cnt == 2 {
+                    h[r][c-2] = Waku::I;
+                    h[r][c-1] = Waku::A;
                 }
             } else {
                 if r_cnt == 1 {
