@@ -59,15 +59,17 @@ pub fn load_config(path: &str) -> io::Result<(HyouProp, Vec<FilePath>, FillConfi
 
     let hyou = read_hyou(&ss[7])?;
 
+    let buffer = read_usize(&ss[6])?;
+
     let hp = HyouProp {
         workers: read_workers(&ss[1])?,
         ng_list: read_ng_list(&ss[2])?,
         worker_count: read_usize(&ss[3])?,
         day_count: read_usize(&ss[4])?,
         days: read_days(&ss[5])?,
-        buffer: read_usize(&ss[6])?,
+        buffer: buffer,
         kibou: hyou.clone(),
-        hyou_st: make_hyou_st(&hyou),
+        hyou_st: make_hyou_st(&hyou, buffer),
         i_ninzuu: read_isizes(&ss[8])?,
         score_props: read_score_props(&ss[12])?,
     };
@@ -311,13 +313,19 @@ fn read_score_prop(text: &str) -> io::Result<ScoreProp> {
 
 
 
-fn make_hyou_st(h: &Hyou) -> HyouST {
+fn make_hyou_st(h: &Hyou, buffer: usize) -> HyouST {
     let mut ans: HyouST = Vec::new();
     for line in h {
-        ans.push(line.iter().map(|w| match w {
-            Waku::U => WakuST::Random,
-            _ => WakuST::Absolute, //Kibouってつかってないんだっけ？
-        }).collect());
+        ans.push(line.iter().enumerate().map(|(i, w)|
+            if i < buffer {
+                WakuST::Absolute
+            } else {
+                match w {
+                    Waku::U => WakuST::Random,
+                    _ => WakuST::Absolute, //Kibouってつかってないんだっけ？
+                }
+            }
+        ).collect());
     }
     ans
 }
