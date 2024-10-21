@@ -74,7 +74,7 @@ macro_rules! count_waku_row {
 fn remove_random<R: Rng>(w: Waku, hp: &HyouProp, newh: &mut Hyou, r: usize, rng: &mut R) {
     let mut is: Vec<usize> = Vec::new();
     for c in hp.buffer..hp.day_count {
-        if newh[r][c] == w {
+        if newh[r][c] == w && hp.hyou_st[r][c] != WakuST::Absolute {
             is.push(c);
         }
     }
@@ -84,7 +84,7 @@ fn remove_random<R: Rng>(w: Waku, hp: &HyouProp, newh: &mut Hyou, r: usize, rng:
 
 fn remove_improper_a(hp: &HyouProp, newh: &mut Hyou, r: usize) {
     for c in hp.buffer..hp.day_count {
-        if newh[r][c] == Waku::A && newh[r][c-1] != Waku::I {
+        if newh[r][c] == Waku::A && newh[r][c-1] != Waku::I && hp.hyou_st[r][c] != WakuST::Absolute {
             newh[r][c] = Waku::N;
         }
     }
@@ -94,7 +94,7 @@ fn add_random<R: Rng>(w: Waku, hp: &HyouProp, newh: &mut Hyou, r:usize, rng: &mu
     let mut is: Vec<usize> = Vec::new();
     for c in hp.buffer..hp.day_count {
         // if newh[r][c] == Waku::N || newh[r][c] == Waku::U {
-        if newh[r][c] == Waku::N {
+        if newh[r][c] == Waku::N && hp.hyou_st[r][c] != WakuST::Absolute {
             is.push(c);
         }
     }
