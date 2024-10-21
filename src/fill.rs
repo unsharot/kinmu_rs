@@ -130,12 +130,16 @@ fn fill_randomly2<R: Rng>(hp: &HyouProp, rng: &mut R) -> Hyou {
                 if r_cnt == 1 {
                     h[r][c-1] = Waku::N;
                 } else if r_cnt == 2 {
-                    h[r][c-2] = Waku::N;
-                    h[r][c-1] = Waku::N;
+                    if h[r][c] == Waku::K || h[r][c] == Waku::Y {
+                        h[r][c-2] = Waku::I;
+                        h[r][c-1] = Waku::A;
+                    } else {
+                        h[r][c-2] = Waku::N;
+                        h[r][c-1] = Waku::N;
+                    }
                 }
                 r_cnt = 0;
             }
-            // TODO: 初めがKならギリギリIAが入る
         }
 
         // Iの差分を計算
