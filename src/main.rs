@@ -112,6 +112,12 @@ fn sub(p: &str) -> io::Result<()> {
         println!("time: {:?}", start.elapsed());
     }
 
+    if check::safe_iak(&hp) {
+        println!("SAFE_IAK CHECK PASSED");
+    } else {
+        println!("SAFE_IAK CHECK FAILED");
+    }
+
     if check::abs_not_changed(&hp, &model) {
         println!("ABS_NOT_CHANGED CHECK PASSED");
     } else {
