@@ -112,7 +112,7 @@ fn sub(p: &str) -> io::Result<()> {
 
     println!("{}", score);
     // println!("{}", score::assess_score(&hp, &model));
-    show_hyou::show(&model, &hp);
+    show_hyou::print_hyou(&hp, &model);
 
     println!();
 
