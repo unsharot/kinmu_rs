@@ -6,7 +6,7 @@ use crate::kata::{
 };
 
 /// すべてAbsoluteになっていないかチェック
-pub fn absolute_ok(hp: &HyouProp) -> bool {
+pub fn all_absolute(hp: &HyouProp) -> bool {
     for r in 0..hp.worker_count {
         for c in hp.buffer..hp.day_count {
             if hp.hyou_st[r][c] != WakuST::Absolute {
@@ -18,7 +18,7 @@ pub fn absolute_ok(hp: &HyouProp) -> bool {
 }
 
 // IAKがすべて埋められているかチェック
-pub fn iak_ok(hp: &HyouProp) -> bool {
+pub fn safe_iak(hp: &HyouProp) -> bool {
 
     for r in 0..hp.worker_count {
         for c in 0..(hp.day_count - 1) {
@@ -51,7 +51,7 @@ macro_rules! count_waku_row {
 }
 
 /// fillした後の表のKとIの数がちゃんとしてるかチェック
-pub fn fill_ok(hp: &HyouProp, h: &Hyou) -> bool {
+pub fn k_i_counts(hp: &HyouProp, h: &Hyou) -> bool {
     for r in 0..hp.worker_count {
         let k_cnt = count_waku_row!(Waku::K, hp, h, r);
         let i_cnt = count_waku_row!(Waku::I, hp, h, r);
@@ -60,6 +60,20 @@ pub fn fill_ok(hp: &HyouProp, h: &Hyou) -> bool {
         }
         if hp.workers[r].i_count != i_cnt {
             return false;
+        }
+    }
+    return true;
+}
+
+/// Absoluteが変化していないことをチェック
+pub fn abs_not_changed(hp: &HyouProp, h: &Hyou) -> bool {
+    for r in 0..hp.worker_count {
+        for c in 0..hp.day_count {
+            if hp.hyou_st[r][c] == WakuST::Absolute {
+                if h[r][c] != hp.kibou[r][c] {
+                    return false;
+                }
+            }
         }
     }
     return true;

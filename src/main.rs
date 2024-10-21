@@ -59,16 +59,16 @@ fn main() -> io::Result<()> {
 fn sub(p: &str) -> io::Result<()> {
     let Ok((hp, fs, fc)) = iofile::load_config(p) else { todo!() };
 
-    if check::absolute_ok(&hp) {
-        println!("ABSOLUTE CHECK PASSED");
+    if check::all_absolute(&hp) {
+        println!("ALL_ABSOLUTE CHECK PASSED");
     } else {
-        println!("ABSOLUTE CHECK FAILED");
+        println!("ALL_ABSOLUTE CHECK FAILED");
     }
 
-    if check::iak_ok(&hp) {
-        println!("IAK CHECK PASSED");
+    if check::safe_iak(&hp) {
+        println!("SAFE_IAK CHECK PASSED");
     } else {
-        println!("IAK CHECK FAILED");
+        println!("SAFE_IAK CHECK FAILED");
     }
 
     let acs: Vec<kata::AnnealingConfig> = fs.iter().map(|s| iofile::load_annealing_config(s).unwrap()).collect();
@@ -78,10 +78,16 @@ fn sub(p: &str) -> io::Result<()> {
 
     let mut model = fill::run(&fc, &hp);
 
-    if check::fill_ok(&hp, &model) {
-        println!("FILL CHECK PASSED");
+    if check::k_i_counts(&hp, &model) {
+        println!("K_I_COUNTS CHECK PASSED");
     } else {
-        println!("FILL CHECK FAILED");
+        println!("K_I_COUNTS CHECK FAILED");
+    }
+
+    if check::abs_not_changed(&hp, &model) {
+        println!("ABS_NOT_CHANGED CHECK PASSED");
+    } else {
+        println!("ABS_NOT_CHANGED CHECK FAILED");
     }
 
     // let mut score: f32;
@@ -104,6 +110,12 @@ fn sub(p: &str) -> io::Result<()> {
         );
         println!("score: {}", temp_score);
         println!("time: {:?}", start.elapsed());
+    }
+
+    if check::abs_not_changed(&hp, &model) {
+        println!("ABS_NOT_CHANGED CHECK PASSED");
+    } else {
+        println!("ABS_NOT_CHANGED CHECK FAILED");
     }
     
     println!();
