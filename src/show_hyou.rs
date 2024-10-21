@@ -7,21 +7,21 @@ use crate::kata::{
 };
 
 ///表を出力
-pub fn show(h: &Hyou, hp: &HyouProp) {
-    for (row_index, row) in h.iter().enumerate() { 
+pub fn print_hyou(hp: &HyouProp, h: &Hyou) {
+    for r in 0..hp.worker_count {
         //Wakuの行を出力
-        print_waku_row(&row, hp.buffer);
+        print_waku_row(hp, h, r);
 
         //統計情報
-        print_waku_count_row(&row, H);
-        print_waku_count_row(&row, O);
-        print_waku_count_row(&row, I);
-        print_waku_count_row(&row, N);
-        print_waku_count_row(&row, K);
-        print_waku_count_row(&row, Y);
+        print_waku_count_row(H, hp, h, r);
+        print_waku_count_row(O, hp, h, r);
+        print_waku_count_row(I, hp, h, r);
+        print_waku_count_row(N, hp, h, r);
+        print_waku_count_row(K, hp, h, r);
+        print_waku_count_row(Y, hp, h, r);
 
         //名前
-        print!(" {}", hp.workers[row_index].name);
+        print!(" {}", hp.workers[r].name);
 
         println!();
     }
@@ -29,23 +29,24 @@ pub fn show(h: &Hyou, hp: &HyouProp) {
     println!();
 
     //曜日を表示
-    print_days(&hp.days, hp.buffer);
+    print_days(hp);
 
     //日ごとの統計を表示
-    print_waku_count_column(&h, hp, N);
-    print_waku_count_column(&h, hp, I);
-    print_waku_count_column(&h, hp, A);
-    print_waku_count_column(&h, hp, K);
-    print_waku_count_column(&h, hp, O);
-    print_waku_count_column(&h, hp, H);
+    print_waku_count_columns(N, hp, h);
+    print_waku_count_columns(I, hp, h);
+    print_waku_count_columns(A, hp, h);
+    print_waku_count_columns(K, hp, h);
+    print_waku_count_columns(O, hp, h);
+    print_waku_count_columns(H, hp, h);
 
     //スコア表示
 }
 
 ///Wakuの行を出力
-fn print_waku_row(row: &Vec<Waku>, buffer: usize) {
-    for (i, w) in row.iter().enumerate() {
-        print!("{}",match w {
+fn print_waku_row(hp: &HyouProp, h: &Hyou, r: usize) {
+    // for (i, w) in row.iter().enumerate() {
+    for c in 0..hp.day_count{
+        print!("{}",match h[r][c] {
             N => "N",
             K => "K",
             I => "I",
@@ -56,17 +57,17 @@ fn print_waku_row(row: &Vec<Waku>, buffer: usize) {
             D => "D",
             U => "U",
         });
-        if i + 1 == buffer {
+        if c + 1 == hp.buffer {
             print!("|");
         }
     }
 }
 
 ///指定した枠の数を出力
-fn print_waku_count_row(row: &Vec<Waku>, target_w: Waku) {
+fn print_waku_count_row(target_w: Waku, hp: &HyouProp, h: &Hyou, r: usize) {
     let mut sum = 0;
-    for w in row {
-        if *w == target_w {
+    for c in hp.buffer..hp.day_count {
+        if h[r][c] == target_w {
             sum += 1;
         }
     }
@@ -75,9 +76,10 @@ fn print_waku_count_row(row: &Vec<Waku>, target_w: Waku) {
 
 
 ///曜日を表示
-fn print_days(days: &Vec<DayST>, buffer: usize) {
-    for (i, d) in days.iter().enumerate() {
-        print!("{}", match d {
+fn print_days(hp: &HyouProp) {
+    // for (i, d) in days.iter().enumerate() {
+    for c in 0..hp.day_count {
+        print!("{}", match hp.days[c] {
             DayST::Weekday => "W",
             DayST::Holiday => "H",
             DayST::Furo => "F",
@@ -85,7 +87,7 @@ fn print_days(days: &Vec<DayST>, buffer: usize) {
             DayST::Weight => "G",
             // _ => "UNDEFINED!!!!",
         });
-        if i + 1 == buffer {
+        if c + 1 == hp.buffer {
             print!("|");
         }
     }
@@ -93,7 +95,7 @@ fn print_days(days: &Vec<DayST>, buffer: usize) {
 }
 
 /// 指定した枠の列の和を表示
-fn print_waku_count_column(h: &Hyou, hp: &HyouProp, target_w: Waku) {
+fn print_waku_count_columns(target_w: Waku, hp: &HyouProp, h: &Hyou) {
     let mut v: Vec<String> = Vec::new();
     let mut max_length = 0;
     for c in 0..hp.day_count {
