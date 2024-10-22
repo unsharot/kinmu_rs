@@ -41,10 +41,10 @@ where
             best_model = next_model.clone();
             best_score = next_score;
 
-            current_model = next_model.clone();
+            current_model = next_model;
             current_score = next_score;
         } else if rng.gen::<f32>() < prob_func(current_score, next_score, temp) {
-            current_model = next_model.clone();
+            current_model = next_model;
             current_score = next_score;
         }
     }
