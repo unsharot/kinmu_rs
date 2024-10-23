@@ -1,11 +1,6 @@
-use kinmu_rs::annealing;
-use kinmu_rs::iofile;
-use kinmu_rs::score;
-use kinmu_rs::update;
-use kinmu_rs::kata;
-use kinmu_rs::show_hyou;
-use kinmu_rs::fill;
-use kinmu_rs::check;
+use annealing::annealing;
+use kinmu_rs::kinmu_lib::{score, update, kata, fill, check};
+use kinmu_rs::io::{read_file, show_hyou};
 use kinmu_rs::seed;
 
 use rand::Rng;
@@ -37,7 +32,7 @@ fn main() -> io::Result<()> {
 
     let config_path = "config/config.yaml".to_string();
 
-    match iofile::load_main_config(&config_path) {
+    match read_file::load_main_config(&config_path) {
         Ok(lines) => {
             for line in lines {
                 println!("{}", line);
@@ -48,7 +43,7 @@ fn main() -> io::Result<()> {
         }
     }
 
-    let ps = iofile::load_main_config(&config_path)?;
+    let ps = read_file::load_main_config(&config_path)?;
 
     ps.iter().for_each(|p| { let _ = sub(p); });
 
@@ -56,7 +51,7 @@ fn main() -> io::Result<()> {
 }
 
 fn sub(p: &str) -> io::Result<()> {
-    let Ok((hp, fs, fc)) = iofile::load_config(p) else { todo!() };
+    let Ok((hp, fs, fc)) = read_file::load_config(p) else { todo!() };
 
     if check::all_absolute(&hp) {
         println!("ALL_ABSOLUTE CHECK PASSED");
@@ -70,7 +65,7 @@ fn sub(p: &str) -> io::Result<()> {
         println!("SAFE_IAK CHECK FAILED");
     }
 
-    let acs: Vec<kata::AnnealingConfig> = fs.iter().map(|s| iofile::load_annealing_config(s).unwrap()).collect();
+    let acs: Vec<kata::AnnealingConfig> = fs.iter().map(|s| read_file::load_annealing_config(s).unwrap()).collect();
 
     let hst_p = &hp.hyou_st;
 
