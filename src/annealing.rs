@@ -1,5 +1,27 @@
 use rand::Rng;
 
+/// 焼きなましの実行
+/// 一般化されたもの
+///
+/// # 例
+///
+/// ```
+/// fn updatef<R: Rng>(x: &f32, rng: &mut R) -> f32{
+///    x + rng.gen::<f32>() / 100.0
+/// }
+///
+/// fn evalf(x: &f32) -> f32{
+///     (x - 5.0) * (x - 5.0)
+/// }
+///
+/// let best_score: f32;
+/// let best_model: f32;
+///
+/// (best_score, best_model) = annealing::annealing(10000.0, &0.0, 100000, updatef, evalf, 10.0, 0.0, annealing::basic_temp_func, annealing::basic_prob_func,
+///     &mut rand::thread_rng(),
+///     // &mut StdRng::seed_from_u64(0),
+/// );
+///```
 pub fn annealing<M, S, U, E, T, P, R>(
     initial_score: S,
     initial_model: &M,
@@ -49,12 +71,15 @@ where
     (best_score, best_model)
 }
 
-
+/// 標準の温度関数
+/// 与えられた最大温度と最低温度から、ステップに対して線形な温度を返す
 pub fn basic_temp_func(temp_max: f32, temp_min: f32, loop_end: usize, loop_now: usize) -> f32 {
     let r: f32 = (loop_end - loop_now) as f32 / loop_end as f32;
     temp_max - ((temp_max - temp_min) * r)
 }
 
+/// 標準の確率関数
+/// 前後のスコアと温度から、スコアが悪化した場合に更新する確率を返す
 pub fn basic_prob_func(score_now: f32, score_next: f32, temp: f32) -> f32 {
     ((score_now - score_next) / temp).exp()
 }
