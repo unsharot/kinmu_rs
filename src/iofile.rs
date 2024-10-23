@@ -35,7 +35,7 @@ pub fn load_main_config(path: &FilePath) -> io::Result<Vec<FilePath>> {
     Ok(ans)
 }
 
-///フィールドごとに区切る
+/// フィールドごとに区切る
 fn sep_by_fields(contents: &Vec<String>) -> Vec<String> {
     let mut temp: Vec<String> = Vec::new();
     let mut ss: Vec<String> = Vec::new();
@@ -51,7 +51,7 @@ fn sep_by_fields(contents: &Vec<String>) -> Vec<String> {
     ss
 }
 
-///勤務表で使う値を読み込む
+/// 勤務表で使う値を読み込む
 pub fn load_config(path: &str) -> io::Result<(HyouProp, Vec<FilePath>, FillConfig)> {
     let contents = read_contents(path)?;
 
@@ -82,14 +82,14 @@ pub fn load_config(path: &str) -> io::Result<(HyouProp, Vec<FilePath>, FillConfi
     Ok((hp, fs, fc))
 }
 
-///焼きなましの段階ごとの設定を読み込む
+/// 焼きなましの段階ごとの設定を読み込む
 pub fn load_annealing_config(path: &str) -> io::Result<AnnealingConfig> {
     let contents = read_contents(path)?;
 
     let ss = sep_by_fields(&contents);
 
     let ac = AnnealingConfig {
-        step: read_usize(&ss[1])?, //ここのindexてきとう
+        step: read_usize(&ss[1])?,
         seed: read_usize(&ss[2])?,
         score_props: read_score_props(&ss[3])?,
         update_func: ss[4].clone(),
@@ -100,27 +100,21 @@ pub fn load_annealing_config(path: &str) -> io::Result<AnnealingConfig> {
     Ok(ac)
 }
 
-/*
-HyouPropのなかでもstep,seed,score_propは
-アニーリングごとに変わるので別問題
-分ける必要があるかも
-*/
-
-///ファイルを読み込んで文字列の行ごとの配列を返す関数
+/// ファイルを読み込んで文字列の行ごとの配列を返す関数
 fn read_contents(path: &str) -> io::Result<Vec<String>> {
 
-    //ファイルの全文をStringとして読み込む
+    // ファイルの全文をStringとして読み込む
     let contents = read_to_string(path)?;
 
-    //成形して行ごとのVec<String>にする
+    // 成形して行ごとのVec<String>にする
     let mut ans: Vec<String> = Vec::new();
     for line in contents.lines() {
-        //コメントを除去
+        // コメントを除去
         let cleaned_line = match line.find('#') {
             Some(index) => &line[..index],
             None => &line,
         };
-        //空白の行を除去
+        // 空白の行を除去
         if cleaned_line != "" {
             ans.push(cleaned_line.to_string());
         }
@@ -241,7 +235,6 @@ fn read_days(text: &str) -> io::Result<Days> {
 fn read_hyou(text: &str) -> io::Result<Hyou> {
     let mut ans: Hyou = Vec::new();
     for line in text.lines() {
-        // println!("{}",line);
         let a: Vec<Waku> = line.chars().map(|c| match c {
             'N' => Ok(Waku::N),
             'K' => Ok(Waku::K),
@@ -322,7 +315,7 @@ fn make_hyou_st(h: &Hyou, buffer: usize) -> HyouST {
             } else {
                 match w {
                     Waku::U => WakuST::Random,
-                    _ => WakuST::Absolute, //Kibouってつかってないんだっけ？
+                    _ => WakuST::Absolute,
                 }
             }
         ).collect());

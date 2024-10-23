@@ -17,7 +17,7 @@ pub fn all_absolute(hp: &HyouProp) -> bool {
     return false;
 }
 
-// IAKがすべて埋められているかチェック
+/// IAKがすべて埋められているかチェック
 pub fn safe_iak(hp: &HyouProp) -> bool {
 
     for r in 0..hp.worker_count {

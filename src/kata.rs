@@ -27,7 +27,6 @@ pub type Score = f32;
 #[derive(PartialEq)]
 pub enum WakuST {
     Absolute,
-    // Kibo,
     Random,
 }
 
@@ -54,11 +53,7 @@ pub enum DayST {
     Weight,
 }
 
-// #[derive(Debug, PartialEq, Eq)]
-// struct ParseDaySTError;
-
 impl FromStr for DayST {
-    // type Err = ParseDaySTError;
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -154,17 +149,15 @@ impl ScoreProp {
             ScoreProp::NoSamePair3(p) => format!("NoSamePair3({:?})", p),
             ScoreProp::NoSamePair2(p) => format!("NoSamePair2({:?})", p),
             ScoreProp::NoUndef(p) => format!("NoUndef({:?})", p),
-            // _ => "NO WAY!!!".to_string(),
         }
     }
 }
 
 
-///勤務表で使う値
+/// 勤務表ごとの設定
 pub struct HyouProp {
     pub workers: Vec<Worker>,
     pub ng_list: NGList,
-    // pub bounds: (usize, usize),
     pub worker_count: usize,
     pub day_count: usize,
     pub days: Days,
@@ -172,7 +165,7 @@ pub struct HyouProp {
     pub kibou: Hyou,
     pub hyou_st: HyouST,
     pub i_ninzuu: Vec<isize>,
-    pub score_props: Vec<ScoreProp>, //結果表示のためのスコア
+    pub score_props: Vec<ScoreProp>, // 結果表示のためのスコア
 }
 
 pub struct FillConfig {
@@ -180,11 +173,11 @@ pub struct FillConfig {
     pub seed: usize,
 }
 
-///焼きなましの段階ごとの設定
+/// 焼きなましの段階ごとの設定
 pub struct AnnealingConfig {
-    pub step: usize, //焼きなましのステップ数
-    pub seed: usize, //焼きなましのupdate関数のシード
-    pub score_props: Vec<ScoreProp>, //焼きなましのためのスコア
+    pub step: usize, // 焼きなましのステップ数
+    pub seed: usize, // 焼きなましのupdate関数のシード
+    pub score_props: Vec<ScoreProp>, // 焼きなましのためのスコア
     pub update_func: String,
     pub max_temp: f32,
     pub min_temp: f32,

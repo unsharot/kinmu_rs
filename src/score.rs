@@ -1,23 +1,15 @@
 use crate::kata::{
-    // Waku,
     Waku::*,
     Hyou,
-    // HyouRow,
-    // HyouColumn,
     Score,
     DayST,
-    // NG,
-    // NGList,
     ScoreProp,
     ScoreProp::*,
     HyouProp,
-    // Worker,
 };
 
 
 
-// use std::cmp;
-// use std::hash::Hash;
 use std::collections::HashMap;
 
 
@@ -96,11 +88,8 @@ fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp) -> Score {
         NoUndef(p) => check_columns!(no_undef, hp, h, p),
         
         _ => 0.0,
-        // _ => {println!("MATCH SINAI SP DESU!!! (score)"); 0.0},
     }
 }
-//hpのパラメータはhp._でとる
-//遅延評価がデフォじゃないので
 
 
 
@@ -114,15 +103,9 @@ fn get_score(hp: &HyouProp, h: &Hyou, sp: &ScoreProp) -> Score {
 
 
 
-//trie木を使って連続パターンを検出したい
-//まとめて実行できたら早いかも
-//木は初回実行時に構築して保持する
-// fn renzoku(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
-//     // for i in 0..hp.day_count {
-//     //     h[r][i]
-//     // }
-//     0.0
-// }
+// trie木を使って連続パターンを検出したい
+// まとめて実行できたら早いかも
+// 木は初回実行時に構築して保持する
 
 fn iak_renzoku(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
     let mut ans = 0.0;
@@ -309,10 +292,10 @@ fn k_renzoku2_no_buffer(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
 }
 
 
-//カウントするタイプのスコアもまとめて実行してから計算したい
-//HashMapをつかえそう
-//やっても早くなるかはわからない
-//HashMapの構築に時間とメモリかかるかも
+// カウントするタイプのスコアもまとめて実行してから計算したい
+// HashMapをつかえそう
+// やっても早くなるかはわからない
+// HashMapの構築に時間とメモリかかるかも
 fn osohaya_baransu(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
     let mut oso: isize = 0;
     let mut haya: isize = 0;
@@ -491,10 +474,8 @@ fn haya_ninzuu(hp: &HyouProp, h: &Hyou, c: usize, (cnt_needed, s): &(isize,Score
     a * a
 }
 
-//NGリストをHashMapとして保持して、タプルで検索?
-//NGリストに今回のペアが含まれるか or NGリストにあるペアがIかどうか確認
-//後者の方針で
 fn ng_pair(hp: &HyouProp, h: &Hyou, c: usize, s: &Score) -> Score {
+    // NGリストにあるペアがIかどうか確認
     let mut ans = 0.0;
     for i in 0..hp.ng_list.len() {
         let (a, b) = hp.ng_list[i];
@@ -506,8 +487,6 @@ fn ng_pair(hp: &HyouProp, h: &Hyou, c: usize, s: &Score) -> Score {
 }
 
 fn leader_ability(hp: &HyouProp, h: &Hyou, c: usize, (ab, s): &(isize,Score)) -> Score {
-    // if hp.days[c] == DayST::Holiday {
-    // if let DayST::Holiday = hp.days[c] {
     if matches!(hp.days[c], DayST::Holiday) {
         let mut a_cnt = 0;
         for r in 0..hp.worker_count {
@@ -562,7 +541,6 @@ fn yakin_alone_before_furo(hp: &HyouProp, h: &Hyou, c: usize, s: &Score) -> Scor
     }
 }
 
-//結局合計をここで計算する必要あり
 fn heyamoti_ability(hp: &HyouProp, h: &Hyou, c: usize, (cnt_needed, ab, s): &(isize,isize,Score)) -> Score {
     let mut a_cnt = 0;
     for r in 0..hp.worker_count {
@@ -578,7 +556,7 @@ fn heyamoti_ability(hp: &HyouProp, h: &Hyou, c: usize, (cnt_needed, ab, s): &(is
     s * d * d
 }
 
-///3回以上同じペアなら発火するスコア
+/// 3回以上同じペアなら発火するスコア
 fn no_same_pair3(hp: &HyouProp, h: &Hyou, s: &Score) -> Score {
     let mut map: HashMap<Vec<usize>, isize> = HashMap::new();
     for c in hp.buffer..hp.day_count {
@@ -602,7 +580,7 @@ fn no_same_pair3(hp: &HyouProp, h: &Hyou, s: &Score) -> Score {
     ans
 }
 
-///2回以上同じペアなら発火するスコア
+/// 2回以上同じペアなら発火するスコア
 fn no_same_pair2(hp: &HyouProp, h: &Hyou, s: &Score) -> Score {
     let mut map: HashMap<Vec<usize>, isize> = HashMap::new();
     for c in hp.buffer..hp.day_count {
