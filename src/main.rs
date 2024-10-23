@@ -13,7 +13,6 @@ use std::io;
 use std::time::Instant;
 
 fn updatef<R: Rng>(x: &f32, rng: &mut R) -> f32{
-    // x + 0.01
     x + rng.gen::<f32>() / 100.0
 }
 
@@ -90,7 +89,6 @@ fn sub(p: &str) -> io::Result<()> {
         println!("ABS_NOT_CHANGED CHECK FAILED");
     }
 
-    // let mut score: f32;
     let mut temp_score;
     for ac in acs {
         let start = Instant::now();

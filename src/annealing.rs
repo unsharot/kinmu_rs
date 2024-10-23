@@ -1,7 +1,5 @@
-// use rand::rngs::StdRng;
 use rand::Rng;
 
-// TODO: seed: i32を追加する
 pub fn annealing<M, S, U, E, T, P, R>(
     initial_score: S,
     initial_model: &M,
@@ -30,7 +28,6 @@ where
     let mut current_score = initial_score;
 
     let mut temp;
-    // let mut rng = rand::thread_rng();
 
     for loop_value in 0..loop_count {
         let next_model = update(&current_model, rng);

@@ -115,7 +115,6 @@ fn remove_random<R: Rng>(w: Waku, hp: &HyouProp, newh: &mut Hyou, r: usize, rng:
 fn add_random<R: Rng>(w: Waku, hp: &HyouProp, newh: &mut Hyou, r:usize, rng: &mut R) {
     let mut is: Vec<usize> = Vec::new();
     for c in hp.buffer..hp.day_count {
-        // if newh[r][c] == Waku::N || newh[r][c] == Waku::U {
         if newh[r][c] == Waku::N {
             is.push(c);
         }
@@ -183,9 +182,9 @@ fn update_randomly5<R: Rng>(hp: &HyouProp, hst: &HyouST, h: &Hyou, rng: &mut R) 
             add_random(Waku::K, &hp, &mut newh, r, rng);
         }
 
-        //条件に合うかのチェック
+        // 条件に合うかのチェック
 
-        //無駄あり
+        // 無駄あり 一回で走査できる
         let ic1 = count_waku_row!(Waku::I, hp, h, r);
         let ic2 = count_waku_row!(Waku::I, hp, newh, r);
         let kc1 = count_waku_row!(Waku::K, hp, h, r);
