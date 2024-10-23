@@ -1,12 +1,12 @@
-pub mod annealing;
-pub mod iofile;
-pub mod score;
-pub mod update;
-pub mod kata;
-pub mod show_hyou;
-pub mod fill;
-pub mod check;
-pub mod seed;
+use kinmu_rs::annealing;
+use kinmu_rs::iofile;
+use kinmu_rs::score;
+use kinmu_rs::update;
+use kinmu_rs::kata;
+use kinmu_rs::show_hyou;
+use kinmu_rs::fill;
+use kinmu_rs::check;
+use kinmu_rs::seed;
 
 use rand::Rng;
 use std::io;

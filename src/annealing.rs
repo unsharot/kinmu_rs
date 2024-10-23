@@ -6,6 +6,9 @@ use rand::Rng;
 /// # 例
 ///
 /// ```
+/// use rand::Rng;
+/// use kinmu_rs::annealing;
+///
 /// fn updatef<R: Rng>(x: &f32, rng: &mut R) -> f32{
 ///    x + rng.gen::<f32>() / 100.0
 /// }
