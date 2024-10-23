@@ -1,7 +1,7 @@
 use std::fs::{read_to_string};
 use std::io;
 
-use crate::kata::{
+use crate::kinmu_lib::kata::{
     HyouProp,
     AnnealingConfig,
     Waku,

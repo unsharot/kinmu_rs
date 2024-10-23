@@ -3,7 +3,7 @@ fill1はUをランダムな枠に
 fill2はIとKの数合わせてうまいこと埋める
 */
 
-use crate::kata::{
+use crate::kinmu_lib::kata::{
     HyouProp,
     Hyou,
     WakuST,

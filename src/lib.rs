@@ -1,9 +1,3 @@
-pub mod annealing;
-pub mod iofile;
-pub mod score;
-pub mod update;
-pub mod kata;
-pub mod show_hyou;
-pub mod fill;
-pub mod check;
+pub mod kinmu_lib;
+pub mod io;
 pub mod seed;
