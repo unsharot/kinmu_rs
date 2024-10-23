@@ -84,12 +84,13 @@ fn sub(p: &str) -> io::Result<()> {
         println!("ABS_NOT_CHANGED CHECK FAILED");
     }
 
-    let mut temp_score;
+    let mut score;
     for ac in acs {
         let start = Instant::now();
         let mut rng = seed::gen_rng_from_seed(ac.seed);
-        (temp_score, model) = annealing::annealing(
-            10000000000.0,
+        score = score::assess_score(&ac.score_props, &hp, &model);
+        (score, model) = annealing::annealing(
+            score,
             &model,
             ac.step,
             update::gen_update_func(&ac.update_func, &hp, hst_p),
@@ -101,7 +102,7 @@ fn sub(p: &str) -> io::Result<()> {
             annealing::basic_prob_func,
             &mut rng,
         );
-        println!("score: {}", temp_score);
+        println!("score: {}", score);
         println!("time: {:?}", start.elapsed());
     }
 
@@ -119,7 +120,7 @@ fn sub(p: &str) -> io::Result<()> {
     
     println!();
 
-    let score = score::assess_score(&hp.score_props, &hp, &model);
+    score = score::assess_score(&hp.score_props, &hp, &model);
 
     println!("{}", score);
     // println!("{}", score::assess_score(&hp, &model));
