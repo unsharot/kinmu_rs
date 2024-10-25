@@ -6,6 +6,8 @@ use crate::kinmu_lib::kata::{
     DayST,
 };
 
+const ROW_STATS_DIGIT: usize = 2;
+
 /// 表を出力
 pub fn print_hyou(hp: &HyouProp, h: &Hyou) {
     for r in 0..hp.worker_count {
@@ -70,7 +72,9 @@ fn print_waku_count_row(target_w: Waku, hp: &HyouProp, h: &Hyou, r: usize) {
             sum += 1;
         }
     }
-    print!(" {:>2}", sum);
+    // 桁を指定して出力
+    let f = format!(" {:>stats$}", sum, stats = ROW_STATS_DIGIT);
+    print!("{}", f);
 }
 
 
