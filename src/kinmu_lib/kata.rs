@@ -1,4 +1,5 @@
 use std::str::FromStr;
+use std::fmt;
 
 #[derive(Debug)]
 #[derive(Clone)]
@@ -14,6 +15,23 @@ pub enum Waku {
     Y,
     D,
     U,
+}
+
+impl fmt::Display for Waku {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let s = match self {
+            Waku::N => "N",
+            Waku::K => "K",
+            Waku::I => "I",
+            Waku::A => "A",
+            Waku::O => "O",
+            Waku::H => "H",
+            Waku::Y => "Y",
+            Waku::D => "D",
+            Waku::U => "U",
+        };
+        write!(f, "{}", s)
+    }
 }
 
 pub type Hyou = Vec<Vec<Waku>>;
@@ -51,6 +69,19 @@ pub enum DayST {
     Furo,
     Furo2,
     Weight,
+}
+
+impl fmt::Display for DayST {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let s = match self {
+            DayST::Weekday => "W",
+            DayST::Holiday => "H",
+            DayST::Furo => "F",
+            DayST::Furo2 => "2",
+            DayST::Weight => "G",
+        };
+        write!(f, "{}", s)
+    }
 }
 
 impl FromStr for DayST {
