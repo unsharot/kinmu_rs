@@ -1,4 +1,4 @@
-use crate::kinmu_lib::kata::{
+use super::types::{
     HyouProp,
     WakuST,
     Waku,

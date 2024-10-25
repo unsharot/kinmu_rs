@@ -1,5 +1,5 @@
 use annealing::annealing;
-use kinmu_rs::kinmu_lib::{score, update, kata, fill, check};
+use kinmu_rs::kinmu_lib::{score, update, types, fill, check};
 use kinmu_rs::io::{reader, display};
 use kinmu_rs::seed;
 
@@ -65,7 +65,7 @@ fn sub(p: &str) -> io::Result<()> {
         println!("SAFE_IAK CHECK FAILED");
     }
 
-    let acs: Vec<kata::AnnealingConfig> = fs.iter().map(|s| reader::load_annealing_config(s).unwrap()).collect();
+    let acs: Vec<types::AnnealingConfig> = fs.iter().map(|s| reader::load_annealing_config(s).unwrap()).collect();
 
     let hst_p = &hp.hyou_st;
 

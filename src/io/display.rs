@@ -1,4 +1,4 @@
-use crate::kinmu_lib::kata::{
+use crate::kinmu_lib::types::{
     Hyou,
     Waku,
     Waku::*,
