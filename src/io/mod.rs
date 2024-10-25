@@ -1,2 +1,2 @@
-pub mod read_file;
-pub mod show_hyou;
+pub mod reader;
+pub mod display;
