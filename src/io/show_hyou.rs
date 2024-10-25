@@ -3,7 +3,6 @@ use crate::kinmu_lib::kata::{
     Waku,
     Waku::*,
     HyouProp,
-    DayST,
 };
 
 const ROW_STATS_DIGIT: usize = 2;
@@ -47,17 +46,7 @@ pub fn print_hyou(hp: &HyouProp, h: &Hyou) {
 /// Wakuの行を出力
 fn print_waku_row(hp: &HyouProp, h: &Hyou, r: usize) {
     for c in 0..hp.day_count{
-        print!("{}",match h[r][c] {
-            N => "N",
-            K => "K",
-            I => "I",
-            A => "A",
-            O => "O",
-            H => "H",
-            Y => "Y",
-            D => "D",
-            U => "U",
-        });
+        print!("{}", h[r][c].to_string());
         if c + 1 == hp.buffer {
             print!("|");
         }
@@ -81,13 +70,7 @@ fn print_waku_count_row(target_w: Waku, hp: &HyouProp, h: &Hyou, r: usize) {
 /// 曜日を表示
 fn print_days(hp: &HyouProp) {
     for c in 0..hp.day_count {
-        print!("{}", match hp.days[c] {
-            DayST::Weekday => "W",
-            DayST::Holiday => "H",
-            DayST::Furo => "F",
-            DayST::Furo2 => "2",
-            DayST::Weight => "G",
-        });
+        print!("{}", hp.days[c].to_string());
         if c + 1 == hp.buffer {
             print!("|");
         }
@@ -125,17 +108,7 @@ fn print_waku_count_columns(target_w: Waku, hp: &HyouProp, h: &Hyou) {
             }
         }
         if l == 0 {
-            print!(" {}", match target_w {
-                N => "N",
-                K => "K",
-                I => "I",
-                A => "A",
-                O => "O",
-                H => "H",
-                Y => "Y",
-                D => "D",
-                U => "U",
-            });
+            print!(" {}", target_w.to_string());
         }
         println!();
     }
