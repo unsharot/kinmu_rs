@@ -39,7 +39,7 @@ pub fn assess_score(sps: &Vec<ScoreProp>, hp: &HyouProp, h: &Hyou) -> Score {
 
 pub fn show_score(sps: &Vec<ScoreProp>, hp: &HyouProp, h: &Hyou) -> String {
     let sl = get_score_list(sps, hp, h);
-    let ss: Vec<String> = sps.iter().map(|x| x.show()).collect();
+    let ss: Vec<String> = sps.iter().map(|x| x.to_string()).collect();
     let zipped: Vec<String> = ss.iter().zip(sl.iter()).map(|(x,y)| x.to_string() + ": " + &y.to_string()).collect();
     zipped.join("\n")
 }

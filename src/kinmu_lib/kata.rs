@@ -88,15 +88,14 @@ impl FromStr for DayST {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let ans = match s {
+        match s {
             "W" => Ok(DayST::Weekday),
             "H" => Ok(DayST::Holiday),
             "F" => Ok(DayST::Furo),
             "2" => Ok(DayST::Furo2),
             "G" => Ok(DayST::Weight),
             _ => Err(format!("Failed to parse DayST: {}", s))
-        };
-        ans
+        }
     }
 }
 
@@ -143,9 +142,9 @@ pub enum ScoreProp {
     NoUndef(Score),
 }
 
-impl ScoreProp {
-    pub fn show(&self) -> String {
-        match self {
+impl fmt::Display for ScoreProp {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let s = match self {
             ScoreProp::IAKrenzoku(p) => format!("IAKrenzoku({:?})", p),
             ScoreProp::KIArenzoku(p) => format!("KIArenzoku({:?})", p),
             ScoreProp::KNIArenzoku(p) => format!("KNIArenzoku({:?})", p),
@@ -180,7 +179,8 @@ impl ScoreProp {
             ScoreProp::NoSamePair3(p) => format!("NoSamePair3({:?})", p),
             ScoreProp::NoSamePair2(p) => format!("NoSamePair2({:?})", p),
             ScoreProp::NoUndef(p) => format!("NoUndef({:?})", p),
-        }
+        };
+        write!(f, "{}", s)
     }
 }
 
