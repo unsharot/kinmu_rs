@@ -1,3 +1,5 @@
+//! config読み込みのモジュール
+
 use std::fs::{read_to_string};
 use std::io;
 

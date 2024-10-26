@@ -1,3 +1,5 @@
+//! 焼きなましで使う評価関数のモジュール
+
 use super::types::{
     Waku::*,
     Hyou,

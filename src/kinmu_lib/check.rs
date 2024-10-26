@@ -1,3 +1,5 @@
+//! 各段階が問題なく動いているか確認する関数のモジュール
+
 use super::types::{
     HyouProp,
     WakuST,
