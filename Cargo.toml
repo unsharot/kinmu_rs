@@ -1,7 +1,10 @@
 [package]
-name = "kinmu_rs"
-version = "0.1.0"
+name = "kinmu"
+version = "1.0.3"
+authors = ["unsharot"]
 edition = "2021"
+description = "A project that solves specific nurse scheduling problem."
+repository = "https://github.com/unsharot/kinmu_rs"
 
 [workspace]
 members = [

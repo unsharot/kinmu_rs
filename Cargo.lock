@@ -4,7 +4,7 @@ version = 3
 
 [[package]]
 name = "annealing"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "rand",
 ]
@@ -33,8 +33,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "kinmu_rs"
-version = "0.1.0"
+name = "kinmu"
+version = "1.0.3"
 dependencies = [
  "annealing",
  "rand",
