@@ -1,7 +1,9 @@
 [package]
 name = "annealing"
-version = "0.1.0"
+version = "1.0.0"
+authors = ["unsharot"]
 edition = "2021"
+description = "A crate to provide Simulated Annealing for kinmu."
 
 [lib]
 name = "annealing"

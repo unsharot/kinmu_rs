@@ -1,7 +1,7 @@
 use annealing::annealing;
-use kinmu_rs::kinmu_lib::{score, update, types, fill, check};
-use kinmu_rs::io::{reader, display};
-use kinmu_rs::seed;
+use kinmu::kinmu_lib::{score, update, types, fill, check};
+use kinmu::io::{reader, display};
+use kinmu::seed;
 
 use rand::Rng;
 use std::io;
