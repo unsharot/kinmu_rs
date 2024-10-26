@@ -1,3 +1,5 @@
+//! 生成した勤務表を標準出力するモジュール
+
 use crate::kinmu_lib::types::{
     Hyou,
     Waku,

@@ -1,3 +1,5 @@
+//! シード値をもとに乱数生成器を作り出すモジュール
+
 use rand::{SeedableRng, RngCore};
 use rand::rngs::StdRng;
 

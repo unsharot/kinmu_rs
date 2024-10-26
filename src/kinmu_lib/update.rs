@@ -1,3 +1,5 @@
+//! 焼きなましで使う更新関数のモジュール
+
 use super::types::{
     Waku,
     Hyou,

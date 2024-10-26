@@ -1,3 +1,5 @@
+//! 勤務表に使う型の宣言
+
 use std::str::FromStr;
 use std::fmt;
 
