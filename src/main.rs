@@ -50,20 +50,20 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
+fn print_check(name: &str, b: bool) {
+    if b {
+        println!("{} CHECK PASSED", name);
+    } else {
+        println!("{} CHECK FAILED", name);
+    }
+}
+
 fn sub(p: &str) -> io::Result<()> {
     let Ok((hp, fs, fc)) = reader::load_config(p) else { todo!() };
 
-    if check::all_absolute(&hp) {
-        println!("ALL_ABSOLUTE CHECK PASSED");
-    } else {
-        println!("ALL_ABSOLUTE CHECK FAILED");
-    }
+    print_check("ALL_ABSOLUTE", check::all_absolute(&hp));
 
-    if check::safe_iak(&hp) {
-        println!("SAFE_IAK CHECK PASSED");
-    } else {
-        println!("SAFE_IAK CHECK FAILED");
-    }
+    print_check("SAFE_IAK", check::safe_iak(&hp));
 
     let acs: Vec<types::AnnealingConfig> = fs.iter().map(|s| reader::load_annealing_config(s).unwrap()).collect();
 
@@ -72,17 +72,9 @@ fn sub(p: &str) -> io::Result<()> {
 
     let mut model = fill::run(&fc, &hp);
 
-    if check::k_i_counts(&hp, &model) {
-        println!("K_I_COUNTS CHECK PASSED");
-    } else {
-        println!("K_I_COUNTS CHECK FAILED");
-    }
+    print_check("K_I_COUNTS", check::k_i_counts(&hp, &model));
 
-    if check::abs_not_changed(&hp, &model) {
-        println!("ABS_NOT_CHANGED CHECK PASSED");
-    } else {
-        println!("ABS_NOT_CHANGED CHECK FAILED");
-    }
+    print_check("ABS_NOT_CHANGED", check::abs_not_changed(&hp, &model));
 
     let mut score;
     for ac in acs {
@@ -106,17 +98,9 @@ fn sub(p: &str) -> io::Result<()> {
         println!("time: {:?}", start.elapsed());
     }
 
-    if check::safe_iak(&hp) {
-        println!("SAFE_IAK CHECK PASSED");
-    } else {
-        println!("SAFE_IAK CHECK FAILED");
-    }
+    print_check("SAFE_IAK", check::safe_iak(&hp));
 
-    if check::abs_not_changed(&hp, &model) {
-        println!("ABS_NOT_CHANGED CHECK PASSED");
-    } else {
-        println!("ABS_NOT_CHANGED CHECK FAILED");
-    }
+    print_check("ABS_NOT_CHANGED", check::abs_not_changed(&hp, &model));
     
     println!();
 
