@@ -1,18 +1,18 @@
 //! 生成した勤務表を標準出力するモジュール
 
 use crate::kinmu_lib::types::{
-    Hyou,
-    Waku,
-    Waku::*,
-    HyouProp,
+    Schedule,
+    Shift,
+    Shift::*,
+    ScheduleProp,
 };
 
 const ROW_STATS_DIGIT: usize = 2;
 
 /// 表を出力
-pub fn print_hyou(hp: &HyouProp, h: &Hyou) {
-    for r in 0..hp.worker_count {
-        // Wakuの行を出力
+pub fn print_hyou(hp: &ScheduleProp, h: &Schedule) {
+    for r in 0..hp.staff_count {
+        // Shiftの行を出力
         print_waku_row(hp, h, r);
 
         // 統計情報
@@ -24,7 +24,7 @@ pub fn print_hyou(hp: &HyouProp, h: &Hyou) {
         print_waku_count_row(Y, hp, h, r);
 
         // 名前
-        print!(" {}", hp.workers[r].name);
+        print!(" {}", hp.staff[r].name);
 
         println!();
     }
@@ -45,8 +45,8 @@ pub fn print_hyou(hp: &HyouProp, h: &Hyou) {
     // スコア表示
 }
 
-/// Wakuの行を出力
-fn print_waku_row(hp: &HyouProp, h: &Hyou, r: usize) {
+/// Shiftの行を出力
+fn print_waku_row(hp: &ScheduleProp, h: &Schedule, r: usize) {
     for c in 0..hp.day_count{
         print!("{}", h[r][c].to_string());
         if c + 1 == hp.buffer {
@@ -56,7 +56,7 @@ fn print_waku_row(hp: &HyouProp, h: &Hyou, r: usize) {
 }
 
 /// 指定した枠の数を出力
-fn print_waku_count_row(target_w: Waku, hp: &HyouProp, h: &Hyou, r: usize) {
+fn print_waku_count_row(target_w: Shift, hp: &ScheduleProp, h: &Schedule, r: usize) {
     let mut sum = 0;
     for c in hp.buffer..hp.day_count {
         if h[r][c] == target_w {
@@ -70,7 +70,7 @@ fn print_waku_count_row(target_w: Waku, hp: &HyouProp, h: &Hyou, r: usize) {
 
 
 /// 曜日を表示
-fn print_days(hp: &HyouProp) {
+fn print_days(hp: &ScheduleProp) {
     for c in 0..hp.day_count {
         print!("{}", hp.days[c].to_string());
         if c + 1 == hp.buffer {
@@ -81,12 +81,12 @@ fn print_days(hp: &HyouProp) {
 }
 
 /// 指定した枠の列の和を表示
-fn print_waku_count_columns(target_w: Waku, hp: &HyouProp, h: &Hyou) {
+fn print_waku_count_columns(target_w: Shift, hp: &ScheduleProp, h: &Schedule) {
     let mut v: Vec<String> = Vec::new();
     let mut max_length = 0;
     for c in 0..hp.day_count {
         let mut sum = 0;
-        for r in 0..hp.worker_count {
+        for r in 0..hp.staff_count {
             if h[r][c] == target_w {
                 sum += 1;
             }

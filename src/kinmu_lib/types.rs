@@ -7,7 +7,7 @@ use std::fmt;
 #[derive(Clone)]
 #[derive(PartialEq)]
 #[derive(Copy)]
-pub enum Waku {
+pub enum Shift {
     N,
     K,
     I,
@@ -19,120 +19,120 @@ pub enum Waku {
     U,
 }
 
-impl fmt::Display for Waku {
+impl fmt::Display for Shift {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let s = match self {
-            Waku::N => "N",
-            Waku::K => "K",
-            Waku::I => "I",
-            Waku::A => "A",
-            Waku::O => "O",
-            Waku::H => "H",
-            Waku::Y => "Y",
-            Waku::D => "D",
-            Waku::U => "U",
+            Shift::N => "N",
+            Shift::K => "K",
+            Shift::I => "I",
+            Shift::A => "A",
+            Shift::O => "O",
+            Shift::H => "H",
+            Shift::Y => "Y",
+            Shift::D => "D",
+            Shift::U => "U",
         };
         write!(f, "{}", s)
     }
 }
 
-pub type Hyou = Vec<Vec<Waku>>;
+pub type Schedule = Vec<Vec<Shift>>;
 
 pub type Score = f32;
 
 #[derive(PartialEq)]
-pub enum WakuST {
+pub enum ShiftState {
     Absolute,
     Random,
 }
 
-pub type HyouST = Vec<Vec<WakuST>>;
+pub type ScheduleState = Vec<Vec<ShiftState>>;
 
-pub struct Worker {
+pub struct Staff {
     pub name: String,
     pub ability: isize,
-    pub k_count: isize,
-    pub i_count: isize,
-    pub o_count: isize,
-    pub h_count: isize,
+    pub k_day_count: isize,
+    pub i_day_count: isize,
+    pub o_day_count: isize,
+    pub h_day_count: isize,
 }
 
 #[derive(Debug)]
 #[derive(PartialEq)]
-pub enum DayST {
+pub enum DayState {
     Weekday,
     Holiday,
-    Furo,
-    Furo2,
+    Bath,
+    Bath2,
     Weight,
 }
 
-impl fmt::Display for DayST {
+impl fmt::Display for DayState {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let s = match self {
-            DayST::Weekday => "W",
-            DayST::Holiday => "H",
-            DayST::Furo => "F",
-            DayST::Furo2 => "2",
-            DayST::Weight => "G",
+            DayState::Weekday => "W",
+            DayState::Holiday => "H",
+            DayState::Bath => "F",
+            DayState::Bath2 => "2",
+            DayState::Weight => "G",
         };
         write!(f, "{}", s)
     }
 }
 
-impl FromStr for DayST {
+impl FromStr for DayState {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "W" => Ok(DayST::Weekday),
-            "H" => Ok(DayST::Holiday),
-            "F" => Ok(DayST::Furo),
-            "2" => Ok(DayST::Furo2),
-            "G" => Ok(DayST::Weight),
-            _ => Err(format!("Failed to parse DayST: {}", s))
+            "W" => Ok(DayState::Weekday),
+            "H" => Ok(DayState::Holiday),
+            "F" => Ok(DayState::Bath),
+            "2" => Ok(DayState::Bath2),
+            "G" => Ok(DayState::Weight),
+            _ => Err(format!("Failed to parse DayState: {}", s))
         }
     }
 }
 
-pub type Days = Vec<DayST>;
+pub type Days = Vec<DayState>;
 
 pub type NG = (usize, usize);
 
 pub type NGList = Vec<NG>;
 
 pub enum ScoreProp {
-    IAKrenzoku(Score),
-    KIArenzoku(Score),
-    KNIArenzoku(Score),
-    NNIArenzoku(Score),
-    ONrenzoku(Score),
-    NHrenzoku(Score),
-    OHrenzoku(Score),
-    Renkin4((Score, Score)),
-    Renkin5((Score, Score)),
-    Renkin6((Score, Score)),
-    Renkyuu(Score),
-    Renkyuu2(Score),
-    Renkyuu2NoBf(Score),
-    OsoHayaBaransu(Score),
-    YakinBaransu(Score),
-    OsoBaransu(Score),
-    HayaBaransu(Score),
-    KokyuCount(Score),
-    YakinCount(Score),
-    OsoCount(Score),
-    HayaCount(Score),
-    Fukouhei(usize),
-    YakinNinzuu(Score),
-    NikkinNinzuu((DayST,isize,Score)),
-    OsoNinzuu((isize,Score)),
-    HayaNinzuu((isize,Score)),
+    IAKpattern(Score),
+    KIApattern(Score),
+    KNIApattern(Score),
+    NNIApattern(Score),
+    ONpattern(Score),
+    NHpattern(Score),
+    OHpattern(Score),
+    WorkingDayStreak4((Score, Score)),
+    WorkingDayStreak5((Score, Score)),
+    WorkingDayStreak6((Score, Score)),
+    HolidayReward(Score),
+    Need2Holidays(Score),
+    Need2HolidaysNoBf(Score),
+    OHBalance(Score),
+    IBalance(Score),
+    OBalance(Score),
+    HBalance(Score),
+    KDayCount(Score),
+    IDayCount(Score),
+    ODayCount(Score),
+    HDayCount(Score),
+    Fair(usize),
+    IStaffCount(Score),
+    NStaffCount((DayState,isize,Score)),
+    OStaffCount((isize,Score)),
+    HStaffCount((isize,Score)),
     NGPair(Score),
-    Leader((isize,Score)),
-    YakinAloneWorker((isize,Score)),
-    YakinAloneBeforeFuro(Score),
-    HeyaMoti((isize,isize,Score)),
+    LeaderAbility((isize,Score)),
+    IAloneAbility((isize,Score)),
+    IAloneBeforeBath(Score),
+    RoomLeaderAbility((isize,isize,Score)),
     NoSamePair3(Score),
     NoSamePair2(Score),
     NoUndef(Score),
@@ -141,37 +141,37 @@ pub enum ScoreProp {
 impl fmt::Display for ScoreProp {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let s = match self {
-            ScoreProp::IAKrenzoku(p) => format!("IAKrenzoku({:?})", p),
-            ScoreProp::KIArenzoku(p) => format!("KIArenzoku({:?})", p),
-            ScoreProp::KNIArenzoku(p) => format!("KNIArenzoku({:?})", p),
-            ScoreProp::NNIArenzoku(p) => format!("NNIArenzoku({:?})", p),
-            ScoreProp::ONrenzoku(p) => format!("ONrenzoku({:?})", p),
-            ScoreProp::NHrenzoku(p) => format!("NHrenzoku({:?})", p),
-            ScoreProp::OHrenzoku(p) => format!("OHrenzoku({:?})", p),
-            ScoreProp::Renkin4(p) => format!("Renkin4({:?})", p),
-            ScoreProp::Renkin5(p) => format!("Renkin5({:?})", p),
-            ScoreProp::Renkin6(p) => format!("Renkin6({:?})", p),
-            ScoreProp::Renkyuu(p) => format!("Renkyuu({:?})", p),
-            ScoreProp::Renkyuu2(p) => format!("Renkyuu2({:?})", p),
-            ScoreProp::Renkyuu2NoBf(p) => format!("Renkyuu2NoBf({:?})", p),
-            ScoreProp::OsoHayaBaransu(p) => format!("OsoHayaBaransu({:?})", p),
-            ScoreProp::YakinBaransu(p) => format!("YakinBaransu({:?})", p),
-            ScoreProp::OsoBaransu(p) => format!("OsoBaransu({:?})", p),
-            ScoreProp::HayaBaransu(p) => format!("HayaBaransu({:?})", p),
-            ScoreProp::KokyuCount(p) => format!("KokyuCount({:?})", p),
-            ScoreProp::YakinCount(p) => format!("YakinCount({:?})", p),
-            ScoreProp::OsoCount(p) => format!("OsoCount({:?})", p),
-            ScoreProp::HayaCount(p) => format!("HayaCount({:?})", p),
-            ScoreProp::Fukouhei(p) => format!("Fukouhei({:?})", p),
-            ScoreProp::YakinNinzuu(p) => format!("YakinNinzuu({:?})", p),
-            ScoreProp::NikkinNinzuu(p) => format!("NikkinNinzuu({:?})", p),
-            ScoreProp::OsoNinzuu(p) => format!("OsoNinzuu({:?})", p),
-            ScoreProp::HayaNinzuu(p) => format!("HayaNinzuu({:?})", p),
+            ScoreProp::IAKpattern(p) => format!("IAKpattern({:?})", p),
+            ScoreProp::KIApattern(p) => format!("KIApattern({:?})", p),
+            ScoreProp::KNIApattern(p) => format!("KNIApattern({:?})", p),
+            ScoreProp::NNIApattern(p) => format!("NNIApattern({:?})", p),
+            ScoreProp::ONpattern(p) => format!("ONpattern({:?})", p),
+            ScoreProp::NHpattern(p) => format!("NHpattern({:?})", p),
+            ScoreProp::OHpattern(p) => format!("OHpattern({:?})", p),
+            ScoreProp::WorkingDayStreak4(p) => format!("WorkingDayStreak4({:?})", p),
+            ScoreProp::WorkingDayStreak5(p) => format!("WorkingDayStreak5({:?})", p),
+            ScoreProp::WorkingDayStreak6(p) => format!("WorkingDayStreak6({:?})", p),
+            ScoreProp::HolidayReward(p) => format!("HolidayReward({:?})", p),
+            ScoreProp::Need2Holidays(p) => format!("Need2Holidays({:?})", p),
+            ScoreProp::Need2HolidaysNoBf(p) => format!("Need2HolidaysNoBf({:?})", p),
+            ScoreProp::OHBalance(p) => format!("OHBalance({:?})", p),
+            ScoreProp::IBalance(p) => format!("IBalance({:?})", p),
+            ScoreProp::OBalance(p) => format!("OBalance({:?})", p),
+            ScoreProp::HBalance(p) => format!("HBalance({:?})", p),
+            ScoreProp::KDayCount(p) => format!("KDayCount({:?})", p),
+            ScoreProp::IDayCount(p) => format!("IDayCount({:?})", p),
+            ScoreProp::ODayCount(p) => format!("ODayCount({:?})", p),
+            ScoreProp::HDayCount(p) => format!("HDayCount({:?})", p),
+            ScoreProp::Fair(p) => format!("Fair({:?})", p),
+            ScoreProp::IStaffCount(p) => format!("IStaffCount({:?})", p),
+            ScoreProp::NStaffCount(p) => format!("NStaffCount({:?})", p),
+            ScoreProp::OStaffCount(p) => format!("OStaffCount({:?})", p),
+            ScoreProp::HStaffCount(p) => format!("HStaffCount({:?})", p),
             ScoreProp::NGPair(p) => format!("NGPair({:?})", p),
-            ScoreProp::Leader(p) => format!("Leader({:?})", p),
-            ScoreProp::YakinAloneWorker(p) => format!("YakinAloneWorker({:?})", p),
-            ScoreProp::YakinAloneBeforeFuro(p) => format!("YakinAloneBeforeFuro({:?})", p),
-            ScoreProp::HeyaMoti(p) => format!("HeyaMoti({:?})", p),
+            ScoreProp::LeaderAbility(p) => format!("LeaderAbility({:?})", p),
+            ScoreProp::IAloneAbility(p) => format!("IAloneAbility({:?})", p),
+            ScoreProp::IAloneBeforeBath(p) => format!("IAloneBeforeBath({:?})", p),
+            ScoreProp::RoomLeaderAbility(p) => format!("RoomLeaderAbility({:?})", p),
             ScoreProp::NoSamePair3(p) => format!("NoSamePair3({:?})", p),
             ScoreProp::NoSamePair2(p) => format!("NoSamePair2({:?})", p),
             ScoreProp::NoUndef(p) => format!("NoUndef({:?})", p),
@@ -182,16 +182,16 @@ impl fmt::Display for ScoreProp {
 
 
 /// 勤務表ごとの設定
-pub struct HyouProp {
-    pub workers: Vec<Worker>,
+pub struct ScheduleProp {
+    pub staff: Vec<Staff>,
     pub ng_list: NGList,
-    pub worker_count: usize,
+    pub staff_count: usize,
     pub day_count: usize,
     pub days: Days,
     pub buffer: usize,
-    pub kibou: Hyou,
-    pub hyou_st: HyouST,
-    pub i_ninzuu: Vec<isize>,
+    pub request: Schedule,
+    pub schedule_st: ScheduleState,
+    pub i_staff_count: Vec<isize>,
     pub score_props: Vec<ScoreProp>, // 結果表示のためのスコア
 }
 
