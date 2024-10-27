@@ -38,10 +38,6 @@ impl fmt::Display for Waku {
 
 pub type Hyou = Vec<Vec<Waku>>;
 
-pub type HyouRow = Vec<Waku>;
-
-pub type HyouColumn = Vec<Waku>;
-
 pub type Score = f32;
 
 #[derive(PartialEq)]
@@ -60,8 +56,6 @@ pub struct Worker {
     pub o_count: isize,
     pub h_count: isize,
 }
-
-pub type ID = usize;
 
 #[derive(Debug)]
 #[derive(PartialEq)]
