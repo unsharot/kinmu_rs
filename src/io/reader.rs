@@ -59,7 +59,7 @@ pub fn load_config(path: &str) -> io::Result<(ScheduleProp, Vec<FilePath>, FillC
 
     let ss = sep_by_fields(&contents);
 
-    let hyou = read_hyou(&ss[7])?;
+    let schedule = read_schedule(&ss[7])?;
 
     let buffer = read_usize(&ss[6])?;
 
@@ -70,8 +70,8 @@ pub fn load_config(path: &str) -> io::Result<(ScheduleProp, Vec<FilePath>, FillC
         day_count: read_usize(&ss[4])?,
         days: read_days(&ss[5])?,
         buffer: buffer,
-        request: hyou.clone(),
-        schedule_st: make_schedule_st(&hyou, buffer),
+        request: schedule.clone(),
+        schedule_st: make_schedule_st(&schedule, buffer),
         i_staff_count: read_isizes(&ss[8])?,
         score_props: read_score_props(&ss[12])?,
     };
@@ -234,7 +234,7 @@ fn read_days(text: &str) -> io::Result<Days> {
     }.unwrap()).collect())
 }
 
-fn read_hyou(text: &str) -> io::Result<Schedule> {
+fn read_schedule(text: &str) -> io::Result<Schedule> {
     let mut ans: Schedule = Vec::new();
     for line in text.lines() {
         let a: Vec<Shift> = line.chars().map(|c| match c {

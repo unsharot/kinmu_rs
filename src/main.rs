@@ -105,7 +105,7 @@ fn sub(p: &str) -> io::Result<()> {
 
     println!("{}", score);
     // println!("{}", score::assess_score(&hp, &model));
-    display::print_hyou(&hp, &model);
+    display::print_schedule(&hp, &model);
 
     println!();
 

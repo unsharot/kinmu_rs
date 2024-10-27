@@ -10,18 +10,18 @@ use crate::kinmu_lib::types::{
 const ROW_STATS_DIGIT: usize = 2;
 
 /// 表を出力
-pub fn print_hyou(hp: &ScheduleProp, h: &Schedule) {
+pub fn print_schedule(hp: &ScheduleProp, h: &Schedule) {
     for r in 0..hp.staff_count {
         // Shiftの行を出力
-        print_waku_row(hp, h, r);
+        print_shift_row(hp, h, r);
 
         // 統計情報
-        print_waku_count_row(H, hp, h, r);
-        print_waku_count_row(O, hp, h, r);
-        print_waku_count_row(I, hp, h, r);
-        print_waku_count_row(N, hp, h, r);
-        print_waku_count_row(K, hp, h, r);
-        print_waku_count_row(Y, hp, h, r);
+        print_shift_count_row(H, hp, h, r);
+        print_shift_count_row(O, hp, h, r);
+        print_shift_count_row(I, hp, h, r);
+        print_shift_count_row(N, hp, h, r);
+        print_shift_count_row(K, hp, h, r);
+        print_shift_count_row(Y, hp, h, r);
 
         // 名前
         print!(" {}", hp.staff[r].name);
@@ -35,18 +35,18 @@ pub fn print_hyou(hp: &ScheduleProp, h: &Schedule) {
     print_days(hp);
 
     // 日ごとの統計を表示
-    print_waku_count_columns(N, hp, h);
-    print_waku_count_columns(I, hp, h);
-    print_waku_count_columns(A, hp, h);
-    print_waku_count_columns(K, hp, h);
-    print_waku_count_columns(O, hp, h);
-    print_waku_count_columns(H, hp, h);
+    print_shift_count_columns(N, hp, h);
+    print_shift_count_columns(I, hp, h);
+    print_shift_count_columns(A, hp, h);
+    print_shift_count_columns(K, hp, h);
+    print_shift_count_columns(O, hp, h);
+    print_shift_count_columns(H, hp, h);
 
     // スコア表示
 }
 
 /// Shiftの行を出力
-fn print_waku_row(hp: &ScheduleProp, h: &Schedule, r: usize) {
+fn print_shift_row(hp: &ScheduleProp, h: &Schedule, r: usize) {
     for c in 0..hp.day_count{
         print!("{}", h[r][c].to_string());
         if c + 1 == hp.buffer {
@@ -56,10 +56,10 @@ fn print_waku_row(hp: &ScheduleProp, h: &Schedule, r: usize) {
 }
 
 /// 指定した枠の数を出力
-fn print_waku_count_row(target_w: Shift, hp: &ScheduleProp, h: &Schedule, r: usize) {
+fn print_shift_count_row(target: Shift, hp: &ScheduleProp, h: &Schedule, r: usize) {
     let mut sum = 0;
     for c in hp.buffer..hp.day_count {
-        if h[r][c] == target_w {
+        if h[r][c] == target {
             sum += 1;
         }
     }
@@ -81,13 +81,13 @@ fn print_days(hp: &ScheduleProp) {
 }
 
 /// 指定した枠の列の和を表示
-fn print_waku_count_columns(target_w: Shift, hp: &ScheduleProp, h: &Schedule) {
+fn print_shift_count_columns(target: Shift, hp: &ScheduleProp, h: &Schedule) {
     let mut v: Vec<String> = Vec::new();
     let mut max_length = 0;
     for c in 0..hp.day_count {
         let mut sum = 0;
         for r in 0..hp.staff_count {
-            if h[r][c] == target_w {
+            if h[r][c] == target {
                 sum += 1;
             }
         }
@@ -110,7 +110,7 @@ fn print_waku_count_columns(target_w: Shift, hp: &ScheduleProp, h: &Schedule) {
             }
         }
         if l == 0 {
-            print!(" {}", target_w.to_string());
+            print!(" {}", target.to_string());
         }
         println!();
     }
