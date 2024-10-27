@@ -97,18 +97,18 @@ Workerのリストで上から1,2,3..と番号を振っていき、その番号�
 33
 ```
 
-### DayST
+### DayState
 日数で指定した日数分の日ごとのステータスを設定します。ステータスは以下の通りです。
 
 - W: WeekDay 平日
 - H: Holiday 休日
-- F: Furo フロ
-- 2: Furo2 フロ2
+- F: Bath フロ
+- 2: Bath2 フロ2
 - G: Weight 体重測定
 
 #### 例
 ```
---DayST:
+--DayState:
 W2WHHWFW2GHHWFW2WHHWFW2WHHWFW2WHH
 ```
 
@@ -236,129 +236,129 @@ fillの乱数に用いるシード値を指定します。
 
 | Prop名               | 引数の型            | 説明                                                                                                                                                                                                                                   |
 | :------------------- | :------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| IAKrenzoku           | f32                 | 入り、明け、休みの順番が取れていない場合のペナルティを指定します。                                                                                                                                                                     |
-| KIArenzoku           | f32                 | 公休、入り、明けの順番になっている場合のペナルティを指定します。                                                                                                                                                                       |
-| KNIArenzoku          | f32                 | 公休、日勤、入り、明けの順番になっている場合のペナルティを指定します。                                                                                                                                                                 |
-| NNIArenzoku          | f32                 | 日勤、日勤、入り、明けの順番になっている場合の報酬を指定します。                                                                                                                                                                       |
-| ONrenzoku            | f32                 | 遅番、日勤の順番になっている場合のペナルティを指定します。                                                                                                                                                                             |
-| NHrenzoku            | f32                 | 日勤、早番の順番になっている場合のペナルティを指定します。                                                                                                                                                                             |
-| OHrenzoku            | f32                 | 遅番、早番の順番になっている場合のペナルティを指定します。                                                                                                                                                                             |
-| Renkin4              | (f32, f32)          | 4日連続勤務の場合のペナルティを指定します。                                                                                                                                                                                            |
-| Renkin5              | (f32, f32)          | Renkin4同様、5日連続勤務の場合のペナルティを指定します。                                                                                                                                                                               |
-| Renkin6              | (f32, f32)          | Renkin4同様、6日連続勤務の場合のペナルティを指定します。                                                                                                                                                                               |
-| Renkyuu              | f32                 | 連休の場合の報酬を指定します。2日の連休ごとに発生します。                                                                                                                                                                              |
-| Renkyuu2             | f32                 | 職員ごとに、一カ月の間に2連休がない場合のペナルティを指定します。                                                                                                                                                                      |
-| Renkyuu2NoBf         | f32                 | Renkyuu2同様のスコアですが、バッファーを含みません。                                                                                                                                                                                   |
-| OsoHayaBaransu       | f32                 | 職員ごとの、1か月の遅番と早番のバランスによるペナルティの倍率を指定します。                                                                                                                                                            |
-| YakinBaransu         | f32                 | 夜勤の月の前半と後半でバランスが取れていない場合のペナルティの倍率を指定します。                                                                                                                                                       |
-| OsoBaransu           | f32                 | 遅番の月の前半と後半でバランスが取れていない場合のペナルティの倍率を指定します。                                                                                                                                                       |
-| HayaBaransu          | f32                 | 早番の月の前半と後半でバランスが取れていない場合のペナルティの倍率を指定します。                                                                                                                                                       |
-| KokyuCount           | f32                 | 職員ごとの公休の数がconfigファイルで設定した通りになっていない場合のペナルティの倍率を指定します。                                                                                                                                     |
-| YakinCount           | f32                 | 職員ごとの夜勤の数がconfigファイルで設定した通りになっていない場合のペナルティの倍率を指定します。                                                                                                                                     |
-| OsoCount             | f32                 | 職員ごとの遅番の数がconfigファイルで設定した通りになっていない場合のペナルティの倍率を指定します。                                                                                                                                     |
-| HayaCount            | f32                 | 職員ごとの早番の数がconfigファイルで設定した通りになっていない場合のペナルティの倍率を指定します。                                                                                                                                     |
-| YakinNinzuu          | f32                 | 夜勤の人数がconfigファイルで設定した通りになっていない場合のペナルティを指定します。                                                                                                                                                   |
-| NikkinNinzuu         | (DayST, isize, f32) | 曜日ごとの日勤の人数と、その通りになっていない場合のペナルティの倍率を指定します。引数は3つで、1つ目が曜日、2つ目が人数、3つ目が倍率です。曜日は平日(W)、休日(H)、フロ(F)、フロ2(2)、Weight(G)に対応します。                           |
-| OsoNinzuu            | (isize, f32)        | 遅番の人数と、その通りになっていない場合のペナルティを指定します。                                                                                                                                                                     |
-| HayaNinzuu           | (isize, f32)        | 早番の人数と、その通りになっていない場合のペナルティを指定します。                                                                                                                                                                     |
+| IAKpattern           | f32                 | 入り、明け、休みの順番が取れていない場合のペナルティを指定します。                                                                                                                                                                     |
+| KIApattern           | f32                 | 公休、入り、明けの順番になっている場合のペナルティを指定します。                                                                                                                                                                       |
+| KNIApattern          | f32                 | 公休、日勤、入り、明けの順番になっている場合のペナルティを指定します。                                                                                                                                                                 |
+| NNIApattern          | f32                 | 日勤、日勤、入り、明けの順番になっている場合の報酬を指定します。                                                                                                                                                                       |
+| ONpattern            | f32                 | 遅番、日勤の順番になっている場合のペナルティを指定します。                                                                                                                                                                             |
+| NHpattern            | f32                 | 日勤、早番の順番になっている場合のペナルティを指定します。                                                                                                                                                                             |
+| OHpattern            | f32                 | 遅番、早番の順番になっている場合のペナルティを指定します。                                                                                                                                                                             |
+| WorkingDayStreak4              | (f32, f32)          | 4日連続勤務の場合のペナルティを指定します。                                                                                                                                                                                            |
+| WorkingDayStreak5              | (f32, f32)          | WorkingDayStreak4同様、5日連続勤務の場合のペナルティを指定します。                                                                                                                                                                               |
+| WorkingDayStreak6              | (f32, f32)          | WorkingDayStreak4同様、6日連続勤務の場合のペナルティを指定します。                                                                                                                                                                               |
+| HolidayReward              | f32                 | 連休の場合の報酬を指定します。2日の連休ごとに発生します。                                                                                                                                                                              |
+| Need2Holidays             | f32                 | 職員ごとに、一カ月の間に2連休がない場合のペナルティを指定します。                                                                                                                                                                      |
+| Need2HolidaysNoBf         | f32                 | Need2Holidays同様のスコアですが、バッファーを含みません。                                                                                                                                                                                   |
+| OHBalance       | f32                 | 職員ごとの、1か月の遅番と早番のバランスによるペナルティの倍率を指定します。                                                                                                                                                            |
+| IBalance         | f32                 | 夜勤の月の前半と後半でバランスが取れていない場合のペナルティの倍率を指定します。                                                                                                                                                       |
+| OBalance           | f32                 | 遅番の月の前半と後半でバランスが取れていない場合のペナルティの倍率を指定します。                                                                                                                                                       |
+| HBalance          | f32                 | 早番の月の前半と後半でバランスが取れていない場合のペナルティの倍率を指定します。                                                                                                                                                       |
+| KDayCount           | f32                 | 職員ごとの公休の数がconfigファイルで設定した通りになっていない場合のペナルティの倍率を指定します。                                                                                                                                     |
+| IDayCount           | f32                 | 職員ごとの夜勤の数がconfigファイルで設定した通りになっていない場合のペナルティの倍率を指定します。                                                                                                                                     |
+| ODayCount             | f32                 | 職員ごとの遅番の数がconfigファイルで設定した通りになっていない場合のペナルティの倍率を指定します。                                                                                                                                     |
+| HDayCount            | f32                 | 職員ごとの早番の数がconfigファイルで設定した通りになっていない場合のペナルティの倍率を指定します。                                                                                                                                     |
+| IStaffCount          | f32                 | 夜勤の人数がconfigファイルで設定した通りになっていない場合のペナルティを指定します。                                                                                                                                                   |
+| NStaffCount         | (DayState, isize, f32) | 曜日ごとの日勤の人数と、その通りになっていない場合のペナルティの倍率を指定します。引数は3つで、1つ目が曜日、2つ目が人数、3つ目が倍率です。曜日は平日(W)、休日(H)、フロ(F)、フロ2(2)、Weight(G)に対応します。                           |
+| OStaffCount            | (isize, f32)        | 遅番の人数と、その通りになっていない場合のペナルティを指定します。                                                                                                                                                                     |
+| HStaffCount           | (isize, f32)        | 早番の人数と、その通りになっていない場合のペナルティを指定します。                                                                                                                                                                     |
 | NGPair               | f32                 | NGに指定されたペアが夜勤で同じ日になる場合のペナルティを指定します。                                                                                                                                                                   |
-| Leader               | (isize, f32)        | リーダーとしての能力の番号と、祝日の日勤にリーダーがいない場合のペナルティを指定します。職員の能力を参照し、職員の能力がここで指定する番号で割り切れないならリーダーとします。                                                         |
-| YakinAloneWorker     | (isize, f32)        | 一人で夜勤ができるワーカーの能力の番号と、ワーカーの夜勤が一人で、それが看護にワーカーの仕事を教えられる人でない場合のペナルティを指定します。職員の能力を参照し、職員の能力がここで指定する番号で割り切れないなら能力があるとします。 |
-| YakinAloneBeforeFuro | f32                 | フロ日の前にワーカーの一人夜勤がある場合のペナルティを指定します。                                                                                                                                                                     |
-| HeyaMoti             | (isize, isize, f32) | 部屋持ちができる能力の番号と、一日に必要な部屋持ちの人数と、部屋持ちの人数が十分でない場合のペナルティを指定します。                                                                                                                   |
+| LeaderAbility               | (isize, f32)        | リーダーとしての能力の番号と、祝日の日勤にリーダーがいない場合のペナルティを指定します。職員の能力を参照し、職員の能力がここで指定する番号で割り切れないならリーダーとします。                                                         |
+| IAloneAbility     | (isize, f32)        | 一人で夜勤ができるワーカーの能力の番号と、ワーカーの夜勤が一人で、それが看護にワーカーの仕事を教えられる人でない場合のペナルティを指定します。職員の能力を参照し、職員の能力がここで指定する番号で割り切れないなら能力があるとします。 |
+| IAloneBeforeBath | f32                 | フロ日の前にワーカーの一人夜勤がある場合のペナルティを指定します。                                                                                                                                                                     |
+| RoomLeaderAbility             | (isize, isize, f32) | 部屋持ちができる能力の番号と、一日に必要な部屋持ちの人数と、部屋持ちの人数が十分でない場合のペナルティを指定します。                                                                                                                   |
 | NoSamePair3          | f32                 | 夜勤で同じペアが3回以上ある場合のペナルティを指定します。                                                                                                                                                                              |
 | NoSamePair2          | f32                 | 夜勤で同じペアが2回以上ある場合のペナルティを指定します。                                                                                                                                                                              |
 | NoUndef              | f32                 | 未定(U)の枠があった場合のペナルティの倍率を指定します。                                                                                                                                                                                |
 
 
-<!-- #### IAKrenzoku
+<!-- #### IAKpattern
 入り、明け、休みの順番が取れていない場合のペナルティを指定します。引数は１つの実数です。
 
-#### KIArenzoku
+#### KIApattern
 公休、入り、明けの順番になっている場合のペナルティを指定します。引数は１つの実数です。
 
-#### KNIArenzoku
+#### KNIApattern
 公休、日勤、入り、明けの順番になっている場合のペナルティを指定します。引数は１つの実数です。
 
-#### NNIArenzoku
+#### NNIApattern
 日勤、日勤、入り、明けの順番になっている場合の報酬を指定します。引数は１つの実数です。
 
-#### ONrenzoku
+#### ONpattern
 遅番、日勤の順番になっている場合のペナルティを指定します。引数は１つの実数です。
 
-#### NHrenzoku
+#### NHpattern
 日勤、早番の順番になっている場合のペナルティを指定します。引数は１つの実数です。
 
-#### OHrenzoku
+#### OHpattern
 遅番、早番の順番になっている場合のペナルティを指定します。引数は１つの実数です。
 
-#### Renkin4
+#### WorkingDayStreak4
 4日連続勤務の場合のペナルティを指定します。引数は2つの実数で、第一引数は最後が入りの場合で、第二引数は最後が入り以外の場合です。
 
-#### Renkin5
-Renkin4同様、5日連続勤務の場合のペナルティを指定します。
+#### WorkingDayStreak5
+WorkingDayStreak4同様、5日連続勤務の場合のペナルティを指定します。
 
-#### Renkin6
-Renkin4同様、6日連続勤務の場合のペナルティを指定します。
+#### WorkingDayStreak6
+WorkingDayStreak4同様、6日連続勤務の場合のペナルティを指定します。
 
-#### Renkyuu
+#### HolidayReward
 連休の場合の報酬を指定します。2日の連休ごとに発生します。引数は1つの実数です。
 
-#### Renkyuu2
+#### Need2Holidays
 職員ごとに、一カ月の間に2連休がない場合のペナルティを指定します。引数は1つの実数です。
 
-#### Renkyuu2NoBf
-Renkyuu2同様のスコアですが、バッファーを含みません。引数は1つの実数です。
+#### Need2HolidaysNoBf
+Need2Holidays同様のスコアですが、バッファーを含みません。引数は1つの実数です。
 
-#### OsoHayaBaransu
+#### OHBalance
 職員ごとの、1か月の遅番と早番のバランスによるペナルティの倍率を指定します。引数は1つの実数です。
 
-#### YakinBaransu
+#### IBalance
 夜勤の月の前半と後半でバランスが取れていない場合のペナルティの倍率を指定します。引数は1つの実数です。
 
-#### OsoBaransu
+#### OBalance
 遅番の月の前半と後半でバランスが取れていない場合のペナルティの倍率を指定します。引数は1つの実数です。
 
-#### HayaBaransu
+#### HBalance
 早番の月の前半と後半でバランスが取れていない場合のペナルティの倍率を指定します。引数は1つの実数です。
 
-#### KokyuCount
+#### KDayCount
 職員ごとの公休の数がconfigファイルで設定した通りになっていない場合のペナルティの倍率を指定します。引数は1つの実数です。
 
-#### YakinCount
+#### IDayCount
 職員ごとの夜勤の数がconfigファイルで設定した通りになっていない場合のペナルティの倍率を指定します。引数は1つの実数です。
 
-#### OsoCount
+#### ODayCount
 職員ごとの遅番の数がconfigファイルで設定した通りになっていない場合のペナルティの倍率を指定します。引数は1つの実数です。
 
-#### HayaCount
+#### HDayCount
 職員ごとの早番の数がconfigファイルで設定した通りになっていない場合のペナルティの倍率を指定します。引数は1つの実数です。
 
-#### YakinNinzuu
+#### IStaffCount
 夜勤の人数がconfigファイルで設定した通りになっていない場合のペナルティを指定します。引数は1つの実数です。
 
-#### NikkinNinzuu
+#### NStaffCount
 曜日ごとの日勤の人数と、その通りになっていない場合のペナルティの倍率を指定します。引数は3つで、1つ目が曜日、2つ目が人数、3つ目が倍率です。曜日は平日(W)、休日(H)、フロ(F)、フロ2(2)、Weight(G)に対応します。
 
-#### OsoNinzuu
+#### OStaffCount
 遅番の人数と、その通りになっていない場合のペナルティを指定します。引数は2つで、1つ目が整数、2つ目が実数です。
 
-#### HayaNinzuu
+#### HStaffCount
 早番の人数と、その通りになっていない場合のペナルティを指定します。引数は2つで、1つ目が整数、2つ目が実数です。
 
 #### NGPair
 NGに指定されたペアが夜勤で同じ日になる場合のペナルティを指定します。引数は1つの実数です。
 
-#### Leader
+#### LeaderAbility
 リーダーとしての能力の番号と、祝日の日勤にリーダーがいない場合のペナルティを指定します。職員の能力を参照し、職員の能力がここで指定する番号で割り切れないならリーダーとします。引数は2つで、1つ目が整数、2つ目が実数です。
 
-#### YakinAloneWorker
+#### IAloneAbility
 一人で夜勤ができるワーカーの能力の番号と、ワーカーの夜勤が一人で、それが看護にワーカーの仕事を教えられる人でない場合のペナルティを指定します。職員の能力を参照し、職員の能力がここで指定する番号で割り切れないなら能力があるとします。引数は2つで、1つ目が整数、2つ目が実数です。
 
-#### YakinAloneBeforeFuro
+#### IAloneBeforeBath
 フロ日の前にワーカーの一人夜勤がある場合のペナルティを指定します。引数は1つの実数です。
 
-#### HeyaMoti
+#### RoomLeaderAbility
 部屋持ちができる能力の番号と、一日に必要な部屋持ちの人数と、部屋持ちの人数が十分でない場合のペナルティを指定します。引数は3つで、1つ目と2つ目が整数、3つ目が実数です。
 
 #### NoSamePair3
@@ -373,38 +373,38 @@ NGに指定されたペアが夜勤で同じ日になる場合のペナルティ
 #### 例
 ```
 --結果のスコア:
-IAKrenzoku 1000
-KIArenzoku 100
-KNIArenzoku 10
-NNIArenzoku 300
-ONrenzoku 100
-NHrenzoku 1000
-OHrenzoku 2000
-Renkin4 (1000,200)
-Renkin5 (4000,1000)
-Renkin6 (10000,4000)
+IAKpattern 1000
+KIApattern 100
+KNIApattern 10
+NNIApattern 300
+ONpattern 100
+NHpattern 1000
+OHpattern 2000
+WorkingDayStreak4 (1000,200)
+WorkingDayStreak5 (4000,1000)
+WorkingDayStreak6 (10000,4000)
 NGPair 1000
-Renkyuu 2
-Renkyuu2 1000
-Renkyuu2NoBf 1000
-OsoHayaBaransu 3
-YakinBaransu 10
-OsoBaransu 3
-HayaBaransu 3
-KokyuCount 10
-YakinCount 10
-OsoCount 100
-HayaCount 100
-YakinNinzuu 10
-NikkinNinzuu (F,4,5)
-NikkinNinzuu (2,2,5)
-NikkinNinzuu (W,2,5)
-NikkinNinzuu (H,2,5)
-NikkinNinzuu (G,2,5)
-OsoNinzuu (1,100)
-HayaNinzuu (1,100)
-YakinAloneWorker (2,5000)
-YakinAloneBeforeFuro 1000
+HolidayReward 2
+Need2Holidays 1000
+Need2HolidaysNoBf 1000
+OHBalance 3
+IBalance 10
+OBalance 3
+HBalance 3
+KDayCount 10
+IDayCount 10
+ODayCount 100
+HDayCount 100
+IStaffCount 10
+NStaffCount (F,4,5)
+NStaffCount (2,2,5)
+NStaffCount (W,2,5)
+NStaffCount (H,2,5)
+NStaffCount (G,2,5)
+OStaffCount (1,100)
+HStaffCount (1,100)
+IAloneAbility (2,5000)
+IAloneBeforeBath 1000
 NoUndef 10
 NoSamePair3 1000
 NoSamePair2 500
@@ -443,24 +443,24 @@ NoSamePair2 500
 #### 例
 ```
 --各スコアのパラメータ:
-KIArenzoku 100
-KNIArenzoku 10
-NNIArenzoku 300
-Renkin4 (1000,200)
-Renkin5 (4000,1000)
-Renkin6 (10000,4000)
-Renkyuu2 1000
-Renkyuu2NoBf 500
+KIApattern 100
+KNIApattern 10
+NNIApattern 300
+WorkingDayStreak4 (1000,200)
+WorkingDayStreak5 (4000,1000)
+WorkingDayStreak6 (10000,4000)
+Need2Holidays 1000
+Need2HolidaysNoBf 500
 NGPair 1000
-YakinBaransu 10
-YakinNinzuu 100
-NikkinNinzuu (F,6,4)
-NikkinNinzuu (2,4,4)
-NikkinNinzuu (W,4,4)
-NikkinNinzuu (H,4,4)
-NikkinNinzuu (G,4,4)
-YakinAloneWorker (2,5000)
-YakinAloneBeforeFuro 100
+IBalance 10
+IStaffCount 100
+NStaffCount (F,6,4)
+NStaffCount (2,4,4)
+NStaffCount (W,4,4)
+NStaffCount (H,4,4)
+NStaffCount (G,4,4)
+IAloneAbility (2,5000)
+IAloneBeforeBath 100
 NoSamePair3 1000
 NoSamePair2 500
 ```
