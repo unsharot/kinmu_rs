@@ -4,17 +4,17 @@ use std::fs::{read_to_string};
 use std::io;
 
 use crate::kinmu_lib::types::{
-    HyouProp,
+    ScheduleProp,
     AnnealingConfig,
-    Waku,
-    Worker,
+    Shift,
+    Staff,
     NGList,
     Days,
-    DayST,
-    Hyou,
+    DayState,
+    Schedule,
     ScoreProp,
-    HyouST,
-    WakuST,
+    ScheduleState,
+    ShiftState,
     FillConfig,
 };
 
@@ -54,7 +54,7 @@ fn sep_by_fields(contents: &Vec<String>) -> Vec<String> {
 }
 
 /// 勤務表で使う値を読み込む
-pub fn load_config(path: &str) -> io::Result<(HyouProp, Vec<FilePath>, FillConfig)> {
+pub fn load_config(path: &str) -> io::Result<(ScheduleProp, Vec<FilePath>, FillConfig)> {
     let contents = read_contents(path)?;
 
     let ss = sep_by_fields(&contents);
@@ -63,16 +63,16 @@ pub fn load_config(path: &str) -> io::Result<(HyouProp, Vec<FilePath>, FillConfi
 
     let buffer = read_usize(&ss[6])?;
 
-    let hp = HyouProp {
-        workers: read_workers(&ss[1])?,
+    let hp = ScheduleProp {
+        staff: read_staff(&ss[1])?,
         ng_list: read_ng_list(&ss[2])?,
-        worker_count: read_usize(&ss[3])?,
+        staff_count: read_usize(&ss[3])?,
         day_count: read_usize(&ss[4])?,
         days: read_days(&ss[5])?,
         buffer: buffer,
-        kibou: hyou.clone(),
-        hyou_st: make_hyou_st(&hyou, buffer),
-        i_ninzuu: read_isizes(&ss[8])?,
+        request: hyou.clone(),
+        schedule_st: make_schedule_st(&hyou, buffer),
+        i_staff_count: read_isizes(&ss[8])?,
         score_props: read_score_props(&ss[12])?,
     };
     let fs = ss[11].lines().map(|s| s.to_string()).collect();
@@ -180,36 +180,36 @@ fn read_isize_isize_float(text: &str) -> io::Result<(isize, isize, f32)> {
     Ok((i1, i2, f))
 }
 
-fn read_dayst_isize_float(text: &str) -> io::Result<(DayST, isize, f32)> {
+fn read_dayst_isize_float(text: &str) -> io::Result<(DayState, isize, f32)> {
     let ns: Vec<_> = text
         .trim_matches(|c| c == '(' || c == ')')
         .split(',')
         .collect();
-    let d = ns[0].parse::<DayST>().unwrap();
+    let d = ns[0].parse::<DayState>().unwrap();
     let i = ns[1].parse::<isize>().unwrap();
     let f = ns[2].parse::<f32>().unwrap();
     Ok((d, i, f))
 }
 
-fn read_workers(text: &str) -> io::Result<Vec<Worker>> {
-    let mut workers: Vec<Worker> = Vec::new();
+fn read_staff(text: &str) -> io::Result<Vec<Staff>> {
+    let mut staff: Vec<Staff> = Vec::new();
     for line in text.lines() {
         let w = read_worker(&line)?;
-        workers.push(w);
+        staff.push(w);
     }
-    Ok(workers)
+    Ok(staff)
 }
 
-fn read_worker(text: &str) -> io::Result<Worker> {
+fn read_worker(text: &str) -> io::Result<Staff> {
     // TODO: もうちょっと安全にアクセスしたい
     let words: Vec<String> = text.split_whitespace().map(|s| s.to_string()).collect();
-    let worker: Worker = Worker {
+    let worker: Staff = Staff {
         name: words[5].clone(),
         ability: read_isize(&words[0])?,
-        k_count: read_isize(&words[1])?,
-        i_count: read_isize(&words[2])?,
-        o_count: read_isize(&words[3])?,
-        h_count: read_isize(&words[4])?,
+        k_day_count: read_isize(&words[1])?,
+        i_day_count: read_isize(&words[2])?,
+        o_day_count: read_isize(&words[3])?,
+        h_day_count: read_isize(&words[4])?,
     };
     Ok(worker)
 }
@@ -225,29 +225,29 @@ fn read_ng_list(text: &str) -> io::Result<NGList> {
 
 fn read_days(text: &str) -> io::Result<Days> {
     Ok(text.chars().map(|c| match c {
-        'W' => Ok(DayST::Weekday),
-        'H' => Ok(DayST::Holiday),
-        'F' => Ok(DayST::Furo),
-        '2' => Ok(DayST::Furo2),
-        'G' => Ok(DayST::Weight),
+        'W' => Ok(DayState::Weekday),
+        'H' => Ok(DayState::Holiday),
+        'F' => Ok(DayState::Bath),
+        '2' => Ok(DayState::Bath2),
+        'G' => Ok(DayState::Weight),
         _ => Err("MATCH sinai DAYST desu!!!"),
     }.unwrap()).collect())
 }
 
-fn read_hyou(text: &str) -> io::Result<Hyou> {
-    let mut ans: Hyou = Vec::new();
+fn read_hyou(text: &str) -> io::Result<Schedule> {
+    let mut ans: Schedule = Vec::new();
     for line in text.lines() {
-        let a: Vec<Waku> = line.chars().map(|c| match c {
-            'N' => Ok(Waku::N),
-            'K' => Ok(Waku::K),
-            'I' => Ok(Waku::I),
-            'A' => Ok(Waku::A),
-            'O' => Ok(Waku::O),
-            'H' => Ok(Waku::H),
-            'Y' => Ok(Waku::Y),
-            'D' => Ok(Waku::D),
-            'U' => Ok(Waku::U),
-            ' ' => Ok(Waku::U),
+        let a: Vec<Shift> = line.chars().map(|c| match c {
+            'N' => Ok(Shift::N),
+            'K' => Ok(Shift::K),
+            'I' => Ok(Shift::I),
+            'A' => Ok(Shift::A),
+            'O' => Ok(Shift::O),
+            'H' => Ok(Shift::H),
+            'Y' => Ok(Shift::Y),
+            'D' => Ok(Shift::D),
+            'U' => Ok(Shift::U),
+            ' ' => Ok(Shift::U),
             _ => Err("MATCH sinai WAKU desu!!!")
         }.unwrap()).collect();
         ans.push(a);
@@ -266,37 +266,37 @@ fn read_score_props(text: &str) -> io::Result<Vec<ScoreProp>> {
 fn read_score_prop(text: &str) -> io::Result<ScoreProp> {
     let words: Vec<&str> = text.split_whitespace().collect();
     let prop: ScoreProp = match (words[0], words[1]) {
-        ("IAKrenzoku", p) => ScoreProp::IAKrenzoku(read_float(p)?),
-        ("KIArenzoku", p) => ScoreProp::KIArenzoku(read_float(p)?),
-        ("KNIArenzoku", p) => ScoreProp::KNIArenzoku(read_float(p)?),
-        ("NNIArenzoku", p) => ScoreProp::NNIArenzoku(read_float(p)?),
-        ("ONrenzoku", p) => ScoreProp::ONrenzoku(read_float(p)?),
-        ("NHrenzoku", p) => ScoreProp::NHrenzoku(read_float(p)?),
-        ("OHrenzoku", p) => ScoreProp::OHrenzoku(read_float(p)?),
-        ("Renkin4", p) => ScoreProp::Renkin4(read_float_pair(p)?),
-        ("Renkin5", p) => ScoreProp::Renkin5(read_float_pair(p)?),
-        ("Renkin6", p) => ScoreProp::Renkin6(read_float_pair(p)?),
-        ("Renkyuu", p) => ScoreProp::Renkyuu(read_float(p)?),
-        ("Renkyuu2", p) => ScoreProp::Renkyuu2(read_float(p)?),
-        ("Renkyuu2NoBf", p) => ScoreProp::Renkyuu2NoBf(read_float(p)?),
-        ("OsoHayaBaransu", p) => ScoreProp::OsoHayaBaransu(read_float(p)?),
-        ("YakinBaransu", p) => ScoreProp::YakinBaransu(read_float(p)?),
-        ("OsoBaransu", p) => ScoreProp::OsoBaransu(read_float(p)?),
-        ("HayaBaransu", p) => ScoreProp::HayaBaransu(read_float(p)?),
-        ("KokyuCount", p) => ScoreProp::KokyuCount(read_float(p)?),
-        ("YakinCount", p) => ScoreProp::YakinCount(read_float(p)?),
-        ("OsoCount", p) => ScoreProp::OsoCount(read_float(p)?),
-        ("HayaCount", p) => ScoreProp::HayaCount(read_float(p)?),
-        ("Fukouhei", p) => ScoreProp::Fukouhei(read_usize(p)?),
-        ("YakinNinzuu", p) => ScoreProp::YakinNinzuu(read_float(p)?),
-        ("NikkinNinzuu", p) => ScoreProp::NikkinNinzuu(read_dayst_isize_float(p)?),
-        ("OsoNinzuu", p) => ScoreProp::OsoNinzuu(read_isize_float(p)?),
-        ("HayaNinzuu", p) => ScoreProp::HayaNinzuu(read_isize_float(p)?),
+        ("IAKpattern", p) => ScoreProp::IAKpattern(read_float(p)?),
+        ("KIApattern", p) => ScoreProp::KIApattern(read_float(p)?),
+        ("KNIApattern", p) => ScoreProp::KNIApattern(read_float(p)?),
+        ("NNIApattern", p) => ScoreProp::NNIApattern(read_float(p)?),
+        ("ONpattern", p) => ScoreProp::ONpattern(read_float(p)?),
+        ("NHpattern", p) => ScoreProp::NHpattern(read_float(p)?),
+        ("OHpattern", p) => ScoreProp::OHpattern(read_float(p)?),
+        ("WorkingDayStreak4", p) => ScoreProp::WorkingDayStreak4(read_float_pair(p)?),
+        ("WorkingDayStreak5", p) => ScoreProp::WorkingDayStreak5(read_float_pair(p)?),
+        ("WorkingDayStreak6", p) => ScoreProp::WorkingDayStreak6(read_float_pair(p)?),
+        ("HolidayReward", p) => ScoreProp::HolidayReward(read_float(p)?),
+        ("Need2Holidays", p) => ScoreProp::Need2Holidays(read_float(p)?),
+        ("Need2HolidaysNoBf", p) => ScoreProp::Need2HolidaysNoBf(read_float(p)?),
+        ("OHBalance", p) => ScoreProp::OHBalance(read_float(p)?),
+        ("IBalance", p) => ScoreProp::IBalance(read_float(p)?),
+        ("OBalance", p) => ScoreProp::OBalance(read_float(p)?),
+        ("HBalance", p) => ScoreProp::HBalance(read_float(p)?),
+        ("KDayCount", p) => ScoreProp::KDayCount(read_float(p)?),
+        ("IDayCount", p) => ScoreProp::IDayCount(read_float(p)?),
+        ("ODayCount", p) => ScoreProp::ODayCount(read_float(p)?),
+        ("HDayCount", p) => ScoreProp::HDayCount(read_float(p)?),
+        ("Fair", p) => ScoreProp::Fair(read_usize(p)?),
+        ("IStaffCount", p) => ScoreProp::IStaffCount(read_float(p)?),
+        ("NStaffCount", p) => ScoreProp::NStaffCount(read_dayst_isize_float(p)?),
+        ("OStaffCount", p) => ScoreProp::OStaffCount(read_isize_float(p)?),
+        ("HStaffCount", p) => ScoreProp::HStaffCount(read_isize_float(p)?),
         ("NGPair", p) => ScoreProp::NGPair(read_float(p)?),
-        ("Leader", p) => ScoreProp::Leader(read_isize_float(p)?),
-        ("YakinAloneWorker", p) => ScoreProp::YakinAloneWorker(read_isize_float(p)?),
-        ("YakinAloneBeforeFuro", p) => ScoreProp::YakinAloneBeforeFuro(read_float(p)?),
-        ("HeyaMoti", p) => ScoreProp::HeyaMoti(read_isize_isize_float(p)?),
+        ("LeaderAbility", p) => ScoreProp::LeaderAbility(read_isize_float(p)?),
+        ("IAloneAbility", p) => ScoreProp::IAloneAbility(read_isize_float(p)?),
+        ("IAloneBeforeBath", p) => ScoreProp::IAloneBeforeBath(read_float(p)?),
+        ("RoomLeaderAbility", p) => ScoreProp::RoomLeaderAbility(read_isize_isize_float(p)?),
         ("NoSamePair3", p) => ScoreProp::NoSamePair3(read_float(p)?),
         ("NoSamePair2", p) => ScoreProp::NoSamePair2(read_float(p)?),
         ("NoUndef", p) => ScoreProp::NoUndef(read_float(p)?),
@@ -308,16 +308,16 @@ fn read_score_prop(text: &str) -> io::Result<ScoreProp> {
 
 
 
-fn make_hyou_st(h: &Hyou, buffer: usize) -> HyouST {
-    let mut ans: HyouST = Vec::new();
+fn make_schedule_st(h: &Schedule, buffer: usize) -> ScheduleState {
+    let mut ans: ScheduleState = Vec::new();
     for line in h {
         ans.push(line.iter().enumerate().map(|(i, w)|
             if i < buffer {
-                WakuST::Absolute
+                ShiftState::Absolute
             } else {
                 match w {
-                    Waku::U => WakuST::Random,
-                    _ => WakuST::Absolute,
+                    Shift::U => ShiftState::Random,
+                    _ => ShiftState::Absolute,
                 }
             }
         ).collect());

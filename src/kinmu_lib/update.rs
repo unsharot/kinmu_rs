@@ -1,20 +1,20 @@
 //! 焼きなましで使う更新関数のモジュール
 
 use super::types::{
-    Waku,
-    Hyou,
-    WakuST,
-    HyouST,
-    HyouProp,
+    Shift,
+    Schedule,
+    ShiftState,
+    ScheduleState,
+    ScheduleProp,
     Score,
 };
 
 use rand::Rng;
 
 
-pub fn gen_update_func<'a, R: Rng>(text: &str, hp: &'a HyouProp) -> Box<dyn FnMut(&Hyou, &mut R) -> Hyou + 'a> {
+pub fn gen_update_func<'a, R: Rng>(text: &str, hp: &'a ScheduleProp) -> Box<dyn FnMut(&Schedule, &mut R) -> Schedule + 'a> {
     println!("{}", text);
-    let hst = &hp.hyou_st;
+    let hst = &hp.schedule_st;
     match text {
         "update1" => Box::new(move |h, rng| update_randomly1(hp, hst, h, rng)),
         "update2" => Box::new(move |h, rng| update_randomly2(hp, hst, h, rng)),
@@ -37,12 +37,12 @@ pub fn gen_update_func<'a, R: Rng>(text: &str, hp: &'a HyouProp) -> Box<dyn FnMu
 
 /// ランダムな1つの枠をランダムな枠に変える
 /// Absoluteの場合繰り返す
-fn update_randomly1<R: Rng>(hp: &HyouProp, hst: &HyouST, h: &Hyou, rng: &mut R) -> Hyou {
+fn update_randomly1<R: Rng>(hp: &ScheduleProp, hst: &ScheduleState, h: &Schedule, rng: &mut R) -> Schedule {
     let mut newh = h.clone();
-    let rx: usize = rng.gen_range(0..hp.worker_count);
+    let rx: usize = rng.gen_range(0..hp.staff_count);
     let ry: usize = rng.gen_range(hp.buffer..hp.day_count);
-    if hst[rx][ry] != WakuST::Absolute {
-        newh[rx][ry] = [Waku::N, Waku::K, Waku::I, Waku::A, Waku::O, Waku::H][rng.gen_range(0..6)];
+    if hst[rx][ry] != ShiftState::Absolute {
+        newh[rx][ry] = [Shift::N, Shift::K, Shift::I, Shift::A, Shift::O, Shift::H][rng.gen_range(0..6)];
         newh
     } else {
         update_randomly1(&hp, &hst, &h, rng)
@@ -50,25 +50,25 @@ fn update_randomly1<R: Rng>(hp: &HyouProp, hst: &HyouST, h: &Hyou, rng: &mut R) 
 }
 
 /// ランダムな1つの枠をランダムな枠に変える
-fn update_randomly2<R: Rng>(hp: &HyouProp, hst: &HyouST, h: &Hyou, rng: &mut R) -> Hyou {
+fn update_randomly2<R: Rng>(hp: &ScheduleProp, hst: &ScheduleState, h: &Schedule, rng: &mut R) -> Schedule {
     let mut newh = h.clone();
-    let rx: usize = rng.gen_range(0..hp.worker_count);
+    let rx: usize = rng.gen_range(0..hp.staff_count);
     let ry: usize = rng.gen_range(hp.buffer..hp.day_count);
-    if hst[rx][ry] != WakuST::Absolute {
-        newh[rx][ry] = [Waku::N, Waku::K, Waku::I, Waku::A, Waku::O, Waku::H][rng.gen_range(0..6)];
+    if hst[rx][ry] != ShiftState::Absolute {
+        newh[rx][ry] = [Shift::N, Shift::K, Shift::I, Shift::A, Shift::O, Shift::H][rng.gen_range(0..6)];
     }
     newh
 }
 
 /// ランダムな1つの枠をN,O,Hのうちランダムな枠に変える Absoluteなら繰り返す
-fn update_randomly4<R: Rng>(hp: &HyouProp, hst: &HyouST, h: &Hyou, rng: &mut R) -> Hyou {
+fn update_randomly4<R: Rng>(hp: &ScheduleProp, hst: &ScheduleState, h: &Schedule, rng: &mut R) -> Schedule {
     let mut newh = h.clone();
-    let rx: usize = rng.gen_range(0..hp.worker_count);
+    let rx: usize = rng.gen_range(0..hp.staff_count);
     let ry: usize = rng.gen_range(hp.buffer..hp.day_count);
-    let b1 = hst[rx][ry] != WakuST::Absolute;
-    let b2 = h[rx][ry] == Waku::N || h[rx][ry] == Waku::O || h[rx][ry] == Waku::H || h[rx][ry] == Waku::U;
+    let b1 = hst[rx][ry] != ShiftState::Absolute;
+    let b2 = h[rx][ry] == Shift::N || h[rx][ry] == Shift::O || h[rx][ry] == Shift::H || h[rx][ry] == Shift::U;
     if b1 && b2 {
-        newh[rx][ry] = [Waku::N, Waku::O, Waku::H][rng.gen_range(0..3)];
+        newh[rx][ry] = [Shift::N, Shift::O, Shift::H][rng.gen_range(0..3)];
         newh
     } else {
         update_randomly4(&hp, &hst, &h, rng)
@@ -104,7 +104,7 @@ macro_rules! count_waku_row {
     }};
 }
 
-fn remove_random<R: Rng>(w: Waku, hp: &HyouProp, newh: &mut Hyou, r: usize, rng: &mut R) {
+fn remove_random<R: Rng>(w: Shift, hp: &ScheduleProp, newh: &mut Schedule, r: usize, rng: &mut R) {
     let mut is: Vec<usize> = Vec::new();
     for c in hp.buffer..hp.day_count {
         if newh[r][c] == w {
@@ -112,13 +112,13 @@ fn remove_random<R: Rng>(w: Waku, hp: &HyouProp, newh: &mut Hyou, r: usize, rng:
         }
     }
     let rnd = rng.gen_range(0..is.len());
-    newh[r][is[rnd]] = Waku::N;
+    newh[r][is[rnd]] = Shift::N;
 }
 
-fn add_random<R: Rng>(w: Waku, hp: &HyouProp, newh: &mut Hyou, r:usize, rng: &mut R) {
+fn add_random<R: Rng>(w: Shift, hp: &ScheduleProp, newh: &mut Schedule, r:usize, rng: &mut R) {
     let mut is: Vec<usize> = Vec::new();
     for c in hp.buffer..hp.day_count {
-        if newh[r][c] == Waku::N {
+        if newh[r][c] == Shift::N {
             is.push(c);
         }
     }
@@ -126,72 +126,72 @@ fn add_random<R: Rng>(w: Waku, hp: &HyouProp, newh: &mut Hyou, r:usize, rng: &mu
     newh[r][is[rnd]] = w;
 }
 
-fn iak_renzoku(hp: &HyouProp, h: &Hyou, r: usize, s: &Score) -> Score {
+fn iak_renzoku(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score {
     let mut ans = 0.0;
     for i in 0..(hp.day_count - 1) {
         ans += match (h[r][i], h[r][i+1]) {
-            (Waku::A, Waku::K) => 0.0,
-            (Waku::A, Waku::Y) => 0.0,
-            (Waku::A, _) => *s,
-            (Waku::I, Waku::A) => 0.0,
-            (Waku::I, _) => *s,
-            (_, Waku::A) => *s,
+            (Shift::A, Shift::K) => 0.0,
+            (Shift::A, Shift::Y) => 0.0,
+            (Shift::A, _) => *s,
+            (Shift::I, Shift::A) => 0.0,
+            (Shift::I, _) => *s,
+            (_, Shift::A) => *s,
             _ => 0.0,
         }
     }
     ans
 }
 
-fn remove_improper_a(hp: &HyouProp, newh: &mut Hyou, r: usize) {
+fn remove_improper_a(hp: &ScheduleProp, newh: &mut Schedule, r: usize) {
     for c in hp.buffer..hp.day_count {
-        if newh[r][c] == Waku::A && newh[r][c-1] != Waku::I {
-            newh[r][c] = Waku::N;
+        if newh[r][c] == Shift::A && newh[r][c-1] != Shift::I {
+            newh[r][c] = Shift::N;
         }
     }
 }
 
-fn add_proper_a(hp: &HyouProp, newh: &mut Hyou, r: usize) {
+fn add_proper_a(hp: &ScheduleProp, newh: &mut Schedule, r: usize) {
     for c in hp.buffer..hp.day_count {
-        if newh[r][c] != Waku::A && newh[r][c-1] == Waku::I {
-            newh[r][c] = Waku::A;
+        if newh[r][c] != Shift::A && newh[r][c-1] == Shift::I {
+            newh[r][c] = Shift::A;
         }
     }
 }
 
 /// IAKを破壊せずに入れ替える
 /// 前提として、Absolute以外はI,A,K,Nで、AbsoluteでないO,Hはないことが条件
-fn update_randomly5<R: Rng>(hp: &HyouProp, hst: &HyouST, h: &Hyou, rng: &mut R) -> Hyou {
+fn update_randomly5<R: Rng>(hp: &ScheduleProp, hst: &ScheduleState, h: &Schedule, rng: &mut R) -> Schedule {
     let mut newh = h.clone();
-    for r in 0..hp.worker_count {
+    for r in 0..hp.staff_count {
         // Iが入っていることを確認
-        let i_cnt = count_waku_row!(Waku::I, hp, h, r);
+        let i_cnt = count_waku_row!(Shift::I, hp, h, r);
         if i_cnt == 0 {
             // ランダムなKを取り除き、Nを代わりに置く
-            remove_random(Waku::K, &hp, &mut newh, r, rng);
+            remove_random(Shift::K, &hp, &mut newh, r, rng);
             // ランダムなNをKで置き換える
-            add_random(Waku::K, &hp, &mut newh, r, rng);
+            add_random(Shift::K, &hp, &mut newh, r, rng);
         } else {
             // ランダムなIを取り除き、Nを代わりに置く
-            remove_random(Waku::I, &hp, &mut newh, r, rng);
+            remove_random(Shift::I, &hp, &mut newh, r, rng);
             // 孤立したAを取り除き、Nを代わりに置く
             remove_improper_a(&hp, &mut newh, r);
             // ランダムなKを取り除き、Nを代わりに置く
-            remove_random(Waku::K, &hp, &mut newh, r, rng);
+            remove_random(Shift::K, &hp, &mut newh, r, rng);
             // ランダムなNをIで置き換える
-            add_random(Waku::I, &hp, &mut newh, r, rng);
+            add_random(Shift::I, &hp, &mut newh, r, rng);
             // Aを必要なら追加する (適当なものを置き換える あらゆる可能性あり)
             add_proper_a(&hp, &mut newh, r);
             // ランダムなNをKで置き換える
-            add_random(Waku::K, &hp, &mut newh, r, rng);
+            add_random(Shift::K, &hp, &mut newh, r, rng);
         }
 
         // 条件に合うかのチェック
 
         // 無駄あり 一回で走査できる
-        let ic1 = count_waku_row!(Waku::I, hp, h, r);
-        let ic2 = count_waku_row!(Waku::I, hp, newh, r);
-        let kc1 = count_waku_row!(Waku::K, hp, h, r);
-        let kc2 = count_waku_row!(Waku::K, hp, newh, r);
+        let ic1 = count_waku_row!(Shift::I, hp, h, r);
+        let ic2 = count_waku_row!(Shift::I, hp, newh, r);
+        let kc1 = count_waku_row!(Shift::K, hp, h, r);
+        let kc2 = count_waku_row!(Shift::K, hp, newh, r);
 
         // Iの数に変化ないか
         let b1 = ic1 == ic2;
@@ -206,7 +206,7 @@ fn update_randomly5<R: Rng>(hp: &HyouProp, hst: &HyouST, h: &Hyou, rng: &mut R) 
         let b4 = {
             let mut ans = true;
             for c in hp.buffer..hp.day_count {
-                if hst[r][c] == WakuST::Absolute {
+                if hst[r][c] == ShiftState::Absolute {
                     ans = ans && h[r][c] == newh[r][c];
                 }
             }
