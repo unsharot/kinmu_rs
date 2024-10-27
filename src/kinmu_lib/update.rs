@@ -12,8 +12,9 @@ use super::types::{
 use rand::Rng;
 
 
-pub fn gen_update_func<'a, R: Rng>(text: &str, hp: &'a HyouProp, hst: &'a HyouST) -> Box<dyn FnMut(&Hyou, &mut R) -> Hyou + 'a> {
+pub fn gen_update_func<'a, R: Rng>(text: &str, hp: &'a HyouProp) -> Box<dyn FnMut(&Hyou, &mut R) -> Hyou + 'a> {
     println!("{}", text);
+    let hst = &hp.hyou_st;
     match text {
         "update1" => Box::new(move |h, rng| update_randomly1(hp, hst, h, rng)),
         "update2" => Box::new(move |h, rng| update_randomly2(hp, hst, h, rng)),

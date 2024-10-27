@@ -67,9 +67,6 @@ fn sub(p: &str) -> io::Result<()> {
 
     let acs: Vec<types::AnnealingConfig> = fs.iter().map(|s| reader::load_annealing_config(s).unwrap()).collect();
 
-    let hst_p = &hp.hyou_st;
-
-
     let mut model = fill::run(&fc, &hp);
 
     print_check("K_I_COUNTS", check::k_i_counts(&hp, &model));
@@ -85,7 +82,7 @@ fn sub(p: &str) -> io::Result<()> {
             score,
             &model,
             ac.step,
-            update::gen_update_func(&ac.update_func, &hp, hst_p),
+            update::gen_update_func(&ac.update_func, &hp),
             |m| score::assess_score(&ac.score_props, &hp, m),
             // |_| 0.0,
             ac.max_temp,
