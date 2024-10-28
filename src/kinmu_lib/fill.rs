@@ -43,22 +43,14 @@ fn fill_randomly1<R: Rng>(schedule_prop: &ScheduleProp, rng: &mut R) -> Schedule
 }
 
 /*
-1.  連続するRandomの個数をリストアップ
-2.  それぞれ3で割って商と余りを出す
-3.  商だけIAKを、余りだけNを並べる
-4.  Iの差分を計算
-5.  余分なIをランダムに消す
-6.  孤立したAを消す
-7.  Kの差分を計算
-8.  不足したKをランダムに足す
-9.  余分なKを消した中で、最もIAKpatternが低いものを採用
-10. 元の表に埋め込む
-
-もとの表に埋め込んでから余分なKを消すほうがいい
-*/
-
-/*
-Kが足りない場合でも、続行できるか
+fill2のアルゴリズム
+1.  Randomの場所をIAKのパターンで埋め、残りはNで埋める
+2.  指定されたIと今埋まっているIの差分を計算
+3.  余分なIをランダムに消す
+4.  孤立したAを消す
+5.  指定されたKと今埋まっているKの差分を計算
+6.  不足したKをランダムに足す
+7.  余分なKを孤立したものを優先にランダムに消す
 */
 
 macro_rules! count_waku_row {
@@ -95,7 +87,6 @@ fn remove_improper_a(schedule_prop: &ScheduleProp, new_schedule: &mut Schedule, 
 fn add_random<R: Rng>(shift: Shift, schedule_prop: &ScheduleProp, new_schedule: &mut Schedule, r:usize, rng: &mut R) {
     let mut is: Vec<usize> = Vec::new();
     for c in schedule_prop.buffer..schedule_prop.day_count {
-        // if new_schedule[r][c] == Shift::N || new_schedule[r][c] == Shift::U {
         if new_schedule[r][c] == Shift::N && schedule_prop.schedule_st[r][c] != ShiftState::Absolute {
             is.push(c);
         }
@@ -108,7 +99,6 @@ fn fill_randomly2<R: Rng>(schedule_prop: &ScheduleProp, rng: &mut R) -> Schedule
     let mut schedule = schedule_prop.request.clone();
     for r in 0..schedule_prop.staff_count {
 
-        // 直接IAKN構築する
         let mut r_cnt = 0;
         for c in schedule_prop.buffer..(schedule_prop.day_count + 1) {
             // Randomが途切れることを検知して、途切れるなら入るだけIAKを入れる
@@ -164,9 +154,8 @@ fn fill_randomly2<R: Rng>(schedule_prop: &ScheduleProp, rng: &mut R) -> Schedule
                 add_random(Shift::K, &schedule_prop, &mut schedule, r, rng);
             }
         } else {
-            // 余分なKを消した中で、最もIAKpatternが低いものを採用
 
-            // 孤立KとそうでないKのインデックスをとる
+            // 孤立したKとそうでないKのインデックスをとる
             let mut k_nc_ids = Vec::new();
             let mut k_ng_ids = Vec::new();
             for c in schedule_prop.buffer..schedule_prop.day_count {
@@ -191,7 +180,6 @@ fn fill_randomly2<R: Rng>(schedule_prop: &ScheduleProp, rng: &mut R) -> Schedule
                     k_nc_ids.remove(rnd);
                 }
             }
-            // TODO: k_ng_idsが空になった場合のエラーハンドリング
         }
     }
     schedule
