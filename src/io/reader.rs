@@ -26,13 +26,9 @@ pub fn load_main_config(path: &FilePath) -> io::Result<Vec<FilePath>> {
 
     let contents = read_contents(path)?;
 
-    let mut ans: Vec<String> = Vec::new();
+    let ss = sep_by_fields(&contents);
 
-    for line in contents {
-        if !line.starts_with("--") {
-            ans.push(line.to_string());
-        }
-    }
+    let ans = ss[1].lines().map(|s| s.to_string()).collect();
 
     Ok(ans)
 }
@@ -42,7 +38,7 @@ fn sep_by_fields(contents: &Vec<String>) -> Vec<String> {
     let mut temp: Vec<String> = Vec::new();
     let mut ss: Vec<String> = Vec::new();
     for line in contents {
-        if line.ends_with(": ") || line.ends_with(":") || line.starts_with("--") {
+        if line.trim().ends_with(":") {
             ss.push(temp.join("\n"));
             temp = Vec::new();
         } else {
