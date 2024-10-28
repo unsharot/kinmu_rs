@@ -43,7 +43,7 @@ pub fn assess_score(sps: &Vec<ScoreProp>, schedule_prop: &ScheduleProp, schedule
 pub fn show_score(sps: &Vec<ScoreProp>, schedule_prop: &ScheduleProp, schedule: &Schedule) -> String {
     let sl = get_score_list(sps, schedule_prop, schedule);
     let ss: Vec<String> = sps.iter().map(|x| x.to_string()).collect();
-    let zipped: Vec<String> = ss.iter().zip(sl.iter()).map(|(x,y)| x.to_string() + ": " + &y.to_string()).collect();
+    let zipped: Vec<String> = ss.iter().zip(sl.iter()).map(|(x,y)| x.to_string() + " : " + &y.to_string()).collect();
     zipped.join("\n")
 }
 
