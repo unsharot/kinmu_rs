@@ -55,7 +55,7 @@ fn print_shift_row(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize) 
     }
 }
 
-/// 指定した枠の数を出力
+/// 指定したシフトの数を出力
 fn print_shift_count_row(target_shift: Shift, schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize) {
     let mut sum = 0;
     for c in schedule_prop.buffer..schedule_prop.day_count {
@@ -80,7 +80,7 @@ fn print_days(schedule_prop: &ScheduleProp) {
     println!();
 }
 
-/// 指定した枠の列の和を表示
+/// 指定したシフトの列の和を表示
 fn print_shift_count_columns(target_shift: Shift, schedule_prop: &ScheduleProp, schedule: &Schedule) {
     let mut v: Vec<String> = Vec::new();
     let mut max_length = 0;

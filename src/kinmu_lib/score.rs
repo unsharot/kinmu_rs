@@ -75,7 +75,7 @@ fn get_score(schedule_prop: &ScheduleProp, schedule: &Schedule, sp: &ScoreProp) 
         IDayCount(p) => check_rows!(i_day_count, schedule_prop, schedule, p),
         ODayCount(p) => check_rows!(o_day_count, schedule_prop, schedule, p),
         HDayCount(p) => check_rows!(h_day_count, schedule_prop, schedule, p),
-        // Fukouhei(p) => check_rows!(fukouhei, schedule_prop, schedule, p),
+        // Fair(p) => check_rows!(fair, schedule_prop, schedule, p),
         IStaffCount(p) => check_columns!(i_staff_count, schedule_prop, schedule, p),
         NStaffCount(p) => check_columns!(n_staff_count, schedule_prop, schedule, p),
         OStaffCount(p) => check_columns!(o_staff_count, schedule_prop, schedule, p),
@@ -506,7 +506,7 @@ fn leader_ability(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usize, (
     }
 }
 
-///一人で夜勤できるワーカー
+///一人で夜勤が可能か
 fn i_alone_worker(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usize, (ab, s): &(isize,Score)) -> Score {
     let mut i_cnt = 0;
     let mut a_cnt = 0;
