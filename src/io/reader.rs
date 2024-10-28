@@ -194,8 +194,8 @@ fn read_dayst_isize_float(text: &str) -> io::Result<(DayState, isize, f32)> {
 fn read_staff(text: &str) -> io::Result<Vec<Staff>> {
     let mut staff: Vec<Staff> = Vec::new();
     for line in text.lines() {
-        let w = read_worker(&line)?;
-        staff.push(w);
+        let a_staff = read_worker(&line)?;
+        staff.push(a_staff);
     }
     Ok(staff)
 }
@@ -308,14 +308,14 @@ fn read_score_prop(text: &str) -> io::Result<ScoreProp> {
 
 
 
-fn make_schedule_st(h: &Schedule, buffer: usize) -> ScheduleState {
+fn make_schedule_st(schedule: &Schedule, buffer: usize) -> ScheduleState {
     let mut ans: ScheduleState = Vec::new();
-    for line in h {
-        ans.push(line.iter().enumerate().map(|(i, w)|
+    for line in schedule {
+        ans.push(line.iter().enumerate().map(|(i, shift)|
             if i < buffer {
                 ShiftState::Absolute
             } else {
-                match w {
+                match shift {
                     Shift::U => ShiftState::Random,
                     _ => ShiftState::Absolute,
                 }
