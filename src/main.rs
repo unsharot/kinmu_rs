@@ -37,7 +37,7 @@ fn print_check(name: &str, b: bool) {
 }
 
 fn sub(p: &str) -> io::Result<()> {
-    let Ok((schedule_prop, fs, fc)) = reader::load_config(p) else { todo!() };
+    let (schedule_prop, fs, fc) = reader::load_config(p)?;
 
     print_check("ALL_ABSOLUTE", check::all_absolute(&schedule_prop));
 
