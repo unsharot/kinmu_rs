@@ -9,20 +9,28 @@ use rand::Rng;
 /// use rand::Rng;
 /// use annealing::annealing;
 ///
-/// fn updatef<R: Rng>(x: &f32, rng: &mut R) -> f32{
+/// fn updatef<R: Rng>(x: &f32, rng: &mut R) -> f32 {
 ///    x + rng.gen::<f32>() / 100.0
 /// }
 ///
-/// fn evalf(x: &f32) -> f32{
+/// fn evalf(x: &f32) -> f32 {
 ///     (x - 5.0) * (x - 5.0)
 /// }
 ///
 /// let best_score: f32;
 /// let best_model: f32;
 ///
-/// (best_score, best_model) = annealing::annealing(10000.0, &0.0, 100000, updatef, evalf, 10.0, 0.0, annealing::basic_temp_func, annealing::basic_prob_func,
+/// (best_score, best_model) = annealing::annealing(
+///     10000.0,
+///     &0.0,
+///     100000,
+///     updatef,
+///     evalf,
+///     10.0,
+///     0.0,
+///     annealing::basic_temp_func,
+///     annealing::basic_prob_func,
 ///     &mut rand::thread_rng(),
-///     // &mut StdRng::seed_from_u64(0),
 /// );
 ///```
 pub fn annealing<M, S, U, E, T, P, R>(
