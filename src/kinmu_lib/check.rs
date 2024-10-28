@@ -8,10 +8,10 @@ use super::types::{
 };
 
 /// すべてAbsoluteになっていないかチェック
-pub fn all_absolute(hp: &ScheduleProp) -> bool {
-    for r in 0..hp.staff_count {
-        for c in hp.buffer..hp.day_count {
-            if hp.schedule_st[r][c] != ShiftState::Absolute {
+pub fn all_absolute(schedule_prop: &ScheduleProp) -> bool {
+    for r in 0..schedule_prop.staff_count {
+        for c in schedule_prop.buffer..schedule_prop.day_count {
+            if schedule_prop.schedule_st[r][c] != ShiftState::Absolute {
                 return true;
             }
         }
@@ -20,11 +20,11 @@ pub fn all_absolute(hp: &ScheduleProp) -> bool {
 }
 
 /// IAKがすべて埋められているかチェック
-pub fn safe_iak(hp: &ScheduleProp) -> bool {
+pub fn safe_iak(schedule_prop: &ScheduleProp) -> bool {
 
-    for r in 0..hp.staff_count {
-        for c in 0..(hp.day_count - 1) {
-            if match (hp.request[r][c], hp.request[r][c+1]) {
+    for r in 0..schedule_prop.staff_count {
+        for c in 0..(schedule_prop.day_count - 1) {
+            if match (schedule_prop.request[r][c], schedule_prop.request[r][c+1]) {
                 (Shift::A, Shift::U) => true,
                 (Shift::A, _) => false,
                 (Shift::I, Shift::U) => true,
@@ -41,10 +41,10 @@ pub fn safe_iak(hp: &ScheduleProp) -> bool {
 }
 
 macro_rules! count_waku_row {
-    ($w:expr, $hp: expr, $h:expr, $r:expr) => {{
+    ($w:expr, $schedule_prop: expr, $schedule:expr, $r:expr) => {{
         let mut cnt: isize = 0;
-        for i in $hp.buffer..$hp.day_count {
-            if $h[$r][i] == $w {
+        for i in $schedule_prop.buffer..$schedule_prop.day_count {
+            if $schedule[$r][i] == $w {
                 cnt += 1;
             }
         }
@@ -53,14 +53,14 @@ macro_rules! count_waku_row {
 }
 
 /// fillした後の表のKとIの数がちゃんとしてるかチェック
-pub fn k_i_counts(hp: &ScheduleProp, h: &Schedule) -> bool {
-    for r in 0..hp.staff_count {
-        let k_cnt = count_waku_row!(Shift::K, hp, h, r);
-        let i_cnt = count_waku_row!(Shift::I, hp, h, r);
-        if hp.staff[r].k_day_count != k_cnt {
+pub fn k_i_counts(schedule_prop: &ScheduleProp, schedule: &Schedule) -> bool {
+    for r in 0..schedule_prop.staff_count {
+        let k_cnt = count_waku_row!(Shift::K, schedule_prop, schedule, r);
+        let i_cnt = count_waku_row!(Shift::I, schedule_prop, schedule, r);
+        if schedule_prop.staff[r].k_day_count != k_cnt {
             return false;
         }
-        if hp.staff[r].i_day_count != i_cnt {
+        if schedule_prop.staff[r].i_day_count != i_cnt {
             return false;
         }
     }
@@ -68,11 +68,11 @@ pub fn k_i_counts(hp: &ScheduleProp, h: &Schedule) -> bool {
 }
 
 /// Absoluteが変化していないことをチェック
-pub fn abs_not_changed(hp: &ScheduleProp, h: &Schedule) -> bool {
-    for r in 0..hp.staff_count {
-        for c in 0..hp.day_count {
-            if hp.schedule_st[r][c] == ShiftState::Absolute {
-                if h[r][c] != hp.request[r][c] {
+pub fn abs_not_changed(schedule_prop: &ScheduleProp, schedule: &Schedule) -> bool {
+    for r in 0..schedule_prop.staff_count {
+        for c in 0..schedule_prop.day_count {
+            if schedule_prop.schedule_st[r][c] == ShiftState::Absolute {
+                if schedule[r][c] != schedule_prop.request[r][c] {
                     return false;
                 }
             }

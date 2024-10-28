@@ -59,31 +59,31 @@ fn print_check(name: &str, b: bool) {
 }
 
 fn sub(p: &str) -> io::Result<()> {
-    let Ok((hp, fs, fc)) = reader::load_config(p) else { todo!() };
+    let Ok((schedule_prop, fs, fc)) = reader::load_config(p) else { todo!() };
 
-    print_check("ALL_ABSOLUTE", check::all_absolute(&hp));
+    print_check("ALL_ABSOLUTE", check::all_absolute(&schedule_prop));
 
-    print_check("SAFE_IAK", check::safe_iak(&hp));
+    print_check("SAFE_IAK", check::safe_iak(&schedule_prop));
 
     let acs: Vec<types::AnnealingConfig> = fs.iter().map(|s| reader::load_annealing_config(s).unwrap()).collect();
 
-    let mut model = fill::run(&fc, &hp);
+    let mut model = fill::run(&fc, &schedule_prop);
 
-    print_check("K_I_COUNTS", check::k_i_counts(&hp, &model));
+    print_check("K_I_COUNTS", check::k_i_counts(&schedule_prop, &model));
 
-    print_check("ABS_NOT_CHANGED", check::abs_not_changed(&hp, &model));
+    print_check("ABS_NOT_CHANGED", check::abs_not_changed(&schedule_prop, &model));
 
     let mut score;
     for ac in acs {
         let start = Instant::now();
         let mut rng = seed::gen_rng_from_seed(ac.seed);
-        score = score::assess_score(&ac.score_props, &hp, &model);
+        score = score::assess_score(&ac.score_props, &schedule_prop, &model);
         (score, model) = annealing::annealing(
             score,
             &model,
             ac.step,
-            update::gen_update_func(&ac.update_func, &hp),
-            |m| score::assess_score(&ac.score_props, &hp, m),
+            update::gen_update_func(&ac.update_func, &schedule_prop),
+            |m| score::assess_score(&ac.score_props, &schedule_prop, m),
             // |_| 0.0,
             ac.max_temp,
             ac.min_temp,
@@ -95,21 +95,21 @@ fn sub(p: &str) -> io::Result<()> {
         println!("time: {:?}", start.elapsed());
     }
 
-    print_check("SAFE_IAK", check::safe_iak(&hp));
+    print_check("SAFE_IAK", check::safe_iak(&schedule_prop));
 
-    print_check("ABS_NOT_CHANGED", check::abs_not_changed(&hp, &model));
+    print_check("ABS_NOT_CHANGED", check::abs_not_changed(&schedule_prop, &model));
     
     println!();
 
-    score = score::assess_score(&hp.score_props, &hp, &model);
+    score = score::assess_score(&schedule_prop.score_props, &schedule_prop, &model);
 
     println!("{}", score);
-    // println!("{}", score::assess_score(&hp, &model));
-    display::print_schedule(&hp, &model);
+    // println!("{}", score::assess_score(&schedule_prop, &model));
+    display::print_schedule(&schedule_prop, &model);
 
     println!();
 
-    println!("{}", score::show_score(&hp.score_props, &hp, &model));
+    println!("{}", score::show_score(&schedule_prop.score_props, &schedule_prop, &model));
 
     println!();
 

@@ -16,78 +16,78 @@ use std::collections::HashMap;
 
 
 macro_rules! check_rows {
-    ($check:expr, $hp: expr, $h:expr, $p:expr) => {{
+    ($check:expr, $schedule_prop: expr, $schedule:expr, $p:expr) => {{
         let mut sum = 0.0;
-        for r in 0..$hp.staff_count {
-            sum += $check($hp, $h, r, $p);
+        for r in 0..$schedule_prop.staff_count {
+            sum += $check($schedule_prop, $schedule, r, $p);
         }
         sum
     }};
 }
 
 macro_rules! check_columns {
-    ($check:expr, $hp: expr, $h:expr, $p:expr) => {{
+    ($check:expr, $schedule_prop: expr, $schedule:expr, $p:expr) => {{
         let mut sum = 0.0;
-        for c in $hp.buffer..$hp.day_count {
-            sum += $check($hp, $h, c, $p);
+        for c in $schedule_prop.buffer..$schedule_prop.day_count {
+            sum += $check($schedule_prop, $schedule, c, $p);
         }
         sum
     }};
 }
 
-pub fn assess_score(sps: &Vec<ScoreProp>, hp: &ScheduleProp, h: &Schedule) -> Score {
-    get_score_list(sps, hp, h).iter().sum()
+pub fn assess_score(sps: &Vec<ScoreProp>, schedule_prop: &ScheduleProp, schedule: &Schedule) -> Score {
+    get_score_list(sps, schedule_prop, schedule).iter().sum()
 }
 
-pub fn show_score(sps: &Vec<ScoreProp>, hp: &ScheduleProp, h: &Schedule) -> String {
-    let sl = get_score_list(sps, hp, h);
+pub fn show_score(sps: &Vec<ScoreProp>, schedule_prop: &ScheduleProp, schedule: &Schedule) -> String {
+    let sl = get_score_list(sps, schedule_prop, schedule);
     let ss: Vec<String> = sps.iter().map(|x| x.to_string()).collect();
     let zipped: Vec<String> = ss.iter().zip(sl.iter()).map(|(x,y)| x.to_string() + ": " + &y.to_string()).collect();
     zipped.join("\n")
 }
 
-fn get_score_list(sps: &Vec<ScoreProp>, hp: &ScheduleProp, h: &Schedule) -> Vec<Score> {
-    sps.iter().map(|sp| get_score(hp, h, sp)).collect()
+fn get_score_list(sps: &Vec<ScoreProp>, schedule_prop: &ScheduleProp, schedule: &Schedule) -> Vec<Score> {
+    sps.iter().map(|sp| get_score(schedule_prop, schedule, sp)).collect()
 }
 
 
-fn get_score(hp: &ScheduleProp, h: &Schedule, sp: &ScoreProp) -> Score {
+fn get_score(schedule_prop: &ScheduleProp, schedule: &Schedule, sp: &ScoreProp) -> Score {
 
     match sp {
-        IAKpattern(p) => check_rows!(iak_pattern, hp, h, p),
-        KIApattern(p) => check_rows!(kia_pattern, hp, h, p),
-        KNIApattern(p) => check_rows!(knia_pattern, hp, h, p),
-        NNIApattern(p) => check_rows!(nnia_pattern, hp, h, p),
-        ONpattern(p) => check_rows!(on_pattern, hp, h, p),
-        NHpattern(p) => check_rows!(nh_pattern, hp, h, p),
-        OHpattern(p) => check_rows!(oh_pattern, hp, h, p),
-        WorkingDayStreak4(p) => check_rows!(renkin4, hp, h, p),
-        WorkingDayStreak5(p) => check_rows!(renkin5, hp, h, p),
-        WorkingDayStreak6(p) => check_rows!(renkin6, hp, h, p),
-        HolidayReward(p) => check_rows!(k_pattern, hp, h, p),
-        Need2Holidays(p) => check_rows!(k_pattern2, hp, h, p),
-        Need2HolidaysNoBf(p) => check_rows!(k_pattern2_no_buffer, hp, h, p),
-        OHBalance(p) => check_rows!(osohaya_baransu, hp, h, p),
-        IBalance(p) => check_rows!(yakin_baransu, hp, h, p),
-        OBalance(p) => check_rows!(oso_baransu, hp, h, p),
-        HBalance(p) => check_rows!(haya_baransu, hp, h, p),
-        KDayCount(p) => check_rows!(kokyu_count, hp, h, p),
-        IDayCount(p) => check_rows!(yakin_count, hp, h, p),
-        ODayCount(p) => check_rows!(oso_count, hp, h, p),
-        HDayCount(p) => check_rows!(haya_count, hp, h, p),
-        // Fukouhei(p) => check_rows!(fukouhei, hp, h, p),
-        IStaffCount(p) => check_columns!(yakin_ninzuu, hp, h, p),
-        NStaffCount(p) => check_columns!(nikkin_ninzuu, hp, h, p),
-        OStaffCount(p) => check_columns!(oso_ninzuu, hp, h, p),
-        HStaffCount(p) => check_columns!(haya_ninzuu, hp, h, p),
-        NGPair(p) => check_columns!(ng_pair, hp, h, p),
-        LeaderAbility(p) => check_columns!(leader_ability, hp, h, p),
-        IAloneAbility(p) => check_columns!(yakin_alone_worker, hp, h, p),
-        IAloneBeforeBath(p) => check_columns!(yakin_alone_before_furo, hp, h, p),
-        RoomLeaderAbility(p) => check_columns!(heyamoti_ability, hp, h, p),
-        NoSamePair3(p) => no_same_pair3(hp, h, p),
-        NoSamePair2(p) => no_same_pair2(hp, h, p),
-        NoUndef(p) => check_columns!(no_undef, hp, h, p),
+        IAKpattern(p) => check_rows!(iak_pattern, schedule_prop, schedule, p),
+        KIApattern(p) => check_rows!(kia_pattern, schedule_prop, schedule, p),
+        KNIApattern(p) => check_rows!(knia_pattern, schedule_prop, schedule, p),
+        NNIApattern(p) => check_rows!(nnia_pattern, schedule_prop, schedule, p),
+        ONpattern(p) => check_rows!(on_pattern, schedule_prop, schedule, p),
+        NHpattern(p) => check_rows!(nh_pattern, schedule_prop, schedule, p),
+        OHpattern(p) => check_rows!(oh_pattern, schedule_prop, schedule, p),
+        WorkingDayStreak4(p) => check_rows!(renkin4, schedule_prop, schedule, p),
+        WorkingDayStreak5(p) => check_rows!(renkin5, schedule_prop, schedule, p),
+        WorkingDayStreak6(p) => check_rows!(renkin6, schedule_prop, schedule, p),
+        HolidayReward(p) => check_rows!(k_pattern, schedule_prop, schedule, p),
+        Need2Holidays(p) => check_rows!(k_pattern2, schedule_prop, schedule, p),
+        Need2HolidaysNoBf(p) => check_rows!(k_pattern2_no_buffer, schedule_prop, schedule, p),
+        OHBalance(p) => check_rows!(osohaya_baransu, schedule_prop, schedule, p),
+        IBalance(p) => check_rows!(yakin_baransu, schedule_prop, schedule, p),
+        OBalance(p) => check_rows!(oso_baransu, schedule_prop, schedule, p),
+        HBalance(p) => check_rows!(haya_baransu, schedule_prop, schedule, p),
+        KDayCount(p) => check_rows!(kokyu_count, schedule_prop, schedule, p),
+        IDayCount(p) => check_rows!(yakin_count, schedule_prop, schedule, p),
+        ODayCount(p) => check_rows!(oso_count, schedule_prop, schedule, p),
+        HDayCount(p) => check_rows!(haya_count, schedule_prop, schedule, p),
+        // Fukouhei(p) => check_rows!(fukouhei, schedule_prop, schedule, p),
+        IStaffCount(p) => check_columns!(yakin_ninzuu, schedule_prop, schedule, p),
+        NStaffCount(p) => check_columns!(nikkin_ninzuu, schedule_prop, schedule, p),
+        OStaffCount(p) => check_columns!(oso_ninzuu, schedule_prop, schedule, p),
+        HStaffCount(p) => check_columns!(haya_ninzuu, schedule_prop, schedule, p),
+        NGPair(p) => check_columns!(ng_pair, schedule_prop, schedule, p),
+        LeaderAbility(p) => check_columns!(leader_ability, schedule_prop, schedule, p),
+        IAloneAbility(p) => check_columns!(yakin_alone_worker, schedule_prop, schedule, p),
+        IAloneBeforeBath(p) => check_columns!(yakin_alone_before_furo, schedule_prop, schedule, p),
+        RoomLeaderAbility(p) => check_columns!(heyamoti_ability, schedule_prop, schedule, p),
+        NoSamePair3(p) => no_same_pair3(schedule_prop, schedule, p),
+        NoSamePair2(p) => no_same_pair2(schedule_prop, schedule, p),
+        NoUndef(p) => check_columns!(no_undef, schedule_prop, schedule, p),
         
         _ => 0.0,
     }
@@ -109,10 +109,10 @@ fn get_score(hp: &ScheduleProp, h: &Schedule, sp: &ScoreProp) -> Score {
 // まとめて実行できたら早いかも
 // 木は初回実行時に構築して保持する
 
-fn iak_pattern(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score {
+fn iak_pattern(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
     let mut ans = 0.0;
-    for i in 0..(hp.day_count - 1) {
-        ans += match (h[r][i], h[r][i+1]) {
+    for i in 0..(schedule_prop.day_count - 1) {
+        ans += match (schedule[r][i], schedule[r][i+1]) {
             (A, K) => 0.0,
             (A, Y) => 0.0,
             (A, _) => *s,
@@ -125,10 +125,10 @@ fn iak_pattern(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score {
     ans
 }
 
-fn kia_pattern(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score {
+fn kia_pattern(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
     let mut ans = 0.0;
-    for i in 0..(hp.day_count - 1) {
-        ans += match (h[r][i], h[r][i+1]) {
+    for i in 0..(schedule_prop.day_count - 1) {
+        ans += match (schedule[r][i], schedule[r][i+1]) {
             (K, I) => *s,
             (Y, I) => *s,
             _ => 0.0,
@@ -137,10 +137,10 @@ fn kia_pattern(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score {
     ans
 }
 
-fn knia_pattern(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score {
+fn knia_pattern(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
     let mut ans = 0.0;
-    for i in 0..(hp.day_count - 2) {
-        ans += match (h[r][i], h[r][i+1], h[r][i+2]) {
+    for i in 0..(schedule_prop.day_count - 2) {
+        ans += match (schedule[r][i], schedule[r][i+1], schedule[r][i+2]) {
             (K, N, I) => *s,
             (K, O, I) => *s,
             (K, H, I) => *s,
@@ -150,10 +150,10 @@ fn knia_pattern(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score {
     ans
 }
 
-fn nnia_pattern(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score {
+fn nnia_pattern(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
     let mut ans = 0.0;
-    for i in 0..(hp.day_count - 2) {
-        ans += match (h[r][i], h[r][i+1], h[r][i+2]) {
+    for i in 0..(schedule_prop.day_count - 2) {
+        ans += match (schedule[r][i], schedule[r][i+1], schedule[r][i+2]) {
             (N, N, I) => *s,
             (N, O, I) => *s,
             (O, O, I) => *s,
@@ -165,10 +165,10 @@ fn nnia_pattern(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score {
     -ans
 }
 
-fn on_pattern(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score {
+fn on_pattern(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
     let mut ans = 0.0;
-    for i in 0..(hp.day_count - 1) {
-        ans += match (h[r][i], h[r][i+1]) {
+    for i in 0..(schedule_prop.day_count - 1) {
+        ans += match (schedule[r][i], schedule[r][i+1]) {
             (O, N) => *s,
             _ => 0.0,
         }
@@ -176,10 +176,10 @@ fn on_pattern(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score {
     ans
 }
 
-fn nh_pattern(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score {
+fn nh_pattern(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
     let mut ans = 0.0;
-    for i in 0..(hp.day_count - 1) {
-        ans += match (h[r][i], h[r][i+1]) {
+    for i in 0..(schedule_prop.day_count - 1) {
+        ans += match (schedule[r][i], schedule[r][i+1]) {
             (N, H) => *s,
             _ => 0.0,
         }
@@ -187,10 +187,10 @@ fn nh_pattern(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score {
     ans
 }
 
-fn oh_pattern(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score {
+fn oh_pattern(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
     let mut ans = 0.0;
-    for i in 0..(hp.day_count - 1) {
-        ans += match (h[r][i], h[r][i+1]) {
+    for i in 0..(schedule_prop.day_count - 1) {
+        ans += match (schedule[r][i], schedule[r][i+1]) {
             (O, H) => *s,
             _ => 0.0,
         }
@@ -198,12 +198,12 @@ fn oh_pattern(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score {
     ans
 }
 
-fn renkin4(hp: &ScheduleProp, h: &Schedule, r: usize, (s1, s2): &(Score, Score)) -> Score {
+fn renkin4(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, (s1, s2): &(Score, Score)) -> Score {
     let mut ans = 0.0;
-    let ws = [N, O, H, I];
-    for i in 0..(hp.day_count - 3) {
-        if ws.contains(&h[r][i]) && ws.contains(&h[r][i+1]) && ws.contains(&h[r][i+2]) && ws.contains(&h[r][i+3]) {
-            if h[r][i+3] == I {
+    let working_shifts = [N, O, H, I];
+    for i in 0..(schedule_prop.day_count - 3) {
+        if working_shifts.contains(&schedule[r][i]) && working_shifts.contains(&schedule[r][i+1]) && working_shifts.contains(&schedule[r][i+2]) && working_shifts.contains(&schedule[r][i+3]) {
+            if schedule[r][i+3] == I {
                 ans += s1;
             } else {
                 ans += s2;
@@ -213,12 +213,12 @@ fn renkin4(hp: &ScheduleProp, h: &Schedule, r: usize, (s1, s2): &(Score, Score))
     ans
 }
 
-fn renkin5(hp: &ScheduleProp, h: &Schedule, r: usize, (s1, s2): &(Score, Score)) -> Score {
+fn renkin5(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, (s1, s2): &(Score, Score)) -> Score {
     let mut ans = 0.0;
-    let ws = [N, O, H, I];
-    for i in 0..(hp.day_count - 4) {
-        if ws.contains(&h[r][i]) && ws.contains(&h[r][i+1]) && ws.contains(&h[r][i+2]) && ws.contains(&h[r][i+3]) && ws.contains(&h[r][i+4]) {
-            if h[r][i+4] == I {
+    let working_shifts = [N, O, H, I];
+    for i in 0..(schedule_prop.day_count - 4) {
+        if working_shifts.contains(&schedule[r][i]) && working_shifts.contains(&schedule[r][i+1]) && working_shifts.contains(&schedule[r][i+2]) && working_shifts.contains(&schedule[r][i+3]) && working_shifts.contains(&schedule[r][i+4]) {
+            if schedule[r][i+4] == I {
                 ans += s1;
             } else {
                 ans += s2;
@@ -228,12 +228,12 @@ fn renkin5(hp: &ScheduleProp, h: &Schedule, r: usize, (s1, s2): &(Score, Score))
     ans
 }
 
-fn renkin6(hp: &ScheduleProp, h: &Schedule, r: usize, (s1, s2): &(Score, Score)) -> Score {
+fn renkin6(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, (s1, s2): &(Score, Score)) -> Score {
     let mut ans = 0.0;
-    let ws = [N, O, H, I];
-    for i in 0..(hp.day_count - 5) {
-        if ws.contains(&h[r][i]) && ws.contains(&h[r][i+1]) && ws.contains(&h[r][i+2]) && ws.contains(&h[r][i+3]) && ws.contains(&h[r][i+4]) && ws.contains(&h[r][i+5]) {
-            if h[r][i+5] == I {
+    let working_shifts = [N, O, H, I];
+    for i in 0..(schedule_prop.day_count - 5) {
+        if working_shifts.contains(&schedule[r][i]) && working_shifts.contains(&schedule[r][i+1]) && working_shifts.contains(&schedule[r][i+2]) && working_shifts.contains(&schedule[r][i+3]) && working_shifts.contains(&schedule[r][i+4]) && working_shifts.contains(&schedule[r][i+5]) {
+            if schedule[r][i+5] == I {
                 ans += s1;
             } else {
                 ans += s2;
@@ -243,10 +243,10 @@ fn renkin6(hp: &ScheduleProp, h: &Schedule, r: usize, (s1, s2): &(Score, Score))
     ans
 }
 
-fn k_pattern(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score {
+fn k_pattern(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
     let mut ans = 0.0;
-    for i in 0..(hp.day_count - 1) {
-        ans += match (h[r][i], h[r][i+1]) {
+    for i in 0..(schedule_prop.day_count - 1) {
+        ans += match (schedule[r][i], schedule[r][i+1]) {
             (K, K) => *s,
             (K, Y) => *s,
             (Y, K) => *s,
@@ -257,10 +257,10 @@ fn k_pattern(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score {
     -ans
 }
 
-fn k_pattern2(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score {
+fn k_pattern2(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
     let mut check = false;
-    for i in 0..(hp.day_count - 1) {
-        check = check || match (h[r][i], h[r][i+1]) {
+    for i in 0..(schedule_prop.day_count - 1) {
+        check = check || match (schedule[r][i], schedule[r][i+1]) {
             (K, K) => true,
             (K, Y) => true,
             (Y, K) => true,
@@ -275,10 +275,10 @@ fn k_pattern2(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score {
     }
 }
 
-fn k_pattern2_no_buffer(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score {
+fn k_pattern2_no_buffer(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
     let mut check = false;
-    for i in hp.buffer..(hp.day_count - 1) {
-        check = check || match (h[r][i], h[r][i+1]) {
+    for i in schedule_prop.buffer..(schedule_prop.day_count - 1) {
+        check = check || match (schedule[r][i], schedule[r][i+1]) {
             (K, K) => true,
             (K, Y) => true,
             (Y, K) => true,
@@ -298,13 +298,13 @@ fn k_pattern2_no_buffer(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) ->
 // HashMapをつかえそう
 // やっても早くなるかはわからない
 // HashMapの構築に時間とメモリかかるかも
-fn osohaya_baransu(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score {
+fn osohaya_baransu(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
     let mut oso: isize = 0;
     let mut haya: isize = 0;
-    for i in hp.buffer..hp.day_count {
-        if h[r][i] == O {
+    for i in schedule_prop.buffer..schedule_prop.day_count {
+        if schedule[r][i] == O {
             oso += 1;
-        } else if h[r][i] == H {
+        } else if schedule[r][i] == H {
             haya += 1;
         }
     }
@@ -313,16 +313,16 @@ fn osohaya_baransu(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Scor
     a * a
 }
 
-fn yakin_baransu(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score {
+fn yakin_baransu(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
     let mut cf: isize = 0;
     let mut cl: isize = 0;
-    for i in hp.buffer..((hp.day_count - hp.buffer) / 2) {
-        if h[r][i] == I {
+    for i in schedule_prop.buffer..((schedule_prop.day_count - schedule_prop.buffer) / 2) {
+        if schedule[r][i] == I {
             cf += 1;
         }
     }
-    for i in ((hp.day_count - hp.buffer) / 2)..hp.day_count {
-        if h[r][i] == I {
+    for i in ((schedule_prop.day_count - schedule_prop.buffer) / 2)..schedule_prop.day_count {
+        if schedule[r][i] == I {
             cl += 1;
         }
     }
@@ -331,16 +331,16 @@ fn yakin_baransu(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score 
     a * a
 }
 
-fn oso_baransu(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score {
+fn oso_baransu(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
     let mut cf: isize = 0;
     let mut cl: isize = 0;
-    for i in hp.buffer..((hp.day_count - hp.buffer) / 2) {
-        if h[r][i] == O {
+    for i in schedule_prop.buffer..((schedule_prop.day_count - schedule_prop.buffer) / 2) {
+        if schedule[r][i] == O {
             cf += 1;
         }
     }
-    for i in ((hp.day_count - hp.buffer) / 2)..hp.day_count {
-        if h[r][i] == O {
+    for i in ((schedule_prop.day_count - schedule_prop.buffer) / 2)..schedule_prop.day_count {
+        if schedule[r][i] == O {
             cl += 1;
         }
     }
@@ -349,16 +349,16 @@ fn oso_baransu(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score {
     a * a
 }
 
-fn haya_baransu(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score {
+fn haya_baransu(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
     let mut cf: isize = 0;
     let mut cl: isize = 0;
-    for i in hp.buffer..((hp.day_count - hp.buffer) / 2) {
-        if h[r][i] == H {
+    for i in schedule_prop.buffer..((schedule_prop.day_count - schedule_prop.buffer) / 2) {
+        if schedule[r][i] == H {
             cf += 1;
         }
     }
-    for i in ((hp.day_count - hp.buffer) / 2)..hp.day_count {
-        if h[r][i] == H {
+    for i in ((schedule_prop.day_count - schedule_prop.buffer) / 2)..schedule_prop.day_count {
+        if schedule[r][i] == H {
             cl += 1;
         }
     }
@@ -368,10 +368,10 @@ fn haya_baransu(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score {
 }
 
 macro_rules! count_waku_row {
-    ($w:expr, $hp: expr, $h:expr, $r:expr) => {{
+    ($w:expr, $schedule_prop: expr, $schedule:expr, $r:expr) => {{
         let mut cnt: isize = 0;
-        for i in $hp.buffer..$hp.day_count {
-            if $h[$r][i] == $w {
+        for i in $schedule_prop.buffer..$schedule_prop.day_count {
+            if $schedule[$r][i] == $w {
                 cnt += 1;
             }
         }
@@ -379,40 +379,40 @@ macro_rules! count_waku_row {
     }};
 }
 
-fn kokyu_count(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score {
-    let cnt_needed = hp.staff[r].k_day_count;
-    let cnt = count_waku_row!(K, hp, h, r);
+fn kokyu_count(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
+    let cnt_needed = schedule_prop.staff[r].k_day_count;
+    let cnt = count_waku_row!(K, schedule_prop, schedule, r);
     let d = (cnt - cnt_needed).abs() as Score;
     let a = d * s;
     a * a
 }
 
-fn yakin_count(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score {
-    let cnt_needed = hp.staff[r].i_day_count;
-    let cnt = count_waku_row!(I, hp, h, r);
+fn yakin_count(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
+    let cnt_needed = schedule_prop.staff[r].i_day_count;
+    let cnt = count_waku_row!(I, schedule_prop, schedule, r);
     let d = (cnt - cnt_needed).abs() as Score;
     let a = d * s;
     a * a
 }
 
-fn oso_count(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score {
-    let cnt_needed = hp.staff[r].o_day_count;
+fn oso_count(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
+    let cnt_needed = schedule_prop.staff[r].o_day_count;
     if cnt_needed == -1 {
         0.0
     } else {
-        let cnt = count_waku_row!(O, hp, h, r);
+        let cnt = count_waku_row!(O, schedule_prop, schedule, r);
         let d = (cnt - cnt_needed).abs() as Score;
         let a = d * s;
         a * a
     }
 }
 
-fn haya_count(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score {
-    let cnt_needed = hp.staff[r].h_day_count;
+fn haya_count(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
+    let cnt_needed = schedule_prop.staff[r].h_day_count;
     if cnt_needed == -1 {
         0.0
     } else {
-        let cnt = count_waku_row!(H, hp, h, r);
+        let cnt = count_waku_row!(H, schedule_prop, schedule, r);
         let d = (cnt - cnt_needed).abs() as Score;
         let a = d * s;
         a * a
@@ -432,10 +432,10 @@ fn haya_count(hp: &ScheduleProp, h: &Schedule, r: usize, s: &Score) -> Score {
 
 
 macro_rules! count_waku_column {
-    ($w:expr, $hp: expr, $h:expr, $c:expr) => {{
+    ($w:expr, $schedule_prop: expr, $schedule:expr, $c:expr) => {{
         let mut cnt: isize = 0;
-        for i in 0..$hp.staff_count {
-            if $h[i][$c] == $w {
+        for i in 0..$schedule_prop.staff_count {
+            if $schedule[i][$c] == $w {
                 cnt += 1;
             }
         }
@@ -443,17 +443,17 @@ macro_rules! count_waku_column {
     }};
 }
 
-fn yakin_ninzuu(hp: &ScheduleProp, h: &Schedule, c: usize, s: &Score) -> Score {
-    let cnt_needed = hp.i_staff_count[c - hp.buffer];
-    let cnt = count_waku_column!(I, hp, h, c);
+fn yakin_ninzuu(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usize, s: &Score) -> Score {
+    let cnt_needed = schedule_prop.i_staff_count[c - schedule_prop.buffer];
+    let cnt = count_waku_column!(I, schedule_prop, schedule, c);
     let d = (cnt - cnt_needed).abs() as Score;
     let a = d * s;
     a * a
 }
 
-fn nikkin_ninzuu(hp: &ScheduleProp, h: &Schedule, c: usize, (d,cnt_needed,s): &(DayState,isize,Score)) -> Score {
-    if hp.days[c] == *d {
-        let cnt = count_waku_column!(N, hp, h, c);
+fn nikkin_ninzuu(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usize, (d,cnt_needed,s): &(DayState,isize,Score)) -> Score {
+    if schedule_prop.days[c] == *d {
+        let cnt = count_waku_column!(N, schedule_prop, schedule, c);
         let d = (cnt - cnt_needed).abs() as Score;
         let a = d * s;
         a * a
@@ -462,37 +462,37 @@ fn nikkin_ninzuu(hp: &ScheduleProp, h: &Schedule, c: usize, (d,cnt_needed,s): &(
     }
 }
 
-fn oso_ninzuu(hp: &ScheduleProp, h: &Schedule, c: usize, (cnt_needed, s): &(isize,Score)) -> Score {
-    let cnt = count_waku_column!(O, hp, h, c);
+fn oso_ninzuu(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usize, (cnt_needed, s): &(isize,Score)) -> Score {
+    let cnt = count_waku_column!(O, schedule_prop, schedule, c);
     let d = (cnt - *cnt_needed).abs() as Score;
     let a = d * s;
     a * a
 }
 
-fn haya_ninzuu(hp: &ScheduleProp, h: &Schedule, c: usize, (cnt_needed, s): &(isize,Score)) -> Score {
-    let cnt = count_waku_column!(H, hp, h, c);
+fn haya_ninzuu(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usize, (cnt_needed, s): &(isize,Score)) -> Score {
+    let cnt = count_waku_column!(H, schedule_prop, schedule, c);
     let d = (cnt - *cnt_needed).abs() as Score;
     let a = d * s;
     a * a
 }
 
-fn ng_pair(hp: &ScheduleProp, h: &Schedule, c: usize, s: &Score) -> Score {
+fn ng_pair(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usize, s: &Score) -> Score {
     // NGリストにあるペアがIかどうか確認
     let mut ans = 0.0;
-    for i in 0..hp.ng_list.len() {
-        let (a, b) = hp.ng_list[i];
-        if (h[a-1][c] == I && h[b-1][c] == I) || (h[a-1][c] == A && h[b-1][c] == A) {
+    for i in 0..schedule_prop.ng_list.len() {
+        let (a, b) = schedule_prop.ng_list[i];
+        if (schedule[a-1][c] == I && schedule[b-1][c] == I) || (schedule[a-1][c] == A && schedule[b-1][c] == A) {
             ans += s;
         }
     }
     ans
 }
 
-fn leader_ability(hp: &ScheduleProp, h: &Schedule, c: usize, (ab, s): &(isize,Score)) -> Score {
-    if matches!(hp.days[c], DayState::Holiday) {
+fn leader_ability(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usize, (ab, s): &(isize,Score)) -> Score {
+    if matches!(schedule_prop.days[c], DayState::Holiday) {
         let mut a_cnt = 0;
-        for r in 0..hp.staff_count {
-            if (h[r][c] == N) && ((hp.staff[r].ability % ab) != 0) {
+        for r in 0..schedule_prop.staff_count {
+            if (schedule[r][c] == N) && ((schedule_prop.staff[r].ability % ab) != 0) {
                     a_cnt += 1;
             }
         }
@@ -507,13 +507,13 @@ fn leader_ability(hp: &ScheduleProp, h: &Schedule, c: usize, (ab, s): &(isize,Sc
 }
 
 ///一人で夜勤できるワーカー
-fn yakin_alone_worker(hp: &ScheduleProp, h: &Schedule, c: usize, (ab, s): &(isize,Score)) -> Score {
+fn yakin_alone_worker(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usize, (ab, s): &(isize,Score)) -> Score {
     let mut i_cnt = 0;
     let mut a_cnt = 0;
-    for r in 0..hp.staff_count {
-        if h[r][c] == I {
+    for r in 0..schedule_prop.staff_count {
+        if schedule[r][c] == I {
             i_cnt += 1;
-            if (hp.staff[r].ability % ab) != 0 {
+            if (schedule_prop.staff[r].ability % ab) != 0 {
                 a_cnt += 1;
             }
         }
@@ -525,11 +525,11 @@ fn yakin_alone_worker(hp: &ScheduleProp, h: &Schedule, c: usize, (ab, s): &(isiz
     }
 }
 
-fn yakin_alone_before_furo(hp: &ScheduleProp, h: &Schedule, c: usize, s: &Score) -> Score {
-    if hp.days[c - 1] == DayState::Bath {
+fn yakin_alone_before_furo(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usize, s: &Score) -> Score {
+    if schedule_prop.days[c - 1] == DayState::Bath {
         let mut i_cnt = 0;
-        for r in 0..hp.staff_count {
-            if h[r][c] == I {
+        for r in 0..schedule_prop.staff_count {
+            if schedule[r][c] == I {
                     i_cnt += 1;
             }
         }
@@ -543,10 +543,10 @@ fn yakin_alone_before_furo(hp: &ScheduleProp, h: &Schedule, c: usize, s: &Score)
     }
 }
 
-fn heyamoti_ability(hp: &ScheduleProp, h: &Schedule, c: usize, (cnt_needed, ab, s): &(isize,isize,Score)) -> Score {
+fn heyamoti_ability(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usize, (cnt_needed, ab, s): &(isize,isize,Score)) -> Score {
     let mut a_cnt = 0;
-    for r in 0..hp.staff_count {
-        if (h[r][c] == N) && ((hp.staff[r].ability % ab) != 0) {
+    for r in 0..schedule_prop.staff_count {
+        if (schedule[r][c] == N) && ((schedule_prop.staff[r].ability % ab) != 0) {
                 a_cnt += 1;
         }
     }
@@ -559,12 +559,12 @@ fn heyamoti_ability(hp: &ScheduleProp, h: &Schedule, c: usize, (cnt_needed, ab, 
 }
 
 /// 3回以上同じペアなら発火するスコア
-fn no_same_pair3(hp: &ScheduleProp, h: &Schedule, s: &Score) -> Score {
+fn no_same_pair3(schedule_prop: &ScheduleProp, schedule: &Schedule, s: &Score) -> Score {
     let mut map: HashMap<Vec<usize>, isize> = HashMap::new();
-    for c in hp.buffer..hp.day_count {
+    for c in schedule_prop.buffer..schedule_prop.day_count {
         let mut i_list: Vec<usize> = Vec::new();
-        for r in 0..hp.staff_count {
-            if matches!(h[r][c], I) {
+        for r in 0..schedule_prop.staff_count {
+            if matches!(schedule[r][c], I) {
                 i_list.push(r)
             }
         }
@@ -583,12 +583,12 @@ fn no_same_pair3(hp: &ScheduleProp, h: &Schedule, s: &Score) -> Score {
 }
 
 /// 2回以上同じペアなら発火するスコア
-fn no_same_pair2(hp: &ScheduleProp, h: &Schedule, s: &Score) -> Score {
+fn no_same_pair2(schedule_prop: &ScheduleProp, schedule: &Schedule, s: &Score) -> Score {
     let mut map: HashMap<Vec<usize>, isize> = HashMap::new();
-    for c in hp.buffer..hp.day_count {
+    for c in schedule_prop.buffer..schedule_prop.day_count {
         let mut i_list: Vec<usize> = Vec::new();
-        for r in 0..hp.staff_count {
-            if matches!(h[r][c], I) {
+        for r in 0..schedule_prop.staff_count {
+            if matches!(schedule[r][c], I) {
                 i_list.push(r)
             }
         }
@@ -606,8 +606,8 @@ fn no_same_pair2(hp: &ScheduleProp, h: &Schedule, s: &Score) -> Score {
     ans
 }
 
-fn no_undef(hp: &ScheduleProp, h: &Schedule, c: usize, s: &Score) -> Score {
-    let cnt = count_waku_column!(U, hp, h, c);
+fn no_undef(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usize, s: &Score) -> Score {
+    let cnt = count_waku_column!(U, schedule_prop, schedule, c);
     let d = cnt as Score;
     let a = d * s;
     a * a
