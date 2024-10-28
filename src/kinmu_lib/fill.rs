@@ -51,7 +51,7 @@ fn fill_randomly1<R: Rng>(schedule_prop: &ScheduleProp, rng: &mut R) -> Schedule
 6.  孤立したAを消す
 7.  Kの差分を計算
 8.  不足したKをランダムに足す
-9.  余分なKを消した中で、最もIAKrenzokuが低いものを採用
+9.  余分なKを消した中で、最もIAKpatternが低いものを採用
 10. 元の表に埋め込む
 
 もとの表に埋め込んでから余分なKを消すほうがいい
@@ -164,7 +164,7 @@ fn fill_randomly2<R: Rng>(schedule_prop: &ScheduleProp, rng: &mut R) -> Schedule
                 add_random(Shift::K, &schedule_prop, &mut schedule, r, rng);
             }
         } else {
-            // 余分なKを消した中で、最もIAKrenzokuが低いものを採用
+            // 余分なKを消した中で、最もIAKpatternが低いものを採用
 
             // 孤立KとそうでないKのインデックスをとる
             let mut k_nc_ids = Vec::new();
