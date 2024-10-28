@@ -71,7 +71,7 @@ pub fn load_config(path: &str) -> io::Result<(ScheduleProp, Vec<FilePath>, FillC
         days: read_days(&ss[5])?,
         buffer: buffer,
         request: schedule.clone(),
-        schedule_st: make_schedule_st(&schedule, buffer),
+        schedule_st: make_schedule_state(&schedule, buffer),
         i_staff_count: read_isizes(&ss[8])?,
         score_props: read_score_props(&ss[12])?,
     };
@@ -180,7 +180,7 @@ fn read_isize_isize_float(text: &str) -> io::Result<(isize, isize, f32)> {
     Ok((i1, i2, f))
 }
 
-fn read_dayst_isize_float(text: &str) -> io::Result<(DayState, isize, f32)> {
+fn read_daystate_isize_float(text: &str) -> io::Result<(DayState, isize, f32)> {
     let ns: Vec<_> = text
         .trim_matches(|c| c == '(' || c == ')')
         .split(',')
@@ -194,13 +194,13 @@ fn read_dayst_isize_float(text: &str) -> io::Result<(DayState, isize, f32)> {
 fn read_staff(text: &str) -> io::Result<Vec<Staff>> {
     let mut staff: Vec<Staff> = Vec::new();
     for line in text.lines() {
-        let a_staff = read_worker(&line)?;
+        let a_staff = read_a_staff(&line)?;
         staff.push(a_staff);
     }
     Ok(staff)
 }
 
-fn read_worker(text: &str) -> io::Result<Staff> {
+fn read_a_staff(text: &str) -> io::Result<Staff> {
     // TODO: もうちょっと安全にアクセスしたい
     let words: Vec<String> = text.split_whitespace().map(|s| s.to_string()).collect();
     let worker: Staff = Staff {
@@ -289,7 +289,7 @@ fn read_score_prop(text: &str) -> io::Result<ScoreProp> {
         ("HDayCount", p) => ScoreProp::HDayCount(read_float(p)?),
         ("Fair", p) => ScoreProp::Fair(read_usize(p)?),
         ("IStaffCount", p) => ScoreProp::IStaffCount(read_float(p)?),
-        ("NStaffCount", p) => ScoreProp::NStaffCount(read_dayst_isize_float(p)?),
+        ("NStaffCount", p) => ScoreProp::NStaffCount(read_daystate_isize_float(p)?),
         ("OStaffCount", p) => ScoreProp::OStaffCount(read_isize_float(p)?),
         ("HStaffCount", p) => ScoreProp::HStaffCount(read_isize_float(p)?),
         ("NGPair", p) => ScoreProp::NGPair(read_float(p)?),
@@ -308,7 +308,7 @@ fn read_score_prop(text: &str) -> io::Result<ScoreProp> {
 
 
 
-fn make_schedule_st(schedule: &Schedule, buffer: usize) -> ScheduleState {
+fn make_schedule_state(schedule: &Schedule, buffer: usize) -> ScheduleState {
     let mut ans: ScheduleState = Vec::new();
     for line in schedule {
         ans.push(line.iter().enumerate().map(|(i, shift)|
