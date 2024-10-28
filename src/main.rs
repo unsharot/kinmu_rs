@@ -29,10 +29,8 @@ fn main() -> io::Result<()> {
 }
 
 fn print_check(name: &str, b: bool) {
-    if b {
-        println!("{} CHECK PASSED", name);
-    } else {
-        println!("{} CHECK FAILED", name);
+    if !b {
+        println!("[WARNING] {} CHECK FAILED", name);
     }
 }
 
