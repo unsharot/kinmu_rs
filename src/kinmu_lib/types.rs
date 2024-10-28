@@ -19,6 +19,25 @@ pub enum Shift {
     U,
 }
 
+impl FromStr for Shift {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "N" => Ok(Shift::N),
+            "K" => Ok(Shift::K),
+            "I" => Ok(Shift::I),
+            "A" => Ok(Shift::A),
+            "O" => Ok(Shift::O),
+            "H" => Ok(Shift::H),
+            "Y" => Ok(Shift::Y),
+            "D" => Ok(Shift::D),
+            "U" => Ok(Shift::U),
+            _ => Err(format!("Failed to parse Shift: {}", s))
+        }
+    }
+}
+
 impl fmt::Display for Shift {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let s = match self {
@@ -116,9 +135,7 @@ pub enum ScoreProp {
     Need2Holidays(Score),
     Need2HolidaysNoBf(Score),
     OHBalance(Score),
-    IBalance(Score),
-    OBalance(Score),
-    HBalance(Score),
+    ShiftHalfBalance((Shift,Score)),
     KDayCount(Score),
     IDayCount(Score),
     ODayCount(Score),
@@ -155,9 +172,7 @@ impl fmt::Display for ScoreProp {
             ScoreProp::Need2Holidays(p) => format!("Need2Holidays({:?})", p),
             ScoreProp::Need2HolidaysNoBf(p) => format!("Need2HolidaysNoBf({:?})", p),
             ScoreProp::OHBalance(p) => format!("OHBalance({:?})", p),
-            ScoreProp::IBalance(p) => format!("IBalance({:?})", p),
-            ScoreProp::OBalance(p) => format!("OBalance({:?})", p),
-            ScoreProp::HBalance(p) => format!("HBalance({:?})", p),
+            ScoreProp::ShiftHalfBalance(p) => format!("ShiftHalfBalance({:?})", p),
             ScoreProp::KDayCount(p) => format!("KDayCount({:?})", p),
             ScoreProp::IDayCount(p) => format!("IDayCount({:?})", p),
             ScoreProp::ODayCount(p) => format!("ODayCount({:?})", p),

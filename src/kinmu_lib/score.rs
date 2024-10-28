@@ -1,6 +1,7 @@
 //! 焼きなましで使う評価関数のモジュール
 
 use super::types::{
+    Shift,
     Shift::*,
     Schedule,
     Score,
@@ -68,9 +69,7 @@ fn get_score(schedule_prop: &ScheduleProp, schedule: &Schedule, sp: &ScoreProp) 
         Need2Holidays(p) => check_rows!(need_2_holidays, schedule_prop, schedule, p),
         Need2HolidaysNoBf(p) => check_rows!(need_2_holidays_no_buffer, schedule_prop, schedule, p),
         OHBalance(p) => check_rows!(oh_balance, schedule_prop, schedule, p),
-        IBalance(p) => check_rows!(i_balance, schedule_prop, schedule, p),
-        OBalance(p) => check_rows!(o_balance, schedule_prop, schedule, p),
-        HBalance(p) => check_rows!(h_balance, schedule_prop, schedule, p),
+        ShiftHalfBalance(p) => check_rows!(shift_half_balance, schedule_prop, schedule, p),
         KDayCount(p) => check_rows!(k_day_count, schedule_prop, schedule, p),
         IDayCount(p) => check_rows!(i_day_count, schedule_prop, schedule, p),
         ODayCount(p) => check_rows!(o_day_count, schedule_prop, schedule, p),
@@ -293,11 +292,6 @@ fn need_2_holidays_no_buffer(schedule_prop: &ScheduleProp, schedule: &Schedule, 
     }
 }
 
-
-// カウントするタイプのスコアもまとめて実行してから計算したい
-// HashMapをつかえそう
-// やっても早くなるかはわからない
-// HashMapの構築に時間とメモリかかるかも
 fn oh_balance(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
     let mut o: isize = 0;
     let mut h: isize = 0;
@@ -313,52 +307,16 @@ fn oh_balance(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &S
     a * a
 }
 
-fn i_balance(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
+fn shift_half_balance(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, (shift, s): &(Shift, Score)) -> Score {
     let mut cf: isize = 0;
     let mut cl: isize = 0;
     for i in schedule_prop.buffer..((schedule_prop.day_count - schedule_prop.buffer) / 2) {
-        if schedule[r][i] == I {
+        if schedule[r][i] == *shift {
             cf += 1;
         }
     }
     for i in ((schedule_prop.day_count - schedule_prop.buffer) / 2)..schedule_prop.day_count {
-        if schedule[r][i] == I {
-            cl += 1;
-        }
-    }
-    let d = (cf - cl).abs() as Score;
-    let a = d * s;
-    a * a
-}
-
-fn o_balance(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
-    let mut cf: isize = 0;
-    let mut cl: isize = 0;
-    for i in schedule_prop.buffer..((schedule_prop.day_count - schedule_prop.buffer) / 2) {
-        if schedule[r][i] == O {
-            cf += 1;
-        }
-    }
-    for i in ((schedule_prop.day_count - schedule_prop.buffer) / 2)..schedule_prop.day_count {
-        if schedule[r][i] == O {
-            cl += 1;
-        }
-    }
-    let d = (cf - cl).abs() as Score;
-    let a = d * s;
-    a * a
-}
-
-fn h_balance(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
-    let mut cf: isize = 0;
-    let mut cl: isize = 0;
-    for i in schedule_prop.buffer..((schedule_prop.day_count - schedule_prop.buffer) / 2) {
-        if schedule[r][i] == H {
-            cf += 1;
-        }
-    }
-    for i in ((schedule_prop.day_count - schedule_prop.buffer) / 2)..schedule_prop.day_count {
-        if schedule[r][i] == H {
+        if schedule[r][i] == *shift {
             cl += 1;
         }
     }
