@@ -176,6 +176,16 @@ fn read_isize_isize_float(text: &str) -> io::Result<(isize, isize, f32)> {
     Ok((i1, i2, f))
 }
 
+fn read_shift_float(text: &str) -> io::Result<(Shift, f32)> {
+    let ns: Vec<_> = text
+        .trim_matches(|c| c == '(' || c == ')')
+        .split(',')
+        .collect();
+    let s = ns[0].parse::<Shift>().unwrap();
+    let f = ns[1].parse::<f32>().unwrap();
+    Ok((s, f))
+}
+
 fn read_daystate_isize_float(text: &str) -> io::Result<(DayState, isize, f32)> {
     let ns: Vec<_> = text
         .trim_matches(|c| c == '(' || c == ')')
@@ -276,9 +286,7 @@ fn read_score_prop(text: &str) -> io::Result<ScoreProp> {
         ("Need2Holidays", p) => ScoreProp::Need2Holidays(read_float(p)?),
         ("Need2HolidaysNoBf", p) => ScoreProp::Need2HolidaysNoBf(read_float(p)?),
         ("OHBalance", p) => ScoreProp::OHBalance(read_float(p)?),
-        ("IBalance", p) => ScoreProp::IBalance(read_float(p)?),
-        ("OBalance", p) => ScoreProp::OBalance(read_float(p)?),
-        ("HBalance", p) => ScoreProp::HBalance(read_float(p)?),
+        ("ShiftHalfBalance", p) => ScoreProp::ShiftHalfBalance(read_shift_float(p)?),
         ("KDayCount", p) => ScoreProp::KDayCount(read_float(p)?),
         ("IDayCount", p) => ScoreProp::IDayCount(read_float(p)?),
         ("ODayCount", p) => ScoreProp::ODayCount(read_float(p)?),
