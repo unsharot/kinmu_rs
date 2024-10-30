@@ -1,5 +1,5 @@
 use annealing::annealing;
-use kinmu::kinmu_lib::{score, update, types, fill, check};
+use kinmu::kinmu_lib::{score, update, fill, check};
 use kinmu::io::{reader, display};
 use kinmu::seed;
 
@@ -11,19 +11,14 @@ fn main() -> io::Result<()> {
     let config_path = "config/config.yaml".to_string();
     
     let schedule_config_paths: Vec<String> = reader::load_main_config(&config_path).map_err(|e| {
-        eprintln!("[エラー]");
+        eprintln!("[エラー] メインconfigの読み込みに失敗しました");
         eprintln!("{}", e);
         eprintln!("対象ファイル: {}", config_path);
         e
     })?;
     
     for path in schedule_config_paths {
-        sub(&path).map_err(|e| {
-            eprintln!("[エラー]");
-            eprintln!("{}", e);
-            eprintln!("対象ファイル: {}", &path);
-            e
-        })?;
+        sub(&path)?;
     }
 
 
@@ -37,13 +32,16 @@ fn print_check(name: &str, b: bool) {
 }
 
 fn sub(p: &str) -> io::Result<()> {
-    let (schedule_prop, fs, fc) = reader::load_config(p)?;
+    let (schedule_prop, ac_paths, fc) = reader::load_config(p).map_err(|e| {
+        eprintln!("[エラー] 勤務表configの読み込みに失敗しました");
+        eprintln!("{}", e);
+        eprintln!("対象ファイル: {}", p);
+        e
+    })?;
 
     print_check("ALL_ABSOLUTE", check::all_absolute(&schedule_prop));
 
     print_check("SAFE_IAK", check::safe_iak(&schedule_prop));
-
-    let acs: Vec<types::AnnealingConfig> = fs.iter().map(|s| reader::load_annealing_config(s).unwrap()).collect();
 
     let mut model = fill::run(&fc, &schedule_prop);
 
@@ -52,7 +50,14 @@ fn sub(p: &str) -> io::Result<()> {
     print_check("ABS_NOT_CHANGED", check::abs_not_changed(&schedule_prop, &model));
 
     let mut score;
-    for ac in acs {
+    for ac_path in ac_paths {
+        let ac = reader::load_annealing_config(&ac_path).map_err(|e| {
+            eprintln!("[エラー] 焼きなましconfigの読み込みに失敗しました");
+            eprintln!("{}", e);
+            eprintln!("対象ファイル: {}", &ac_path);
+            e
+        })?;
+
         let start = Instant::now();
         let mut rng = seed::gen_rng_from_seed(ac.seed);
         score = score::assess_score(&ac.score_props, &schedule_prop, &model);
