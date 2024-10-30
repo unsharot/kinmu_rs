@@ -9,21 +9,23 @@ use std::time::Instant;
 fn main() -> io::Result<()> {
 
     let config_path = "config/config.yaml".to_string();
-
-    match reader::load_main_config(&config_path) {
-        Ok(lines) => {
-            for line in lines {
-                println!("{}", line);
-            }
-        }
-        Err(e) => {
-            eprintln!("Error loading config: {}", e);
-        }
+    
+    let schedule_config_paths: Vec<String> = reader::load_main_config(&config_path).map_err(|e| {
+        eprintln!("[エラー]");
+        eprintln!("{}", e);
+        eprintln!("対象ファイル: {}", config_path);
+        e
+    })?;
+    
+    for path in schedule_config_paths {
+        sub(&path).map_err(|e| {
+            eprintln!("[エラー]");
+            eprintln!("{}", e);
+            eprintln!("対象ファイル: {}", &path);
+            e
+        })?;
     }
 
-    let ps = reader::load_main_config(&config_path)?;
-
-    ps.iter().for_each(|p| { let _ = sub(p); });
 
     Ok(())
 }
