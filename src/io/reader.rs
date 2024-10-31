@@ -9,6 +9,7 @@ use crate::kinmu_lib::types::{
     Shift,
     Staff,
     NGList,
+    NG,
     Days,
     DayState,
     Schedule,
@@ -143,8 +144,8 @@ fn read_usize(text: &str) -> Result<usize, String> {
     Ok(ans)
 }
 
-// fn read_usizes(text: &str) -> io::Result<Vec<usize>> {
-//     Ok(text.split_whitespace().map(|x| x.parse::<usize>().unwrap()).collect())
+// fn read_usizes(text: &str) -> Result<Vec<usize>, String> {
+//     text.split_whitespace().map(|x| x.parse::<usize>().map_err(|e| e.to_string())).collect()
 // }
 
 fn read_isize(text: &str) -> Result<isize, String> {
@@ -162,57 +163,54 @@ fn read_float(text: &str) -> Result<f32, String> {
 }
 
 fn read_float_pair(text: &str) -> Result<(f32, f32), String> {
-    let rns: Result<Vec<f32>, String> = text
+    let words: Vec<_> = text
         .trim_matches(|c| c == '(' || c == ')')
         .split(',')
-        .map(|x| x.parse::<f32>().map_err(|e| e.to_string()))
         .collect();
-    match rns {
-        Ok(ns) if ns.len() >= 2 => Ok((ns[0], ns[1])),
-        Ok(_) => Err("入力がペアになっていません".to_string()),
-        Err(e) => Err(e.to_string()),
-    }
+    let f1 = words[0].parse::<f32>().map_err(|e| e.to_string())?;
+    let f2 = words[1].parse::<f32>().map_err(|e| e.to_string())?;
+    Ok((f1, f2))
 }
 
 fn read_isize_float(text: &str) -> Result<(isize, f32), String> {
-    let ns: Vec<_> = text
+    let words: Vec<_> = text
         .trim_matches(|c| c == '(' || c == ')')
         .split(',')
         .collect();
-    let i = ns[0].parse::<isize>().unwrap();
-    let f = ns[1].parse::<f32>().unwrap();
+    let i = words[0].parse::<isize>().map_err(|e| e.to_string())?;
+    let f = words[1].parse::<f32>().map_err(|e| e.to_string())?;
     Ok((i, f))
 }
 
 fn read_isize_isize_float(text: &str) -> Result<(isize, isize, f32), String> {
-    let ns: Vec<_> = text
+    let words: Vec<_> = text
         .trim_matches(|c| c == '(' || c == ')')
         .split(',')
         .collect();
-    let i1 = ns[0].parse::<isize>().unwrap();
-    let i2 = ns[1].parse::<isize>().unwrap();
-    let f = ns[2].parse::<f32>().unwrap();
+    let i1 = words[0].parse::<isize>().map_err(|e| e.to_string())?;
+    let i2 = words[1].parse::<isize>().map_err(|e| e.to_string())?;
+    let f = words[2].parse::<f32>().map_err(|e| e.to_string())?;
     Ok((i1, i2, f))
 }
 
 fn read_shift_float(text: &str) -> Result<(Shift, f32), String> {
-    let ns: Vec<_> = text
+    let words: Vec<_> = text
         .trim_matches(|c| c == '(' || c == ')')
         .split(',')
         .collect();
-    let s = ns[0].parse::<Shift>().unwrap();
-    let f = ns[1].parse::<f32>().unwrap();
+    let s = words[0].parse::<Shift>().map_err(|e| e.to_string())?;
+    let f = words[1].parse::<f32>().map_err(|e| e.to_string())?;
     Ok((s, f))
 }
 
 fn read_daystate_isize_float(text: &str) -> Result<(DayState, isize, f32), String> {
-    let ns: Vec<_> = text
+    let words: Vec<_> = text
         .trim_matches(|c| c == '(' || c == ')')
         .split(',')
         .collect();
-    let d = ns[0].parse::<DayState>().unwrap();
-    let i = ns[1].parse::<isize>().unwrap();
-    let f = ns[2].parse::<f32>().unwrap();
+    let d = words[0].parse::<DayState>().map_err(|e| e.to_string())?;
+    let i = words[1].parse::<isize>().map_err(|e| e.to_string())?;
+    let f = words[2].parse::<f32>().map_err(|e| e.to_string())?;
     Ok((d, i, f))
 }
 
@@ -226,7 +224,6 @@ fn read_staff(text: &str) -> Result<Vec<Staff>, String> {
 }
 
 fn read_a_staff(text: &str) -> Result<Staff, String> {
-    // TODO: もうちょっと安全にアクセスしたい
     let words: Vec<String> = text.split_whitespace().map(|s| s.to_string()).collect();
     let worker: Staff = Staff {
         name: words[5].clone(),
@@ -242,40 +239,35 @@ fn read_a_staff(text: &str) -> Result<Staff, String> {
 fn read_ng_list(text: &str) -> Result<NGList, String> {
     let mut ans: NGList = Vec::new();
     for line in text.lines() {
-        let a: Vec<usize> = line.split_whitespace().map(|x| read_usize(x).unwrap()).collect();
-        ans.push((a[0], a[1]));
+        let ng = read_ng(&line)?;
+        ans.push(ng);
     }
     Ok(ans)
 }
 
+fn read_ng(text: &str) -> Result<NG, String> {
+    let words: Vec<String> = text.split_whitespace().map(|s| s.to_string()).collect();
+    let id1 = read_usize(&words[0])?;
+    let id2 = read_usize(&words[1])?;
+    Ok((id1, id2))
+}
+
 fn read_days(text: &str) -> Result<Days, String> {
-    Ok(text.chars().map(|c| match c {
-        'W' => Ok(DayState::Weekday),
-        'H' => Ok(DayState::Holiday),
-        'F' => Ok(DayState::Bath),
-        '2' => Ok(DayState::Bath2),
-        'G' => Ok(DayState::Weight),
-        _ => Err("MATCH sinai DAYST desu!!!"),
-    }.unwrap()).collect())
+    let mut ans: Days = Vec::new();
+    for c in text.chars() {
+        ans.push(c.to_string().parse::<DayState>()?);
+    }
+    Ok(ans)
 }
 
 fn read_schedule(text: &str) -> Result<Schedule, String> {
     let mut ans: Schedule = Vec::new();
     for line in text.lines() {
-        let a: Vec<Shift> = line.chars().map(|c| match c {
-            'N' => Ok(Shift::N),
-            'K' => Ok(Shift::K),
-            'I' => Ok(Shift::I),
-            'A' => Ok(Shift::A),
-            'O' => Ok(Shift::O),
-            'H' => Ok(Shift::H),
-            'Y' => Ok(Shift::Y),
-            'D' => Ok(Shift::D),
-            'U' => Ok(Shift::U),
-            ' ' => Ok(Shift::U),
-            _ => Err("MATCH sinai WAKU desu!!!")
-        }.unwrap()).collect();
-        ans.push(a);
+        let mut row = Vec::new();
+        for c in line.chars() {
+            row.push(c.to_string().parse::<Shift>()?);
+        }
+        ans.push(row);
     }
     Ok(ans)
 }
