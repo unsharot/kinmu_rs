@@ -9,7 +9,12 @@ fn main() -> Result<(), String> {
 
     let config_path = "config/config.yaml".to_string();
     
-    let schedule_config_paths: Vec<String> = reader::load_main_config(&config_path)?;
+    let schedule_config_paths: Vec<String> = reader::load_main_config(&config_path).map_err(|e| {
+        eprintln!("[エラー] メインconfigの読み込みに失敗しました");
+        eprintln!("{}", e);
+        eprintln!("対象ファイル: {}", &config_path);
+        format!("{}", e)
+    })?;
     
     for path in schedule_config_paths {
         sub(&path)?;
@@ -26,7 +31,12 @@ fn print_check(name: &str, b: bool) {
 }
 
 fn sub(p: &str) -> Result<(), String> {
-    let (schedule_prop, ac_paths, fc) = reader::load_config(p)?;
+    let (schedule_prop, ac_paths, fc) = reader::load_config(p).map_err(|e| {
+        eprintln!("[エラー] 焼きなましconfigの読み込みに失敗しました");
+        eprintln!("{}", e);
+        eprintln!("対象ファイル: {}", &p);
+        format!("{}", e)
+    })?;
 
     print_check("ALL_ABSOLUTE", check::all_absolute(&schedule_prop));
 
@@ -40,7 +50,12 @@ fn sub(p: &str) -> Result<(), String> {
 
     let mut score;
     for ac_path in ac_paths {
-        let ac = reader::load_annealing_config(&ac_path)?;
+        let ac = reader::load_annealing_config(&ac_path).map_err(|e| {
+            eprintln!("[エラー] 焼きなましconfigの読み込みに失敗しました");
+            eprintln!("{}", e);
+            eprintln!("対象ファイル: {}", ac_path);
+            format!("{}", e)
+        })?;
 
         let start = Instant::now();
         let mut rng = seed::gen_rng_from_seed(ac.seed);

@@ -1,7 +1,6 @@
 //! config読み込みのモジュール
 
 use std::fs::{read_to_string};
-use std::io;
 
 use crate::kinmu_lib::types::{
     ScheduleProp,
@@ -25,12 +24,7 @@ type FilePath = String;
 
 pub fn load_main_config(path: &FilePath) -> Result<Vec<FilePath>, String> {
 
-    let contents = read_contents(path).map_err(|e| {
-        eprintln!("[エラー] メインconfigの読み込みに失敗しました");
-        eprintln!("{}", e);
-        eprintln!("対象ファイル: {}", path);
-        format!("{}", e)
-    })?;
+    let contents = read_contents(path)?;
 
     let ss = sep_by_fields(&contents);
 
@@ -57,12 +51,7 @@ fn sep_by_fields(contents: &Vec<String>) -> Vec<String> {
 
 /// 勤務表で使う値を読み込む
 pub fn load_config(path: &str) -> Result<(ScheduleProp, Vec<FilePath>, FillConfig), String> {
-    let contents = read_contents(path).map_err(|e| {
-        eprintln!("[エラー] 勤務表configの読み込みに失敗しました");
-        eprintln!("{}", e);
-        eprintln!("対象ファイル: {}", path);
-        format!("{}", e)
-    })?;
+    let contents = read_contents(path)?;
 
     let ss = sep_by_fields(&contents);
 
@@ -93,12 +82,7 @@ pub fn load_config(path: &str) -> Result<(ScheduleProp, Vec<FilePath>, FillConfi
 
 /// 焼きなましの段階ごとの設定を読み込む
 pub fn load_annealing_config(path: &str) -> Result<AnnealingConfig, String> {
-    let contents = read_contents(path).map_err(|e| {
-        eprintln!("[エラー] 焼きなましconfigの読み込みに失敗しました");
-        eprintln!("{}", e);
-        eprintln!("対象ファイル: {}", path);
-        format!("{}", e)
-    })?;
+    let contents = read_contents(path)?;
 
     let ss = sep_by_fields(&contents);
 
@@ -115,10 +99,10 @@ pub fn load_annealing_config(path: &str) -> Result<AnnealingConfig, String> {
 }
 
 /// ファイルを読み込んで文字列の行ごとの配列を返す関数
-fn read_contents(path: &str) -> io::Result<Vec<String>> {
+fn read_contents(path: &str) -> Result<Vec<String>, String> {
 
     // ファイルの全文をStringとして読み込む
-    let contents = read_to_string(path)?;
+    let contents = read_to_string(path).map_err(|e| e.to_string())?;
 
     // 成形して行ごとのVec<String>にする
     let mut ans: Vec<String> = Vec::new();
