@@ -33,6 +33,7 @@ impl FromStr for Shift {
             "Y" => Ok(Shift::Y),
             "D" => Ok(Shift::D),
             "U" => Ok(Shift::U),
+            " " => Ok(Shift::U),
             _ => Err(format!("Failed to parse Shift: {}", s))
         }
     }
