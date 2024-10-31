@@ -87,7 +87,7 @@ cargo build --release
 
 ##### 例
 ```
---Files:
+Files:
 ./config/configW.yaml
 ./config/configK.yaml
 ```
@@ -100,7 +100,7 @@ cargo build --release
 
 ##### 例
 ```
---職員リスト:
+職員リスト:
 0 8 3 -1 -1 職員A
 1 9 6  0  0 職員B
 ```
@@ -112,7 +112,7 @@ Workerのリストで上から1,2,3..と番号を振っていき、その番号�
 
 ##### 例
 ```
---NGリスト:
+NGリスト:
 1 2
 6 2
 ```
@@ -123,7 +123,7 @@ Workerのリストで上から1,2,3..と番号を振っていき、その番号�
 
 ##### 例
 ```
---職員数:
+職員数:
 12
 ```
 
@@ -133,7 +133,7 @@ Workerのリストで上から1,2,3..と番号を振っていき、その番号�
 
 ##### 例
 ```
---日数:
+日数:
 33
 ```
 
@@ -148,7 +148,7 @@ Workerのリストで上から1,2,3..と番号を振っていき、その番号�
 
 ##### 例
 ```
---DayState:
+DayState:
 W2WHHWFW2GHHWFW2WHHWFW2WHHWFW2WHH
 ```
 
@@ -159,7 +159,7 @@ W2WHHWFW2GHHWFW2WHHWFW2WHHWFW2WHH
 
 ##### 例
 ```
---バッファー日数:
+バッファー日数:
 3
 ```
 
@@ -185,7 +185,7 @@ W2WHHWFW2GHHWFW2WHHWFW2WHHWFW2WHH
 
 ##### 例
 ```
---希望:
+希望:
 AKNUUUUUUUUUUIAKYUUUUUUUUIAKUUUUU
 KHIAKUUUUUUUUUUUIAKYUUUUUUUUUUUUU
 OIAKUUUUUUUUUUUUUUUUUUUIAKYUUUUUU
@@ -201,7 +201,7 @@ UUUKKUUUUUKKUUUUUKKKUUUKKKUUUUUKK
 ```
 
 ```
---希望:
+希望:
    KKNNNNNKKNNNNNKKNNNNNKKNNNNNKK
 NIAKKK    KKYK                   
 AKN KK                           
@@ -226,7 +226,7 @@ KNK
 
 ##### 例
 ```
---夜勤の日数リスト:
+夜勤の日数リスト:
 3 6 6 6 6 6 6 6 3 6 0 0
 ```
 
@@ -239,7 +239,7 @@ KNK
 
 ##### 例
 ```
---fillの関数:
+fillの関数:
 fill2
 ```
 
@@ -252,7 +252,7 @@ fillの乱数に用いるシード値を指定します。
 
 ##### 例
 ```
---fillのシード値:
+fillのシード値:
 53
 ```
 
@@ -262,7 +262,7 @@ fillの乱数に用いるシード値を指定します。
 
 ##### 例
 ```
---アニーリング:
+アニーリング:
 ./config/anconfigW/randomWalk.yaml
 ./config/anconfigW/W1.yaml
 ./config/anconfigW/W2.yaml
@@ -404,7 +404,7 @@ NGに指定されたペアが夜勤で同じ日になる場合のペナルティ
 
 ##### 例
 ```
---結果のスコア:
+結果のスコア:
 IAKpattern 1000
 KIApattern 100
 KNIApattern 10
@@ -450,7 +450,7 @@ NoSamePair2 500
 
 ##### 例
 ```
---ステップ数:
+ステップ数:
 20000
 ```
 
@@ -462,7 +462,7 @@ NoSamePair2 500
 再現性のあるテストがしたいときは固定し、実際に使う場合は0が良いでしょう。
 
 ```
---乱数のシード:
+乱数のシード:
 6554
 ```
 
@@ -474,7 +474,7 @@ NoSamePair2 500
 
 ##### 例
 ```
---各スコアのパラメータ:
+各スコアのパラメータ:
 KIApattern 100
 KNIApattern 10
 NNIApattern 300
@@ -506,7 +506,7 @@ NoSamePair2 500
 
 ##### 例
 ```
---更例関数:
+更例関数:
 update5
 ```
 
@@ -516,7 +516,7 @@ update5
 
 ##### 例
 ```
---maxTemp:
+maxTemp:
 25
 ```
 
@@ -525,7 +525,7 @@ update5
 
 ##### 例
 ```
---minTemp:
+minTemp:
 0
 ```
 
