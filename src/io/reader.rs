@@ -22,9 +22,14 @@ use crate::kinmu_lib::types::{
 
 type FilePath = String;
 
-pub fn load_main_config(path: &FilePath) -> io::Result<Vec<FilePath>> {
+pub fn load_main_config(path: &FilePath) -> Result<Vec<FilePath>, String> {
 
-    let contents = read_contents(path)?;
+    let contents = read_contents(path).map_err(|e| {
+        eprintln!("[エラー] メインconfigの読み込みに失敗しました");
+        eprintln!("{}", e);
+        eprintln!("対象ファイル: {}", path);
+        format!("{}", e)
+    })?;
 
     let ss = sep_by_fields(&contents);
 
@@ -50,8 +55,13 @@ fn sep_by_fields(contents: &Vec<String>) -> Vec<String> {
 }
 
 /// 勤務表で使う値を読み込む
-pub fn load_config(path: &str) -> io::Result<(ScheduleProp, Vec<FilePath>, FillConfig)> {
-    let contents = read_contents(path)?;
+pub fn load_config(path: &str) -> Result<(ScheduleProp, Vec<FilePath>, FillConfig), String> {
+    let contents = read_contents(path).map_err(|e| {
+        eprintln!("[エラー] 勤務表configの読み込みに失敗しました");
+        eprintln!("{}", e);
+        eprintln!("対象ファイル: {}", path);
+        format!("{}", e)
+    })?;
 
     let ss = sep_by_fields(&contents);
 
@@ -81,8 +91,13 @@ pub fn load_config(path: &str) -> io::Result<(ScheduleProp, Vec<FilePath>, FillC
 }
 
 /// 焼きなましの段階ごとの設定を読み込む
-pub fn load_annealing_config(path: &str) -> io::Result<AnnealingConfig> {
-    let contents = read_contents(path)?;
+pub fn load_annealing_config(path: &str) -> Result<AnnealingConfig, String> {
+    let contents = read_contents(path).map_err(|e| {
+        eprintln!("[エラー] 焼きなましconfigの読み込みに失敗しました");
+        eprintln!("{}", e);
+        eprintln!("対象ファイル: {}", path);
+        format!("{}", e)
+    })?;
 
     let ss = sep_by_fields(&contents);
 
@@ -123,8 +138,8 @@ fn read_contents(path: &str) -> io::Result<Vec<String>> {
 
 
 
-fn read_usize(text: &str) -> io::Result<usize> {
-    let ans: usize = text.parse::<usize>().unwrap();
+fn read_usize(text: &str) -> Result<usize, String> {
+    let ans: usize = text.parse::<usize>().map_err(|e| e.to_string())?;
     Ok(ans)
 }
 
@@ -132,30 +147,34 @@ fn read_usize(text: &str) -> io::Result<usize> {
 //     Ok(text.split_whitespace().map(|x| x.parse::<usize>().unwrap()).collect())
 // }
 
-fn read_isize(text: &str) -> io::Result<isize> {
-    let ans: isize = text.parse::<isize>().unwrap();
+fn read_isize(text: &str) -> Result<isize, String> {
+    let ans: isize = text.parse::<isize>().map_err(|e| e.to_string())?;
     Ok(ans)
 }
 
-fn read_isizes(text: &str) -> io::Result<Vec<isize>> {
-    Ok(text.split_whitespace().map(|x| x.parse::<isize>().unwrap()).collect())
+fn read_isizes(text: &str) -> Result<Vec<isize>, String> {
+    text.split_whitespace().map(|x| x.parse::<isize>().map_err(|e| e.to_string())).collect()
 }
 
-fn read_float(text: &str) -> io::Result<f32> {
-    let ans: f32 = text.parse::<f32>().unwrap();
+fn read_float(text: &str) -> Result<f32, String> {
+    let ans: f32 = text.parse::<f32>().map_err(|e| e.to_string())?;
     Ok(ans)
 }
 
-fn read_float_pair(text: &str) -> io::Result<(f32, f32)> {
-    let ns: Vec<f32> = text
+fn read_float_pair(text: &str) -> Result<(f32, f32), String> {
+    let rns: Result<Vec<f32>, String> = text
         .trim_matches(|c| c == '(' || c == ')')
         .split(',')
-        .map(|x| x.parse::<f32>().unwrap())
+        .map(|x| x.parse::<f32>().map_err(|e| e.to_string()))
         .collect();
-    Ok((ns[0], ns[1]))
+    match rns {
+        Ok(ns) if ns.len() >= 2 => Ok((ns[0], ns[1])),
+        Ok(_) => Err("入力がペアになっていません".to_string()),
+        Err(e) => Err(e.to_string()),
+    }
 }
 
-fn read_isize_float(text: &str) -> io::Result<(isize, f32)> {
+fn read_isize_float(text: &str) -> Result<(isize, f32), String> {
     let ns: Vec<_> = text
         .trim_matches(|c| c == '(' || c == ')')
         .split(',')
@@ -165,7 +184,7 @@ fn read_isize_float(text: &str) -> io::Result<(isize, f32)> {
     Ok((i, f))
 }
 
-fn read_isize_isize_float(text: &str) -> io::Result<(isize, isize, f32)> {
+fn read_isize_isize_float(text: &str) -> Result<(isize, isize, f32), String> {
     let ns: Vec<_> = text
         .trim_matches(|c| c == '(' || c == ')')
         .split(',')
@@ -176,7 +195,7 @@ fn read_isize_isize_float(text: &str) -> io::Result<(isize, isize, f32)> {
     Ok((i1, i2, f))
 }
 
-fn read_shift_float(text: &str) -> io::Result<(Shift, f32)> {
+fn read_shift_float(text: &str) -> Result<(Shift, f32), String> {
     let ns: Vec<_> = text
         .trim_matches(|c| c == '(' || c == ')')
         .split(',')
@@ -186,7 +205,7 @@ fn read_shift_float(text: &str) -> io::Result<(Shift, f32)> {
     Ok((s, f))
 }
 
-fn read_daystate_isize_float(text: &str) -> io::Result<(DayState, isize, f32)> {
+fn read_daystate_isize_float(text: &str) -> Result<(DayState, isize, f32), String> {
     let ns: Vec<_> = text
         .trim_matches(|c| c == '(' || c == ')')
         .split(',')
@@ -197,7 +216,7 @@ fn read_daystate_isize_float(text: &str) -> io::Result<(DayState, isize, f32)> {
     Ok((d, i, f))
 }
 
-fn read_staff(text: &str) -> io::Result<Vec<Staff>> {
+fn read_staff(text: &str) -> Result<Vec<Staff>, String> {
     let mut staff: Vec<Staff> = Vec::new();
     for line in text.lines() {
         let a_staff = read_a_staff(&line)?;
@@ -206,7 +225,7 @@ fn read_staff(text: &str) -> io::Result<Vec<Staff>> {
     Ok(staff)
 }
 
-fn read_a_staff(text: &str) -> io::Result<Staff> {
+fn read_a_staff(text: &str) -> Result<Staff, String> {
     // TODO: もうちょっと安全にアクセスしたい
     let words: Vec<String> = text.split_whitespace().map(|s| s.to_string()).collect();
     let worker: Staff = Staff {
@@ -220,7 +239,7 @@ fn read_a_staff(text: &str) -> io::Result<Staff> {
     Ok(worker)
 }
 
-fn read_ng_list(text: &str) -> io::Result<NGList> {
+fn read_ng_list(text: &str) -> Result<NGList, String> {
     let mut ans: NGList = Vec::new();
     for line in text.lines() {
         let a: Vec<usize> = line.split_whitespace().map(|x| read_usize(x).unwrap()).collect();
@@ -229,7 +248,7 @@ fn read_ng_list(text: &str) -> io::Result<NGList> {
     Ok(ans)
 }
 
-fn read_days(text: &str) -> io::Result<Days> {
+fn read_days(text: &str) -> Result<Days, String> {
     Ok(text.chars().map(|c| match c {
         'W' => Ok(DayState::Weekday),
         'H' => Ok(DayState::Holiday),
@@ -240,7 +259,7 @@ fn read_days(text: &str) -> io::Result<Days> {
     }.unwrap()).collect())
 }
 
-fn read_schedule(text: &str) -> io::Result<Schedule> {
+fn read_schedule(text: &str) -> Result<Schedule, String> {
     let mut ans: Schedule = Vec::new();
     for line in text.lines() {
         let a: Vec<Shift> = line.chars().map(|c| match c {
@@ -261,7 +280,7 @@ fn read_schedule(text: &str) -> io::Result<Schedule> {
     Ok(ans)
 }
 
-fn read_score_props(text: &str) -> io::Result<Vec<ScoreProp>> {
+fn read_score_props(text: &str) -> Result<Vec<ScoreProp>, String> {
     let mut ans: Vec<ScoreProp> = Vec::new();
     for line in text.lines() {
         ans.push(read_score_prop(&line)?);
@@ -269,7 +288,7 @@ fn read_score_props(text: &str) -> io::Result<Vec<ScoreProp>> {
     Ok(ans)
 }
 
-fn read_score_prop(text: &str) -> io::Result<ScoreProp> {
+fn read_score_prop(text: &str) -> Result<ScoreProp, String> {
     let words: Vec<&str> = text.split_whitespace().collect();
     let prop: ScoreProp = match (words[0], words[1]) {
         ("IAKpattern", p) => ScoreProp::IAKpattern(read_float(p)?),
