@@ -28,6 +28,8 @@ pub fn load_main_config(path: &FilePath) -> Result<Vec<FilePath>, String> {
 
     let ss = sep_by_fields(&contents);
 
+    check_len(2, &ss, "項目が足りません")?;
+
     let ans = ss[1].lines().map(|s| s.to_string()).collect();
 
     Ok(ans)
@@ -54,6 +56,8 @@ pub fn load_config(path: &str) -> Result<(ScheduleProp, Vec<FilePath>, FillConfi
     let contents = read_contents(path)?;
 
     let ss = sep_by_fields(&contents);
+
+    check_len(13, &ss, "項目が足りません")?;
 
     let schedule = read_schedule(&ss[7])?;
 
@@ -85,6 +89,8 @@ pub fn load_annealing_config(path: &str) -> Result<AnnealingConfig, String> {
     let contents = read_contents(path)?;
 
     let ss = sep_by_fields(&contents);
+
+    check_len(4, &ss, "項目が足りません")?;
 
     let (tmax, tmin) = read_temp(&ss[5])?;
 
@@ -153,6 +159,7 @@ fn read_float_pair(text: &str) -> Result<(f32, f32), String> {
         .trim_matches(|c| c == '(' || c == ')')
         .split(',')
         .collect();
+    check_len(2, &words, "Needs 2 fields, but not enough.")?;
     let f1 = words[0].parse::<f32>().map_err(|e| e.to_string())?;
     let f2 = words[1].parse::<f32>().map_err(|e| e.to_string())?;
     Ok((f1, f2))
@@ -163,6 +170,7 @@ fn read_isize_float(text: &str) -> Result<(isize, f32), String> {
         .trim_matches(|c| c == '(' || c == ')')
         .split(',')
         .collect();
+    check_len(2, &words, "Needs 2 fields, but not enough.")?;
     let i = words[0].parse::<isize>().map_err(|e| e.to_string())?;
     let f = words[1].parse::<f32>().map_err(|e| e.to_string())?;
     Ok((i, f))
@@ -173,6 +181,7 @@ fn read_isize_isize_float(text: &str) -> Result<(isize, isize, f32), String> {
         .trim_matches(|c| c == '(' || c == ')')
         .split(',')
         .collect();
+    check_len(3, &words, "Needs 3 fields, but not enough.")?;
     let i1 = words[0].parse::<isize>().map_err(|e| e.to_string())?;
     let i2 = words[1].parse::<isize>().map_err(|e| e.to_string())?;
     let f = words[2].parse::<f32>().map_err(|e| e.to_string())?;
@@ -184,6 +193,7 @@ fn read_shift_float(text: &str) -> Result<(Shift, f32), String> {
         .trim_matches(|c| c == '(' || c == ')')
         .split(',')
         .collect();
+    check_len(2, &words, "Needs 2 fields, but not enough.")?;
     let s = words[0].parse::<Shift>().map_err(|e| e.to_string())?;
     let f = words[1].parse::<f32>().map_err(|e| e.to_string())?;
     Ok((s, f))
@@ -194,6 +204,7 @@ fn read_daystate_isize_float(text: &str) -> Result<(DayState, isize, f32), Strin
         .trim_matches(|c| c == '(' || c == ')')
         .split(',')
         .collect();
+    check_len(3, &words, "Needs 3 fields, but not enough.")?;
     let d = words[0].parse::<DayState>().map_err(|e| e.to_string())?;
     let i = words[1].parse::<isize>().map_err(|e| e.to_string())?;
     let f = words[2].parse::<f32>().map_err(|e| e.to_string())?;
@@ -211,6 +222,7 @@ fn read_staff(text: &str) -> Result<Vec<Staff>, String> {
 
 fn read_a_staff(text: &str) -> Result<Staff, String> {
     let words: Vec<String> = text.split_whitespace().map(|s| s.to_string()).collect();
+    check_len(6, &words, "Needs 6 fields, but not enough.")?;
     let worker: Staff = Staff {
         name: words[5].clone(),
         ability: read_isize(&words[0])?,
@@ -233,6 +245,7 @@ fn read_ng_list(text: &str) -> Result<NGList, String> {
 
 fn read_ng(text: &str) -> Result<NG, String> {
     let words: Vec<String> = text.split_whitespace().map(|s| s.to_string()).collect();
+    check_len(2, &words, "Needs 2 fields, but not enough.")?;
     let id1 = read_usize(&words[0])?;
     let id2 = read_usize(&words[1])?;
     Ok((id1, id2))
@@ -240,6 +253,7 @@ fn read_ng(text: &str) -> Result<NG, String> {
 
 fn read_temp(text: &str) -> Result<(f32, f32), String> {
     let words: Vec<String> = text.split_whitespace().map(|s| s.to_string()).collect();
+    check_len(2, &words, "Needs 2 fields, but not enough.")?;
     let id1 = read_float(&words[0])?;
     let id2 = read_float(&words[1])?;
     Ok((id1, id2))
@@ -275,6 +289,7 @@ fn read_score_props(text: &str) -> Result<Vec<ScoreProp>, String> {
 
 fn read_score_prop(text: &str) -> Result<ScoreProp, String> {
     let words: Vec<&str> = text.split_whitespace().collect();
+    check_len(2, &words, "Needs 2 fields, but not enough.")?;
     match (words[0], words[1]) {
         ("IAKpattern", p) => Ok(ScoreProp::IAKpattern(read_float(p)?)),
         ("KIApattern", p) => Ok(ScoreProp::KIApattern(read_float(p)?)),
@@ -330,4 +345,12 @@ fn make_schedule_state(schedule: &Schedule, buffer: usize) -> ScheduleState {
         ).collect());
     }
     ans
+}
+
+
+fn check_len<T, E>(l: usize, v: &Vec<T>, error: E) -> Result<(), E> {
+    if v.len() < l {
+        return Err(error);
+    }
+    Ok(())
 }
