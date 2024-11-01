@@ -42,7 +42,7 @@ fn sub(p: &str) -> Result<(), String> {
 
     print_check("SAFE_IAK", check::safe_iak(&schedule_prop));
 
-    let mut model = fill::run(&fc, &schedule_prop);
+    let mut model = fill::run(&fc, &schedule_prop)?;
 
     print_check("K_I_COUNTS", check::k_i_counts(&schedule_prop, &model));
 
@@ -64,7 +64,7 @@ fn sub(p: &str) -> Result<(), String> {
             score,
             &model,
             ac.step,
-            update::gen_update_func(&ac.update_func, &schedule_prop),
+            update::gen_update_func(&ac.update_func, &schedule_prop)?,
             |m| score::assess_score(&ac.score_props, &schedule_prop, m),
             // |_| 0.0,
             ac.max_temp,

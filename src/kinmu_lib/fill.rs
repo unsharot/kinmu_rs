@@ -16,16 +16,13 @@ use crate::seed;
 
 use rand::Rng;
 
-pub fn run(fc: &FillConfig, schedule_prop: &ScheduleProp) -> Schedule {
+pub fn run(fc: &FillConfig, schedule_prop: &ScheduleProp) -> Result<Schedule, String> {
     println!("{}", fc.name);
     let mut rng = seed::gen_rng_from_seed(fc.seed);
     match fc.name.as_str() {
-        "fill1" => fill_randomly1(schedule_prop, &mut rng),
-        "fill2" => fill_randomly2(schedule_prop, &mut rng),
-        _ => {
-            println!("MATCH SINAI FILL FUNC DESU!!! {}", fc.name);
-            fill_randomly1(schedule_prop, &mut rng)
-        },
+        "fill1" => Ok(fill_randomly1(schedule_prop, &mut rng)),
+        "fill2" => Ok(fill_randomly2(schedule_prop, &mut rng)),
+        _ => Err(format!("Failed to parse fill function {}", fc.name)),
     }
 }
 
