@@ -12,18 +12,15 @@ use super::types::{
 use rand::Rng;
 
 
-pub fn gen_update_func<'a, R: Rng>(text: &str, schedule_prop: &'a ScheduleProp) -> Box<dyn FnMut(&Schedule, &mut R) -> Schedule + 'a> {
+pub fn gen_update_func<'a, R: Rng>(text: &str, schedule_prop: &'a ScheduleProp) -> Result<Box<dyn FnMut(&Schedule, &mut R) -> Schedule + 'a>, String> {
     println!("{}", text);
     let schedule_state = &schedule_prop.schedule_st;
     match text {
-        "update1" => Box::new(move |schedule, rng| update_randomly1(schedule_prop, schedule_state, schedule, rng)),
-        "update2" => Box::new(move |schedule, rng| update_randomly2(schedule_prop, schedule_state, schedule, rng)),
-        "update4" => Box::new(move |schedule, rng| update_randomly4(schedule_prop, schedule_state, schedule, rng)),
-        "update5" => Box::new(move |schedule, rng| update_randomly5(schedule_prop, schedule_state, schedule, rng)),
-        _ => {
-            println!("MATCH SINAI UPDATE FUNC DESU!!! {}", text);
-            Box::new(move |schedule, rng| update_randomly4(schedule_prop, schedule_state, schedule, rng))
-        },
+        "update1" => Ok(Box::new(move |schedule, rng| update_randomly1(schedule_prop, schedule_state, schedule, rng))),
+        "update2" => Ok(Box::new(move |schedule, rng| update_randomly2(schedule_prop, schedule_state, schedule, rng))),
+        "update4" => Ok(Box::new(move |schedule, rng| update_randomly4(schedule_prop, schedule_state, schedule, rng))),
+        "update5" => Ok(Box::new(move |schedule, rng| update_randomly5(schedule_prop, schedule_state, schedule, rng))),
+        _ => Err(format!("Failed to generate update function {}", text)),
     }
 }
 
