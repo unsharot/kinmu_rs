@@ -32,7 +32,7 @@ fn print_check(name: &str, b: bool) {
 
 fn sub(p: &str) -> Result<(), String> {
     let (schedule_prop, ac_paths, fc) = reader::load_config(p).map_err(|e| {
-        eprintln!("[エラー] 焼きなましconfigの読み込みに失敗しました");
+        eprintln!("[エラー] 勤務表configの読み込みに失敗しました");
         eprintln!("{}", e);
         eprintln!("対象ファイル: {}", &p);
         format!("{}", e)
