@@ -86,13 +86,15 @@ pub fn load_annealing_config(path: &str) -> Result<AnnealingConfig, String> {
 
     let ss = sep_by_fields(&contents);
 
+    let (tmax, tmin) = read_temp(&ss[5])?;
+
     let ac = AnnealingConfig {
         step: read_usize(&ss[1])?,
         seed: read_usize(&ss[2])?,
         score_props: read_score_props(&ss[3])?,
         update_func: ss[4].clone(),
-        max_temp: read_float(&ss[5])?,
-        min_temp: read_float(&ss[6])?,
+        max_temp: tmax,
+        min_temp: tmin,
     };
 
     Ok(ac)
@@ -233,6 +235,13 @@ fn read_ng(text: &str) -> Result<NG, String> {
     let words: Vec<String> = text.split_whitespace().map(|s| s.to_string()).collect();
     let id1 = read_usize(&words[0])?;
     let id2 = read_usize(&words[1])?;
+    Ok((id1, id2))
+}
+
+fn read_temp(text: &str) -> Result<(f32, f32), String> {
+    let words: Vec<String> = text.split_whitespace().map(|s| s.to_string()).collect();
+    let id1 = read_float(&words[0])?;
+    let id2 = read_float(&words[1])?;
     Ok((id1, id2))
 }
 
