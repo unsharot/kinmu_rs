@@ -199,7 +199,7 @@ impl fmt::Display for ScoreProp {
 
 /// 勤務表ごとの設定
 pub struct ScheduleProp {
-    pub staff: Vec<Staff>,
+    pub staff_list: Vec<Staff>,
     pub ng_list: NGList,
     pub staff_count: usize,
     pub day_count: usize,

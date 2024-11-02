@@ -132,7 +132,7 @@ fn fill_randomly2<R: Rng>(schedule_prop: &ScheduleProp, rng: &mut R) -> Schedule
         }
 
         // Iの差分を計算
-        let i_dif = count_waku_row!(Shift::I, schedule_prop, schedule, r) - schedule_prop.staff[r].i_day_count;
+        let i_dif = count_waku_row!(Shift::I, schedule_prop, schedule, r) - schedule_prop.staff_list[r].i_day_count;
 
         // 余分なIをランダムに消す
         for _ in 0..i_dif {
@@ -143,7 +143,7 @@ fn fill_randomly2<R: Rng>(schedule_prop: &ScheduleProp, rng: &mut R) -> Schedule
         remove_improper_a(&schedule_prop, &mut schedule, r);
 
         // Kの差分を計算
-        let k_dif = schedule_prop.staff[r].k_day_count - count_waku_row!(Shift::K, schedule_prop, schedule, r);
+        let k_dif = schedule_prop.staff_list[r].k_day_count - count_waku_row!(Shift::K, schedule_prop, schedule, r);
 
         if k_dif > 0 {
             // 不足したKをランダムに足す
