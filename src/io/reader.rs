@@ -28,9 +28,9 @@ pub fn load_main_config(path: &FilePath) -> Result<Vec<FilePath>, String> {
 
     let ss = sep_by_fields(&contents);
 
-    check_len(2, &ss, "項目が足りません")?;
+    check_len(1, &ss, "項目が足りません")?;
 
-    let ans = ss[1].lines().map(|s| s.to_string()).collect();
+    let ans = ss[0].lines().map(|s| s.to_string()).collect();
 
     Ok(ans)
 }
@@ -48,7 +48,7 @@ fn sep_by_fields(contents: &Vec<String>) -> Vec<String> {
         }
     }
     ss.push(temp.join("\n"));
-    ss
+    ss[1..].to_vec()
 }
 
 /// 勤務表で使う値を読み込む
@@ -57,28 +57,28 @@ pub fn load_config(path: &str) -> Result<(ScheduleProp, Vec<FilePath>, FillConfi
 
     let ss = sep_by_fields(&contents);
 
-    check_len(13, &ss, "項目が足りません")?;
+    check_len(12, &ss, "項目が足りません")?;
 
-    let schedule = read_schedule(&ss[7])?;
+    let schedule = read_schedule(&ss[6])?;
 
-    let buffer = read_usize(&ss[6])?;
+    let buffer = read_usize(&ss[5])?;
 
     let hp = ScheduleProp {
-        staff: read_staff(&ss[1])?,
-        ng_list: read_ng_list(&ss[2])?,
-        staff_count: read_usize(&ss[3])?,
-        day_count: read_usize(&ss[4])?,
-        days: read_days(&ss[5])?,
+        staff: read_staff(&ss[0])?,
+        ng_list: read_ng_list(&ss[1])?,
+        staff_count: read_usize(&ss[2])?,
+        day_count: read_usize(&ss[3])?,
+        days: read_days(&ss[4])?,
         buffer: buffer,
         request: schedule.clone(),
         schedule_st: make_schedule_state(&schedule, buffer),
-        i_staff_count: read_isizes(&ss[8])?,
-        score_props: read_score_props(&ss[12])?,
+        i_staff_count: read_isizes(&ss[7])?,
+        score_props: read_score_props(&ss[11])?,
     };
-    let fs = ss[11].lines().map(|s| s.to_string()).collect();
+    let fs = ss[10].lines().map(|s| s.to_string()).collect();
     let fc = FillConfig {
-        name: ss[9].clone(), 
-        seed: read_usize(&ss[10])?,
+        name: ss[8].clone(), 
+        seed: read_usize(&ss[9])?,
     };
 
     Ok((hp, fs, fc))
@@ -90,15 +90,15 @@ pub fn load_annealing_config(path: &str) -> Result<AnnealingConfig, String> {
 
     let ss = sep_by_fields(&contents);
 
-    check_len(4, &ss, "項目が足りません")?;
+    check_len(3, &ss, "項目が足りません")?;
 
-    let (tmax, tmin) = read_temp(&ss[5])?;
+    let (tmax, tmin) = read_temp(&ss[4])?;
 
     let ac = AnnealingConfig {
-        step: read_usize(&ss[1])?,
-        seed: read_usize(&ss[2])?,
-        score_props: read_score_props(&ss[3])?,
-        update_func: ss[4].clone(),
+        step: read_usize(&ss[0])?,
+        seed: read_usize(&ss[1])?,
+        score_props: read_score_props(&ss[2])?,
+        update_func: ss[3].clone(),
         max_temp: tmax,
         min_temp: tmin,
     };
