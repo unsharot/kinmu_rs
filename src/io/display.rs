@@ -24,7 +24,7 @@ pub fn print_schedule(schedule_prop: &ScheduleProp, schedule: &Schedule) {
         print_shift_count_row(Y, schedule_prop, schedule, r);
 
         // 名前
-        print!(" {}", schedule_prop.staff[r].name);
+        print!(" {}", schedule_prop.staff_list[r].name);
 
         println!();
     }

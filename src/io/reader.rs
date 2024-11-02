@@ -35,22 +35,6 @@ pub fn load_main_config(path: &FilePath) -> Result<Vec<FilePath>, String> {
     Ok(ans)
 }
 
-/// フィールドごとに区切る
-fn sep_by_fields(contents: &Vec<String>) -> Vec<String> {
-    let mut temp: Vec<String> = Vec::new();
-    let mut ss: Vec<String> = Vec::new();
-    for line in contents {
-        if line.trim().ends_with(":") {
-            ss.push(temp.join("\n"));
-            temp = Vec::new();
-        } else {
-            temp.push(line.to_string());
-        }
-    }
-    ss.push(temp.join("\n"));
-    ss[1..].to_vec()
-}
-
 /// 勤務表で使う値を読み込む
 pub fn load_config(path: &str) -> Result<(ScheduleProp, Vec<FilePath>, FillConfig), String> {
     let contents = read_contents(path)?;
@@ -59,20 +43,33 @@ pub fn load_config(path: &str) -> Result<(ScheduleProp, Vec<FilePath>, FillConfi
 
     check_len(12, &ss, "項目が足りません")?;
 
-    let schedule = read_schedule(&ss[6])?;
-
+    let staff_list = read_staff_list(&ss[0])?;
+    let ng_list = read_ng_list(&ss[1])?;
+    let staff_count = read_usize(&ss[2])?;
+    let day_count = read_usize(&ss[3])?;
+    let days = read_days(&ss[4])?;
     let buffer = read_usize(&ss[5])?;
+    let schedule = read_schedule(&ss[6])?;
+    let i_staff_count = read_isizes(&ss[7])?;
+
+    check_len(day_count - buffer, &i_staff_count, "夜勤の人数の数が日数分ありません")?;
+    check_len(staff_count, &staff_list, "職員リストが設定した職員数だけありません")?;
+    check_len(day_count, &days, "DayStateが設定した日数だけありません")?;
+    check_len(staff_count, &schedule, "スケジュールが職員数分ありません")?;
+    for r in 0..staff_count {
+        check_len(day_count, &schedule[r], "スケジュールが日数分ありません")?;
+    }
 
     let hp = ScheduleProp {
-        staff: read_staff(&ss[0])?,
-        ng_list: read_ng_list(&ss[1])?,
-        staff_count: read_usize(&ss[2])?,
-        day_count: read_usize(&ss[3])?,
-        days: read_days(&ss[4])?,
+        staff_list: staff_list,
+        ng_list: ng_list,
+        staff_count: staff_count,
+        day_count: day_count,
+        days: days,
         buffer: buffer,
         request: schedule.clone(),
         schedule_st: make_schedule_state(&schedule, buffer),
-        i_staff_count: read_isizes(&ss[7])?,
+        i_staff_count: i_staff_count,
         score_props: read_score_props(&ss[11])?,
     };
     let fs = ss[10].lines().map(|s| s.to_string()).collect();
@@ -129,7 +126,21 @@ fn read_contents(path: &str) -> Result<Vec<String>, String> {
     Ok(ans)
 }
 
-
+/// フィールドごとに区切る
+fn sep_by_fields(contents: &Vec<String>) -> Vec<String> {
+    let mut temp: Vec<String> = Vec::new();
+    let mut ss: Vec<String> = Vec::new();
+    for line in contents {
+        if line.trim().ends_with(":") {
+            ss.push(temp.join("\n"));
+            temp = Vec::new();
+        } else {
+            temp.push(line.to_string());
+        }
+    }
+    ss.push(temp.join("\n"));
+    ss[1..].to_vec()
+}
 
 fn read_usize(text: &str) -> Result<usize, String> {
     let ans: usize = text.parse::<usize>().map_err(|e| e.to_string())?;
@@ -211,7 +222,7 @@ fn read_daystate_isize_float(text: &str) -> Result<(DayState, isize, f32), Strin
     Ok((d, i, f))
 }
 
-fn read_staff(text: &str) -> Result<Vec<Staff>, String> {
+fn read_staff_list(text: &str) -> Result<Vec<Staff>, String> {
     let mut staff: Vec<Staff> = Vec::new();
     for line in text.lines() {
         let a_staff = read_a_staff(&line)?;

@@ -338,7 +338,7 @@ macro_rules! count_waku_row {
 }
 
 fn k_day_count(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
-    let cnt_needed = schedule_prop.staff[r].k_day_count;
+    let cnt_needed = schedule_prop.staff_list[r].k_day_count;
     let cnt = count_waku_row!(K, schedule_prop, schedule, r);
     let d = (cnt - cnt_needed).abs() as Score;
     let a = d * s;
@@ -346,7 +346,7 @@ fn k_day_count(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &
 }
 
 fn i_day_count(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
-    let cnt_needed = schedule_prop.staff[r].i_day_count;
+    let cnt_needed = schedule_prop.staff_list[r].i_day_count;
     let cnt = count_waku_row!(I, schedule_prop, schedule, r);
     let d = (cnt - cnt_needed).abs() as Score;
     let a = d * s;
@@ -354,7 +354,7 @@ fn i_day_count(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &
 }
 
 fn o_day_count(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
-    let cnt_needed = schedule_prop.staff[r].o_day_count;
+    let cnt_needed = schedule_prop.staff_list[r].o_day_count;
     if cnt_needed == -1 {
         0.0
     } else {
@@ -366,7 +366,7 @@ fn o_day_count(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &
 }
 
 fn h_day_count(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
-    let cnt_needed = schedule_prop.staff[r].h_day_count;
+    let cnt_needed = schedule_prop.staff_list[r].h_day_count;
     if cnt_needed == -1 {
         0.0
     } else {
@@ -450,7 +450,7 @@ fn leader_ability(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usize, (
     if matches!(schedule_prop.days[c], DayState::Holiday) {
         let mut a_cnt = 0;
         for r in 0..schedule_prop.staff_count {
-            if (schedule[r][c] == N) && ((schedule_prop.staff[r].ability % ab) != 0) {
+            if (schedule[r][c] == N) && ((schedule_prop.staff_list[r].ability % ab) != 0) {
                     a_cnt += 1;
             }
         }
@@ -471,7 +471,7 @@ fn i_alone_worker(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usize, (
     for r in 0..schedule_prop.staff_count {
         if schedule[r][c] == I {
             i_cnt += 1;
-            if (schedule_prop.staff[r].ability % ab) != 0 {
+            if (schedule_prop.staff_list[r].ability % ab) != 0 {
                 a_cnt += 1;
             }
         }
@@ -504,7 +504,7 @@ fn i_alone_before_furo(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usi
 fn room_leader_ability(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usize, (cnt_needed, ab, s): &(isize,isize,Score)) -> Score {
     let mut a_cnt = 0;
     for r in 0..schedule_prop.staff_count {
-        if (schedule[r][c] == N) && ((schedule_prop.staff[r].ability % ab) != 0) {
+        if (schedule[r][c] == N) && ((schedule_prop.staff_list[r].ability % ab) != 0) {
                 a_cnt += 1;
         }
     }
