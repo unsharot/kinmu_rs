@@ -84,7 +84,7 @@ pub enum DayState {
     Holiday,
     Bath,
     Bath2,
-    Weight,
+    Measure,
 }
 
 impl fmt::Display for DayState {
@@ -92,9 +92,9 @@ impl fmt::Display for DayState {
         let s = match self {
             DayState::Weekday => "W",
             DayState::Holiday => "H",
-            DayState::Bath => "F",
+            DayState::Bath => "B",
             DayState::Bath2 => "2",
-            DayState::Weight => "G",
+            DayState::Measure => "M",
         };
         write!(f, "{}", s)
     }
@@ -107,9 +107,9 @@ impl FromStr for DayState {
         match s {
             "W" => Ok(DayState::Weekday),
             "H" => Ok(DayState::Holiday),
-            "F" => Ok(DayState::Bath),
+            "B" => Ok(DayState::Bath),
             "2" => Ok(DayState::Bath2),
-            "G" => Ok(DayState::Weight),
+            "M" => Ok(DayState::Measure),
             _ => Err(format!("Failed to parse DayState: {}", s))
         }
     }
