@@ -1,7 +1,6 @@
 use annealing::annealing;
 use kinmu::kinmu_lib::{score, update, fill, check};
 use kinmu::io::{reader, display};
-use kinmu::io::reader::seed;
 
 use std::time::Instant;
 
@@ -31,7 +30,7 @@ fn print_check(name: &str, b: bool) {
 }
 
 fn sub(p: &str) -> Result<(), String> {
-    let (schedule_prop, ac_paths, fc) = reader::load_config(p).map_err(|e| {
+    let (schedule_prop, ac_paths, mut fc) = reader::load_config(p).map_err(|e| {
         eprintln!("[エラー] 勤務表configの読み込みに失敗しました");
         eprintln!("{}", e);
         eprintln!("対象ファイル: {}", &p);
@@ -42,7 +41,7 @@ fn sub(p: &str) -> Result<(), String> {
 
     print_check("SAFE_IAK", check::safe_iak(&schedule_prop));
 
-    let mut model = fill::run(&fc, &schedule_prop)?;
+    let mut model = fill::run(&mut fc, &schedule_prop)?;
 
     print_check("K_I_COUNTS", check::k_i_counts(&schedule_prop, &model));
 
@@ -58,7 +57,7 @@ fn sub(p: &str) -> Result<(), String> {
         })?;
 
         let start = Instant::now();
-        let mut rng = seed::gen_rng_from_seed(ac.seed);
+        let mut rng = ac.rng;
         score = score::assess_score(&ac.score_props, &schedule_prop, &model);
         (score, model) = annealing::annealing(
             score,

@@ -2,7 +2,7 @@
 
 mod common;
 mod type_reader;
-pub mod seed;
+mod seed;
 
 use type_reader::*;
 use common::*;
@@ -76,7 +76,7 @@ pub fn load_config(path: &str) -> Result<(ScheduleProp, Vec<FilePath>, FillConfi
     let fs = ss[10].lines().map(|s| s.to_string()).collect();
     let fc = FillConfig {
         name: ss[8].clone(), 
-        seed: read_usize(&ss[9])?,
+        rng: seed::gen_rng_from_seed(read_usize(&ss[9])?),
     };
 
     Ok((hp, fs, fc))
@@ -94,7 +94,7 @@ pub fn load_annealing_config(path: &str) -> Result<AnnealingConfig, String> {
 
     let ac = AnnealingConfig {
         step: read_usize(&ss[0])?,
-        seed: read_usize(&ss[1])?,
+        rng: seed::gen_rng_from_seed(read_usize(&ss[1])?),
         score_props: read_score_props(&ss[2])?,
         update_func: ss[3].clone(),
         max_temp: tmax,

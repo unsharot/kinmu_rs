@@ -2,6 +2,7 @@
 
 use std::str::FromStr;
 use std::fmt;
+use rand::RngCore;
 
 #[derive(Debug)]
 #[derive(Clone)]
@@ -213,13 +214,13 @@ pub struct ScheduleProp {
 
 pub struct FillConfig {
     pub name: String,
-    pub seed: usize,
+    pub rng: Box<dyn RngCore>,
 }
 
 /// 焼きなましの段階ごとの設定
 pub struct AnnealingConfig {
     pub step: usize, // 焼きなましのステップ数
-    pub seed: usize, // 焼きなましのupdate関数のシード
+    pub rng: Box<dyn RngCore>, // 焼きなましのupdate関数の乱数生成器
     pub score_props: Vec<ScoreProp>, // 焼きなましのためのスコア
     pub update_func: String,
     pub max_temp: f32,
