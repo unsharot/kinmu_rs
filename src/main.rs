@@ -1,7 +1,7 @@
 use annealing::annealing;
 use kinmu::kinmu_lib::{score, update, fill, check};
 use kinmu::io::{reader, display};
-use kinmu::seed;
+use kinmu::io::reader::seed;
 
 use std::time::Instant;
 

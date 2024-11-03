@@ -12,7 +12,7 @@ use super::types::{
     Shift,
     FillConfig,
 };
-use crate::seed;
+use crate::io::reader::seed;
 
 use rand::Rng;
 
