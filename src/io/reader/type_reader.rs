@@ -1,10 +1,4 @@
-//! config読み込みのモジュール
-
-use std::fs::{read_to_string};
-
 use crate::kinmu_lib::types::{
-    ScheduleProp,
-    AnnealingConfig,
     Shift,
     Staff,
     NGList,
@@ -13,159 +7,37 @@ use crate::kinmu_lib::types::{
     DayState,
     Schedule,
     ScoreProp,
-    ScheduleState,
-    ShiftState,
-    FillConfig,
 };
 
+use super::common::check_len;
 
 
-type FilePath = String;
 
-pub fn load_main_config(path: &FilePath) -> Result<Vec<FilePath>, String> {
 
-    let contents = read_contents(path)?;
-
-    let ss = sep_by_fields(&contents);
-
-    check_len(1, &ss, "項目が足りません", "項目が余分です")?;
-
-    let ans = ss[0].lines().map(|s| s.to_string()).collect();
-
-    Ok(ans)
-}
-
-/// 勤務表で使う値を読み込む
-pub fn load_config(path: &str) -> Result<(ScheduleProp, Vec<FilePath>, FillConfig), String> {
-    let contents = read_contents(path)?;
-
-    let ss = sep_by_fields(&contents);
-
-    check_len(12, &ss, "項目が足りません", "項目が余分です")?;
-
-    let staff_list = read_staff_list(&ss[0])?;
-    let ng_list = read_ng_list(&ss[1])?;
-    let staff_count = read_usize(&ss[2])?;
-    let day_count = read_usize(&ss[3])?;
-    let days = read_days(&ss[4])?;
-    let buffer = read_usize(&ss[5])?;
-    let schedule = read_schedule(&ss[6])?;
-    let i_staff_count = read_isizes(&ss[7])?;
-
-    check_len(day_count - buffer, &i_staff_count, "夜勤の人数が日数分ありません", "夜勤の人数が日数分を超過しています")?;
-    check_len(staff_count, &staff_list, "職員リストが設定した職員数だけありません", "職員リストが設定した職員数を超過しています")?;
-    check_len(day_count, &days, "DayStateが設定した日数だけありません", "DayStateが設定した日数を超過しています")?;
-    check_len(staff_count, &schedule, "スケジュールが職員数分ありません", "スケージュールが職員数を超過しています")?;
-    for r in 0..staff_count {
-        check_len(day_count, &schedule[r], "スケジュールが日数分ありません", "スケージュールが日数を超過しています")?;
-    }
-
-    let hp = ScheduleProp {
-        staff_list: staff_list,
-        ng_list: ng_list,
-        staff_count: staff_count,
-        day_count: day_count,
-        days: days,
-        buffer: buffer,
-        request: schedule.clone(),
-        schedule_st: make_schedule_state(&schedule, buffer),
-        i_staff_count: i_staff_count,
-        score_props: read_score_props(&ss[11])?,
-    };
-    let fs = ss[10].lines().map(|s| s.to_string()).collect();
-    let fc = FillConfig {
-        name: ss[8].clone(), 
-        seed: read_usize(&ss[9])?,
-    };
-
-    Ok((hp, fs, fc))
-}
-
-/// 焼きなましの段階ごとの設定を読み込む
-pub fn load_annealing_config(path: &str) -> Result<AnnealingConfig, String> {
-    let contents = read_contents(path)?;
-
-    let ss = sep_by_fields(&contents);
-
-    check_len(5, &ss, "項目が足りません", "項目が余分です")?;
-
-    let (tmax, tmin) = read_temp(&ss[4])?;
-
-    let ac = AnnealingConfig {
-        step: read_usize(&ss[0])?,
-        seed: read_usize(&ss[1])?,
-        score_props: read_score_props(&ss[2])?,
-        update_func: ss[3].clone(),
-        max_temp: tmax,
-        min_temp: tmin,
-    };
-
-    Ok(ac)
-}
-
-/// ファイルを読み込んで文字列の行ごとの配列を返す関数
-fn read_contents(path: &str) -> Result<Vec<String>, String> {
-
-    // ファイルの全文をStringとして読み込む
-    let contents = read_to_string(path).map_err(|e| e.to_string())?;
-
-    // 成形して行ごとのVec<String>にする
-    let mut ans: Vec<String> = Vec::new();
-    for line in contents.lines() {
-        // コメントを除去
-        let cleaned_line = match line.find('#') {
-            Some(index) => &line[..index],
-            None => &line,
-        };
-        // 空白の行を除去
-        if cleaned_line != "" {
-            ans.push(cleaned_line.to_string());
-        }
-    }
-
-    Ok(ans)
-}
-
-/// フィールドごとに区切る
-fn sep_by_fields(contents: &Vec<String>) -> Vec<String> {
-    let mut temp: Vec<String> = Vec::new();
-    let mut ss: Vec<String> = Vec::new();
-    for line in contents {
-        if line.trim().ends_with(":") {
-            ss.push(temp.join("\n"));
-            temp = Vec::new();
-        } else {
-            temp.push(line.to_string());
-        }
-    }
-    ss.push(temp.join("\n"));
-    ss[1..].to_vec()
-}
-
-fn read_usize(text: &str) -> Result<usize, String> {
+pub fn read_usize(text: &str) -> Result<usize, String> {
     let ans: usize = text.parse::<usize>().map_err(|e| e.to_string())?;
     Ok(ans)
 }
 
-// fn read_usizes(text: &str) -> Result<Vec<usize>, String> {
+// pub fn read_usizes(text: &str) -> Result<Vec<usize>, String> {
 //     text.split_whitespace().map(|x| x.parse::<usize>().map_err(|e| e.to_string())).collect()
 // }
 
-fn read_isize(text: &str) -> Result<isize, String> {
+pub fn read_isize(text: &str) -> Result<isize, String> {
     let ans: isize = text.parse::<isize>().map_err(|e| e.to_string())?;
     Ok(ans)
 }
 
-fn read_isizes(text: &str) -> Result<Vec<isize>, String> {
+pub fn read_isizes(text: &str) -> Result<Vec<isize>, String> {
     text.split_whitespace().map(|x| x.parse::<isize>().map_err(|e| e.to_string())).collect()
 }
 
-fn read_float(text: &str) -> Result<f32, String> {
+pub fn read_float(text: &str) -> Result<f32, String> {
     let ans: f32 = text.parse::<f32>().map_err(|e| e.to_string())?;
     Ok(ans)
 }
 
-fn read_float_pair(text: &str) -> Result<(f32, f32), String> {
+pub fn read_float_pair(text: &str) -> Result<(f32, f32), String> {
     let words: Vec<_> = text
         .trim_matches(|c| c == '(' || c == ')')
         .split(',')
@@ -176,7 +48,7 @@ fn read_float_pair(text: &str) -> Result<(f32, f32), String> {
     Ok((f1, f2))
 }
 
-fn read_isize_float(text: &str) -> Result<(isize, f32), String> {
+pub fn read_isize_float(text: &str) -> Result<(isize, f32), String> {
     let words: Vec<_> = text
         .trim_matches(|c| c == '(' || c == ')')
         .split(',')
@@ -187,7 +59,7 @@ fn read_isize_float(text: &str) -> Result<(isize, f32), String> {
     Ok((i, f))
 }
 
-fn read_isize_isize_float(text: &str) -> Result<(isize, isize, f32), String> {
+pub fn read_isize_isize_float(text: &str) -> Result<(isize, isize, f32), String> {
     let words: Vec<_> = text
         .trim_matches(|c| c == '(' || c == ')')
         .split(',')
@@ -199,7 +71,7 @@ fn read_isize_isize_float(text: &str) -> Result<(isize, isize, f32), String> {
     Ok((i1, i2, f))
 }
 
-fn read_shift_float(text: &str) -> Result<(Shift, f32), String> {
+pub fn read_shift_float(text: &str) -> Result<(Shift, f32), String> {
     let words: Vec<_> = text
         .trim_matches(|c| c == '(' || c == ')')
         .split(',')
@@ -210,7 +82,7 @@ fn read_shift_float(text: &str) -> Result<(Shift, f32), String> {
     Ok((s, f))
 }
 
-fn read_daystate_isize_float(text: &str) -> Result<(DayState, isize, f32), String> {
+pub fn read_daystate_isize_float(text: &str) -> Result<(DayState, isize, f32), String> {
     let words: Vec<_> = text
         .trim_matches(|c| c == '(' || c == ')')
         .split(',')
@@ -222,7 +94,7 @@ fn read_daystate_isize_float(text: &str) -> Result<(DayState, isize, f32), Strin
     Ok((d, i, f))
 }
 
-fn read_staff_list(text: &str) -> Result<Vec<Staff>, String> {
+pub fn read_staff_list(text: &str) -> Result<Vec<Staff>, String> {
     let mut staff: Vec<Staff> = Vec::new();
     for line in text.lines() {
         let a_staff = read_a_staff(&line)?;
@@ -231,7 +103,7 @@ fn read_staff_list(text: &str) -> Result<Vec<Staff>, String> {
     Ok(staff)
 }
 
-fn read_a_staff(text: &str) -> Result<Staff, String> {
+pub fn read_a_staff(text: &str) -> Result<Staff, String> {
     let words: Vec<String> = text.split_whitespace().map(|s| s.to_string()).collect();
     check_len(6, &words, "Needs 6 fields, but not enough.", "Needs 6 fields, but too much given.")?;
     let worker: Staff = Staff {
@@ -245,7 +117,7 @@ fn read_a_staff(text: &str) -> Result<Staff, String> {
     Ok(worker)
 }
 
-fn read_ng_list(text: &str) -> Result<NGList, String> {
+pub fn read_ng_list(text: &str) -> Result<NGList, String> {
     let mut ans: NGList = Vec::new();
     for line in text.lines() {
         let ng = read_ng(&line)?;
@@ -254,7 +126,7 @@ fn read_ng_list(text: &str) -> Result<NGList, String> {
     Ok(ans)
 }
 
-fn read_ng(text: &str) -> Result<NG, String> {
+pub fn read_ng(text: &str) -> Result<NG, String> {
     let words: Vec<String> = text.split_whitespace().map(|s| s.to_string()).collect();
     check_len(2, &words, "Needs 2 fields, but not enough.", "Needs 2 fields, but too much given.")?;
     let id1 = read_usize(&words[0])?;
@@ -262,7 +134,7 @@ fn read_ng(text: &str) -> Result<NG, String> {
     Ok((id1, id2))
 }
 
-fn read_temp(text: &str) -> Result<(f32, f32), String> {
+pub fn read_temp(text: &str) -> Result<(f32, f32), String> {
     let words: Vec<String> = text.split_whitespace().map(|s| s.to_string()).collect();
     check_len(2, &words, "Needs 2 fields, but not enough.", "Needs 2 fields, but too much given.")?;
     let id1 = read_float(&words[0])?;
@@ -270,7 +142,7 @@ fn read_temp(text: &str) -> Result<(f32, f32), String> {
     Ok((id1, id2))
 }
 
-fn read_days(text: &str) -> Result<Days, String> {
+pub fn read_days(text: &str) -> Result<Days, String> {
     let mut ans: Days = Vec::new();
     for c in text.chars() {
         ans.push(c.to_string().parse::<DayState>()?);
@@ -278,7 +150,7 @@ fn read_days(text: &str) -> Result<Days, String> {
     Ok(ans)
 }
 
-fn read_schedule(text: &str) -> Result<Schedule, String> {
+pub fn read_schedule(text: &str) -> Result<Schedule, String> {
     let mut ans: Schedule = Vec::new();
     for line in text.lines() {
         let mut row = Vec::new();
@@ -290,7 +162,7 @@ fn read_schedule(text: &str) -> Result<Schedule, String> {
     Ok(ans)
 }
 
-fn read_score_props(text: &str) -> Result<Vec<ScoreProp>, String> {
+pub fn read_score_props(text: &str) -> Result<Vec<ScoreProp>, String> {
     let mut ans: Vec<ScoreProp> = Vec::new();
     for line in text.lines() {
         ans.push(read_score_prop(&line)?);
@@ -298,7 +170,7 @@ fn read_score_props(text: &str) -> Result<Vec<ScoreProp>, String> {
     Ok(ans)
 }
 
-fn read_score_prop(text: &str) -> Result<ScoreProp, String> {
+pub fn read_score_prop(text: &str) -> Result<ScoreProp, String> {
     let words: Vec<&str> = text.split_whitespace().collect();
     check_len(2, &words, "Needs 2 fields, but not enough.", "Needs 2 fields, but too much given.")?;
     match (words[0], words[1]) {
@@ -336,35 +208,4 @@ fn read_score_prop(text: &str) -> Result<ScoreProp, String> {
         ("NoUndef", p) => Ok(ScoreProp::NoUndef(read_float(p)?)),
         (s, p) => Err(format!("Failed to parse ScoreProp: {} {}",s,p))
     }
-}
-
-
-
-
-fn make_schedule_state(schedule: &Schedule, buffer: usize) -> ScheduleState {
-    let mut ans: ScheduleState = Vec::new();
-    for line in schedule {
-        ans.push(line.iter().enumerate().map(|(i, shift)|
-            if i < buffer {
-                ShiftState::Absolute
-            } else {
-                match shift {
-                    Shift::U => ShiftState::Random,
-                    _ => ShiftState::Absolute,
-                }
-            }
-        ).collect());
-    }
-    ans
-}
-
-
-fn check_len<T, E>(l: usize, v: &Vec<T>, error_deficit: E, error_exceed: E) -> Result<(), E> {
-    if v.len() < l {
-        return Err(error_deficit);
-    }
-    if v.len() > l {
-        return Err(error_exceed);
-    }
-    Ok(())
 }
