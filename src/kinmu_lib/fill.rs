@@ -12,13 +12,12 @@ use super::types::{
     Shift,
     FillConfig,
 };
-use crate::io::reader::seed;
 
 use rand::Rng;
 
-pub fn run(fc: &FillConfig, schedule_prop: &ScheduleProp) -> Result<Schedule, String> {
+pub fn run(fc: &mut FillConfig, schedule_prop: &ScheduleProp) -> Result<Schedule, String> {
     println!("{}", fc.name);
-    let mut rng = seed::gen_rng_from_seed(fc.seed);
+    let mut rng = &mut fc.rng;
     match fc.name.as_str() {
         "fill1" => Ok(fill_randomly1(schedule_prop, &mut rng)),
         "fill2" => Ok(fill_randomly2(schedule_prop, &mut rng)),
