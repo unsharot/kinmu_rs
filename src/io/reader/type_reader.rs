@@ -193,7 +193,6 @@ pub fn read_score_prop(text: &str) -> Result<ScoreProp, String> {
         ("IDayCount", p) => Ok(ScoreProp::IDayCount(read_float(p)?)),
         ("ODayCount", p) => Ok(ScoreProp::ODayCount(read_float(p)?)),
         ("HDayCount", p) => Ok(ScoreProp::HDayCount(read_float(p)?)),
-        ("Fair", p) => Ok(ScoreProp::Fair(read_usize(p)?)),
         ("IStaffCount", p) => Ok(ScoreProp::IStaffCount(read_float(p)?)),
         ("NStaffCount", p) => Ok(ScoreProp::NStaffCount(read_daystate_isize_float(p)?)),
         ("OStaffCount", p) => Ok(ScoreProp::OStaffCount(read_isize_float(p)?)),
