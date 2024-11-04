@@ -189,6 +189,7 @@ pub fn read_score_prop(text: &str) -> Result<ScoreProp, String> {
         ("Need2HolidaysNoBf", p) => Ok(ScoreProp::Need2HolidaysNoBf(read_float(p)?)),
         ("OHBalance", p) => Ok(ScoreProp::OHBalance(read_float(p)?)),
         ("ShiftHalfBalance", p) => Ok(ScoreProp::ShiftHalfBalance(read_shift_float(p)?)),
+        ("ShiftDirPriority", p) => Ok(ScoreProp::ShiftDirPriority(read_shift_float(p)?)),
         ("KDayCount", p) => Ok(ScoreProp::KDayCount(read_float(p)?)),
         ("IDayCount", p) => Ok(ScoreProp::IDayCount(read_float(p)?)),
         ("ODayCount", p) => Ok(ScoreProp::ODayCount(read_float(p)?)),
