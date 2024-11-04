@@ -34,7 +34,7 @@ fn print_check(name: &str, b: bool) {
 }
 
 fn generate_schedule(p: &str) -> Result<(), String> {
-    let (schedule_prop, ac_paths, mut fc) = reader::load_config(p).map_err(|e| {
+    let (schedule_prop, ac_paths, mut fc) = reader::load_schedule_config(p).map_err(|e| {
         format!("[エラー] 勤務表configの読み込みに失敗しました\n対象ファイル: {}\n理由: {}", p, e)
     })?;
 
