@@ -202,7 +202,7 @@ pub fn read_score_prop(text: &str) -> Result<ScoreProp, String> {
         ("LeaderAbility", p) => Ok(ScoreProp::LeaderAbility(read_isize_float(p)?)),
         ("IAloneAbility", p) => Ok(ScoreProp::IAloneAbility(read_isize_float(p)?)),
         ("IAloneBeforeBath", p) => Ok(ScoreProp::IAloneBeforeBath(read_float(p)?)),
-        ("RoomLeaderAbility", p) => Ok(ScoreProp::RoomLeaderAbility(read_isize_isize_float(p)?)),
+        ("NStaffCountWithAbility", p) => Ok(ScoreProp::NStaffCountWithAbility(read_isize_isize_float(p)?)),
         ("NoSamePair3", p) => Ok(ScoreProp::NoSamePair3(read_float(p)?)),
         ("NoSamePair2", p) => Ok(ScoreProp::NoSamePair2(read_float(p)?)),
         ("NoUndef", p) => Ok(ScoreProp::NoUndef(read_float(p)?)),

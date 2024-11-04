@@ -83,7 +83,7 @@ fn get_score(schedule_prop: &ScheduleProp, schedule: &Schedule, sp: &ScoreProp) 
         LeaderAbility(p) => check_columns!(leader_ability, schedule_prop, schedule, p),
         IAloneAbility(p) => check_columns!(i_alone_worker, schedule_prop, schedule, p),
         IAloneBeforeBath(p) => check_columns!(i_alone_before_furo, schedule_prop, schedule, p),
-        RoomLeaderAbility(p) => check_columns!(room_leader_ability, schedule_prop, schedule, p),
+        NStaffCountWithAbility(p) => check_columns!(n_staff_count_with_ability, schedule_prop, schedule, p),
         NoSamePair3(p) => no_same_pair3(schedule_prop, schedule, p),
         NoSamePair2(p) => no_same_pair2(schedule_prop, schedule, p),
         NoUndef(p) => check_columns!(no_undef, schedule_prop, schedule, p),
@@ -501,7 +501,9 @@ fn i_alone_before_furo(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usi
     }
 }
 
-fn room_leader_ability(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usize, (cnt_needed, ab, s): &(isize,isize,Score)) -> Score {
+/// 能力条件を満たすスタッフが指定した人数いない場合のペナルティを設定
+/// 部屋持ちとO,Hできる人をIAKで保持するために使用
+fn n_staff_count_with_ability(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usize, (cnt_needed, ab, s): &(isize,isize,Score)) -> Score {
     let mut a_cnt = 0;
     for r in 0..schedule_prop.staff_count {
         if (schedule[r][c] == N) && ((schedule_prop.staff_list[r].ability % ab) != 0) {
