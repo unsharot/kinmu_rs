@@ -74,7 +74,6 @@ fn get_score(schedule_prop: &ScheduleProp, schedule: &Schedule, sp: &ScoreProp) 
         IDayCount(p) => check_rows!(i_day_count, schedule_prop, schedule, p),
         ODayCount(p) => check_rows!(o_day_count, schedule_prop, schedule, p),
         HDayCount(p) => check_rows!(h_day_count, schedule_prop, schedule, p),
-        // Fair(p) => check_rows!(fair, schedule_prop, schedule, p),
         IStaffCount(p) => check_columns!(i_staff_count, schedule_prop, schedule, p),
         NStaffCount(p) => check_columns!(n_staff_count, schedule_prop, schedule, p),
         OStaffCount(p) => check_columns!(o_staff_count, schedule_prop, schedule, p),
@@ -87,8 +86,6 @@ fn get_score(schedule_prop: &ScheduleProp, schedule: &Schedule, sp: &ScoreProp) 
         NoSamePair3(p) => no_same_pair3(schedule_prop, schedule, p),
         NoSamePair2(p) => no_same_pair2(schedule_prop, schedule, p),
         NoUndef(p) => check_columns!(no_undef, schedule_prop, schedule, p),
-        
-        _ => 0.0,
     }
 }
 
