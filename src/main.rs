@@ -4,19 +4,23 @@ use kinmu::io::{reader, display};
 
 use std::time::Instant;
 
-fn main() -> Result<(), String> {
+fn main() {
+    match generate_schedules() {
+        Ok(_) => {},
+        Err(e) => println!("{}", e),
+    }
+}
+
+fn generate_schedules() -> Result<(), String> {
 
     let config_path = "config/config.yaml".to_string();
     
     let schedule_config_paths: Vec<String> = reader::load_main_config(&config_path).map_err(|e| {
-        eprintln!("[エラー] メインconfigの読み込みに失敗しました");
-        eprintln!("{}", e);
-        eprintln!("対象ファイル: {}", &config_path);
-        format!("{}", e)
+        format!("[エラー] メインconfigの読み込みに失敗しました\n対象ファイル: {}\n理由: {}", config_path, e)
     })?;
     
     for path in schedule_config_paths {
-        sub(&path)?;
+        generate_schedule(&path)?;
     }
 
 
@@ -29,12 +33,9 @@ fn print_check(name: &str, b: bool) {
     }
 }
 
-fn sub(p: &str) -> Result<(), String> {
+fn generate_schedule(p: &str) -> Result<(), String> {
     let (schedule_prop, ac_paths, mut fc) = reader::load_config(p).map_err(|e| {
-        eprintln!("[エラー] 勤務表configの読み込みに失敗しました");
-        eprintln!("{}", e);
-        eprintln!("対象ファイル: {}", &p);
-        format!("{}", e)
+        format!("[エラー] 勤務表configの読み込みに失敗しました\n対象ファイル: {}\n理由: {}", p, e)
     })?;
 
     print_check("ALL_ABSOLUTE", check::all_absolute(&schedule_prop));
@@ -50,10 +51,7 @@ fn sub(p: &str) -> Result<(), String> {
     let mut score;
     for ac_path in ac_paths {
         let ac = reader::load_annealing_config(&ac_path).map_err(|e| {
-            eprintln!("[エラー] 焼きなましconfigの読み込みに失敗しました");
-            eprintln!("{}", e);
-            eprintln!("対象ファイル: {}", ac_path);
-            format!("{}", e)
+            format!("[エラー] 焼きなましconfigの読み込みに失敗しました\n対象ファイル: {}\n理由: {}", ac_path, e)
         })?;
 
         let start = Instant::now();
