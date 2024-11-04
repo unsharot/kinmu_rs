@@ -70,6 +70,7 @@ fn get_score(schedule_prop: &ScheduleProp, schedule: &Schedule, sp: &ScoreProp) 
         Need2HolidaysNoBf(p) => check_rows!(need_2_holidays_no_buffer, schedule_prop, schedule, p),
         OHBalance(p) => check_rows!(oh_balance, schedule_prop, schedule, p),
         ShiftHalfBalance(p) => check_rows!(shift_half_balance, schedule_prop, schedule, p),
+        ShiftDirPriority(p) => check_rows!(shift_dir_priority, schedule_prop, schedule, p),
         KDayCount(p) => check_rows!(k_day_count, schedule_prop, schedule, p),
         IDayCount(p) => check_rows!(i_day_count, schedule_prop, schedule, p),
         ODayCount(p) => check_rows!(o_day_count, schedule_prop, schedule, p),
@@ -320,6 +321,19 @@ fn shift_half_balance(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usiz
     let d = (cf - cl).abs() as Score;
     let a = d * s;
     a * a
+}
+
+/// 指定したシフトが月の前後どちらにあるほうが良いか設定する
+/// Scoreのフィールドが正なら前を優先、負なら後ろを優先
+fn shift_dir_priority(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, (shift, s): &(Shift, Score)) -> Score {
+    let mut ans: Score = 0.0;
+    let mid = schedule_prop.buffer + ((schedule_prop.day_count - schedule_prop.buffer) / 2);
+    for i in schedule_prop.buffer..schedule_prop.day_count {
+        if schedule[r][i] == *shift {
+            ans += s * ((i as Score) - (mid as Score));
+        }
+    }
+    ans
 }
 
 macro_rules! count_waku_row {
