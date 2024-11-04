@@ -520,6 +520,47 @@ max_and_min_temp:
 25 0
 ```
 
+## ファイル構成
+
+```
+.
+│  .gitignore
+│  Cargo.lock
+│  Cargo.toml
+│  README.md
+│
+├─annealing
+│  │  .gitignore
+│  │  Cargo.lock
+│  │  Cargo.toml
+│  │
+│  └─src
+│          annealing.rs
+│          lib.rs
+│
+└──src
+   │  lib.rs
+   │  main.rs
+   │
+   ├─io
+   │  │  display.rs
+   │  │  mod.rs
+   │  │
+   │  └─reader
+   │          common.rs
+   │          mod.rs
+   │          seed.rs
+   │          type_reader.rs
+   │
+   └─kinmu_lib
+           check.rs
+           fill.rs
+           mod.rs
+           score.rs
+           types.rs
+           update.rs
+```
+
 ## 改造するには
 
 CLIの出力形式を変更したかったり、GUIを実装したかったりする場合はsrc/io内のコードを
