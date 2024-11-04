@@ -37,7 +37,7 @@ pub fn load_main_config(path: &FilePath) -> Result<Vec<FilePath>, String> {
 }
 
 /// 勤務表で使う値を読み込む
-pub fn load_config(path: &str) -> Result<(ScheduleProp, Vec<FilePath>, FillConfig), String> {
+pub fn load_schedule_config(path: &str) -> Result<(ScheduleProp, Vec<FilePath>, FillConfig), String> {
     let contents = read_contents(path)?;
 
     let ss = sep_by_fields(&contents);
