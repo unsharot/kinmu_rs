@@ -1,6 +1,6 @@
 [package]
 name = "kinmu"
-version = "1.0.3"
+version = "1.0.6"
 authors = ["unsharot"]
 edition = "2021"
 description = "A project that solves specific nurse scheduling problem."
