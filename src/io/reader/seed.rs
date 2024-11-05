@@ -1,7 +1,7 @@
 //! シード値をもとに乱数生成器を作り出すモジュール
 
-use rand::{SeedableRng, RngCore};
 use rand::rngs::StdRng;
+use rand::{RngCore, SeedableRng};
 
 pub fn gen_rng_from_seed(seed: usize) -> Box<dyn RngCore> {
     if seed == 0 {

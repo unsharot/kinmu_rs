@@ -1,13 +1,10 @@
 //! 勤務表に使う型の宣言
 
-use std::str::FromStr;
-use std::fmt;
 use rand::RngCore;
+use std::fmt;
+use std::str::FromStr;
 
-#[derive(Debug)]
-#[derive(Clone)]
-#[derive(PartialEq)]
-#[derive(Copy)]
+#[derive(Debug, Clone, PartialEq, Copy)]
 pub enum Shift {
     N,
     K,
@@ -35,7 +32,7 @@ impl FromStr for Shift {
             "D" => Ok(Shift::D),
             "U" => Ok(Shift::U),
             " " => Ok(Shift::U),
-            _ => Err(format!("Failed to parse Shift: {}", s))
+            _ => Err(format!("Failed to parse Shift: {}", s)),
         }
     }
 }
@@ -78,8 +75,7 @@ pub struct Staff {
     pub h_day_count: isize,
 }
 
-#[derive(Debug)]
-#[derive(PartialEq)]
+#[derive(Debug, PartialEq)]
 pub enum DayState {
     Weekday,
     Holiday,
@@ -111,7 +107,7 @@ impl FromStr for DayState {
             "B" => Ok(DayState::Bath),
             "2" => Ok(DayState::Bath2),
             "M" => Ok(DayState::Measure),
-            _ => Err(format!("Failed to parse DayState: {}", s))
+            _ => Err(format!("Failed to parse DayState: {}", s)),
         }
     }
 }
@@ -137,21 +133,21 @@ pub enum ScoreProp {
     Need2Holidays(Score),
     Need2HolidaysNoBf(Score),
     OHBalance(Score),
-    ShiftHalfBalance((Shift,Score)),
-    ShiftDirPriority((Shift,Score)),
+    ShiftHalfBalance((Shift, Score)),
+    ShiftDirPriority((Shift, Score)),
     KDayCount(Score),
     IDayCount(Score),
     ODayCount(Score),
     HDayCount(Score),
     IStaffCount(Score),
-    NStaffCount((DayState,isize,Score)),
-    OStaffCount((isize,Score)),
-    HStaffCount((isize,Score)),
+    NStaffCount((DayState, isize, Score)),
+    OStaffCount((isize, Score)),
+    HStaffCount((isize, Score)),
     NGPair(Score),
-    LeaderAbility((isize,Score)),
-    IAloneAbility((isize,Score)),
+    LeaderAbility((isize, Score)),
+    IAloneAbility((isize, Score)),
     IAloneBeforeBath(Score),
-    NStaffCountWithAbility((isize,isize,Score)),
+    NStaffCountWithAbility((isize, isize, Score)),
     NoSamePair3(Score),
     NoSamePair2(Score),
     NoUndef(Score),
@@ -197,7 +193,6 @@ impl fmt::Display for ScoreProp {
     }
 }
 
-
 /// 勤務表ごとの設定
 pub struct ScheduleProp {
     pub staff_list: Vec<Staff>,
@@ -219,8 +214,8 @@ pub struct FillConfig {
 
 /// 焼きなましの段階ごとの設定
 pub struct AnnealingConfig {
-    pub step: usize, // 焼きなましのステップ数
-    pub rng: Box<dyn RngCore>, // 焼きなましのupdate関数の乱数生成器
+    pub step: usize,                 // 焼きなましのステップ数
+    pub rng: Box<dyn RngCore>,       // 焼きなましのupdate関数の乱数生成器
     pub score_props: Vec<ScoreProp>, // 焼きなましのためのスコア
     pub update_func: String,
     pub max_temp: f32,

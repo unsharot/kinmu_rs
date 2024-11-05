@@ -1,18 +1,6 @@
-use crate::kinmu_lib::types::{
-    Shift,
-    Staff,
-    NGList,
-    NG,
-    Days,
-    DayState,
-    Schedule,
-    ScoreProp,
-};
+use crate::kinmu_lib::types::{DayState, Days, NGList, Schedule, ScoreProp, Shift, Staff, NG};
 
 use super::common::check_len;
-
-
-
 
 pub fn read_usize(text: &str) -> Result<usize, String> {
     let ans: usize = text.parse::<usize>().map_err(|e| e.to_string())?;
@@ -29,7 +17,9 @@ pub fn read_isize(text: &str) -> Result<isize, String> {
 }
 
 pub fn read_isizes(text: &str) -> Result<Vec<isize>, String> {
-    text.split_whitespace().map(|x| x.parse::<isize>().map_err(|e| e.to_string())).collect()
+    text.split_whitespace()
+        .map(|x| x.parse::<isize>().map_err(|e| e.to_string()))
+        .collect()
 }
 
 pub fn read_float(text: &str) -> Result<f32, String> {
@@ -42,7 +32,12 @@ pub fn read_float_pair(text: &str) -> Result<(f32, f32), String> {
         .trim_matches(|c| c == '(' || c == ')')
         .split(',')
         .collect();
-    check_len(2, &words, "Needs 2 fields, but not enough.", "Needs 2 fields, but too much given.")?;
+    check_len(
+        2,
+        &words,
+        "Needs 2 fields, but not enough.",
+        "Needs 2 fields, but too much given.",
+    )?;
     let f1 = words[0].parse::<f32>().map_err(|e| e.to_string())?;
     let f2 = words[1].parse::<f32>().map_err(|e| e.to_string())?;
     Ok((f1, f2))
@@ -53,7 +48,12 @@ pub fn read_isize_float(text: &str) -> Result<(isize, f32), String> {
         .trim_matches(|c| c == '(' || c == ')')
         .split(',')
         .collect();
-    check_len(2, &words, "Needs 2 fields, but not enough.", "Needs 2 fields, but too much given.")?;
+    check_len(
+        2,
+        &words,
+        "Needs 2 fields, but not enough.",
+        "Needs 2 fields, but too much given.",
+    )?;
     let i = words[0].parse::<isize>().map_err(|e| e.to_string())?;
     let f = words[1].parse::<f32>().map_err(|e| e.to_string())?;
     Ok((i, f))
@@ -64,7 +64,12 @@ pub fn read_isize_isize_float(text: &str) -> Result<(isize, isize, f32), String>
         .trim_matches(|c| c == '(' || c == ')')
         .split(',')
         .collect();
-    check_len(3, &words, "Needs 3 fields, but not enough.", "Needs 3 fields, but too much given.")?;
+    check_len(
+        3,
+        &words,
+        "Needs 3 fields, but not enough.",
+        "Needs 3 fields, but too much given.",
+    )?;
     let i1 = words[0].parse::<isize>().map_err(|e| e.to_string())?;
     let i2 = words[1].parse::<isize>().map_err(|e| e.to_string())?;
     let f = words[2].parse::<f32>().map_err(|e| e.to_string())?;
@@ -76,7 +81,12 @@ pub fn read_shift_float(text: &str) -> Result<(Shift, f32), String> {
         .trim_matches(|c| c == '(' || c == ')')
         .split(',')
         .collect();
-    check_len(2, &words, "Needs 2 fields, but not enough.", "Needs 2 fields, but too much given.")?;
+    check_len(
+        2,
+        &words,
+        "Needs 2 fields, but not enough.",
+        "Needs 2 fields, but too much given.",
+    )?;
     let s = words[0].parse::<Shift>().map_err(|e| e.to_string())?;
     let f = words[1].parse::<f32>().map_err(|e| e.to_string())?;
     Ok((s, f))
@@ -87,7 +97,12 @@ pub fn read_daystate_isize_float(text: &str) -> Result<(DayState, isize, f32), S
         .trim_matches(|c| c == '(' || c == ')')
         .split(',')
         .collect();
-    check_len(3, &words, "Needs 3 fields, but not enough.", "Needs 3 fields, but too much given.")?;
+    check_len(
+        3,
+        &words,
+        "Needs 3 fields, but not enough.",
+        "Needs 3 fields, but too much given.",
+    )?;
     let d = words[0].parse::<DayState>().map_err(|e| e.to_string())?;
     let i = words[1].parse::<isize>().map_err(|e| e.to_string())?;
     let f = words[2].parse::<f32>().map_err(|e| e.to_string())?;
@@ -105,7 +120,12 @@ pub fn read_staff_list(text: &str) -> Result<Vec<Staff>, String> {
 
 pub fn read_a_staff(text: &str) -> Result<Staff, String> {
     let words: Vec<String> = text.split_whitespace().map(|s| s.to_string()).collect();
-    check_len(6, &words, "Needs 6 fields, but not enough.", "Needs 6 fields, but too much given.")?;
+    check_len(
+        6,
+        &words,
+        "Needs 6 fields, but not enough.",
+        "Needs 6 fields, but too much given.",
+    )?;
     let worker: Staff = Staff {
         name: words[5].clone(),
         ability: read_isize(&words[0])?,
@@ -128,7 +148,12 @@ pub fn read_ng_list(text: &str) -> Result<NGList, String> {
 
 pub fn read_ng(text: &str) -> Result<NG, String> {
     let words: Vec<String> = text.split_whitespace().map(|s| s.to_string()).collect();
-    check_len(2, &words, "Needs 2 fields, but not enough.", "Needs 2 fields, but too much given.")?;
+    check_len(
+        2,
+        &words,
+        "Needs 2 fields, but not enough.",
+        "Needs 2 fields, but too much given.",
+    )?;
     let id1 = read_usize(&words[0])?;
     let id2 = read_usize(&words[1])?;
     Ok((id1, id2))
@@ -136,7 +161,12 @@ pub fn read_ng(text: &str) -> Result<NG, String> {
 
 pub fn read_temp(text: &str) -> Result<(f32, f32), String> {
     let words: Vec<String> = text.split_whitespace().map(|s| s.to_string()).collect();
-    check_len(2, &words, "Needs 2 fields, but not enough.", "Needs 2 fields, but too much given.")?;
+    check_len(
+        2,
+        &words,
+        "Needs 2 fields, but not enough.",
+        "Needs 2 fields, but too much given.",
+    )?;
     let id1 = read_float(&words[0])?;
     let id2 = read_float(&words[1])?;
     Ok((id1, id2))
@@ -172,7 +202,12 @@ pub fn read_score_props(text: &str) -> Result<Vec<ScoreProp>, String> {
 
 pub fn read_score_prop(text: &str) -> Result<ScoreProp, String> {
     let words: Vec<&str> = text.split_whitespace().collect();
-    check_len(2, &words, "Needs 2 fields, but not enough.", "Needs 2 fields, but too much given.")?;
+    check_len(
+        2,
+        &words,
+        "Needs 2 fields, but not enough.",
+        "Needs 2 fields, but too much given.",
+    )?;
     match (words[0], words[1]) {
         ("IAKpattern", p) => Ok(ScoreProp::IAKpattern(read_float(p)?)),
         ("KIApattern", p) => Ok(ScoreProp::KIApattern(read_float(p)?)),
@@ -202,10 +237,12 @@ pub fn read_score_prop(text: &str) -> Result<ScoreProp, String> {
         ("LeaderAbility", p) => Ok(ScoreProp::LeaderAbility(read_isize_float(p)?)),
         ("IAloneAbility", p) => Ok(ScoreProp::IAloneAbility(read_isize_float(p)?)),
         ("IAloneBeforeBath", p) => Ok(ScoreProp::IAloneBeforeBath(read_float(p)?)),
-        ("NStaffCountWithAbility", p) => Ok(ScoreProp::NStaffCountWithAbility(read_isize_isize_float(p)?)),
+        ("NStaffCountWithAbility", p) => Ok(ScoreProp::NStaffCountWithAbility(
+            read_isize_isize_float(p)?,
+        )),
         ("NoSamePair3", p) => Ok(ScoreProp::NoSamePair3(read_float(p)?)),
         ("NoSamePair2", p) => Ok(ScoreProp::NoSamePair2(read_float(p)?)),
         ("NoUndef", p) => Ok(ScoreProp::NoUndef(read_float(p)?)),
-        (s, p) => Err(format!("Failed to parse ScoreProp: {} {}",s,p))
+        (s, p) => Err(format!("Failed to parse ScoreProp: {} {}", s, p)),
     }
 }

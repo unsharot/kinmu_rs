@@ -1,11 +1,6 @@
 //! 生成した勤務表を標準出力するモジュール
 
-use crate::kinmu_lib::types::{
-    Schedule,
-    Shift,
-    Shift::*,
-    ScheduleProp,
-};
+use crate::kinmu_lib::types::{Schedule, ScheduleProp, Shift, Shift::*};
 
 const ROW_STATS_DIGIT: usize = 2;
 
@@ -47,7 +42,7 @@ pub fn print_schedule(schedule_prop: &ScheduleProp, schedule: &Schedule) {
 
 /// Shiftの行を出力
 fn print_shift_row(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize) {
-    for c in 0..schedule_prop.day_count{
+    for c in 0..schedule_prop.day_count {
         print!("{}", schedule[r][c].to_string());
         if c + 1 == schedule_prop.buffer {
             print!("|");
@@ -56,7 +51,12 @@ fn print_shift_row(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize) 
 }
 
 /// 指定したシフトの数を出力
-fn print_shift_count_row(target_shift: Shift, schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize) {
+fn print_shift_count_row(
+    target_shift: Shift,
+    schedule_prop: &ScheduleProp,
+    schedule: &Schedule,
+    r: usize,
+) {
     let mut sum = 0;
     for c in schedule_prop.buffer..schedule_prop.day_count {
         if schedule[r][c] == target_shift {
@@ -67,7 +67,6 @@ fn print_shift_count_row(target_shift: Shift, schedule_prop: &ScheduleProp, sche
     let f = format!(" {:>stats$}", sum, stats = ROW_STATS_DIGIT);
     print!("{}", f);
 }
-
 
 /// 曜日を表示
 fn print_days(schedule_prop: &ScheduleProp) {
@@ -81,7 +80,11 @@ fn print_days(schedule_prop: &ScheduleProp) {
 }
 
 /// 指定したシフトの列の和を表示
-fn print_shift_count_columns(target_shift: Shift, schedule_prop: &ScheduleProp, schedule: &Schedule) {
+fn print_shift_count_columns(
+    target_shift: Shift,
+    schedule_prop: &ScheduleProp,
+    schedule: &Schedule,
+) {
     let mut v: Vec<String> = Vec::new();
     let mut max_length = 0;
     for c in 0..schedule_prop.day_count {
@@ -97,11 +100,11 @@ fn print_shift_count_columns(target_shift: Shift, schedule_prop: &ScheduleProp, 
             max_length = s.len();
         }
     }
-    
+
     for l in 0..max_length {
         for c in 0..schedule_prop.day_count {
             if l < v[c].len() {
-                print!("{}", &v[c][l..l+1]);
+                print!("{}", &v[c][l..l + 1]);
             } else {
                 print!(" ");
             }
