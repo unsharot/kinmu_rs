@@ -1,20 +1,10 @@
 //! 焼きなましで使う評価関数のモジュール
 
 use super::types::{
-    Shift,
-    Shift::*,
-    Schedule,
-    Score,
-    DayState,
-    ScoreProp,
-    ScoreProp::*,
-    ScheduleProp,
+    DayState, Schedule, ScheduleProp, Score, ScoreProp, ScoreProp::*, Shift, Shift::*,
 };
 
-
-
 use std::collections::HashMap;
-
 
 macro_rules! check_rows {
     ($check:expr, $schedule_prop: expr, $schedule:expr, $p:expr) => {{
@@ -36,24 +26,40 @@ macro_rules! check_columns {
     }};
 }
 
-pub fn assess_score(sps: &Vec<ScoreProp>, schedule_prop: &ScheduleProp, schedule: &Schedule) -> Score {
+pub fn assess_score(
+    sps: &Vec<ScoreProp>,
+    schedule_prop: &ScheduleProp,
+    schedule: &Schedule,
+) -> Score {
     get_score_list(sps, schedule_prop, schedule).iter().sum()
 }
 
-pub fn show_score(sps: &Vec<ScoreProp>, schedule_prop: &ScheduleProp, schedule: &Schedule) -> String {
+pub fn show_score(
+    sps: &Vec<ScoreProp>,
+    schedule_prop: &ScheduleProp,
+    schedule: &Schedule,
+) -> String {
     let sl = get_score_list(sps, schedule_prop, schedule);
     let ss: Vec<String> = sps.iter().map(|x| x.to_string()).collect();
-    let zipped: Vec<String> = ss.iter().zip(sl.iter()).map(|(x,y)| x.to_string() + " : " + &y.to_string()).collect();
+    let zipped: Vec<String> = ss
+        .iter()
+        .zip(sl.iter())
+        .map(|(x, y)| x.to_string() + " : " + &y.to_string())
+        .collect();
     zipped.join("\n")
 }
 
-fn get_score_list(sps: &Vec<ScoreProp>, schedule_prop: &ScheduleProp, schedule: &Schedule) -> Vec<Score> {
-    sps.iter().map(|sp| get_score(schedule_prop, schedule, sp)).collect()
+fn get_score_list(
+    sps: &Vec<ScoreProp>,
+    schedule_prop: &ScheduleProp,
+    schedule: &Schedule,
+) -> Vec<Score> {
+    sps.iter()
+        .map(|sp| get_score(schedule_prop, schedule, sp))
+        .collect()
 }
 
-
 fn get_score(schedule_prop: &ScheduleProp, schedule: &Schedule, sp: &ScoreProp) -> Score {
-
     match sp {
         IAKpattern(p) => check_rows!(iak_pattern, schedule_prop, schedule, p),
         KIApattern(p) => check_rows!(kia_pattern, schedule_prop, schedule, p),
@@ -83,24 +89,14 @@ fn get_score(schedule_prop: &ScheduleProp, schedule: &Schedule, sp: &ScoreProp) 
         LeaderAbility(p) => check_columns!(leader_ability, schedule_prop, schedule, p),
         IAloneAbility(p) => check_columns!(i_alone_worker, schedule_prop, schedule, p),
         IAloneBeforeBath(p) => check_columns!(i_alone_before_furo, schedule_prop, schedule, p),
-        NStaffCountWithAbility(p) => check_columns!(n_staff_count_with_ability, schedule_prop, schedule, p),
+        NStaffCountWithAbility(p) => {
+            check_columns!(n_staff_count_with_ability, schedule_prop, schedule, p)
+        }
         NoSamePair3(p) => no_same_pair3(schedule_prop, schedule, p),
         NoSamePair2(p) => no_same_pair2(schedule_prop, schedule, p),
         NoUndef(p) => check_columns!(no_undef, schedule_prop, schedule, p),
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 // trie木を使って連続パターンを検出したい
 // まとめて実行できたら早いかも
@@ -109,7 +105,7 @@ fn get_score(schedule_prop: &ScheduleProp, schedule: &Schedule, sp: &ScoreProp) 
 fn iak_pattern(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
     let mut ans = 0.0;
     for i in 0..(schedule_prop.day_count - 1) {
-        ans += match (schedule[r][i], schedule[r][i+1]) {
+        ans += match (schedule[r][i], schedule[r][i + 1]) {
             (A, K) => 0.0,
             (A, Y) => 0.0,
             (A, _) => *s,
@@ -125,7 +121,7 @@ fn iak_pattern(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &
 fn kia_pattern(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
     let mut ans = 0.0;
     for i in 0..(schedule_prop.day_count - 1) {
-        ans += match (schedule[r][i], schedule[r][i+1]) {
+        ans += match (schedule[r][i], schedule[r][i + 1]) {
             (K, I) => *s,
             (Y, I) => *s,
             _ => 0.0,
@@ -137,7 +133,7 @@ fn kia_pattern(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &
 fn knia_pattern(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
     let mut ans = 0.0;
     for i in 0..(schedule_prop.day_count - 2) {
-        ans += match (schedule[r][i], schedule[r][i+1], schedule[r][i+2]) {
+        ans += match (schedule[r][i], schedule[r][i + 1], schedule[r][i + 2]) {
             (K, N, I) => *s,
             (K, O, I) => *s,
             (K, H, I) => *s,
@@ -150,7 +146,7 @@ fn knia_pattern(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: 
 fn nnia_pattern(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
     let mut ans = 0.0;
     for i in 0..(schedule_prop.day_count - 2) {
-        ans += match (schedule[r][i], schedule[r][i+1], schedule[r][i+2]) {
+        ans += match (schedule[r][i], schedule[r][i + 1], schedule[r][i + 2]) {
             (N, N, I) => *s,
             (N, O, I) => *s,
             (O, O, I) => *s,
@@ -165,7 +161,7 @@ fn nnia_pattern(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: 
 fn on_pattern(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
     let mut ans = 0.0;
     for i in 0..(schedule_prop.day_count - 1) {
-        ans += match (schedule[r][i], schedule[r][i+1]) {
+        ans += match (schedule[r][i], schedule[r][i + 1]) {
             (O, N) => *s,
             _ => 0.0,
         }
@@ -176,7 +172,7 @@ fn on_pattern(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &S
 fn nh_pattern(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
     let mut ans = 0.0;
     for i in 0..(schedule_prop.day_count - 1) {
-        ans += match (schedule[r][i], schedule[r][i+1]) {
+        ans += match (schedule[r][i], schedule[r][i + 1]) {
             (N, H) => *s,
             _ => 0.0,
         }
@@ -187,7 +183,7 @@ fn nh_pattern(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &S
 fn oh_pattern(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
     let mut ans = 0.0;
     for i in 0..(schedule_prop.day_count - 1) {
-        ans += match (schedule[r][i], schedule[r][i+1]) {
+        ans += match (schedule[r][i], schedule[r][i + 1]) {
             (O, H) => *s,
             _ => 0.0,
         }
@@ -195,12 +191,21 @@ fn oh_pattern(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &S
     ans
 }
 
-fn working_day_streak4(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, (s1, s2): &(Score, Score)) -> Score {
+fn working_day_streak4(
+    schedule_prop: &ScheduleProp,
+    schedule: &Schedule,
+    r: usize,
+    (s1, s2): &(Score, Score),
+) -> Score {
     let mut ans = 0.0;
     let working_shifts = [N, O, H, I];
     for i in 0..(schedule_prop.day_count - 3) {
-        if working_shifts.contains(&schedule[r][i]) && working_shifts.contains(&schedule[r][i+1]) && working_shifts.contains(&schedule[r][i+2]) && working_shifts.contains(&schedule[r][i+3]) {
-            if schedule[r][i+3] == I {
+        if working_shifts.contains(&schedule[r][i])
+            && working_shifts.contains(&schedule[r][i + 1])
+            && working_shifts.contains(&schedule[r][i + 2])
+            && working_shifts.contains(&schedule[r][i + 3])
+        {
+            if schedule[r][i + 3] == I {
                 ans += s1;
             } else {
                 ans += s2;
@@ -210,12 +215,22 @@ fn working_day_streak4(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usi
     ans
 }
 
-fn working_day_streak5(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, (s1, s2): &(Score, Score)) -> Score {
+fn working_day_streak5(
+    schedule_prop: &ScheduleProp,
+    schedule: &Schedule,
+    r: usize,
+    (s1, s2): &(Score, Score),
+) -> Score {
     let mut ans = 0.0;
     let working_shifts = [N, O, H, I];
     for i in 0..(schedule_prop.day_count - 4) {
-        if working_shifts.contains(&schedule[r][i]) && working_shifts.contains(&schedule[r][i+1]) && working_shifts.contains(&schedule[r][i+2]) && working_shifts.contains(&schedule[r][i+3]) && working_shifts.contains(&schedule[r][i+4]) {
-            if schedule[r][i+4] == I {
+        if working_shifts.contains(&schedule[r][i])
+            && working_shifts.contains(&schedule[r][i + 1])
+            && working_shifts.contains(&schedule[r][i + 2])
+            && working_shifts.contains(&schedule[r][i + 3])
+            && working_shifts.contains(&schedule[r][i + 4])
+        {
+            if schedule[r][i + 4] == I {
                 ans += s1;
             } else {
                 ans += s2;
@@ -225,12 +240,23 @@ fn working_day_streak5(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usi
     ans
 }
 
-fn working_day_streak6(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, (s1, s2): &(Score, Score)) -> Score {
+fn working_day_streak6(
+    schedule_prop: &ScheduleProp,
+    schedule: &Schedule,
+    r: usize,
+    (s1, s2): &(Score, Score),
+) -> Score {
     let mut ans = 0.0;
     let working_shifts = [N, O, H, I];
     for i in 0..(schedule_prop.day_count - 5) {
-        if working_shifts.contains(&schedule[r][i]) && working_shifts.contains(&schedule[r][i+1]) && working_shifts.contains(&schedule[r][i+2]) && working_shifts.contains(&schedule[r][i+3]) && working_shifts.contains(&schedule[r][i+4]) && working_shifts.contains(&schedule[r][i+5]) {
-            if schedule[r][i+5] == I {
+        if working_shifts.contains(&schedule[r][i])
+            && working_shifts.contains(&schedule[r][i + 1])
+            && working_shifts.contains(&schedule[r][i + 2])
+            && working_shifts.contains(&schedule[r][i + 3])
+            && working_shifts.contains(&schedule[r][i + 4])
+            && working_shifts.contains(&schedule[r][i + 5])
+        {
+            if schedule[r][i + 5] == I {
                 ans += s1;
             } else {
                 ans += s2;
@@ -243,7 +269,7 @@ fn working_day_streak6(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usi
 fn holiday_reward(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
     let mut ans = 0.0;
     for i in 0..(schedule_prop.day_count - 1) {
-        ans += match (schedule[r][i], schedule[r][i+1]) {
+        ans += match (schedule[r][i], schedule[r][i + 1]) {
             (K, K) => *s,
             (K, Y) => *s,
             (Y, K) => *s,
@@ -254,16 +280,22 @@ fn holiday_reward(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s
     -ans
 }
 
-fn need_2_holidays(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
+fn need_2_holidays(
+    schedule_prop: &ScheduleProp,
+    schedule: &Schedule,
+    r: usize,
+    s: &Score,
+) -> Score {
     let mut check = false;
     for i in 0..(schedule_prop.day_count - 1) {
-        check = check || match (schedule[r][i], schedule[r][i+1]) {
-            (K, K) => true,
-            (K, Y) => true,
-            (Y, K) => true,
-            (Y, Y) => true,
-            _ => false,
-        }
+        check = check
+            || match (schedule[r][i], schedule[r][i + 1]) {
+                (K, K) => true,
+                (K, Y) => true,
+                (Y, K) => true,
+                (Y, Y) => true,
+                _ => false,
+            }
     }
     if check {
         0.0
@@ -272,16 +304,22 @@ fn need_2_holidays(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, 
     }
 }
 
-fn need_2_holidays_no_buffer(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
+fn need_2_holidays_no_buffer(
+    schedule_prop: &ScheduleProp,
+    schedule: &Schedule,
+    r: usize,
+    s: &Score,
+) -> Score {
     let mut check = false;
     for i in schedule_prop.buffer..(schedule_prop.day_count - 1) {
-        check = check || match (schedule[r][i], schedule[r][i+1]) {
-            (K, K) => true,
-            (K, Y) => true,
-            (Y, K) => true,
-            (Y, Y) => true,
-            _ => false,
-        }
+        check = check
+            || match (schedule[r][i], schedule[r][i + 1]) {
+                (K, K) => true,
+                (K, Y) => true,
+                (Y, K) => true,
+                (Y, Y) => true,
+                _ => false,
+            }
     }
     if check {
         0.0
@@ -305,7 +343,12 @@ fn oh_balance(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &S
     a * a
 }
 
-fn shift_half_balance(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, (shift, s): &(Shift, Score)) -> Score {
+fn shift_half_balance(
+    schedule_prop: &ScheduleProp,
+    schedule: &Schedule,
+    r: usize,
+    (shift, s): &(Shift, Score),
+) -> Score {
     let mut cf: isize = 0;
     let mut cl: isize = 0;
     for i in schedule_prop.buffer..((schedule_prop.day_count - schedule_prop.buffer) / 2) {
@@ -325,7 +368,12 @@ fn shift_half_balance(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usiz
 
 /// 指定したシフトが月の前後どちらにあるほうが良いか設定する
 /// Scoreのフィールドが正なら前を優先、負なら後ろを優先
-fn shift_dir_priority(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, (shift, s): &(Shift, Score)) -> Score {
+fn shift_dir_priority(
+    schedule_prop: &ScheduleProp,
+    schedule: &Schedule,
+    r: usize,
+    (shift, s): &(Shift, Score),
+) -> Score {
     let mut ans: Score = 0.0;
     let mid = schedule_prop.buffer + ((schedule_prop.day_count - schedule_prop.buffer) / 2);
     for i in schedule_prop.buffer..schedule_prop.day_count {
@@ -388,18 +436,6 @@ fn h_day_count(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
 macro_rules! count_waku_column {
     ($shift:expr, $schedule_prop: expr, $schedule:expr, $c:expr) => {{
         let mut cnt: isize = 0;
@@ -420,7 +456,12 @@ fn i_staff_count(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usize, s:
     a * a
 }
 
-fn n_staff_count(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usize, (d,cnt_needed,s): &(DayState,isize,Score)) -> Score {
+fn n_staff_count(
+    schedule_prop: &ScheduleProp,
+    schedule: &Schedule,
+    c: usize,
+    (d, cnt_needed, s): &(DayState, isize, Score),
+) -> Score {
     if schedule_prop.days[c] == *d {
         let cnt = count_waku_column!(N, schedule_prop, schedule, c);
         let d = (cnt - cnt_needed).abs() as Score;
@@ -431,14 +472,24 @@ fn n_staff_count(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usize, (d
     }
 }
 
-fn o_staff_count(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usize, (cnt_needed, s): &(isize,Score)) -> Score {
+fn o_staff_count(
+    schedule_prop: &ScheduleProp,
+    schedule: &Schedule,
+    c: usize,
+    (cnt_needed, s): &(isize, Score),
+) -> Score {
     let cnt = count_waku_column!(O, schedule_prop, schedule, c);
     let d = (cnt - *cnt_needed).abs() as Score;
     let a = d * s;
     a * a
 }
 
-fn h_staff_count(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usize, (cnt_needed, s): &(isize,Score)) -> Score {
+fn h_staff_count(
+    schedule_prop: &ScheduleProp,
+    schedule: &Schedule,
+    c: usize,
+    (cnt_needed, s): &(isize, Score),
+) -> Score {
     let cnt = count_waku_column!(H, schedule_prop, schedule, c);
     let d = (cnt - *cnt_needed).abs() as Score;
     let a = d * s;
@@ -450,19 +501,26 @@ fn ng_pair(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usize, s: &Scor
     let mut ans = 0.0;
     for i in 0..schedule_prop.ng_list.len() {
         let (a, b) = schedule_prop.ng_list[i];
-        if (schedule[a-1][c] == I && schedule[b-1][c] == I) || (schedule[a-1][c] == A && schedule[b-1][c] == A) {
+        if (schedule[a - 1][c] == I && schedule[b - 1][c] == I)
+            || (schedule[a - 1][c] == A && schedule[b - 1][c] == A)
+        {
             ans += s;
         }
     }
     ans
 }
 
-fn leader_ability(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usize, (ab, s): &(isize,Score)) -> Score {
+fn leader_ability(
+    schedule_prop: &ScheduleProp,
+    schedule: &Schedule,
+    c: usize,
+    (ab, s): &(isize, Score),
+) -> Score {
     if matches!(schedule_prop.days[c], DayState::Holiday) {
         let mut a_cnt = 0;
         for r in 0..schedule_prop.staff_count {
             if (schedule[r][c] == N) && ((schedule_prop.staff_list[r].ability % ab) != 0) {
-                    a_cnt += 1;
+                a_cnt += 1;
             }
         }
         if a_cnt == 0 {
@@ -476,7 +534,12 @@ fn leader_ability(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usize, (
 }
 
 ///一人で夜勤が可能か
-fn i_alone_worker(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usize, (ab, s): &(isize,Score)) -> Score {
+fn i_alone_worker(
+    schedule_prop: &ScheduleProp,
+    schedule: &Schedule,
+    c: usize,
+    (ab, s): &(isize, Score),
+) -> Score {
     let mut i_cnt = 0;
     let mut a_cnt = 0;
     for r in 0..schedule_prop.staff_count {
@@ -494,12 +557,17 @@ fn i_alone_worker(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usize, (
     }
 }
 
-fn i_alone_before_furo(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usize, s: &Score) -> Score {
+fn i_alone_before_furo(
+    schedule_prop: &ScheduleProp,
+    schedule: &Schedule,
+    c: usize,
+    s: &Score,
+) -> Score {
     if schedule_prop.days[c - 1] == DayState::Bath {
         let mut i_cnt = 0;
         for r in 0..schedule_prop.staff_count {
             if schedule[r][c] == I {
-                    i_cnt += 1;
+                i_cnt += 1;
             }
         }
         if i_cnt <= 1 {
@@ -514,11 +582,16 @@ fn i_alone_before_furo(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usi
 
 /// 能力条件を満たすスタッフが指定した人数いない場合のペナルティを設定
 /// 部屋持ちとO,Hできる人をIAKで保持するために使用
-fn n_staff_count_with_ability(schedule_prop: &ScheduleProp, schedule: &Schedule, c: usize, (cnt_needed, ab, s): &(isize,isize,Score)) -> Score {
+fn n_staff_count_with_ability(
+    schedule_prop: &ScheduleProp,
+    schedule: &Schedule,
+    c: usize,
+    (cnt_needed, ab, s): &(isize, isize, Score),
+) -> Score {
     let mut a_cnt = 0;
     for r in 0..schedule_prop.staff_count {
         if (schedule[r][c] == N) && ((schedule_prop.staff_list[r].ability % ab) != 0) {
-                a_cnt += 1;
+            a_cnt += 1;
         }
     }
     let d = if *cnt_needed > a_cnt {

@@ -1,30 +1,21 @@
 //! config読み込みのモジュール
 
 mod common;
-mod type_reader;
 mod seed;
+mod type_reader;
 
-use type_reader::*;
 use common::*;
+use type_reader::*;
 
 use std::fs;
 
 use crate::kinmu_lib::types::{
-    ScheduleProp,
-    AnnealingConfig,
-    Shift,
-    Schedule,
-    ScheduleState,
-    ShiftState,
-    FillConfig,
+    AnnealingConfig, FillConfig, Schedule, ScheduleProp, ScheduleState, Shift, ShiftState,
 };
-
 
 type FilePath = String;
 
-
 pub fn load_main_config(path: &FilePath) -> Result<Vec<FilePath>, String> {
-
     let contents = read_contents(path)?;
 
     let ss = sep_by_fields(&contents);
@@ -37,7 +28,9 @@ pub fn load_main_config(path: &FilePath) -> Result<Vec<FilePath>, String> {
 }
 
 /// 勤務表で使う値を読み込む
-pub fn load_schedule_config(path: &str) -> Result<(ScheduleProp, Vec<FilePath>, FillConfig), String> {
+pub fn load_schedule_config(
+    path: &str,
+) -> Result<(ScheduleProp, Vec<FilePath>, FillConfig), String> {
     let contents = read_contents(path)?;
 
     let ss = sep_by_fields(&contents);
@@ -53,12 +46,37 @@ pub fn load_schedule_config(path: &str) -> Result<(ScheduleProp, Vec<FilePath>, 
     let schedule = read_schedule(&ss[6])?;
     let i_staff_count = read_isizes(&ss[7])?;
 
-    check_len(day_count - buffer, &i_staff_count, "夜勤の人数が日数分ありません", "夜勤の人数が日数分を超過しています")?;
-    check_len(staff_count, &staff_list, "職員リストが設定した職員数だけありません", "職員リストが設定した職員数を超過しています")?;
-    check_len(day_count, &days, "DayStateが設定した日数だけありません", "DayStateが設定した日数を超過しています")?;
-    check_len(staff_count, &schedule, "スケジュールが職員数分ありません", "スケージュールが職員数を超過しています")?;
+    check_len(
+        day_count - buffer,
+        &i_staff_count,
+        "夜勤の人数が日数分ありません",
+        "夜勤の人数が日数分を超過しています",
+    )?;
+    check_len(
+        staff_count,
+        &staff_list,
+        "職員リストが設定した職員数だけありません",
+        "職員リストが設定した職員数を超過しています",
+    )?;
+    check_len(
+        day_count,
+        &days,
+        "DayStateが設定した日数だけありません",
+        "DayStateが設定した日数を超過しています",
+    )?;
+    check_len(
+        staff_count,
+        &schedule,
+        "スケジュールが職員数分ありません",
+        "スケージュールが職員数を超過しています",
+    )?;
     for r in 0..staff_count {
-        check_len(day_count, &schedule[r], "スケジュールが日数分ありません", "スケージュールが日数を超過しています")?;
+        check_len(
+            day_count,
+            &schedule[r],
+            "スケジュールが日数分ありません",
+            "スケージュールが日数を超過しています",
+        )?;
     }
 
     let hp = ScheduleProp {
@@ -75,7 +93,7 @@ pub fn load_schedule_config(path: &str) -> Result<(ScheduleProp, Vec<FilePath>, 
     };
     let fs = ss[10].lines().map(|s| s.to_string()).collect();
     let fc = FillConfig {
-        name: ss[8].clone(), 
+        name: ss[8].clone(),
         rng: seed::gen_rng_from_seed(read_usize(&ss[9])?),
     };
 
@@ -106,7 +124,6 @@ pub fn load_annealing_config(path: &str) -> Result<AnnealingConfig, String> {
 
 /// ファイルを読み込んで文字列の行ごとの配列を返す関数
 fn read_contents(path: &str) -> Result<Vec<String>, String> {
-
     // ファイルの全文をStringとして読み込む
     let contents = fs::read_to_string(path).map_err(|e| e.to_string())?;
 
@@ -143,21 +160,24 @@ fn sep_by_fields(contents: &Vec<String>) -> Vec<String> {
     ss[1..].to_vec()
 }
 
-
-
 fn make_schedule_state(schedule: &Schedule, buffer: usize) -> ScheduleState {
     let mut ans: ScheduleState = Vec::new();
     for line in schedule {
-        ans.push(line.iter().enumerate().map(|(i, shift)|
-            if i < buffer {
-                ShiftState::Absolute
-            } else {
-                match shift {
-                    Shift::U => ShiftState::Random,
-                    _ => ShiftState::Absolute,
-                }
-            }
-        ).collect());
+        ans.push(
+            line.iter()
+                .enumerate()
+                .map(|(i, shift)| {
+                    if i < buffer {
+                        ShiftState::Absolute
+                    } else {
+                        match shift {
+                            Shift::U => ShiftState::Random,
+                            _ => ShiftState::Absolute,
+                        }
+                    }
+                })
+                .collect(),
+        );
     }
     ans
 }

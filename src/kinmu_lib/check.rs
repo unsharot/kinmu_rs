@@ -1,11 +1,6 @@
 //! 各段階が問題なく動いているか確認する関数のモジュール
 
-use super::types::{
-    ScheduleProp,
-    ShiftState,
-    Shift,
-    Schedule,
-};
+use super::types::{Schedule, ScheduleProp, Shift, ShiftState};
 
 /// すべてAbsoluteになっていないかチェック
 pub fn all_absolute(schedule_prop: &ScheduleProp) -> bool {
@@ -21,10 +16,9 @@ pub fn all_absolute(schedule_prop: &ScheduleProp) -> bool {
 
 /// IAKがすべて埋められているかチェック
 pub fn safe_iak(schedule_prop: &ScheduleProp) -> bool {
-
     for r in 0..schedule_prop.staff_count {
         for c in 0..(schedule_prop.day_count - 1) {
-            if match (schedule_prop.request[r][c], schedule_prop.request[r][c+1]) {
+            if match (schedule_prop.request[r][c], schedule_prop.request[r][c + 1]) {
                 (Shift::A, Shift::U) => true,
                 (Shift::A, _) => false,
                 (Shift::I, Shift::U) => true,

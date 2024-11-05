@@ -52,7 +52,7 @@ where
     E: FnMut(&M) -> S,
     T: FnMut(f32, f32, usize, usize) -> f32,
     P: FnMut(S, S, f32) -> f32,
-    R: Rng
+    R: Rng,
 {
     let mut best_model = initial_model.clone();
     let mut current_model = initial_model.clone();
