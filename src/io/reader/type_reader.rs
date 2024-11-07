@@ -1,19 +1,96 @@
-use crate::kinmu_lib::types::{DayState, Days, NGList, Schedule, ScoreProp, Shift, Staff, NG};
+use crate::kinmu_lib::types::{
+    Cond, DayAttributeName, DayState, Days, NGList, Schedule, Score, ScoreProp, Shift, Staff,
+    StaffAttributeName, NG,
+};
 
 use super::common::check_len;
 
-pub fn read_usize(text: &str) -> Result<usize, String> {
-    let ans: usize = text.parse::<usize>().map_err(|e| e.to_string())?;
-    Ok(ans)
+pub trait MyFromStr: Sized {
+    fn my_from_str(s: &str) -> Result<Self, String>;
 }
 
-// pub fn read_usizes(text: &str) -> Result<Vec<usize>, String> {
-//     text.split_whitespace().map(|x| x.parse::<usize>().map_err(|e| e.to_string())).collect()
-// }
+impl<T, U> MyFromStr for (T, U)
+where
+    T: MyFromStr,
+    U: MyFromStr,
+{
+    fn my_from_str(s: &str) -> Result<Self, String> {
+        let words: Vec<_> = s
+            .trim_matches(|c| c == '(' || c == ')')
+            .split(',')
+            .collect();
+        check_len(
+            2,
+            &words,
+            "Needs 2 fields, but not enough.",
+            "Needs 2 fields, but too much given.",
+        )?;
+        let t = T::my_from_str(words[0]).map_err(|e| e.to_string())?;
+        let u = U::my_from_str(words[1]).map_err(|e| e.to_string())?;
+        Ok((t, u))
+    }
+}
 
-pub fn read_isize(text: &str) -> Result<isize, String> {
-    let ans: isize = text.parse::<isize>().map_err(|e| e.to_string())?;
-    Ok(ans)
+impl<T, U, V> MyFromStr for (T, U, V)
+where
+    T: MyFromStr,
+    U: MyFromStr,
+    V: MyFromStr,
+{
+    fn my_from_str(s: &str) -> Result<Self, String> {
+        let words: Vec<_> = s
+            .trim_matches(|c| c == '(' || c == ')')
+            .split(',')
+            .collect();
+        check_len(
+            3,
+            &words,
+            "Needs 3 fields, but not enough.",
+            "Needs 3 fields, but too much given.",
+        )?;
+        let t = T::my_from_str(words[0]).map_err(|e| e.to_string())?;
+        let u = U::my_from_str(words[1]).map_err(|e| e.to_string())?;
+        let v = V::my_from_str(words[2]).map_err(|e| e.to_string())?;
+        Ok((t, u, v))
+    }
+}
+
+impl<T, U, V, W> MyFromStr for (T, U, V, W)
+where
+    T: MyFromStr,
+    U: MyFromStr,
+    V: MyFromStr,
+    W: MyFromStr,
+{
+    fn my_from_str(s: &str) -> Result<Self, String> {
+        let words: Vec<_> = s
+            .trim_matches(|c| c == '(' || c == ')')
+            .split(',')
+            .collect();
+        check_len(
+            4,
+            &words,
+            "Needs 4 fields, but not enough.",
+            "Needs 4 fields, but too much given.",
+        )?;
+        let t = T::my_from_str(words[0]).map_err(|e| e.to_string())?;
+        let u = U::my_from_str(words[1]).map_err(|e| e.to_string())?;
+        let v = V::my_from_str(words[2]).map_err(|e| e.to_string())?;
+        let w = W::my_from_str(words[3]).map_err(|e| e.to_string())?;
+        Ok((t, u, v, w))
+    }
+}
+
+impl MyFromStr for usize {
+    fn my_from_str(s: &str) -> Result<Self, String> {
+        Ok(s.parse::<usize>().map_err(|e| e.to_string())?)
+    }
+}
+
+impl MyFromStr for isize {
+    fn my_from_str(s: &str) -> Result<Self, String> {
+        Ok(s.parse::<isize>().map_err(|e| e.to_string())?)
+    }
 }
 
 pub fn read_isizes(text: &str) -> Result<Vec<isize>, String> {
@@ -22,74 +99,16 @@ pub fn read_isizes(text: &str) -> Result<Vec<isize>, String> {
         .collect()
 }
 
-pub fn read_float(text: &str) -> Result<f32, String> {
-    let ans: f32 = text.parse::<f32>().map_err(|e| e.to_string())?;
-    Ok(ans)
+impl MyFromStr for f32 {
+    fn my_from_str(s: &str) -> Result<Self, String> {
+        Ok(s.parse::<f32>().map_err(|e| e.to_string())?)
+    }
 }
 
-pub fn read_float_pair(text: &str) -> Result<(f32, f32), String> {
-    let words: Vec<_> = text
-        .trim_matches(|c| c == '(' || c == ')')
-        .split(',')
-        .collect();
-    check_len(
-        2,
-        &words,
-        "Needs 2 fields, but not enough.",
-        "Needs 2 fields, but too much given.",
-    )?;
-    let f1 = words[0].parse::<f32>().map_err(|e| e.to_string())?;
-    let f2 = words[1].parse::<f32>().map_err(|e| e.to_string())?;
-    Ok((f1, f2))
-}
-
-pub fn read_isize_float(text: &str) -> Result<(isize, f32), String> {
-    let words: Vec<_> = text
-        .trim_matches(|c| c == '(' || c == ')')
-        .split(',')
-        .collect();
-    check_len(
-        2,
-        &words,
-        "Needs 2 fields, but not enough.",
-        "Needs 2 fields, but too much given.",
-    )?;
-    let i = words[0].parse::<isize>().map_err(|e| e.to_string())?;
-    let f = words[1].parse::<f32>().map_err(|e| e.to_string())?;
-    Ok((i, f))
-}
-
-pub fn read_isize_isize_float(text: &str) -> Result<(isize, isize, f32), String> {
-    let words: Vec<_> = text
-        .trim_matches(|c| c == '(' || c == ')')
-        .split(',')
-        .collect();
-    check_len(
-        3,
-        &words,
-        "Needs 3 fields, but not enough.",
-        "Needs 3 fields, but too much given.",
-    )?;
-    let i1 = words[0].parse::<isize>().map_err(|e| e.to_string())?;
-    let i2 = words[1].parse::<isize>().map_err(|e| e.to_string())?;
-    let f = words[2].parse::<f32>().map_err(|e| e.to_string())?;
-    Ok((i1, i2, f))
-}
-
-pub fn read_shift_float(text: &str) -> Result<(Shift, f32), String> {
-    let words: Vec<_> = text
-        .trim_matches(|c| c == '(' || c == ')')
-        .split(',')
-        .collect();
-    check_len(
-        2,
-        &words,
-        "Needs 2 fields, but not enough.",
-        "Needs 2 fields, but too much given.",
-    )?;
-    let s = words[0].parse::<Shift>().map_err(|e| e.to_string())?;
-    let f = words[1].parse::<f32>().map_err(|e| e.to_string())?;
-    Ok((s, f))
+impl MyFromStr for Shift {
+    fn my_from_str(s: &str) -> Result<Self, String> {
+        Ok(s.parse::<Shift>().map_err(|e| e.to_string())?)
+    }
 }
 
 pub fn read_daystate_isize_float(text: &str) -> Result<(DayState, isize, f32), String> {
@@ -128,11 +147,11 @@ pub fn read_a_staff(text: &str) -> Result<Staff, String> {
     )?;
     let worker: Staff = Staff {
         name: words[5].clone(),
-        ability: read_isize(&words[0])?,
-        k_day_count: read_isize(&words[1])?,
-        i_day_count: read_isize(&words[2])?,
-        o_day_count: read_isize(&words[3])?,
-        h_day_count: read_isize(&words[4])?,
+        ability: <isize>::my_from_str(&words[0])?,
+        k_day_count: <isize>::my_from_str(&words[1])?,
+        i_day_count: <isize>::my_from_str(&words[2])?,
+        o_day_count: <isize>::my_from_str(&words[3])?,
+        h_day_count: <isize>::my_from_str(&words[4])?,
     };
     Ok(worker)
 }
@@ -154,8 +173,8 @@ pub fn read_ng(text: &str) -> Result<NG, String> {
         "Needs 2 fields, but not enough.",
         "Needs 2 fields, but too much given.",
     )?;
-    let id1 = read_usize(&words[0])?;
-    let id2 = read_usize(&words[1])?;
+    let id1 = <usize>::my_from_str(&words[0])?;
+    let id2 = <usize>::my_from_str(&words[1])?;
     Ok((id1, id2))
 }
 
@@ -167,8 +186,8 @@ pub fn read_temp(text: &str) -> Result<(f32, f32), String> {
         "Needs 2 fields, but not enough.",
         "Needs 2 fields, but too much given.",
     )?;
-    let id1 = read_float(&words[0])?;
-    let id2 = read_float(&words[1])?;
+    let id1 = <f32>::my_from_str(&words[0])?;
+    let id2 = <f32>::my_from_str(&words[1])?;
     Ok((id1, id2))
 }
 
@@ -192,6 +211,80 @@ pub fn read_schedule(text: &str) -> Result<Schedule, String> {
     Ok(ans)
 }
 
+impl MyFromStr for DayState {
+    fn my_from_str(s: &str) -> Result<Self, String> {
+        Ok(s.parse::<DayState>().map_err(|e| e.to_string())?)
+    }
+}
+
+impl MyFromStr for Cond {
+    fn my_from_str(s: &str) -> Result<Self, String> {
+        let words: Vec<&str> = s.split_whitespace().collect();
+        check_len(
+            2,
+            &words,
+            "Needs 2 fields, but not enough.",
+            "Needs 2 fields, but too much given.",
+        )?;
+        match (words[0], words[1]) {
+            ("Every", _) => Ok(Cond::Every),
+            ("Or", p) => Ok(Cond::Or(<(Box<Cond>, Box<Cond>)>::my_from_str(p)?)),
+            ("And", p) => Ok(Cond::And(<(Box<Cond>, Box<Cond>)>::my_from_str(p)?)),
+            ("Not", p) => Ok(Cond::Not(Box::new(<Cond>::my_from_str(p)?))),
+            ("DayExceptBuffer", _) => Ok(Cond::DayExceptBuffer),
+            ("DayInRange", p) => Ok(Cond::DayInRange(<(usize, usize)>::my_from_str(p)?)),
+            ("ParticularDayState", p) => Ok(Cond::ParticularDayState(<DayState>::my_from_str(p)?)),
+            ("BeforeDayState", p) => Ok(Cond::ParticularDayState(<DayState>::my_from_str(p)?)),
+            ("ParticularDay", p) => Ok(Cond::ParticularDay(<usize>::my_from_str(p)?)),
+            ("StaffInRange", p) => Ok(Cond::StaffInRange(<(usize, usize)>::my_from_str(p)?)),
+            ("StaffWithAbility", p) => Ok(Cond::StaffWithAbility(<isize>::my_from_str(p)?)),
+            ("ParticularStaff", p) => Ok(Cond::ParticularStaff(<usize>::my_from_str(p)?)),
+            (s, p) => Err(format!("Failed to parse Cond: {} {}", s, p)),
+        }
+    }
+}
+
+impl MyFromStr for Box<Cond> {
+    fn my_from_str(s: &str) -> Result<Self, String> {
+        let words: Vec<&str> = s.split_whitespace().collect();
+        check_len(
+            2,
+            &words,
+            "Needs 2 fields, but not enough.",
+            "Needs 2 fields, but too much given.",
+        )?;
+        match (words[0], words[1]) {
+            ("Every", _) => Ok(Box::new(Cond::Every)),
+            ("Or", p) => Ok(Box::new(Cond::Or(<(Box<Cond>, Box<Cond>)>::my_from_str(
+                p,
+            )?))),
+            ("And", p) => Ok(Box::new(Cond::And(<(Box<Cond>, Box<Cond>)>::my_from_str(
+                p,
+            )?))),
+            ("Not", p) => Ok(Box::new(Cond::Not(Box::new(<Cond>::my_from_str(p)?)))),
+            ("DayExceptBuffer", _) => Ok(Box::new(Cond::DayExceptBuffer)),
+            ("DayInRange", p) => Ok(Box::new(Cond::DayInRange(<(usize, usize)>::my_from_str(
+                p,
+            )?))),
+            ("ParticularDayState", p) => Ok(Box::new(Cond::ParticularDayState(
+                <DayState>::my_from_str(p)?,
+            ))),
+            ("BeforeDayState", p) => Ok(Box::new(Cond::ParticularDayState(
+                <DayState>::my_from_str(p)?,
+            ))),
+            ("ParticularDay", p) => Ok(Box::new(Cond::ParticularDay(<usize>::my_from_str(p)?))),
+            ("StaffInRange", p) => Ok(Box::new(Cond::StaffInRange(<(usize, usize)>::my_from_str(
+                p,
+            )?))),
+            ("StaffWithAbility", p) => {
+                Ok(Box::new(Cond::StaffWithAbility(<isize>::my_from_str(p)?)))
+            }
+            ("ParticularStaff", p) => Ok(Box::new(Cond::ParticularStaff(<usize>::my_from_str(p)?))),
+            (s, p) => Err(format!("Failed to parse Box<Cond>: {} {}", s, p)),
+        }
+    }
+}
+
 pub fn read_score_props(text: &str) -> Result<Vec<ScoreProp>, String> {
     let mut ans: Vec<ScoreProp> = Vec::new();
     for line in text.lines() {
@@ -209,40 +302,40 @@ pub fn read_score_prop(text: &str) -> Result<ScoreProp, String> {
         "Needs 2 fields, but too much given.",
     )?;
     match (words[0], words[1]) {
-        ("IAKpattern", p) => Ok(ScoreProp::IAKpattern(read_float(p)?)),
-        ("KIApattern", p) => Ok(ScoreProp::KIApattern(read_float(p)?)),
-        ("KNIApattern", p) => Ok(ScoreProp::KNIApattern(read_float(p)?)),
-        ("NNIApattern", p) => Ok(ScoreProp::NNIApattern(read_float(p)?)),
-        ("ONpattern", p) => Ok(ScoreProp::ONpattern(read_float(p)?)),
-        ("NHpattern", p) => Ok(ScoreProp::NHpattern(read_float(p)?)),
-        ("OHpattern", p) => Ok(ScoreProp::OHpattern(read_float(p)?)),
-        ("WorkingDayStreak4", p) => Ok(ScoreProp::WorkingDayStreak4(read_float_pair(p)?)),
-        ("WorkingDayStreak5", p) => Ok(ScoreProp::WorkingDayStreak5(read_float_pair(p)?)),
-        ("WorkingDayStreak6", p) => Ok(ScoreProp::WorkingDayStreak6(read_float_pair(p)?)),
-        ("HolidayReward", p) => Ok(ScoreProp::HolidayReward(read_float(p)?)),
-        ("Need2Holidays", p) => Ok(ScoreProp::Need2Holidays(read_float(p)?)),
-        ("Need2HolidaysNoBf", p) => Ok(ScoreProp::Need2HolidaysNoBf(read_float(p)?)),
-        ("OHBalance", p) => Ok(ScoreProp::OHBalance(read_float(p)?)),
-        ("ShiftHalfBalance", p) => Ok(ScoreProp::ShiftHalfBalance(read_shift_float(p)?)),
-        ("ShiftDirPriority", p) => Ok(ScoreProp::ShiftDirPriority(read_shift_float(p)?)),
-        ("KDayCount", p) => Ok(ScoreProp::KDayCount(read_float(p)?)),
-        ("IDayCount", p) => Ok(ScoreProp::IDayCount(read_float(p)?)),
-        ("ODayCount", p) => Ok(ScoreProp::ODayCount(read_float(p)?)),
-        ("HDayCount", p) => Ok(ScoreProp::HDayCount(read_float(p)?)),
-        ("IStaffCount", p) => Ok(ScoreProp::IStaffCount(read_float(p)?)),
-        ("NStaffCount", p) => Ok(ScoreProp::NStaffCount(read_daystate_isize_float(p)?)),
-        ("OStaffCount", p) => Ok(ScoreProp::OStaffCount(read_isize_float(p)?)),
-        ("HStaffCount", p) => Ok(ScoreProp::HStaffCount(read_isize_float(p)?)),
-        ("NGPair", p) => Ok(ScoreProp::NGPair(read_float(p)?)),
-        ("LeaderAbility", p) => Ok(ScoreProp::LeaderAbility(read_isize_float(p)?)),
-        ("IAloneAbility", p) => Ok(ScoreProp::IAloneAbility(read_isize_float(p)?)),
-        ("IAloneBeforeBath", p) => Ok(ScoreProp::IAloneBeforeBath(read_float(p)?)),
-        ("NStaffCountWithAbility", p) => Ok(ScoreProp::NStaffCountWithAbility(
-            read_isize_isize_float(p)?,
+        ("PatternInList", p) => Ok(ScoreProp::PatternInList(
+            <(Cond, Vec<Vec<Shift>>, Score)>::my_from_str(p)?,
         )),
-        ("NoSamePair3", p) => Ok(ScoreProp::NoSamePair3(read_float(p)?)),
-        ("NoSamePair2", p) => Ok(ScoreProp::NoSamePair2(read_float(p)?)),
-        ("NoUndef", p) => Ok(ScoreProp::NoUndef(read_float(p)?)),
+        ("Pattern", p) => Ok(ScoreProp::Pattern(
+            <(Cond, Vec<Shift>, Score)>::my_from_str(p)?,
+        )),
+        ("Streak", p) => Ok(ScoreProp::Streak(
+            <(Cond, Vec<Shift>, isize, Score)>::my_from_str(p)?,
+        )),
+        ("Need2Holidays", p) => Ok(ScoreProp::Need2Holidays(
+            <(Cond, Vec<Shift>, Score)>::my_from_str(p)?,
+        )),
+        ("ShiftsBalance", p) => Ok(ScoreProp::ShiftsBalance(
+            <(Cond, Shift, Shift, Score)>::my_from_str(p)?,
+        )),
+        ("ShiftHalfBalance", p) => Ok(ScoreProp::ShiftHalfBalance(
+            <(Cond, Shift, Score)>::my_from_str(p)?,
+        )),
+        ("ShiftDirPriority", p) => Ok(ScoreProp::ShiftDirPriority(
+            <(Cond, Shift, Score)>::my_from_str(p)?,
+        )),
+        ("DayCountRegardStaffAttribute", p) => Ok(ScoreProp::DayCountRegardStaffAttribute(
+            <(Cond, Shift, StaffAttributeName, Score)>::my_from_str(p)?,
+        )),
+        ("StaffCountRegardDayAttribute", p) => Ok(ScoreProp::StaffCountRegardDayAttribute(
+            <(Cond, Shift, DayAttributeName, Score)>::my_from_str(p)?,
+        )),
+        ("StaffCount", p) => Ok(ScoreProp::StaffCount(
+            <(Cond, Shift, isize, Score)>::my_from_str(p)?,
+        )),
+        ("NGPair", p) => Ok(ScoreProp::NGPair(<(Cond, Shift, Score)>::my_from_str(p)?)),
+        ("NoSamePair", p) => Ok(ScoreProp::NoSamePair(
+            <(Cond, isize, Shift, Score)>::my_from_str(p)?,
+        )),
         (s, p) => Err(format!("Failed to parse ScoreProp: {} {}", s, p)),
     }
 }
