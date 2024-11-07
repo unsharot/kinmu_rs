@@ -1,9 +1,9 @@
 //! 勤務表に使う型の宣言
 
 use rand::RngCore;
+use std::collections::HashMap;
 use std::fmt;
 use std::str::FromStr;
-use std::collections::HashMap;
 
 #[derive(Debug, Clone, PartialEq, Copy)]
 pub enum Shift {
@@ -124,87 +124,39 @@ pub type StaffAttributeName = String;
 pub type DayAttributeName = String;
 
 pub enum ScoreProp {
-    IAKpattern((Cond, Score)),
-    KIApattern((Cond, Score)),
-    KNIApattern((Cond, Score)),
-    NNIApattern((Cond, Score)),
-    ONpattern((Cond, Score)),
-    NHpattern((Cond, Score)),
-    OHpattern((Cond, Score)),
-    // WorkingDayStreak4((Score, Score)),
-    // WorkingDayStreak5((Score, Score)),
-    // WorkingDayStreak6((Score, Score)),
+    PatternInList((Cond, Vec<Vec<Shift>>, Score)),
+    Pattern((Cond, Vec<Shift>, Score)),
     Streak((Cond, Vec<Shift>, isize, Score)),
-    // HolidayReward((Cond, Score)),
     Need2Holidays((Cond, Vec<Shift>, Score)),
-    // Need2HolidaysNoBf((Cond, Score)),
-    // OHBalance(Score),
     ShiftsBalance((Cond, Shift, Shift, Score)),
     ShiftHalfBalance((Cond, Shift, Score)),
     ShiftDirPriority((Cond, Shift, Score)),
-    // KDayCount(Score),
-    // IDayCount(Score),
-    // ODayCount(Score),
-    // HDayCount(Score),
     DayCountRegardStaffAttribute((Cond, Shift, StaffAttributeName, Score)),
-    // IStaffCount(Score),
     StaffCountRegardDayAttribute((Cond, Shift, DayAttributeName, Score)),
-    // NStaffCount((DayState, isize, Score)),
-    // OStaffCount((isize, Score)),
-    // HStaffCount((isize, Score)),
     StaffCount((Cond, Shift, isize, Score)),
     NGPair((Cond, Shift, Score)),
-    // LeaderAbility((isize, Score)),
-    // IAloneAbility((isize, Score)),
-    // IAloneBeforeBath(Score),
-    // NStaffCountWithAbility((isize, isize, Score)),
-    // NoSamePair3(Score),
-    // NoSamePair2(Score),
     NoSamePair((Cond, isize, Shift, Score)),
-    // NoUndef(Score),
 }
 
 impl fmt::Display for ScoreProp {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let s = match self {
-            ScoreProp::IAKpattern(p) => format!("IAKpattern {:?}", p),
-            ScoreProp::KIApattern(p) => format!("KIApattern {:?}", p),
-            ScoreProp::KNIApattern(p) => format!("KNIApattern {:?}", p),
-            ScoreProp::NNIApattern(p) => format!("NNIApattern {:?}", p),
-            ScoreProp::ONpattern(p) => format!("ONpattern {:?}", p),
-            ScoreProp::NHpattern(p) => format!("NHpattern {:?}", p),
-            ScoreProp::OHpattern(p) => format!("OHpattern {:?}", p),
-            // ScoreProp::WorkingDayStreak4(p) => format!("WorkingDayStreak4 {:?}", p),
-            // ScoreProp::WorkingDayStreak5(p) => format!("WorkingDayStreak5 {:?}", p),
-            // ScoreProp::WorkingDayStreak6(p) => format!("WorkingDayStreak6 {:?}", p),
+            ScoreProp::PatternInList(p) => format!("PatternInList {:?}", p),
+            ScoreProp::Pattern(p) => format!("Pattern {:?}", p),
             ScoreProp::Streak(p) => format!("Streak {:?}", p),
-            // ScoreProp::HolidayReward(p) => format!("HolidayReward {:?}", p),
             ScoreProp::Need2Holidays(p) => format!("Need2Holidays {:?}", p),
-            // ScoreProp::Need2HolidaysNoBf(p) => format!("Need2HolidaysNoBf {:?}", p),
-            // ScoreProp::OHBalance(p) => format!("OHBalance {:?}", p),
             ScoreProp::ShiftsBalance(p) => format!("ShiftsBalance {:?}", p),
             ScoreProp::ShiftHalfBalance(p) => format!("ShiftHalfBalance {:?}", p),
             ScoreProp::ShiftDirPriority(p) => format!("ShiftDirPriority {:?}", p),
-            // ScoreProp::KDayCount(p) => format!("KDayCount {:?}", p),
-            // ScoreProp::IDayCount(p) => format!("IDayCount {:?}", p),
-            // ScoreProp::ODayCount(p) => format!("ODayCount {:?}", p),
-            // ScoreProp::HDayCount(p) => format!("HDayCount {:?}", p),
-            ScoreProp::DayCountRegardStaffAttribute(p) => format!("DayCountRegardStaffAttribute {:?}", p),
-            // ScoreProp::IStaffCount(p) => format!("IStaffCount {:?}", p),
-            ScoreProp::StaffCountRegardDayAttribute(p) => format!("StaffCountRegardDayAttribute {:?}", p),
-            // ScoreProp::NStaffCount(p) => format!("NStaffCount {:?}", p),
-            // ScoreProp::OStaffCount(p) => format!("OStaffCount {:?}", p),
-            // ScoreProp::HStaffCount(p) => format!("HStaffCount {:?}", p),
+            ScoreProp::DayCountRegardStaffAttribute(p) => {
+                format!("DayCountRegardStaffAttribute {:?}", p)
+            }
+            ScoreProp::StaffCountRegardDayAttribute(p) => {
+                format!("StaffCountRegardDayAttribute {:?}", p)
+            }
             ScoreProp::StaffCount(p) => format!("StaffCount {:?}", p),
             ScoreProp::NGPair(p) => format!("NGPair {:?}", p),
-            // ScoreProp::LeaderAbility(p) => format!("LeaderAbility {:?}", p),
-            // ScoreProp::IAloneAbility(p) => format!("IAloneAbility {:?}", p),
-            // ScoreProp::IAloneBeforeBath(p) => format!("IAloneBeforeBath {:?}", p),
-            // ScoreProp::NStaffCountWithAbility(p) => format!("NStaffCountWithAbility {:?}", p),
-            // ScoreProp::NoSamePair3(p) => format!("NoSamePair3 {:?}", p),
-            // ScoreProp::NoSamePair2(p) => format!("NoSamePair2 {:?}", p),
             ScoreProp::NoSamePair(p) => format!("NoSamePair {:?}", p),
-            // ScoreProp::NoUndef(p) => format!("NoUndef {:?}", p),
         };
         write!(f, "{}", s)
     }
@@ -236,13 +188,19 @@ impl Cond {
             Cond::And(cond1, cond2) => cond1.eval(r, c, sp) && cond2.eval(r, c, sp),
             Cond::Not(cond) => !cond.eval(r, c, sp),
             Cond::DayExceptBuffer => sp.buffer <= c,
-            Cond::DayInRange(day_start, day_end ) => *day_start <= c && c <= *day_end, // indexおかしいかも
+            Cond::DayInRange(day_start, day_end) => *day_start <= c && c <= *day_end, // indexおかしいかも
             Cond::ParticularDayState(ds) => sp.days[c] == *ds, // indexおかしいかも
-            Cond::BeforeDayState(ds) => if c == 0 { return false; } else { sp.days[c-1] == *ds },
+            Cond::BeforeDayState(ds) => {
+                if c == 0 {
+                    return false;
+                } else {
+                    sp.days[c - 1] == *ds
+                }
+            }
             Cond::ParticularDay(d) => *d == c,
             Cond::StaffInRange(staff_start, staff_end) => *staff_start <= r && r <= *staff_end, // indexおかしいかも
             Cond::StaffWithAbility(ability) => sp.staff_list[r].ability % ability != 0,
-            Cond::ParticularStaff(staff) => *staff == c // indexおかしいかも
+            Cond::ParticularStaff(staff) => *staff == c, // indexおかしいかも
         }
     }
 }

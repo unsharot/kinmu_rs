@@ -1,20 +1,10 @@
 //! 焼きなましで使う評価関数のモジュール
 
 use super::types::{
-    Schedule, ScheduleProp, Score, ScoreProp, ScoreProp::*, Shift, Shift::*, Cond, DayAttributeName, StaffAttributeName,
+    Cond, DayAttributeName, Schedule, ScheduleProp, Score, ScoreProp, Shift, StaffAttributeName,
 };
 
 use std::collections::HashMap;
-
-macro_rules! check_rows {
-    ($check:expr, $schedule_prop: expr, $schedule:expr, $p:expr) => {{
-        let mut sum = 0.0;
-        for r in 0..$schedule_prop.staff_count {
-            sum += $check($schedule_prop, $schedule, r, $p);
-        }
-        sum
-    }};
-}
 
 pub fn assess_score(
     sps: &Vec<ScoreProp>,
@@ -51,142 +41,86 @@ fn get_score_list(
 
 fn get_score(schedule_prop: &ScheduleProp, schedule: &Schedule, sp: &ScoreProp) -> Score {
     match sp {
-        IAKpattern(p) => check_rows!(iak_pattern, schedule_prop, schedule, p),
-        KIApattern(p) => check_rows!(kia_pattern, schedule_prop, schedule, p),
-        KNIApattern(p) => check_rows!(knia_pattern, schedule_prop, schedule, p),
-        NNIApattern(p) => check_rows!(nnia_pattern, schedule_prop, schedule, p),
-        ONpattern(p) => check_rows!(on_pattern, schedule_prop, schedule, p),
-        NHpattern(p) => check_rows!(nh_pattern, schedule_prop, schedule, p),
-        OHpattern(p) => check_rows!(oh_pattern, schedule_prop, schedule, p),
-        // WorkingDayStreak4(p) => check_rows!(working_day_streak4, schedule_prop, schedule, p),
-        // WorkingDayStreak5(p) => check_rows!(working_day_streak5, schedule_prop, schedule, p),
-        // WorkingDayStreak6(p) => check_rows!(working_day_streak6, schedule_prop, schedule, p),
-        Streak(p) => 0.0,
-        // HolidayReward(p) => check_rows!(holiday_reward, schedule_prop, schedule, p),
-        Need2Holidays(p) => need_2_holidays(schedule_prop, schedule, p),
-        // Need2HolidaysNoBf(p) => check_rows!(need_2_holidays_no_buffer, schedule_prop, schedule, p),
-        // OHBalance(p) => check_rows!(oh_balance, schedule_prop, schedule, p),
-        ShiftsBalance(p) => shifts_balance(schedule_prop, schedule, p),
-        ShiftHalfBalance(p) => shift_half_balance(schedule_prop, schedule, p),
-        ShiftDirPriority(p) => shift_dir_priority(schedule_prop, schedule, p),
-        // KDayCount(p) => check_rows!(k_day_count, schedule_prop, schedule, p),
-        // IDayCount(p) => check_rows!(i_day_count, schedule_prop, schedule, p),
-        // ODayCount(p) => check_rows!(o_day_count, schedule_prop, schedule, p),
-        // HDayCount(p) => check_rows!(h_day_count, schedule_prop, schedule, p),
-        DayCountRegardStaffAttribute(p) => day_count_regard_staff_attribute(schedule_prop, schedule, p),
-        // IStaffCount(p) => check_columns!(i_staff_count, schedule_prop, schedule, p),
-        StaffCountRegardDayAttribute(p) => staff_count_regard_day_attribute(schedule_prop, schedule, p),
-        // NStaffCount(p) => check_columns!(n_staff_count, schedule_prop, schedule, p),
-        // OStaffCount(p) => check_columns!(o_staff_count, schedule_prop, schedule, p),
-        // HStaffCount(p) => check_columns!(h_staff_count, schedule_prop, schedule, p),
-        StaffCount(p) => staff_count(schedule_prop, schedule, p),
-        NGPair(p) => ng_pair(schedule_prop, schedule, p),
-        // LeaderAbility(p) => check_columns!(leader_ability, schedule_prop, schedule, p),
-        // IAloneAbility(p) => check_columns!(i_alone_worker, schedule_prop, schedule, p),
-        // IAloneBeforeBath(p) => check_columns!(i_alone_before_furo, schedule_prop, schedule, p),
-        // NStaffCountWithAbility(p) => {
-        //     check_columns!(n_staff_count_with_ability, schedule_prop, schedule, p)
-        // }
-        // NoSamePair3(p) => no_same_pair3(schedule_prop, schedule, p),
-        // NoSamePair2(p) => no_same_pair2(schedule_prop, schedule, p),
-        NoSamePair(p) => no_same_pair(schedule_prop, schedule, p),
-        // NoUndef(p) => check_columns!(no_undef, schedule_prop, schedule, p),
-    }
-}
-
-// trie木を使って連続パターンを検出したい
-// まとめて実行できたら早いかも
-// 木は初回実行時に構築して保持する
-
-fn iak_pattern(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
-    let mut ans = 0.0;
-    for i in 0..(schedule_prop.day_count - 1) {
-        ans += match (schedule[r][i], schedule[r][i + 1]) {
-            (A, K) => 0.0,
-            (A, Y) => 0.0,
-            (A, _) => *s,
-            (I, A) => 0.0,
-            (I, _) => *s,
-            (_, A) => *s,
-            _ => 0.0,
+        ScoreProp::PatternInList(p) => pattern_in_list(schedule_prop, schedule, p),
+        ScoreProp::Pattern(p) => pattern(schedule_prop, schedule, p),
+        ScoreProp::Streak(p) => streak(schedule_prop, schedule, p),
+        ScoreProp::Need2Holidays(p) => need_2_holidays(schedule_prop, schedule, p),
+        ScoreProp::ShiftsBalance(p) => shifts_balance(schedule_prop, schedule, p),
+        ScoreProp::ShiftHalfBalance(p) => shift_half_balance(schedule_prop, schedule, p),
+        ScoreProp::ShiftDirPriority(p) => shift_dir_priority(schedule_prop, schedule, p),
+        ScoreProp::DayCountRegardStaffAttribute(p) => {
+            day_count_regard_staff_attribute(schedule_prop, schedule, p)
         }
-    }
-    ans
-}
-
-fn kia_pattern(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
-    let mut ans = 0.0;
-    for i in 0..(schedule_prop.day_count - 1) {
-        ans += match (schedule[r][i], schedule[r][i + 1]) {
-            (K, I) => *s,
-            (Y, I) => *s,
-            _ => 0.0,
+        ScoreProp::StaffCountRegardDayAttribute(p) => {
+            staff_count_regard_day_attribute(schedule_prop, schedule, p)
         }
+        ScoreProp::StaffCount(p) => staff_count(schedule_prop, schedule, p),
+        ScoreProp::NGPair(p) => ng_pair(schedule_prop, schedule, p),
+        ScoreProp::NoSamePair(p) => no_same_pair(schedule_prop, schedule, p),
     }
-    ans
 }
 
-fn knia_pattern(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
-    let mut ans = 0.0;
-    for i in 0..(schedule_prop.day_count - 2) {
-        ans += match (schedule[r][i], schedule[r][i + 1], schedule[r][i + 2]) {
-            (K, N, I) => *s,
-            (K, O, I) => *s,
-            (K, H, I) => *s,
-            _ => 0.0,
+/// 指定したシフトパターンが存在するか判定するスコア
+/// ただし、シフトパターンは複数候補を指定可能
+/// 配置がかぶる場合、うまく判定されない可能性あり
+fn pattern_in_list(
+    schedule_prop: &ScheduleProp,
+    schedule: &Schedule,
+    (cond, shift_pattern, score): &(Cond, Vec<Vec<Shift>>, Score),
+) -> Score {
+    let mut sum = 0.0;
+    for staff in 0..schedule_prop.staff_count {
+        let mut a = 0.0;
+        let mut accum = 0;
+        for day in 0..schedule_prop.day_count {
+            if cond.eval(staff, day, schedule_prop) {
+                if shift_pattern[accum].contains(&schedule[staff][day]) {
+                    accum += 1;
+                    if accum == shift_pattern.len() {
+                        accum = 0;
+                        a += score;
+                    }
+                } else {
+                    accum = 0;
+                }
+            }
         }
+        sum += a;
     }
-    ans
+    sum
 }
 
-fn nnia_pattern(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
-    let mut ans = 0.0;
-    for i in 0..(schedule_prop.day_count - 2) {
-        ans += match (schedule[r][i], schedule[r][i + 1], schedule[r][i + 2]) {
-            (N, N, I) => *s,
-            (N, O, I) => *s,
-            (O, O, I) => *s,
-            (H, H, I) => *s,
-            (H, N, I) => *s,
-            _ => 0.0,
+/// 指定したシフトパターンが存在するか判定するスコア
+/// 配置がかぶる場合、うまく判定されない可能性あり
+fn pattern(
+    schedule_prop: &ScheduleProp,
+    schedule: &Schedule,
+    (cond, shift_pattern, score): &(Cond, Vec<Shift>, Score),
+) -> Score {
+    let mut sum = 0.0;
+    for staff in 0..schedule_prop.staff_count {
+        let mut a = 0.0;
+        let mut accum = 0;
+        for day in 0..schedule_prop.day_count {
+            if cond.eval(staff, day, schedule_prop) {
+                if shift_pattern[accum] == schedule[staff][day] {
+                    accum += 1;
+                    if accum == shift_pattern.len() {
+                        accum = 0;
+                        a += score;
+                    }
+                } else {
+                    accum = 0;
+                }
+            }
         }
+        sum += a;
     }
-    -ans
+    sum
 }
 
-fn on_pattern(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
-    let mut ans = 0.0;
-    for i in 0..(schedule_prop.day_count - 1) {
-        ans += match (schedule[r][i], schedule[r][i + 1]) {
-            (O, N) => *s,
-            _ => 0.0,
-        }
-    }
-    ans
-}
-
-fn nh_pattern(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
-    let mut ans = 0.0;
-    for i in 0..(schedule_prop.day_count - 1) {
-        ans += match (schedule[r][i], schedule[r][i + 1]) {
-            (N, H) => *s,
-            _ => 0.0,
-        }
-    }
-    ans
-}
-
-fn oh_pattern(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize, s: &Score) -> Score {
-    let mut ans = 0.0;
-    for i in 0..(schedule_prop.day_count - 1) {
-        ans += match (schedule[r][i], schedule[r][i + 1]) {
-            (O, H) => *s,
-            _ => 0.0,
-        }
-    }
-    ans
-}
-
+/// 指定したシフトが指定回数連続して存在するか判定するスコア
+/// 指定回数+1回連続は1回分としてカウントされる
 fn streak(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
@@ -214,6 +148,7 @@ fn streak(
     sum
 }
 
+/// 休日として指定したシフトの2連休が月最低1回あるか判定するスコア
 fn need_2_holidays(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
@@ -243,6 +178,7 @@ fn need_2_holidays(
     sum
 }
 
+/// 指定した2つのシフト数がスタッフあたりでバランス良いか判定するスコア
 fn shifts_balance(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
@@ -269,6 +205,7 @@ fn shifts_balance(
     sum
 }
 
+/// 指定したシフトが月の前後でバランスよく配置されているかを判定するスコア
 fn shift_half_balance(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
@@ -336,6 +273,7 @@ fn shift_dir_priority(
     sum
 }
 
+/// 指定したシフトをStaffAttributeで指定した数入らなかった場合に発火するスコア
 fn day_count_regard_staff_attribute(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
@@ -357,10 +295,11 @@ fn day_count_regard_staff_attribute(
     sum
 }
 
+/// 指定したシフトがDayAttributeで指定した数いない場合に発火するスコア
 fn staff_count_regard_day_attribute(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
-    (cond, shift, attribute, score): &(Cond, Shift, DayAttributeName, Score)
+    (cond, shift, attribute, score): &(Cond, Shift, DayAttributeName, Score),
 ) -> Score {
     let mut sum = 0.0;
     for day in 0..schedule_prop.day_count {
@@ -378,10 +317,11 @@ fn staff_count_regard_day_attribute(
     sum
 }
 
+/// 指定したシフトが指定した数いない場合に発火するスコア
 fn staff_count(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
-    (cond, shift, count, score): &(Cond, Shift, isize, Score)
+    (cond, shift, count, score): &(Cond, Shift, isize, Score),
 ) -> Score {
     let mut sum = 0.0;
     for day in 0..schedule_prop.day_count {
@@ -398,12 +338,12 @@ fn staff_count(
     sum
 }
 
+/// NGリストにあるペアがともに指定したシフトなら発火するスコア
 fn ng_pair(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
     (cond, shift, score): &(Cond, Shift, Score),
 ) -> Score {
-    // NGリストにあるペアがIかどうか確認
     let mut sum = 0.0;
     for day in 0..schedule_prop.day_count {
         let mut a = 0.0;
@@ -412,7 +352,8 @@ fn ng_pair(
             if cond.eval(staff1, day, schedule_prop)
                 && cond.eval(staff2, day, schedule_prop)
                 && schedule[day][staff1] == *shift
-                && schedule[day][staff2] == *shift {
+                && schedule[day][staff2] == *shift
+            {
                 a += *score;
             }
         }
@@ -422,7 +363,11 @@ fn ng_pair(
 }
 
 /// 指定回数以上同じペアなら発火するスコア
-fn no_same_pair(schedule_prop: &ScheduleProp, schedule: &Schedule, (cond, pair_limit, shift, score): &(Cond, isize, Shift, Score)) -> Score {
+fn no_same_pair(
+    schedule_prop: &ScheduleProp,
+    schedule: &Schedule,
+    (cond, pair_limit, shift, score): &(Cond, isize, Shift, Score),
+) -> Score {
     let mut map: HashMap<Vec<usize>, isize> = HashMap::new();
     for day in 0..schedule_prop.day_count {
         let mut i_list: Vec<usize> = Vec::new();
