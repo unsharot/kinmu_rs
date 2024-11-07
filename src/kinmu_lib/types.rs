@@ -165,17 +165,17 @@ impl fmt::Display for ScoreProp {
 #[derive(Debug)]
 pub enum Cond {
     Every,
-    Or(Box<Cond>, Box<Cond>),
-    And(Box<Cond>, Box<Cond>),
+    Or((Box<Cond>, Box<Cond>)),
+    And((Box<Cond>, Box<Cond>)),
     Not(Box<Cond>),
 
     DayExceptBuffer,
-    DayInRange(usize, usize),
+    DayInRange((usize, usize)),
     ParticularDayState(DayState),
     BeforeDayState(DayState),
     ParticularDay(usize),
 
-    StaffInRange(usize, usize),
+    StaffInRange((usize, usize)),
     StaffWithAbility(isize),
     ParticularStaff(usize),
 }
@@ -184,11 +184,11 @@ impl Cond {
     pub fn eval(&self, r: usize, c: usize, sp: &ScheduleProp) -> bool {
         match self {
             Cond::Every => true,
-            Cond::Or(cond1, cond2) => cond1.eval(r, c, sp) || cond2.eval(r, c, sp),
-            Cond::And(cond1, cond2) => cond1.eval(r, c, sp) && cond2.eval(r, c, sp),
+            Cond::Or((cond1, cond2)) => cond1.eval(r, c, sp) || cond2.eval(r, c, sp),
+            Cond::And((cond1, cond2)) => cond1.eval(r, c, sp) && cond2.eval(r, c, sp),
             Cond::Not(cond) => !cond.eval(r, c, sp),
             Cond::DayExceptBuffer => sp.buffer <= c,
-            Cond::DayInRange(day_start, day_end) => *day_start <= c && c <= *day_end, // indexおかしいかも
+            Cond::DayInRange((day_start, day_end)) => *day_start <= c && c <= *day_end, // indexおかしいかも
             Cond::ParticularDayState(ds) => sp.days[c] == *ds, // indexおかしいかも
             Cond::BeforeDayState(ds) => {
                 if c == 0 {
@@ -198,7 +198,7 @@ impl Cond {
                 }
             }
             Cond::ParticularDay(d) => *d == c,
-            Cond::StaffInRange(staff_start, staff_end) => *staff_start <= r && r <= *staff_end, // indexおかしいかも
+            Cond::StaffInRange((staff_start, staff_end)) => *staff_start <= r && r <= *staff_end, // indexおかしいかも
             Cond::StaffWithAbility(ability) => sp.staff_list[r].ability % ability != 0,
             Cond::ParticularStaff(staff) => *staff == c, // indexおかしいかも
         }
