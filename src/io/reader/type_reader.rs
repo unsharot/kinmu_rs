@@ -117,15 +117,47 @@ impl FromConfig for Shift {
     }
 }
 
+/// Vecを読み込む
+/// 入れ子構造になったVecにも対応
+fn format_str_vec_to_words(s: &str) -> Result<Vec<&str>, String> {
+    let trimmed_s = s.trim();
+    if !trimmed_s.starts_with("[") {
+        return Err("\'[\' not found".to_string());
+    }
+    if !trimmed_s.ends_with("]") {
+        return Err("\']\' not found".to_string());
+    }
+    let bare_s = &trimmed_s[1..(trimmed_s.len() - 1)];
+    let mut words = Vec::new();
+    let mut bracket_flag = false;
+    let mut start_idx = 0;
+    let mut end_idx = 0;
+    for c in bare_s.chars() {
+        if !bracket_flag && c == ',' {
+            words.push(bare_s[start_idx..end_idx].trim());
+            start_idx = end_idx + 1;
+        }
+        if c == '[' {
+            bracket_flag = true;
+        }
+        if c == ']' {
+            bracket_flag = false;
+        }
+        end_idx += 1;
+    }
+    if !bare_s[start_idx..end_idx].trim().is_empty() {
+        words.push(bare_s[start_idx..end_idx].trim());
+    }
+    
+    Ok(words)
+}
+
 impl FromConfig for Vec<Shift> {
     fn from_config(s: &str) -> Result<Self, String> {
-        let words: Vec<_> = s
-            .trim_matches(|c| c == '[' || c == ']')
-            .split(',')
-            .collect();
+        let words = format_str_vec_to_words(s)?;
         let mut ans = Vec::new();
         for w in words {
-            ans.push(<Shift>::from_config(w)?)
+            ans.push(<Shift>::from_config(w)?);
         }
         Ok(ans)
     }
@@ -133,13 +165,10 @@ impl FromConfig for Vec<Shift> {
 
 impl FromConfig for Vec<Vec<Shift>> {
     fn from_config(s: &str) -> Result<Self, String> {
-        let words: Vec<_> = s
-            .trim_matches(|c| c == '[' || c == ']')
-            .split(',')
-            .collect();
+        let words = format_str_vec_to_words(s)?;
         let mut ans = Vec::new();
         for w in words {
-            ans.push(<Vec<Shift>>::from_config(w)?)
+            ans.push(<Vec<Shift>>::from_config(w)?);
         }
         Ok(ans)
     }
