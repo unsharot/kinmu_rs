@@ -41,8 +41,8 @@ fn get_score_list(
 
 fn get_score(schedule_prop: &ScheduleProp, schedule: &Schedule, sp: &ScoreProp) -> Score {
     match sp {
-        ScoreProp::PatternInList(p) => pattern_in_list(schedule_prop, schedule, p),
-        ScoreProp::Pattern(p) => pattern(schedule_prop, schedule, p),
+        ScoreProp::PatternGeneral(p) => pattern_general(schedule_prop, schedule, p),
+        ScoreProp::PatternFixed(p) => pattern_fixed(schedule_prop, schedule, p),
         ScoreProp::Streak(p) => streak(schedule_prop, schedule, p),
         ScoreProp::Need2Holidays(p) => need_2_holidays(schedule_prop, schedule, p),
         ScoreProp::ShiftsBalance(p) => shifts_balance(schedule_prop, schedule, p),
@@ -63,7 +63,7 @@ fn get_score(schedule_prop: &ScheduleProp, schedule: &Schedule, sp: &ScoreProp) 
 /// 指定したシフトパターンが存在するか判定するスコア
 /// ただし、シフトパターンは複数候補を指定可能
 /// 配置がかぶる場合、うまく判定されない可能性あり
-fn pattern_in_list(
+fn pattern_general(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
     (cond, shift_pattern, score): &(Cond, Vec<Vec<Shift>>, Score),
@@ -92,7 +92,7 @@ fn pattern_in_list(
 
 /// 指定したシフトパターンが存在するか判定するスコア
 /// 配置がかぶる場合、うまく判定されない可能性あり
-fn pattern(
+fn pattern_fixed(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
     (cond, shift_pattern, score): &(Cond, Vec<Shift>, Score),
