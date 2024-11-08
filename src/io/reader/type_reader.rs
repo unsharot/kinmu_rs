@@ -344,10 +344,10 @@ pub fn read_score_prop(text: &str) -> Result<ScoreProp, String> {
         "Needs 2 fields, but too much given.",
     )?;
     match (words[0], words[1]) {
-        ("PatternInList", p) => Ok(ScoreProp::PatternInList(
+        ("PatternGeneral", p) => Ok(ScoreProp::PatternGeneral(
             <(Cond, Vec<Vec<Shift>>, Score)>::my_from_str(p)?,
         )),
-        ("Pattern", p) => Ok(ScoreProp::Pattern(
+        ("PatternFixed", p) => Ok(ScoreProp::PatternFixed(
             <(Cond, Vec<Shift>, Score)>::my_from_str(p)?,
         )),
         ("Streak", p) => Ok(ScoreProp::Streak(
