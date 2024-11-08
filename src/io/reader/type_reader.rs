@@ -99,10 +99,15 @@ impl FromConfig for isize {
     }
 }
 
-pub fn read_isizes(text: &str) -> Result<Vec<isize>, String> {
-    text.split_whitespace()
-        .map(|x| x.parse::<isize>().map_err(|e| e.to_string()))
-        .collect()
+pub struct AttributeWrapper(pub Vec<isize>);
+
+impl FromConfig for AttributeWrapper {
+    fn from_config(s: &str) -> Result<Self, String> {
+        let attribute = s.split_whitespace()
+            .map(|x| x.parse::<isize>().map_err(|e| e.to_string()))
+            .collect::<Result<Vec<_>, String>>()?;
+        Ok(AttributeWrapper(attribute))
+    }
 }
 
 impl FromConfig for f32 {
@@ -199,87 +204,109 @@ mod test {
     }
 }
 
-pub fn read_staff_list(text: &str) -> Result<Vec<Staff>, String> {
-    let mut staff: Vec<Staff> = Vec::new();
-    for line in text.lines() {
-        let a_staff = read_a_staff(&line)?;
-        staff.push(a_staff);
-    }
-    Ok(staff)
-}
-
-pub fn read_a_staff(text: &str) -> Result<Staff, String> {
-    let words: Vec<String> = text.split_whitespace().map(|s| s.to_string()).collect();
-    check_len(
-        6,
-        &words,
-        "Needs 6 fields, but not enough.",
-        "Needs 6 fields, but too much given.",
-    )?;
-    let worker: Staff = Staff {
-        name: words[5].clone(),
-        ability: <isize>::from_config(&words[0])?,
-        k_day_count: <isize>::from_config(&words[1])?,
-        i_day_count: <isize>::from_config(&words[2])?,
-        o_day_count: <isize>::from_config(&words[3])?,
-        h_day_count: <isize>::from_config(&words[4])?,
-    };
-    Ok(worker)
-}
-
-pub fn read_ng_list(text: &str) -> Result<NGList, String> {
-    let mut ans: NGList = Vec::new();
-    for line in text.lines() {
-        let ng = read_ng(&line)?;
-        ans.push(ng);
-    }
-    Ok(ans)
-}
-
-pub fn read_ng(text: &str) -> Result<NG, String> {
-    let words: Vec<String> = text.split_whitespace().map(|s| s.to_string()).collect();
-    check_len(
-        2,
-        &words,
-        "Needs 2 fields, but not enough.",
-        "Needs 2 fields, but too much given.",
-    )?;
-    let id1 = <usize>::from_config(&words[0])?;
-    let id2 = <usize>::from_config(&words[1])?;
-    Ok((id1, id2))
-}
-
-pub fn read_temp(text: &str) -> Result<(f32, f32), String> {
-    let words: Vec<String> = text.split_whitespace().map(|s| s.to_string()).collect();
-    check_len(
-        2,
-        &words,
-        "Needs 2 fields, but not enough.",
-        "Needs 2 fields, but too much given.",
-    )?;
-    let id1 = <f32>::from_config(&words[0])?;
-    let id2 = <f32>::from_config(&words[1])?;
-    Ok((id1, id2))
-}
-
-pub fn read_days(text: &str) -> Result<Days, String> {
-    let mut ans: Days = Vec::new();
-    for c in text.chars() {
-        ans.push(c.to_string().parse::<DayState>()?);
-    }
-    Ok(ans)
-}
-
-pub fn read_schedule(text: &str) -> Result<Schedule, String> {
-    let mut ans: Schedule = Vec::new();
-    for line in text.lines() {
-        let mut row = Vec::new();
-        for c in line.chars() {
-            row.push(c.to_string().parse::<Shift>()?);
+impl FromConfig for Vec<Staff> {
+    fn from_config(s: &str) -> Result<Self, String> {
+        let mut staff: Vec<Staff> = Vec::new();
+        for line in s.lines() {
+            let a_staff = <Staff>::from_config(&line)?;
+            staff.push(a_staff);
         }
-        ans.push(row);
+        Ok(staff)
     }
-    Ok(ans)
+}
+
+impl FromConfig for Staff {
+    fn from_config(s: &str) -> Result<Self, String> {
+        let words: Vec<String> = s.split_whitespace().map(|s| s.to_string()).collect();
+        check_len(
+            6,
+            &words,
+            "Needs 6 fields, but not enough.",
+            "Needs 6 fields, but too much given.",
+        )?;
+        let worker: Staff = Staff {
+            name: words[5].clone(),
+            ability: <isize>::from_config(&words[0])?,
+            k_day_count: <isize>::from_config(&words[1])?,
+            i_day_count: <isize>::from_config(&words[2])?,
+            o_day_count: <isize>::from_config(&words[3])?,
+            h_day_count: <isize>::from_config(&words[4])?,
+        };
+        Ok(worker)
+    }
+}
+
+pub struct NGListWrapper(pub NGList);
+
+impl FromConfig for NGListWrapper {
+    fn from_config(s: &str) -> Result<Self, String> {
+        let mut ans: NGList = Vec::new();
+        for line in s.lines() {
+            let NGWrapper(ng) = <NGWrapper>::from_config(&line)?;
+            ans.push(ng);
+        }
+        Ok(NGListWrapper(ans))
+    }
+}
+
+struct NGWrapper(pub NG);
+
+impl FromConfig for NGWrapper {
+    fn from_config(s: &str) -> Result<Self, String> {
+        let words: Vec<String> = s.split_whitespace().map(|s| s.to_string()).collect();
+        check_len(
+            2,
+            &words,
+            "Needs 2 fields, but not enough.",
+            "Needs 2 fields, but too much given.",
+        )?;
+        let id1 = <usize>::from_config(&words[0])?;
+        let id2 = <usize>::from_config(&words[1])?;
+        Ok(NGWrapper((id1, id2)))
+    }
+}
+
+pub struct TempWrapper(pub f32, pub f32);
+
+impl FromConfig for TempWrapper {
+    fn from_config(s: &str) -> Result<Self, String> {
+        let words: Vec<String> = s.split_whitespace().map(|s| s.to_string()).collect();
+        check_len(
+            2,
+            &words,
+            "Needs 2 fields, but not enough.",
+            "Needs 2 fields, but too much given.",
+        )?;
+        let id1 = <f32>::from_config(&words[0])?;
+        let id2 = <f32>::from_config(&words[1])?;
+        Ok(TempWrapper(id1, id2))
+    }
+}
+
+impl FromConfig for Days {
+    fn from_config(s: &str) -> Result<Self, String> {
+        let mut ans: Days = Vec::new();
+        for c in s.chars() {
+            ans.push(c.to_string().parse::<DayState>()?);
+        }
+        Ok(ans)
+    }
+}
+
+pub struct ScheduleWrapper(pub Schedule);
+
+impl FromConfig for ScheduleWrapper {
+    fn from_config(s: &str) -> Result<Self, String> {
+        let mut ans: Schedule = Vec::new();
+        for line in s.lines() {
+            let mut row = Vec::new();
+            for c in line.chars() {
+                row.push(c.to_string().parse::<Shift>()?);
+            }
+            ans.push(row);
+        }
+        Ok(ScheduleWrapper(ans))
+    }
 }
 
 impl FromConfig for DayState {
@@ -356,57 +383,61 @@ impl FromConfig for Box<Cond> {
     }
 }
 
-pub fn read_score_props(text: &str) -> Result<Vec<ScoreProp>, String> {
-    let mut ans: Vec<ScoreProp> = Vec::new();
-    for line in text.lines() {
-        ans.push(read_score_prop(&line)?);
+impl FromConfig for ScoreProp {
+    fn from_config(s: &str) -> Result<Self, String> {
+        let words: Vec<&str> = s.split_whitespace().collect();
+        check_len(
+            2,
+            &words,
+            "Needs 2 fields, but not enough.",
+            "Needs 2 fields, but too much given.",
+        )?;
+        match (words[0], words[1]) {
+            ("PatternGeneral", p) => Ok(ScoreProp::PatternGeneral(
+                <(Cond, Vec<Vec<Shift>>, Score)>::from_config(p)?,
+            )),
+            ("PatternFixed", p) => Ok(ScoreProp::PatternFixed(
+                <(Cond, Vec<Shift>, Score)>::from_config(p)?,
+            )),
+            ("Streak", p) => Ok(ScoreProp::Streak(
+                <(Cond, Vec<Shift>, isize, Score)>::from_config(p)?,
+            )),
+            ("Need2Holidays", p) => Ok(ScoreProp::Need2Holidays(
+                <(Cond, Vec<Shift>, Score)>::from_config(p)?,
+            )),
+            ("ShiftsBalance", p) => Ok(ScoreProp::ShiftsBalance(
+                <(Cond, Shift, Shift, Score)>::from_config(p)?,
+            )),
+            ("ShiftHalfBalance", p) => Ok(ScoreProp::ShiftHalfBalance(
+                <(Cond, Shift, Score)>::from_config(p)?,
+            )),
+            ("ShiftDirPriority", p) => Ok(ScoreProp::ShiftDirPriority(
+                <(Cond, Shift, Score)>::from_config(p)?,
+            )),
+            ("DayCountRegardStaffAttribute", p) => Ok(ScoreProp::DayCountRegardStaffAttribute(
+                <(Cond, Shift, StaffAttributeName, Score)>::from_config(p)?,
+            )),
+            ("StaffCountRegardDayAttribute", p) => Ok(ScoreProp::StaffCountRegardDayAttribute(
+                <(Cond, Shift, DayAttributeName, Score)>::from_config(p)?,
+            )),
+            ("StaffCount", p) => Ok(ScoreProp::StaffCount(
+                <(Cond, Shift, isize, Score)>::from_config(p)?,
+            )),
+            ("NGPair", p) => Ok(ScoreProp::NGPair(<(Cond, Shift, Score)>::from_config(p)?)),
+            ("NoSamePair", p) => Ok(ScoreProp::NoSamePair(
+                <(Cond, isize, Shift, Score)>::from_config(p)?,
+            )),
+            (s, p) => Err(format!("Failed to parse ScoreProp: {} {}", s, p)),
+        }
     }
-    Ok(ans)
 }
 
-pub fn read_score_prop(text: &str) -> Result<ScoreProp, String> {
-    let words: Vec<&str> = text.split_whitespace().collect();
-    check_len(
-        2,
-        &words,
-        "Needs 2 fields, but not enough.",
-        "Needs 2 fields, but too much given.",
-    )?;
-    match (words[0], words[1]) {
-        ("PatternGeneral", p) => Ok(ScoreProp::PatternGeneral(
-            <(Cond, Vec<Vec<Shift>>, Score)>::from_config(p)?,
-        )),
-        ("PatternFixed", p) => Ok(ScoreProp::PatternFixed(
-            <(Cond, Vec<Shift>, Score)>::from_config(p)?,
-        )),
-        ("Streak", p) => Ok(ScoreProp::Streak(
-            <(Cond, Vec<Shift>, isize, Score)>::from_config(p)?,
-        )),
-        ("Need2Holidays", p) => Ok(ScoreProp::Need2Holidays(
-            <(Cond, Vec<Shift>, Score)>::from_config(p)?,
-        )),
-        ("ShiftsBalance", p) => Ok(ScoreProp::ShiftsBalance(
-            <(Cond, Shift, Shift, Score)>::from_config(p)?,
-        )),
-        ("ShiftHalfBalance", p) => Ok(ScoreProp::ShiftHalfBalance(
-            <(Cond, Shift, Score)>::from_config(p)?,
-        )),
-        ("ShiftDirPriority", p) => Ok(ScoreProp::ShiftDirPriority(
-            <(Cond, Shift, Score)>::from_config(p)?,
-        )),
-        ("DayCountRegardStaffAttribute", p) => Ok(ScoreProp::DayCountRegardStaffAttribute(
-            <(Cond, Shift, StaffAttributeName, Score)>::from_config(p)?,
-        )),
-        ("StaffCountRegardDayAttribute", p) => Ok(ScoreProp::StaffCountRegardDayAttribute(
-            <(Cond, Shift, DayAttributeName, Score)>::from_config(p)?,
-        )),
-        ("StaffCount", p) => Ok(ScoreProp::StaffCount(
-            <(Cond, Shift, isize, Score)>::from_config(p)?,
-        )),
-        ("NGPair", p) => Ok(ScoreProp::NGPair(<(Cond, Shift, Score)>::from_config(p)?)),
-        ("NoSamePair", p) => Ok(ScoreProp::NoSamePair(
-            <(Cond, isize, Shift, Score)>::from_config(p)?,
-        )),
-        (s, p) => Err(format!("Failed to parse ScoreProp: {} {}", s, p)),
+impl FromConfig for Vec<ScoreProp> {
+    fn from_config(s: &str) -> Result<Self, String> {
+        let mut ans: Vec<ScoreProp> = Vec::new();
+        for line in s.lines() {
+            ans.push(<ScoreProp>::from_config(&line)?);
+        }
+        Ok(ans)
     }
 }

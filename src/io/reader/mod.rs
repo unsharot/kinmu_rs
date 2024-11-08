@@ -11,7 +11,7 @@ use std::collections::HashMap;
 use std::fs;
 
 use crate::kinmu_lib::types::{
-    AnnealingConfig, FillConfig, Schedule, ScheduleProp, ScheduleState, Shift, ShiftState,
+    AnnealingConfig, FillConfig, Schedule, ScheduleProp, ScheduleState, ScoreProp, Shift, ShiftState, Days, Staff
 };
 
 type FilePath = String;
@@ -38,14 +38,14 @@ pub fn load_schedule_config(
 
     check_len(12, &ss, "項目が足りません", "項目が余分です")?;
 
-    let staff_list = read_staff_list(&ss[0])?;
-    let ng_list = read_ng_list(&ss[1])?;
+    let staff_list = <Vec<Staff>>::from_config(&ss[0])?;
+    let NGListWrapper(ng_list) = <NGListWrapper>::from_config(&ss[1])?;
     let staff_count = <usize>::from_config(&ss[2])?;
     let day_count = <usize>::from_config(&ss[3])?;
-    let days = read_days(&ss[4])?;
+    let days = <Days>::from_config(&ss[4])?;
     let buffer = <usize>::from_config(&ss[5])?;
-    let schedule = read_schedule(&ss[6])?;
-    let i_staff_count = read_isizes(&ss[7])?;
+    let ScheduleWrapper(schedule) = <ScheduleWrapper>::from_config(&ss[6])?;
+    let AttributeWrapper(i_staff_count) = <AttributeWrapper>::from_config(&ss[7])?;
 
     check_len(
         day_count - buffer,
@@ -92,7 +92,7 @@ pub fn load_schedule_config(
         i_staff_count: i_staff_count,
         day_attributes: HashMap::new(), // TODO: ちゃんと読み込む
         staff_attributes: HashMap::new(),
-        score_props: read_score_props(&ss[11])?,
+        score_props: <Vec<ScoreProp>>::from_config(&ss[11])?,
     };
     let fs = ss[10].lines().map(|s| s.to_string()).collect();
     let fc = FillConfig {
@@ -111,12 +111,12 @@ pub fn load_annealing_config(path: &str) -> Result<AnnealingConfig, String> {
 
     check_len(5, &ss, "項目が足りません", "項目が余分です")?;
 
-    let (tmax, tmin) = read_temp(&ss[4])?;
+    let TempWrapper(tmax, tmin) = <TempWrapper>::from_config(&ss[4])?;
 
     let ac = AnnealingConfig {
         step: <usize>::from_config(&ss[0])?,
         rng: seed::gen_rng_from_seed(<usize>::from_config(&ss[1])?),
-        score_props: read_score_props(&ss[2])?,
+        score_props: <Vec<ScoreProp>>::from_config(&ss[2])?,
         update_func: ss[3].clone(),
         max_temp: tmax,
         min_temp: tmin,
