@@ -7,6 +7,7 @@ mod type_reader;
 use common::*;
 use type_reader::*;
 
+use std::collections::HashMap;
 use std::fs;
 
 use crate::kinmu_lib::types::{
@@ -39,10 +40,10 @@ pub fn load_schedule_config(
 
     let staff_list = read_staff_list(&ss[0])?;
     let ng_list = read_ng_list(&ss[1])?;
-    let staff_count = read_usize(&ss[2])?;
-    let day_count = read_usize(&ss[3])?;
+    let staff_count = <usize>::my_from_str(&ss[2])?;
+    let day_count = <usize>::my_from_str(&ss[3])?;
     let days = read_days(&ss[4])?;
-    let buffer = read_usize(&ss[5])?;
+    let buffer = <usize>::my_from_str(&ss[5])?;
     let schedule = read_schedule(&ss[6])?;
     let i_staff_count = read_isizes(&ss[7])?;
 
@@ -89,12 +90,14 @@ pub fn load_schedule_config(
         request: schedule.clone(),
         schedule_st: make_schedule_state(&schedule, buffer),
         i_staff_count: i_staff_count,
+        day_attributes: HashMap::new(), // TODO: ちゃんと読み込む
+        staff_attributes: HashMap::new(),
         score_props: read_score_props(&ss[11])?,
     };
     let fs = ss[10].lines().map(|s| s.to_string()).collect();
     let fc = FillConfig {
         name: ss[8].clone(),
-        rng: seed::gen_rng_from_seed(read_usize(&ss[9])?),
+        rng: seed::gen_rng_from_seed(<usize>::my_from_str(&ss[9])?),
     };
 
     Ok((hp, fs, fc))
@@ -111,8 +114,8 @@ pub fn load_annealing_config(path: &str) -> Result<AnnealingConfig, String> {
     let (tmax, tmin) = read_temp(&ss[4])?;
 
     let ac = AnnealingConfig {
-        step: read_usize(&ss[0])?,
-        rng: seed::gen_rng_from_seed(read_usize(&ss[1])?),
+        step: <usize>::my_from_str(&ss[0])?,
+        rng: seed::gen_rng_from_seed(<usize>::my_from_str(&ss[1])?),
         score_props: read_score_props(&ss[2])?,
         update_func: ss[3].clone(),
         max_temp: tmax,

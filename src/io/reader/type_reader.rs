@@ -9,6 +9,12 @@ pub trait MyFromStr: Sized {
     fn my_from_str(s: &str) -> Result<Self, String>;
 }
 
+impl MyFromStr for String {
+    fn my_from_str(s: &str) -> Result<Self, String> {
+        Ok(s.to_string())
+    }
+}
+
 impl<T, U> MyFromStr for (T, U)
 where
     T: MyFromStr,
@@ -111,21 +117,57 @@ impl MyFromStr for Shift {
     }
 }
 
-pub fn read_daystate_isize_float(text: &str) -> Result<(DayState, isize, f32), String> {
-    let words: Vec<_> = text
-        .trim_matches(|c| c == '(' || c == ')')
-        .split(',')
-        .collect();
-    check_len(
-        3,
-        &words,
-        "Needs 3 fields, but not enough.",
-        "Needs 3 fields, but too much given.",
-    )?;
-    let d = words[0].parse::<DayState>().map_err(|e| e.to_string())?;
-    let i = words[1].parse::<isize>().map_err(|e| e.to_string())?;
-    let f = words[2].parse::<f32>().map_err(|e| e.to_string())?;
-    Ok((d, i, f))
+impl MyFromStr for Vec<Shift> {
+    fn my_from_str(s: &str) -> Result<Self, String> {
+        let words: Vec<_> = s
+            .trim_matches(|c| c == '[' || c == ']')
+            .split(',')
+            .collect();
+        let mut ans = Vec::new();
+        for w in words {
+            ans.push(<Shift>::my_from_str(w)?)
+        }
+        Ok(ans)
+    }
+}
+
+impl MyFromStr for Vec<Vec<Shift>> {
+    fn my_from_str(s: &str) -> Result<Self, String> {
+        let words: Vec<_> = s
+            .trim_matches(|c| c == '[' || c == ']')
+            .split(',')
+            .collect();
+        let mut ans = Vec::new();
+        for w in words {
+            ans.push(<Vec<Shift>>::my_from_str(w)?)
+        }
+        Ok(ans)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test() {
+        let v1: Vec<Shift> = <Vec<Shift>>::my_from_str("[N, I, K]").unwrap();
+
+        assert_eq!(v1, vec![Shift::N, Shift::I, Shift::K]);
+    }
+
+    #[test]
+    fn test2() {
+        let v2 = <Vec<Vec<Shift>>>::my_from_str("[[N, I, K], [O, H, A]]").unwrap();
+
+        assert_eq!(
+            v2,
+            vec![
+                vec![Shift::N, Shift::I, Shift::K],
+                vec![Shift::O, Shift::H, Shift::A]
+            ]
+        );
+    }
 }
 
 pub fn read_staff_list(text: &str) -> Result<Vec<Staff>, String> {
