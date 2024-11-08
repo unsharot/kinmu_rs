@@ -11,7 +11,8 @@ use std::collections::HashMap;
 use std::fs;
 
 use crate::kinmu_lib::types::{
-    AnnealingConfig, FillConfig, Schedule, ScheduleProp, ScheduleState, ScoreProp, Shift, ShiftState, Days, Staff
+    AnnealingConfig, Days, FillConfig, Schedule, ScheduleProp, ScheduleState, ScoreProp, Shift,
+    ShiftState, Staff,
 };
 
 type FilePath = String;

@@ -123,6 +123,7 @@ pub type StaffAttributeName = String;
 
 pub type DayAttributeName = String;
 
+#[derive(Debug, PartialEq)]
 pub enum ScoreProp {
     PatternGeneral((Cond, Vec<Vec<Shift>>, Score)),
     PatternFixed((Cond, Vec<Shift>, Score)),
@@ -162,7 +163,7 @@ impl fmt::Display for ScoreProp {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Cond {
     Every,
     Or((Box<Cond>, Box<Cond>)),
