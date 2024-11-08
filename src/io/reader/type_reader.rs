@@ -15,16 +15,48 @@ impl FromConfig for String {
     }
 }
 
+/// タプルを読み込む
+/// Vecやタプルの複数の入れ子構造になったタプルにも対応
+fn format_str_tuple_to_words(s: &str) -> Result<Vec<&str>, String> {
+    let trimmed_s = s.trim();
+    if !trimmed_s.starts_with("(") {
+        return Err("\'(\' not found".to_string());
+    }
+    if !trimmed_s.ends_with(")") {
+        return Err("\')\' not found".to_string());
+    }
+    let bare_s = &trimmed_s[1..(trimmed_s.len() - 1)];
+    let mut words = Vec::new();
+    let mut bracket_count = 0;
+    let mut start_idx = 0;
+    let mut end_idx = 0;
+    for c in bare_s.chars() {
+        if bracket_count == 0 && c == ',' {
+            words.push(bare_s[start_idx..end_idx].trim());
+            start_idx = end_idx + 1;
+        }
+        if c == '(' || c == '[' {
+            bracket_count += 1;
+        }
+        if c == ')' || c == ']' {
+            bracket_count -= 1;
+        }
+        end_idx += 1;
+    }
+    if !bare_s[start_idx..end_idx].trim().is_empty() {
+        words.push(bare_s[start_idx..end_idx].trim());
+    }
+
+    Ok(words)
+}
+
 impl<T, U> FromConfig for (T, U)
 where
     T: FromConfig,
     U: FromConfig,
 {
     fn from_config(s: &str) -> Result<Self, String> {
-        let words: Vec<_> = s
-            .trim_matches(|c| c == '(' || c == ')')
-            .split(',')
-            .collect();
+        let words = format_str_tuple_to_words(s)?;
         check_len(
             2,
             &words,
@@ -44,10 +76,7 @@ where
     V: FromConfig,
 {
     fn from_config(s: &str) -> Result<Self, String> {
-        let words: Vec<_> = s
-            .trim_matches(|c| c == '(' || c == ')')
-            .split(',')
-            .collect();
+        let words = format_str_tuple_to_words(s)?;
         check_len(
             3,
             &words,
@@ -103,7 +132,8 @@ pub struct AttributeWrapper(pub Vec<isize>);
 
 impl FromConfig for AttributeWrapper {
     fn from_config(s: &str) -> Result<Self, String> {
-        let attribute = s.split_whitespace()
+        let attribute = s
+            .split_whitespace()
             .map(|x| x.parse::<isize>().map_err(|e| e.to_string()))
             .collect::<Result<Vec<_>, String>>()?;
         Ok(AttributeWrapper(attribute))
@@ -123,7 +153,7 @@ impl FromConfig for Shift {
 }
 
 /// Vecを読み込む
-/// 入れ子構造になったVecにも対応
+/// 2重入れ子構造になったVecにも対応
 fn format_str_vec_to_words(s: &str) -> Result<Vec<&str>, String> {
     let trimmed_s = s.trim();
     if !trimmed_s.starts_with("[") {
@@ -153,7 +183,7 @@ fn format_str_vec_to_words(s: &str) -> Result<Vec<&str>, String> {
     if !bare_s[start_idx..end_idx].trim().is_empty() {
         words.push(bare_s[start_idx..end_idx].trim());
     }
-    
+
     Ok(words)
 }
 
@@ -176,31 +206,6 @@ impl FromConfig for Vec<Vec<Shift>> {
             ans.push(<Vec<Shift>>::from_config(w)?);
         }
         Ok(ans)
-    }
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn test() {
-        let v1: Vec<Shift> = <Vec<Shift>>::from_config("[N, I, K]").unwrap();
-
-        assert_eq!(v1, vec![Shift::N, Shift::I, Shift::K]);
-    }
-
-    #[test]
-    fn test2() {
-        let v2 = <Vec<Vec<Shift>>>::from_config("[[N, I, K], [O, H, A]]").unwrap();
-
-        assert_eq!(
-            v2,
-            vec![
-                vec![Shift::N, Shift::I, Shift::K],
-                vec![Shift::O, Shift::H, Shift::A]
-            ]
-        );
     }
 }
 
@@ -385,7 +390,7 @@ impl FromConfig for Box<Cond> {
 
 impl FromConfig for ScoreProp {
     fn from_config(s: &str) -> Result<Self, String> {
-        let words: Vec<&str> = s.split_whitespace().collect();
+        let words: Vec<&str> = s.splitn(2, ' ').collect();
         check_len(
             2,
             &words,
@@ -439,5 +444,48 @@ impl FromConfig for Vec<ScoreProp> {
             ans.push(<ScoreProp>::from_config(&line)?);
         }
         Ok(ans)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn vec_shift_test() {
+        let v1: Vec<Shift> = <Vec<Shift>>::from_config("[N, I, K]").unwrap();
+
+        assert_eq!(v1, vec![Shift::N, Shift::I, Shift::K]);
+    }
+
+    #[test]
+    fn vec_vec_shift_test() {
+        let v2 = <Vec<Vec<Shift>>>::from_config("[[N, I, K], [O, H, A]]").unwrap();
+
+        assert_eq!(
+            v2,
+            vec![
+                vec![Shift::N, Shift::I, Shift::K],
+                vec![Shift::O, Shift::H, Shift::A]
+            ]
+        );
+    }
+
+    #[test]
+    fn score_prop_test() {
+        let s = "PatternGeneral (Every (), [[N,O,H], [O,H], [K, Y]], 123)";
+        println!("{:?}", ScoreProp::from_config(s).unwrap());
+        assert_eq!(
+            ScoreProp::PatternGeneral((
+                Cond::Every,
+                vec![
+                    vec![Shift::N, Shift::O, Shift::H],
+                    vec![Shift::O, Shift::H],
+                    vec![Shift::K, Shift::Y]
+                ],
+                123.0
+            )),
+            ScoreProp::from_config(s).unwrap()
+        );
     }
 }
