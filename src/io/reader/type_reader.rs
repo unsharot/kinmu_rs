@@ -5,20 +5,20 @@ use crate::kinmu_lib::types::{
 
 use super::common::check_len;
 
-pub trait MyFromStr: Sized {
+pub trait FromConfig: Sized {
     fn my_from_str(s: &str) -> Result<Self, String>;
 }
 
-impl MyFromStr for String {
+impl FromConfig for String {
     fn my_from_str(s: &str) -> Result<Self, String> {
         Ok(s.to_string())
     }
 }
 
-impl<T, U> MyFromStr for (T, U)
+impl<T, U> FromConfig for (T, U)
 where
-    T: MyFromStr,
-    U: MyFromStr,
+    T: FromConfig,
+    U: FromConfig,
 {
     fn my_from_str(s: &str) -> Result<Self, String> {
         let words: Vec<_> = s
@@ -37,11 +37,11 @@ where
     }
 }
 
-impl<T, U, V> MyFromStr for (T, U, V)
+impl<T, U, V> FromConfig for (T, U, V)
 where
-    T: MyFromStr,
-    U: MyFromStr,
-    V: MyFromStr,
+    T: FromConfig,
+    U: FromConfig,
+    V: FromConfig,
 {
     fn my_from_str(s: &str) -> Result<Self, String> {
         let words: Vec<_> = s
@@ -61,12 +61,12 @@ where
     }
 }
 
-impl<T, U, V, W> MyFromStr for (T, U, V, W)
+impl<T, U, V, W> FromConfig for (T, U, V, W)
 where
-    T: MyFromStr,
-    U: MyFromStr,
-    V: MyFromStr,
-    W: MyFromStr,
+    T: FromConfig,
+    U: FromConfig,
+    V: FromConfig,
+    W: FromConfig,
 {
     fn my_from_str(s: &str) -> Result<Self, String> {
         let words: Vec<_> = s
@@ -87,13 +87,13 @@ where
     }
 }
 
-impl MyFromStr for usize {
+impl FromConfig for usize {
     fn my_from_str(s: &str) -> Result<Self, String> {
         Ok(s.parse::<usize>().map_err(|e| e.to_string())?)
     }
 }
 
-impl MyFromStr for isize {
+impl FromConfig for isize {
     fn my_from_str(s: &str) -> Result<Self, String> {
         Ok(s.parse::<isize>().map_err(|e| e.to_string())?)
     }
@@ -105,19 +105,19 @@ pub fn read_isizes(text: &str) -> Result<Vec<isize>, String> {
         .collect()
 }
 
-impl MyFromStr for f32 {
+impl FromConfig for f32 {
     fn my_from_str(s: &str) -> Result<Self, String> {
         Ok(s.parse::<f32>().map_err(|e| e.to_string())?)
     }
 }
 
-impl MyFromStr for Shift {
+impl FromConfig for Shift {
     fn my_from_str(s: &str) -> Result<Self, String> {
         Ok(s.parse::<Shift>().map_err(|e| e.to_string())?)
     }
 }
 
-impl MyFromStr for Vec<Shift> {
+impl FromConfig for Vec<Shift> {
     fn my_from_str(s: &str) -> Result<Self, String> {
         let words: Vec<_> = s
             .trim_matches(|c| c == '[' || c == ']')
@@ -131,7 +131,7 @@ impl MyFromStr for Vec<Shift> {
     }
 }
 
-impl MyFromStr for Vec<Vec<Shift>> {
+impl FromConfig for Vec<Vec<Shift>> {
     fn my_from_str(s: &str) -> Result<Self, String> {
         let words: Vec<_> = s
             .trim_matches(|c| c == '[' || c == ']')
@@ -253,13 +253,13 @@ pub fn read_schedule(text: &str) -> Result<Schedule, String> {
     Ok(ans)
 }
 
-impl MyFromStr for DayState {
+impl FromConfig for DayState {
     fn my_from_str(s: &str) -> Result<Self, String> {
         Ok(s.parse::<DayState>().map_err(|e| e.to_string())?)
     }
 }
 
-impl MyFromStr for Cond {
+impl FromConfig for Cond {
     fn my_from_str(s: &str) -> Result<Self, String> {
         let words: Vec<&str> = s.split_whitespace().collect();
         check_len(
@@ -286,7 +286,7 @@ impl MyFromStr for Cond {
     }
 }
 
-impl MyFromStr for Box<Cond> {
+impl FromConfig for Box<Cond> {
     fn my_from_str(s: &str) -> Result<Self, String> {
         let words: Vec<&str> = s.split_whitespace().collect();
         check_len(
