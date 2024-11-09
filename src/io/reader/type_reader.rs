@@ -98,10 +98,7 @@ where
     W: FromConfig,
 {
     fn from_config(s: &str) -> Result<Self, String> {
-        let words: Vec<_> = s
-            .trim_matches(|c| c == '(' || c == ')')
-            .split(',')
-            .collect();
+        let words = format_str_tuple_to_words(s)?;
         check_len(
             4,
             &words,
