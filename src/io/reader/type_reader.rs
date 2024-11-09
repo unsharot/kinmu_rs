@@ -319,7 +319,7 @@ impl FromConfig for DayState {
 
 impl FromConfig for Cond {
     fn from_config(s: &str) -> Result<Self, String> {
-        let words: Vec<&str> = s.split_whitespace().collect();
+        let words: Vec<&str> = s.splitn(2, ' ').collect();
         check_len(
             2,
             &words,
@@ -346,7 +346,7 @@ impl FromConfig for Cond {
 
 impl FromConfig for Box<Cond> {
     fn from_config(s: &str) -> Result<Self, String> {
-        let words: Vec<&str> = s.split_whitespace().collect();
+        let words: Vec<&str> = s.splitn(2, ' ').collect();
         check_len(
             2,
             &words,
