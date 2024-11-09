@@ -351,8 +351,8 @@ fn ng_pair(
             let (staff1, staff2) = schedule_prop.ng_list[i];
             if cond.eval(staff1, day, schedule_prop)
                 && cond.eval(staff2, day, schedule_prop)
-                && schedule[day][staff1] == *shift
-                && schedule[day][staff2] == *shift
+                && schedule[staff1][day] == *shift
+                && schedule[staff2][day] == *shift
             {
                 a += *score;
             }
