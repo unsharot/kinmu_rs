@@ -213,7 +213,6 @@ pub struct ScheduleProp {
     pub buffer: usize,
     pub request: Schedule,
     pub schedule_st: ScheduleState,
-    // pub i_staff_count: Vec<isize>,
     pub day_attributes: HashMap<DayAttributeName, Vec<isize>>,
     pub staff_attribute_map: StaffAttributeNameIndexMap,
     pub score_props: Vec<ScoreProp>, // 結果表示のためのスコア
