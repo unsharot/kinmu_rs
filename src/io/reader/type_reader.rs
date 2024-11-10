@@ -1,9 +1,10 @@
 use crate::kinmu_lib::types::{
-    Cond, DayAttributeName, DayState, Days, NGList, Schedule, Score, ScoreProp, Shift, Staff,
-    StaffAttributeName, NG,
+    Cond, DayAttributeName, DayState, Days, NGList, Schedule, Score, ScoreProp, Shift, Staff, StaffAttributeName, StaffAttributeNameIndexMap, NG
 };
 
 use super::common::check_len;
+
+use std::collections::HashMap;
 
 pub trait FromConfig: Sized {
     fn from_config(s: &str) -> Result<Self, String>;
@@ -220,19 +221,21 @@ impl FromConfig for Vec<Staff> {
 impl FromConfig for Staff {
     fn from_config(s: &str) -> Result<Self, String> {
         let words: Vec<String> = s.split_whitespace().map(|s| s.to_string()).collect();
+        let l = words.len();
         check_len(
             6,
             &words,
             "Needs 6 fields, but not enough.",
             "Needs 6 fields, but too much given.",
         )?;
+        let mut attributes = Vec::new();
+        for i in 1..(l-1) {
+            attributes.push(<isize>::from_config(&words[i])?);
+        }
         let worker: Staff = Staff {
-            name: words[5].clone(),
+            name: words[l-1].clone(),
             ability: <isize>::from_config(&words[0])?,
-            k_day_count: <isize>::from_config(&words[1])?,
-            i_day_count: <isize>::from_config(&words[2])?,
-            o_day_count: <isize>::from_config(&words[3])?,
-            h_day_count: <isize>::from_config(&words[4])?,
+            attributes: attributes,
         };
         Ok(worker)
     }
@@ -441,6 +444,23 @@ impl FromConfig for Vec<ScoreProp> {
             ans.push(<ScoreProp>::from_config(&line)?);
         }
         Ok(ans)
+    }
+}
+
+pub struct StaffAttributeMapWrapper(pub StaffAttributeNameIndexMap);
+
+impl FromConfig for StaffAttributeMapWrapper {
+    fn from_config(s: &str) -> Result<Self, String> {
+        let names: Vec<String> = s.split_whitespace().map(|s| s.to_string()).collect();
+        let mut name_to_index = HashMap::new();
+        for (i, name) in names.iter().enumerate() {
+            name_to_index.insert(name.to_string(), i);
+        }
+        let sa_map = StaffAttributeNameIndexMap {
+            names: names,
+            name_to_index: name_to_index,
+        };
+        Ok(StaffAttributeMapWrapper(sa_map))
     }
 }
 

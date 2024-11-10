@@ -51,10 +51,10 @@ pub fn k_i_counts(schedule_prop: &ScheduleProp, schedule: &Schedule) -> bool {
     for r in 0..schedule_prop.staff_count {
         let k_cnt = count_waku_row!(Shift::K, schedule_prop, schedule, r);
         let i_cnt = count_waku_row!(Shift::I, schedule_prop, schedule, r);
-        if schedule_prop.staff_list[r].k_day_count != k_cnt {
+        if schedule_prop.get_attribute(r, &"KDayCount".to_string()) != k_cnt {
             return false;
         }
-        if schedule_prop.staff_list[r].i_day_count != i_cnt {
+        if schedule_prop.get_attribute(r, &"IDayCount".to_string()) != i_cnt {
             return false;
         }
     }

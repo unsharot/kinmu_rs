@@ -37,16 +37,17 @@ pub fn load_schedule_config(
 
     let ss = sep_by_fields(&contents);
 
-    check_len(12, &ss, "項目が足りません", "項目が余分です")?;
+    check_len(13, &ss, "項目が足りません", "項目が余分です")?;
 
-    let staff_list = <Vec<Staff>>::from_config(&ss[0])?;
-    let NGListWrapper(ng_list) = <NGListWrapper>::from_config(&ss[1])?;
-    let staff_count = <usize>::from_config(&ss[2])?;
-    let day_count = <usize>::from_config(&ss[3])?;
-    let days = <Days>::from_config(&ss[4])?;
-    let buffer = <usize>::from_config(&ss[5])?;
-    let ScheduleWrapper(schedule) = <ScheduleWrapper>::from_config(&ss[6])?;
-    let AttributeWrapper(i_staff_count) = <AttributeWrapper>::from_config(&ss[7])?;
+    let StaffAttributeMapWrapper(staff_attribute_name_index_map) = <StaffAttributeMapWrapper>::from_config(&ss[0])?;
+    let staff_list = <Vec<Staff>>::from_config(&ss[1])?;
+    let NGListWrapper(ng_list) = <NGListWrapper>::from_config(&ss[2])?;
+    let staff_count = <usize>::from_config(&ss[3])?;
+    let day_count = <usize>::from_config(&ss[4])?;
+    let days = <Days>::from_config(&ss[5])?;
+    let buffer = <usize>::from_config(&ss[6])?;
+    let ScheduleWrapper(schedule) = <ScheduleWrapper>::from_config(&ss[7])?;
+    let AttributeWrapper(i_staff_count) = <AttributeWrapper>::from_config(&ss[8])?;
 
     check_len(
         day_count - buffer,
@@ -92,13 +93,13 @@ pub fn load_schedule_config(
         schedule_st: make_schedule_state(&schedule, buffer),
         i_staff_count: i_staff_count,
         day_attributes: HashMap::new(), // TODO: ちゃんと読み込む
-        staff_attributes: HashMap::new(),
-        score_props: <Vec<ScoreProp>>::from_config(&ss[11])?,
+        staff_attribute_map: staff_attribute_name_index_map,
+        score_props: <Vec<ScoreProp>>::from_config(&ss[12])?,
     };
-    let fs = ss[10].lines().map(|s| s.to_string()).collect();
+    let fs = ss[11].lines().map(|s| s.to_string()).collect();
     let fc = FillConfig {
-        name: ss[8].clone(),
-        rng: seed::gen_rng_from_seed(<usize>::from_config(&ss[9])?),
+        name: ss[9].clone(),
+        rng: seed::gen_rng_from_seed(<usize>::from_config(&ss[10])?),
     };
 
     Ok((hp, fs, fc))
