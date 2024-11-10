@@ -287,7 +287,7 @@ fn day_count_regard_staff_attribute(
                 cnt += 1;
             }
         }
-        let cnt_needed = schedule_prop.staff_attributes[attribute][staff];
+        let cnt_needed = schedule_prop.get_attribute(staff, attribute);
         let d = (cnt - cnt_needed).abs() as Score;
         let a = d * score;
         sum += a * a;
@@ -309,7 +309,7 @@ fn staff_count_regard_day_attribute(
                 cnt += 1;
             }
         }
-        let cnt_needed = schedule_prop.day_attributes[attribute][day];
+        let cnt_needed = schedule_prop.day_attributes.get(attribute).unwrap()[day];
         let d = (cnt - cnt_needed).abs() as Score;
         let a = d * score;
         sum += a * a;

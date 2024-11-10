@@ -70,10 +70,7 @@ pub type ScheduleState = Vec<Vec<ShiftState>>;
 pub struct Staff {
     pub name: String,
     pub ability: isize,
-    pub k_day_count: isize,
-    pub i_day_count: isize,
-    pub o_day_count: isize,
-    pub h_day_count: isize,
+    pub attributes: Vec<isize>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -216,10 +213,22 @@ pub struct ScheduleProp {
     pub buffer: usize,
     pub request: Schedule,
     pub schedule_st: ScheduleState,
-    pub i_staff_count: Vec<isize>,
+    // pub i_staff_count: Vec<isize>,
     pub day_attributes: HashMap<DayAttributeName, Vec<isize>>,
-    pub staff_attributes: HashMap<StaffAttributeName, Vec<isize>>,
+    pub staff_attribute_map: StaffAttributeNameIndexMap,
     pub score_props: Vec<ScoreProp>, // 結果表示のためのスコア
+}
+
+impl ScheduleProp {
+    pub fn get_attribute(&self, staff: usize, attribute: &StaffAttributeName) -> isize {
+        let att_index = self.staff_attribute_map.name_to_index.get(attribute).unwrap();
+        self.staff_list[staff].attributes[*att_index]
+    }
+}
+
+pub struct StaffAttributeNameIndexMap {
+    pub names: Vec<StaffAttributeName>,
+    pub name_to_index: HashMap<StaffAttributeName, usize>,
 }
 
 pub struct FillConfig {
