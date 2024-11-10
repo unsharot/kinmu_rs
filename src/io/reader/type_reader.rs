@@ -126,15 +126,27 @@ impl FromConfig for isize {
     }
 }
 
-pub struct AttributeWrapper(pub Vec<isize>);
+pub struct DayAttributeWrapper(pub HashMap<DayAttributeName, Vec<isize>>);
 
-impl FromConfig for AttributeWrapper {
+impl FromConfig for DayAttributeWrapper {
     fn from_config(s: &str) -> Result<Self, String> {
-        let attribute = s
-            .split_whitespace()
-            .map(|x| x.parse::<isize>().map_err(|e| e.to_string()))
-            .collect::<Result<Vec<_>, String>>()?;
-        Ok(AttributeWrapper(attribute))
+        let mut ans = HashMap::new();
+        let mut name_flag = true;
+        let mut name = "".to_string();
+        for line in s.lines() {
+            if name_flag {
+                name = line.to_string();
+                name_flag = false;
+            } else {
+                let att: Vec<isize> = line
+                    .split_whitespace()
+                    .map(|x| x.parse::<isize>().map_err(|e| e.to_string()))
+                    .collect::<Result<Vec<_>, String>>()?;
+                ans.insert(name.clone(), att);
+                name_flag = true;
+            }
+        }
+        Ok(DayAttributeWrapper(ans))
     }
 }
 

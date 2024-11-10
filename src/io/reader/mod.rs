@@ -7,7 +7,6 @@ mod type_reader;
 use common::*;
 use type_reader::*;
 
-use std::collections::HashMap;
 use std::fs;
 
 use crate::kinmu_lib::types::{
@@ -47,14 +46,16 @@ pub fn load_schedule_config(
     let days = <Days>::from_config(&ss[5])?;
     let buffer = <usize>::from_config(&ss[6])?;
     let ScheduleWrapper(schedule) = <ScheduleWrapper>::from_config(&ss[7])?;
-    let AttributeWrapper(i_staff_count) = <AttributeWrapper>::from_config(&ss[8])?;
+    let DayAttributeWrapper(day_attributes) = <DayAttributeWrapper>::from_config(&ss[8])?;
 
-    check_len(
-        day_count - buffer,
-        &i_staff_count,
-        "夜勤の人数が日数分ありません",
-        "夜勤の人数が日数分を超過しています",
-    )?;
+    for attribute in day_attributes.clone().into_values() {
+        check_len(
+            day_count,
+            &attribute,
+            "DayAttributeが日数分ありません",
+            "DayAttributeが日数分を超過しています",
+        )?;
+    }
     check_len(
         staff_count,
         &staff_list,
@@ -91,8 +92,7 @@ pub fn load_schedule_config(
         buffer: buffer,
         request: schedule.clone(),
         schedule_st: make_schedule_state(&schedule, buffer),
-        i_staff_count: i_staff_count,
-        day_attributes: HashMap::new(), // TODO: ちゃんと読み込む
+        day_attributes: day_attributes,
         staff_attribute_map: staff_attribute_name_index_map,
         score_props: <Vec<ScoreProp>>::from_config(&ss[12])?,
     };
