@@ -1,5 +1,6 @@
 use crate::kinmu_lib::types::{
-    Cond, DayAttributeName, DayState, Days, NGList, Schedule, Score, ScoreProp, Shift, Staff, StaffAttributeName, StaffAttributeNameIndexMap, NG
+    Cond, CondWrapper, DayAttributeName, DayState, Days, NGList, Schedule, Score, ScoreProp, Shift,
+    Staff, StaffAttributeName, StaffAttributeNameIndexMap, NG,
 };
 
 use super::common::check_len;
@@ -241,11 +242,11 @@ impl FromConfig for Staff {
             "Needs 6 fields, but too much given.",
         )?;
         let mut attributes = Vec::new();
-        for i in 1..(l-1) {
+        for i in 1..(l - 1) {
             attributes.push(<isize>::from_config(&words[i])?);
         }
         let worker: Staff = Staff {
-            name: words[l-1].clone(),
+            name: words[l - 1].clone(),
             ability: <isize>::from_config(&words[0])?,
             attributes: attributes,
         };
@@ -400,6 +401,13 @@ impl FromConfig for Box<Cond> {
     }
 }
 
+impl FromConfig for CondWrapper {
+    fn from_config(s: &str) -> Result<Self, String> {
+        let cond = Cond::from_config(s)?;
+        Ok(CondWrapper::new(cond))
+    }
+}
+
 impl FromConfig for ScoreProp {
     fn from_config(s: &str) -> Result<Self, String> {
         let words: Vec<&str> = s.splitn(2, ' ').collect();
@@ -410,39 +418,50 @@ impl FromConfig for ScoreProp {
             "Needs 2 fields, but too much given.",
         )?;
         match (words[0], words[1]) {
-            ("PatternGeneral", p) => Ok(ScoreProp::PatternGeneral(
-                <(Cond, Vec<Vec<Shift>>, Score)>::from_config(p)?,
-            )),
+            ("PatternGeneral", p) => Ok(ScoreProp::PatternGeneral(<(
+                CondWrapper,
+                Vec<Vec<Shift>>,
+                Score,
+            )>::from_config(p)?)),
             ("PatternFixed", p) => Ok(ScoreProp::PatternFixed(
-                <(Cond, Vec<Shift>, Score)>::from_config(p)?,
+                <(CondWrapper, Vec<Shift>, Score)>::from_config(p)?,
             )),
             ("Streak", p) => Ok(ScoreProp::Streak(
-                <(Cond, Vec<Shift>, isize, Score)>::from_config(p)?,
+                <(CondWrapper, Vec<Shift>, isize, Score)>::from_config(p)?,
             )),
             ("Need2Holidays", p) => Ok(ScoreProp::Need2Holidays(
-                <(Cond, Vec<Shift>, Score)>::from_config(p)?,
+                <(CondWrapper, Vec<Shift>, Score)>::from_config(p)?,
             )),
-            ("ShiftsBalance", p) => Ok(ScoreProp::ShiftsBalance(
-                <(Cond, Shift, Shift, Score)>::from_config(p)?,
-            )),
-            ("ShiftHalfBalance", p) => Ok(ScoreProp::ShiftHalfBalance(
-                <(Cond, Shift, Score)>::from_config(p)?,
-            )),
-            ("ShiftDirPriority", p) => Ok(ScoreProp::ShiftDirPriority(
-                <(Cond, Shift, Score)>::from_config(p)?,
-            )),
+            ("ShiftsBalance", p) => Ok(ScoreProp::ShiftsBalance(<(
+                CondWrapper,
+                Shift,
+                Shift,
+                Score,
+            )>::from_config(p)?)),
+            ("ShiftHalfBalance", p) => {
+                Ok(ScoreProp::ShiftHalfBalance(
+                    <(CondWrapper, Shift, Score)>::from_config(p)?,
+                ))
+            }
+            ("ShiftDirPriority", p) => {
+                Ok(ScoreProp::ShiftDirPriority(
+                    <(CondWrapper, Shift, Score)>::from_config(p)?,
+                ))
+            }
             ("DayCountRegardStaffAttribute", p) => Ok(ScoreProp::DayCountRegardStaffAttribute(
-                <(Cond, Shift, StaffAttributeName, Score)>::from_config(p)?,
+                <(CondWrapper, Shift, StaffAttributeName, Score)>::from_config(p)?,
             )),
             ("StaffCountRegardDayAttribute", p) => Ok(ScoreProp::StaffCountRegardDayAttribute(
-                <(Cond, Shift, DayAttributeName, Score)>::from_config(p)?,
+                <(CondWrapper, Shift, DayAttributeName, Score)>::from_config(p)?,
             )),
             ("StaffCount", p) => Ok(ScoreProp::StaffCount(
-                <(Cond, Shift, isize, Score)>::from_config(p)?,
+                <(CondWrapper, Shift, isize, Score)>::from_config(p)?,
             )),
-            ("NGPair", p) => Ok(ScoreProp::NGPair(<(Cond, Shift, Score)>::from_config(p)?)),
+            ("NGPair", p) => Ok(ScoreProp::NGPair(
+                <(CondWrapper, Shift, Score)>::from_config(p)?,
+            )),
             ("NoSamePair", p) => Ok(ScoreProp::NoSamePair(
-                <(Cond, isize, Shift, Score)>::from_config(p)?,
+                <(CondWrapper, isize, Shift, Score)>::from_config(p)?,
             )),
             (s, p) => Err(format!("Failed to parse ScoreProp: {} {}", s, p)),
         }
@@ -506,7 +525,7 @@ mod test {
         println!("{:?}", ScoreProp::from_config(s).unwrap());
         assert_eq!(
             ScoreProp::PatternGeneral((
-                Cond::Every,
+                CondWrapper::new(Cond::Every),
                 vec![
                     vec![Shift::N, Shift::O, Shift::H],
                     vec![Shift::O, Shift::H],
