@@ -36,7 +36,7 @@ fn print_check(name: &str, b: bool) {
 }
 
 fn generate_schedule(p: &str) -> Result<(), String> {
-    let (schedule_prop, ac_paths, mut fc) = reader::load_schedule_config(p).map_err(|e| {
+    let (mut schedule_prop, ac_paths, mut fc) = reader::load_schedule_config(p).map_err(|e| {
         format!(
             "[エラー] 勤務表configの読み込みに失敗しました\n対象ファイル: {}\n理由: {}",
             p, e
@@ -58,7 +58,7 @@ fn generate_schedule(p: &str) -> Result<(), String> {
 
     let mut score;
     for ac_path in ac_paths {
-        let ac = reader::load_annealing_config(&ac_path).map_err(|e| {
+        let mut ac = reader::load_annealing_config(&ac_path).map_err(|e| {
             format!(
                 "[エラー] 焼きなましconfigの読み込みに失敗しました\n対象ファイル: {}\n理由: {}",
                 ac_path, e
@@ -67,13 +67,13 @@ fn generate_schedule(p: &str) -> Result<(), String> {
 
         let start = Instant::now();
         let mut rng = ac.rng;
-        score = score::assess_score(&ac.score_props, &schedule_prop, &model);
+        score = score::assess_score(&mut ac.score_props, &schedule_prop, &model);
         (score, model) = annealing::annealing(
             score,
             &model,
             ac.step,
             update::gen_update_func(&ac.update_func, &schedule_prop)?,
-            |m| score::assess_score(&ac.score_props, &schedule_prop, m),
+            |m| score::assess_score(&mut ac.score_props, &schedule_prop, m),
             // |_| 0.0,
             ac.max_temp,
             ac.min_temp,
@@ -94,7 +94,11 @@ fn generate_schedule(p: &str) -> Result<(), String> {
 
     println!();
 
-    score = score::assess_score(&schedule_prop.score_props, &schedule_prop, &model);
+    score = score::assess_score(
+        &mut schedule_prop.score_props.clone(),
+        &mut schedule_prop,
+        &model,
+    );
 
     println!("{}", score);
     // println!("{}", score::assess_score(&schedule_prop, &model));
@@ -104,7 +108,11 @@ fn generate_schedule(p: &str) -> Result<(), String> {
 
     println!(
         "{}",
-        score::show_score(&schedule_prop.score_props, &schedule_prop, &model)
+        score::show_score(
+            &mut schedule_prop.score_props.clone(),
+            &mut schedule_prop,
+            &model
+        )
     );
 
     println!();

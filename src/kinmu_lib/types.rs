@@ -73,7 +73,7 @@ pub struct Staff {
     pub attributes: Vec<isize>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum DayState {
     Weekday,
     Holiday,
@@ -120,20 +120,20 @@ pub type StaffAttributeName = String;
 
 pub type DayAttributeName = String;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum ScoreProp {
-    PatternGeneral((Cond, Vec<Vec<Shift>>, Score)),
-    PatternFixed((Cond, Vec<Shift>, Score)),
-    Streak((Cond, Vec<Shift>, isize, Score)),
-    Need2Holidays((Cond, Vec<Shift>, Score)),
-    ShiftsBalance((Cond, Shift, Shift, Score)),
-    ShiftHalfBalance((Cond, Shift, Score)),
-    ShiftDirPriority((Cond, Shift, Score)),
-    DayCountRegardStaffAttribute((Cond, Shift, StaffAttributeName, Score)),
-    StaffCountRegardDayAttribute((Cond, Shift, DayAttributeName, Score)),
-    StaffCount((Cond, Shift, isize, Score)),
-    NGPair((Cond, Shift, Score)),
-    NoSamePair((Cond, isize, Shift, Score)),
+    PatternGeneral((CondWrapper, Vec<Vec<Shift>>, Score)),
+    PatternFixed((CondWrapper, Vec<Shift>, Score)),
+    Streak((CondWrapper, Vec<Shift>, isize, Score)),
+    Need2Holidays((CondWrapper, Vec<Shift>, Score)),
+    ShiftsBalance((CondWrapper, Shift, Shift, Score)),
+    ShiftHalfBalance((CondWrapper, Shift, Score)),
+    ShiftDirPriority((CondWrapper, Shift, Score)),
+    DayCountRegardStaffAttribute((CondWrapper, Shift, StaffAttributeName, Score)),
+    StaffCountRegardDayAttribute((CondWrapper, Shift, DayAttributeName, Score)),
+    StaffCount((CondWrapper, Shift, isize, Score)),
+    NGPair((CondWrapper, Shift, Score)),
+    NoSamePair((CondWrapper, isize, Shift, Score)),
 }
 
 impl fmt::Display for ScoreProp {
@@ -160,7 +160,7 @@ impl fmt::Display for ScoreProp {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Cond {
     Every,
     Or((Box<Cond>, Box<Cond>)),
@@ -203,6 +203,43 @@ impl Cond {
     }
 }
 
+/// Condをメモ化して高速化するためのラッパー
+#[derive(PartialEq, Clone)]
+pub struct CondWrapper {
+    cond: Cond,
+    memo: Vec<Vec<Option<bool>>>,
+}
+
+impl CondWrapper {
+    pub fn new(cond: Cond) -> Self {
+        CondWrapper {
+            cond: cond,
+            memo: <Vec<Vec<Option<bool>>>>::new(),
+        }
+    }
+
+    /// SchedulePropが焼きなましの過程で変化しない制限の上で
+    pub fn eval(&mut self, r: usize, c: usize, sp: &ScheduleProp) -> bool {
+        if self.memo.is_empty() {
+            self.memo = vec![vec![None; sp.day_count]; sp.staff_count];
+        }
+        match self.memo[r][c] {
+            Some(ans) => ans,
+            None => {
+                let ans = self.cond.eval(r, c, sp);
+                self.memo[r][c] = Some(ans);
+                ans
+            }
+        }
+    }
+}
+
+impl fmt::Debug for CondWrapper {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:?}", self.cond)
+    }
+}
+
 /// 勤務表ごとの設定
 pub struct ScheduleProp {
     pub staff_list: Vec<Staff>,
@@ -220,7 +257,11 @@ pub struct ScheduleProp {
 
 impl ScheduleProp {
     pub fn get_attribute(&self, staff: usize, attribute: &StaffAttributeName) -> isize {
-        let att_index = self.staff_attribute_map.name_to_index.get(attribute).unwrap();
+        let att_index = self
+            .staff_attribute_map
+            .name_to_index
+            .get(attribute)
+            .unwrap();
         self.staff_list[staff].attributes[*att_index]
     }
 }

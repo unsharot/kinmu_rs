@@ -1,13 +1,14 @@
 //! 焼きなましで使う評価関数のモジュール
 
 use super::types::{
-    Cond, DayAttributeName, Schedule, ScheduleProp, Score, ScoreProp, Shift, StaffAttributeName,
+    CondWrapper, DayAttributeName, Schedule, ScheduleProp, Score, ScoreProp, Shift,
+    StaffAttributeName,
 };
 
 use std::collections::HashMap;
 
 pub fn assess_score(
-    sps: &Vec<ScoreProp>,
+    sps: &mut Vec<ScoreProp>,
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
 ) -> Score {
@@ -15,7 +16,7 @@ pub fn assess_score(
 }
 
 pub fn show_score(
-    sps: &Vec<ScoreProp>,
+    sps: &mut Vec<ScoreProp>,
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
 ) -> String {
@@ -30,16 +31,16 @@ pub fn show_score(
 }
 
 fn get_score_list(
-    sps: &Vec<ScoreProp>,
+    sps: &mut Vec<ScoreProp>,
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
 ) -> Vec<Score> {
-    sps.iter()
-        .map(|sp| get_score(schedule_prop, schedule, sp))
+    sps.iter_mut()
+        .map(|sp: &mut ScoreProp| get_score(schedule_prop, schedule, sp))
         .collect()
 }
 
-fn get_score(schedule_prop: &ScheduleProp, schedule: &Schedule, sp: &ScoreProp) -> Score {
+fn get_score(schedule_prop: &ScheduleProp, schedule: &Schedule, sp: &mut ScoreProp) -> Score {
     match sp {
         ScoreProp::PatternGeneral(p) => pattern_general(schedule_prop, schedule, p),
         ScoreProp::PatternFixed(p) => pattern_fixed(schedule_prop, schedule, p),
@@ -66,7 +67,7 @@ fn get_score(schedule_prop: &ScheduleProp, schedule: &Schedule, sp: &ScoreProp) 
 fn pattern_general(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
-    (cond, shift_pattern, score): &(Cond, Vec<Vec<Shift>>, Score),
+    (cond, shift_pattern, score): &mut (CondWrapper, Vec<Vec<Shift>>, Score),
 ) -> Score {
     let mut sum = 0.0;
     for staff in 0..schedule_prop.staff_count {
@@ -78,7 +79,7 @@ fn pattern_general(
                     accum += 1;
                     if accum == shift_pattern.len() {
                         accum = 0;
-                        a += score;
+                        a += *score;
                     }
                 } else {
                     accum = 0;
@@ -95,7 +96,7 @@ fn pattern_general(
 fn pattern_fixed(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
-    (cond, shift_pattern, score): &(Cond, Vec<Shift>, Score),
+    (cond, shift_pattern, score): &mut (CondWrapper, Vec<Shift>, Score),
 ) -> Score {
     let mut sum = 0.0;
     for staff in 0..schedule_prop.staff_count {
@@ -107,7 +108,7 @@ fn pattern_fixed(
                     accum += 1;
                     if accum == shift_pattern.len() {
                         accum = 0;
-                        a += score;
+                        a += *score;
                     }
                 } else {
                     accum = 0;
@@ -124,7 +125,7 @@ fn pattern_fixed(
 fn streak(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
-    (cond, target_shifts, streak_count, score): &(Cond, Vec<Shift>, isize, Score),
+    (cond, target_shifts, streak_count, score): &mut (CondWrapper, Vec<Shift>, isize, Score),
 ) -> Score {
     let mut sum = 0.0;
     for staff in 0..schedule_prop.staff_count {
@@ -152,7 +153,7 @@ fn streak(
 fn need_2_holidays(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
-    (cond, holidays, score): &(Cond, Vec<Shift>, Score),
+    (cond, holidays, score): &mut (CondWrapper, Vec<Shift>, Score),
 ) -> Score {
     let mut sum = 0.0;
     for staff in 0..schedule_prop.staff_count {
@@ -172,7 +173,7 @@ fn need_2_holidays(
             }
         }
         if !has_2_holidays {
-            sum += score;
+            sum += *score;
         }
     }
     sum
@@ -182,7 +183,7 @@ fn need_2_holidays(
 fn shifts_balance(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
-    (cond, shift1, shift2, score): &(Cond, Shift, Shift, Score),
+    (cond, shift1, shift2, score): &mut (CondWrapper, Shift, Shift, Score),
 ) -> Score {
     let mut sum = 0.0;
     for day in 0..schedule_prop.day_count {
@@ -199,7 +200,7 @@ fn shifts_balance(
             }
         }
         let d = (cnt1 - cnt2).abs() as Score;
-        let a = d * score;
+        let a = d * *score;
         sum += a * a;
     }
     sum
@@ -209,7 +210,7 @@ fn shifts_balance(
 fn shift_half_balance(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
-    (cond, shift, score): &(Cond, Shift, Score),
+    (cond, shift, score): &mut (CondWrapper, Shift, Score),
 ) -> Score {
     let mut sum = 0.0;
     for staff in 0..schedule_prop.staff_count {
@@ -236,7 +237,7 @@ fn shift_half_balance(
             }
         }
         let d = (cf - cl).abs() as Score;
-        let a = d * score;
+        let a = d * *score;
         sum += a * a;
     }
     sum
@@ -247,7 +248,7 @@ fn shift_half_balance(
 fn shift_dir_priority(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
-    (cond, shift, score): &(Cond, Shift, Score),
+    (cond, shift, score): &mut (CondWrapper, Shift, Score),
 ) -> Score {
     let mut sum = 0.0;
     for staff in 0..schedule_prop.staff_count {
@@ -265,7 +266,7 @@ fn shift_dir_priority(
         for day in 0..schedule_prop.day_count {
             if cond.eval(staff, day, schedule_prop) && schedule[staff][day] == *shift {
                 i += 1;
-                a += score * ((i as Score) - (mid as Score));
+                a += *score * ((i as Score) - (mid as Score));
             }
         }
         sum += a;
@@ -277,7 +278,7 @@ fn shift_dir_priority(
 fn day_count_regard_staff_attribute(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
-    (cond, shift, attribute, score): &(Cond, Shift, StaffAttributeName, Score),
+    (cond, shift, attribute, score): &mut (CondWrapper, Shift, StaffAttributeName, Score),
 ) -> Score {
     let mut sum = 0.0;
     for staff in 0..schedule_prop.staff_count {
@@ -289,7 +290,7 @@ fn day_count_regard_staff_attribute(
         }
         let cnt_needed = schedule_prop.get_attribute(staff, attribute);
         let d = (cnt - cnt_needed).abs() as Score;
-        let a = d * score;
+        let a = d * *score;
         sum += a * a;
     }
     sum
@@ -299,7 +300,7 @@ fn day_count_regard_staff_attribute(
 fn staff_count_regard_day_attribute(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
-    (cond, shift, attribute, score): &(Cond, Shift, DayAttributeName, Score),
+    (cond, shift, attribute, score): &mut (CondWrapper, Shift, DayAttributeName, Score),
 ) -> Score {
     let mut sum = 0.0;
     for day in 0..schedule_prop.day_count {
@@ -311,7 +312,7 @@ fn staff_count_regard_day_attribute(
         }
         let cnt_needed = schedule_prop.day_attributes.get(attribute).unwrap()[day];
         let d = (cnt - cnt_needed).abs() as Score;
-        let a = d * score;
+        let a = d * *score;
         sum += a * a;
     }
     sum
@@ -321,7 +322,7 @@ fn staff_count_regard_day_attribute(
 fn staff_count(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
-    (cond, shift, count, score): &(Cond, Shift, isize, Score),
+    (cond, shift, count, score): &mut (CondWrapper, Shift, isize, Score),
 ) -> Score {
     let mut sum = 0.0;
     for day in 0..schedule_prop.day_count {
@@ -332,7 +333,7 @@ fn staff_count(
             }
         }
         let d = (cnt - *count).abs() as Score;
-        let a = d * score;
+        let a = d * *score;
         sum += a * a;
     }
     sum
@@ -342,7 +343,7 @@ fn staff_count(
 fn ng_pair(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
-    (cond, shift, score): &(Cond, Shift, Score),
+    (cond, shift, score): &mut (CondWrapper, Shift, Score),
 ) -> Score {
     let mut sum = 0.0;
     for day in 0..schedule_prop.day_count {
@@ -366,7 +367,7 @@ fn ng_pair(
 fn no_same_pair(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
-    (cond, pair_limit, shift, score): &(Cond, isize, Shift, Score),
+    (cond, pair_limit, shift, score): &mut (CondWrapper, isize, Shift, Score),
 ) -> Score {
     let mut map: HashMap<Vec<usize>, isize> = HashMap::new();
     for day in 0..schedule_prop.day_count {
@@ -382,9 +383,9 @@ fn no_same_pair(
     }
     let mut ans = 0.0;
     for (_, cnt) in &map {
-        let a = *cnt - pair_limit + 1;
+        let a = *cnt - *pair_limit + 1;
         if a > 0 {
-            ans += (a as Score) * score
+            ans += (a as Score) * *score
         }
     }
     ans
