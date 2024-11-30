@@ -350,7 +350,7 @@ impl FromConfig for Cond {
             ("DayExceptBuffer", _) => Ok(Cond::DayExceptBuffer),
             ("DayInRange", p) => Ok(Cond::DayInRange(<(usize, usize)>::from_config(p)?)),
             ("ParticularDayState", p) => Ok(Cond::ParticularDayState(<DayState>::from_config(p)?)),
-            ("BeforeDayState", p) => Ok(Cond::ParticularDayState(<DayState>::from_config(p)?)),
+            ("BeforeDayState", p) => Ok(Cond::BeforeDayState(<DayState>::from_config(p)?)),
             ("ParticularDay", p) => Ok(Cond::ParticularDay(<usize>::from_config(p)?)),
             ("StaffInRange", p) => Ok(Cond::StaffInRange(<(usize, usize)>::from_config(p)?)),
             ("StaffWithAbility", p) => Ok(Cond::StaffWithAbility(<isize>::from_config(p)?)),
