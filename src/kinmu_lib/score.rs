@@ -412,20 +412,23 @@ fn no_same_pair(
     schedule: &Schedule,
     (cond, pair_limit, shift, score): &mut (CondWrapper, isize, Shift, Score),
 ) -> Score {
-    let mut map: HashMap<Vec<usize>, isize> = HashMap::new();
+    let mut pair_map: HashMap<Vec<usize>, isize> = HashMap::new();
     for day in 0..schedule_prop.day_count {
         let mut i_list: Vec<usize> = Vec::new();
         for staff in 0..schedule_prop.staff_count {
-            if cond.eval(staff, day, schedule_prop) && schedule[staff][day] == *shift {
-                i_list.push(staff);
+            if cond.eval(staff, day, schedule_prop) {
+                if schedule[staff][day] == *shift {
+                    i_list.push(staff);
+                }
             }
         }
-        if i_list.len() > 1 {
-            *map.entry(i_list).or_insert(0) += 1;
+        // ある日の夜勤の人数が2人以上ならペアのマップに加算
+        if i_list.len() >= 2 {
+            *pair_map.entry(i_list).or_insert(0) += 1;
         }
     }
     let mut ans = 0.0;
-    for (_, cnt) in &map {
+    for (_, cnt) in &pair_map {
         let a = *cnt - *pair_limit + 1;
         if a > 0 {
             ans += (a as Score) * *score
