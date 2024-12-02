@@ -132,6 +132,7 @@ pub enum ScoreProp {
     DayCountRegardStaffAttribute((CondWrapper, Shift, StaffAttributeName, Score)),
     StaffCountRegardDayAttribute((CondWrapper, Shift, DayAttributeName, Score)),
     StaffCount((CondWrapper, Shift, isize, Score)),
+    StaffCountWithPremise((CondWrapper, Shift, isize, CondWrapper, Shift, isize, Score)),
     NGPair((CondWrapper, Shift, Score)),
     NoSamePair((CondWrapper, isize, Shift, Score)),
 }
@@ -153,6 +154,7 @@ impl fmt::Display for ScoreProp {
                 format!("StaffCountRegardDayAttribute {:?}", p)
             }
             ScoreProp::StaffCount(p) => format!("StaffCount {:?}", p),
+            ScoreProp::StaffCountWithPremise(p) => format!("StaffCountWithPremise {:?}", p),
             ScoreProp::NGPair(p) => format!("NGPair {:?}", p),
             ScoreProp::NoSamePair(p) => format!("NoSamePair {:?}", p),
         };

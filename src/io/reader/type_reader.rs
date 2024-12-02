@@ -115,6 +115,35 @@ where
     }
 }
 
+impl<T, U, V, W, X, Y, Z> FromConfig for (T, U, V, W, X, Y, Z)
+where
+    T: FromConfig,
+    U: FromConfig,
+    V: FromConfig,
+    W: FromConfig,
+    X: FromConfig,
+    Y: FromConfig,
+    Z: FromConfig,
+{
+    fn from_config(s: &str) -> Result<Self, String> {
+        let words = format_str_tuple_to_words(s)?;
+        check_len(
+            7,
+            &words,
+            "Needs 7 fields, but not enough.",
+            "Needs 7 fields, but too much given.",
+        )?;
+        let t = T::from_config(words[0]).map_err(|e| e.to_string())?;
+        let u = U::from_config(words[1]).map_err(|e| e.to_string())?;
+        let v = V::from_config(words[2]).map_err(|e| e.to_string())?;
+        let w = W::from_config(words[3]).map_err(|e| e.to_string())?;
+        let x = X::from_config(words[4]).map_err(|e| e.to_string())?;
+        let y = Y::from_config(words[5]).map_err(|e| e.to_string())?;
+        let z = Z::from_config(words[6]).map_err(|e| e.to_string())?;
+        Ok((t, u, v, w, x, y, z))
+    }
+}
+
 impl FromConfig for usize {
     fn from_config(s: &str) -> Result<Self, String> {
         Ok(s.parse::<usize>().map_err(|e| e.to_string())?)
@@ -457,6 +486,17 @@ impl FromConfig for ScoreProp {
             ("StaffCount", p) => Ok(ScoreProp::StaffCount(
                 <(CondWrapper, Shift, isize, Score)>::from_config(p)?,
             )),
+            ("StaffCountWithPremise", p) => Ok(ScoreProp::StaffCountWithPremise(<(
+                CondWrapper,
+                Shift,
+                isize,
+                CondWrapper,
+                Shift,
+                isize,
+                Score,
+            )>::from_config(
+                p
+            )?)),
             ("NGPair", p) => Ok(ScoreProp::NGPair(
                 <(CondWrapper, Shift, Score)>::from_config(p)?,
             )),
