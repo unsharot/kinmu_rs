@@ -56,6 +56,7 @@ fn get_score(schedule_prop: &ScheduleProp, schedule: &Schedule, sp: &mut ScorePr
             staff_count_regard_day_attribute(schedule_prop, schedule, p)
         }
         ScoreProp::StaffCount(p) => staff_count(schedule_prop, schedule, p),
+        ScoreProp::StaffCountWithPremise(p) => staff_count_with_premise(schedule_prop, schedule, p),
         ScoreProp::NGPair(p) => ng_pair(schedule_prop, schedule, p),
         ScoreProp::NoSamePair(p) => no_same_pair(schedule_prop, schedule, p),
     }
@@ -377,6 +378,50 @@ fn staff_count(
             let d = (cnt - *count).abs() as Score;
             let a = d * *score;
             sum += a * a;
+        }
+    }
+    sum
+}
+
+fn staff_count_with_premise(
+    schedule_prop: &ScheduleProp,
+    schedule: &Schedule,
+    (cond_premise, shift_premise, count_premise, cond_main, shift_main, count_main, score): &mut (
+        CondWrapper,
+        Shift,
+        isize,
+        CondWrapper,
+        Shift,
+        isize,
+        Score,
+    ),
+) -> Score {
+    let mut sum = 0.0;
+    for day in 0..schedule_prop.day_count {
+        let mut cnt = 0;
+        for staff in 0..schedule_prop.staff_count {
+            if cond_premise.eval(staff, day, schedule_prop) {
+                if schedule[staff][day] == *shift_premise {
+                    cnt += 1;
+                }
+            }
+        }
+        if cnt == *count_premise {
+            let mut is_valid = false;
+            let mut cnt2 = 0;
+            for staff in 0..schedule_prop.staff_count {
+                if cond_main.eval(staff, day, schedule_prop) {
+                    is_valid = true;
+                    if schedule[staff][day] == *shift_main {
+                        cnt2 += 1;
+                    }
+                }
+            }
+            if is_valid {
+                let d = (cnt2 - *count_main).abs() as Score;
+                let a = d * *score;
+                sum += a * a;
+            }
         }
     }
     sum
