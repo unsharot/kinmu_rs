@@ -45,13 +45,13 @@ fill2のアルゴリズム
 
 macro_rules! count_waku_row {
     ($shift:expr, $schedule_prop: expr, $schedule:expr, $r:expr) => {{
-        let mut cnt: isize = 0;
+        let mut count: isize = 0;
         for i in $schedule_prop.buffer..$schedule_prop.day_count {
             if $schedule[$r][i] == $shift {
-                cnt += 1;
+                count += 1;
             }
         }
-        cnt
+        count
     }};
 }
 
@@ -104,30 +104,30 @@ fn add_random<R: Rng>(
 fn fill_randomly2<R: Rng>(schedule_prop: &ScheduleProp, rng: &mut R) -> Schedule {
     let mut schedule = schedule_prop.request.clone();
     for r in 0..schedule_prop.staff_count {
-        let mut r_cnt = 0;
+        let mut r_count = 0;
         for c in schedule_prop.buffer..(schedule_prop.day_count + 1) {
             // Randomが途切れることを検知して、途切れるなら入るだけIAKを入れる
             // なお、最後は途切れないとしてIAKが埋まるだけ埋める
             if c != schedule_prop.day_count && schedule_prop.schedule_st[r][c] == ShiftState::Random
             {
-                r_cnt += 1;
-                if r_cnt == 3 {
-                    r_cnt = 0;
+                r_count += 1;
+                if r_count == 3 {
+                    r_count = 0;
                     schedule[r][c - 2] = Shift::I;
                     schedule[r][c - 1] = Shift::A;
                     schedule[r][c] = Shift::K;
                 }
             } else if c == schedule_prop.day_count {
-                if r_cnt == 1 {
+                if r_count == 1 {
                     schedule[r][c - 1] = Shift::I;
-                } else if r_cnt == 2 {
+                } else if r_count == 2 {
                     schedule[r][c - 2] = Shift::I;
                     schedule[r][c - 1] = Shift::A;
                 }
             } else {
-                if r_cnt == 1 {
+                if r_count == 1 {
                     schedule[r][c - 1] = Shift::N;
-                } else if r_cnt == 2 {
+                } else if r_count == 2 {
                     if schedule[r][c] == Shift::K || schedule[r][c] == Shift::Y {
                         schedule[r][c - 2] = Shift::I;
                         schedule[r][c - 1] = Shift::A;
@@ -136,7 +136,7 @@ fn fill_randomly2<R: Rng>(schedule_prop: &ScheduleProp, rng: &mut R) -> Schedule
                         schedule[r][c - 1] = Shift::N;
                     }
                 }
-                r_cnt = 0;
+                r_count = 0;
             }
         }
 
