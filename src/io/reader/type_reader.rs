@@ -19,15 +19,18 @@ impl FromConfig for String {
 
 /// タプルを読み込む
 /// Vecやタプルの複数の入れ子構造になったタプルにも対応
+/// 括弧がない場合も対応
 fn format_str_tuple_to_words(s: &str) -> Result<Vec<&str>, String> {
     let trimmed_s = s.trim();
-    if !trimmed_s.starts_with("(") {
-        return Err("\'(\' not found".to_string());
+    let bare_s;
+    if trimmed_s.starts_with("(") {
+        if !trimmed_s.ends_with(")") {
+            return Err("found '(', but ')' not found".to_string());
+        }
+        bare_s = &trimmed_s[1..(trimmed_s.len() - 1)];
+    } else {
+        bare_s = trimmed_s;
     }
-    if !trimmed_s.ends_with(")") {
-        return Err("\')\' not found".to_string());
-    }
-    let bare_s = &trimmed_s[1..(trimmed_s.len() - 1)];
     let mut words = Vec::new();
     let mut bracket_count = 0;
     let mut start_idx = 0;
@@ -547,7 +550,7 @@ impl FromConfig for StaffAttributeMapWrapper {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
 
     #[test]
@@ -586,5 +589,15 @@ mod test {
             )),
             ScoreProp::from_config(s).unwrap()
         );
+    }
+
+    #[test]
+    fn parse_tuple_test() {
+        assert_eq!(<(isize, isize)>::from_config("(1,2"), Err("found '(', but ')' not found".to_string()));
+        assert_eq!(<(isize, isize)>::from_config("(1)"), Err("Needs 2 fields, but not enough.".to_string()));
+        assert_eq!(<(isize, isize)>::from_config("(1, 2, 3)"), Err("Needs 2 fields, but too much given.".to_string()));
+        assert_eq!(<(isize, isize)>::from_config("(1,2)"), Ok((1,2)));
+        assert_eq!(<(isize, isize)>::from_config("1,2"), Ok((1,2)));
+        assert_eq!(<(isize, isize)>::from_config(" 1, 2 "), Ok((1,2)));
     }
 }
