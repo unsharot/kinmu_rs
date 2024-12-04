@@ -124,6 +124,8 @@ pub type DayAttributeName = String;
 pub enum ScoreProp {
     PatternGeneral((CondWrapper, Vec<Vec<Shift>>, Score)),
     PatternFixed((CondWrapper, Vec<Shift>, Score)),
+    PatternGeneralAny((CondWrapper, Vec<Vec<Shift>>, Score)),
+    PatternFixedAny((CondWrapper, Vec<Shift>, Score)),
     Streak((CondWrapper, Vec<Shift>, isize, Score)),
     Need2Holidays((CondWrapper, Vec<Shift>, Score)),
     ShiftsBalance((CondWrapper, Shift, Shift, Score)),
@@ -142,6 +144,8 @@ impl fmt::Display for ScoreProp {
         let s = match self {
             ScoreProp::PatternGeneral(p) => format!("PatternGeneral {:?}", p),
             ScoreProp::PatternFixed(p) => format!("PatternFixed {:?}", p),
+            ScoreProp::PatternGeneralAny(p) => format!("PatternGeneralAny {:?}", p),
+            ScoreProp::PatternFixedAny(p) => format!("PatternFixedAny {:?}", p),
             ScoreProp::Streak(p) => format!("Streak {:?}", p),
             ScoreProp::Need2Holidays(p) => format!("Need2Holidays {:?}", p),
             ScoreProp::ShiftsBalance(p) => format!("ShiftsBalance {:?}", p),

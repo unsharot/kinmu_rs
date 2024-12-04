@@ -44,6 +44,8 @@ fn get_score(schedule_prop: &ScheduleProp, schedule: &Schedule, sp: &mut ScorePr
     match sp {
         ScoreProp::PatternGeneral(p) => pattern_general(schedule_prop, schedule, p),
         ScoreProp::PatternFixed(p) => pattern_fixed(schedule_prop, schedule, p),
+        ScoreProp::PatternGeneralAny(p) => pattern_general_any(schedule_prop, schedule, p),
+        ScoreProp::PatternFixedAny(p) => pattern_fixed_any(schedule_prop, schedule, p),
         ScoreProp::Streak(p) => streak(schedule_prop, schedule, p),
         ScoreProp::Need2Holidays(p) => need_2_holidays(schedule_prop, schedule, p),
         ScoreProp::ShiftsBalance(p) => shifts_balance(schedule_prop, schedule, p),
@@ -62,7 +64,7 @@ fn get_score(schedule_prop: &ScheduleProp, schedule: &Schedule, sp: &mut ScorePr
     }
 }
 
-/// 指定したシフトパターンが存在するか判定するスコア
+/// 指定したシフトパターンの数に応じて発火するスコア
 /// ただし、シフトパターンは複数候補を指定可能
 /// 配置がかぶる場合、うまく判定されない可能性あり
 fn pattern_general(
@@ -92,7 +94,7 @@ fn pattern_general(
     sum
 }
 
-/// 指定したシフトパターンが存在するか判定するスコア
+/// 指定したシフトパターンの数に応じて発火するスコア
 /// 配置がかぶる場合、うまく判定されない可能性あり
 fn pattern_fixed(
     schedule_prop: &ScheduleProp,
@@ -117,6 +119,67 @@ fn pattern_fixed(
             }
         }
         sum += a;
+    }
+    sum
+}
+
+/// 指定したパターンが存在するスタッフに対して発火するスコア
+fn pattern_general_any(
+    schedule_prop: &ScheduleProp,
+    schedule: &Schedule,
+    (cond, shift_pattern, score): &mut (CondWrapper, Vec<Vec<Shift>>, Score),
+) -> Score {
+    let mut sum = 0.0;
+    for staff in 0..schedule_prop.staff_count {
+        let mut any = false;
+        let mut accum = 0;
+        for day in 0..schedule_prop.day_count {
+            if cond.eval(staff, day, schedule_prop) {
+                if shift_pattern[accum].contains(&schedule[staff][day]) {
+                    accum += 1;
+                    if accum == shift_pattern.len() {
+                        any = true;
+                        break;
+                    }
+                } else {
+                    accum = 0;
+                }
+            }
+        }
+        if any {
+            sum += *score;
+        }
+    }
+    sum
+}
+
+/// 指定したパターンが存在するスタッフに対して発火するスコア
+/// ただし、パターンは固定
+fn pattern_fixed_any(
+    schedule_prop: &ScheduleProp,
+    schedule: &Schedule,
+    (cond, shift_pattern, score): &mut (CondWrapper, Vec<Shift>, Score),
+) -> Score {
+    let mut sum = 0.0;
+    for staff in 0..schedule_prop.staff_count {
+        let mut any = false;
+        let mut accum = 0;
+        for day in 0..schedule_prop.day_count {
+            if cond.eval(staff, day, schedule_prop) {
+                if shift_pattern[accum] == schedule[staff][day] {
+                    accum += 1;
+                    if accum == shift_pattern.len() {
+                        any = true;
+                        break;
+                    }
+                } else {
+                    accum = 0;
+                }
+            }
+        }
+        if any {
+            sum += *score
+        }
     }
     sum
 }
