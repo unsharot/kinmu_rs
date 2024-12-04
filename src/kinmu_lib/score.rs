@@ -221,21 +221,21 @@ fn shifts_balance(
     let mut sum = 0.0;
     for day in 0..schedule_prop.day_count {
         let mut is_valid = false;
-        let mut cnt1: isize = 0;
-        let mut cnt2: isize = 0;
+        let mut count1: isize = 0;
+        let mut count2: isize = 0;
         for staff in 0..schedule_prop.staff_count {
             if cond.eval(staff, day, schedule_prop) {
                 is_valid = true;
                 if schedule[staff][day] == *shift1 {
-                    cnt1 += 1;
+                    count1 += 1;
                 }
                 if schedule[staff][day] == *shift2 {
-                    cnt2 += 1;
+                    count2 += 1;
                 }
             }
         }
         if is_valid {
-            let d = (cnt1 - cnt2).abs() as Score;
+            let d = (count1 - count2).abs() as Score;
             let a = d * *score;
             sum += a * a;
         }
@@ -338,20 +338,20 @@ fn day_count_regard_staff_attribute(
     let mut sum = 0.0;
     for staff in 0..schedule_prop.staff_count {
         let mut is_valid = false;
-        let mut cnt: isize = 0;
+        let mut count: isize = 0;
         for day in 0..schedule_prop.day_count {
             if cond.eval(staff, day, schedule_prop) {
                 is_valid = true;
                 if schedule[staff][day] == *shift {
-                    cnt += 1;
+                    count += 1;
                 }
             }
         }
         if is_valid {
-            let cnt_needed = schedule_prop.get_attribute(staff, attribute);
-            if cnt_needed != -1 {
+            let count_needed = schedule_prop.get_attribute(staff, attribute);
+            if count_needed != -1 {
                 // 値が-1の場合、任意の数を許すためスコアを増やさない
-                let d = (cnt - cnt_needed).abs() as Score;
+                let d = (count - count_needed).abs() as Score;
                 let a = d * *score;
                 sum += a * a;
             }
@@ -369,18 +369,18 @@ fn staff_count_regard_day_attribute(
     let mut sum = 0.0;
     for day in 0..schedule_prop.day_count {
         let mut is_valid = false;
-        let mut cnt: isize = 0;
+        let mut count: isize = 0;
         for staff in 0..schedule_prop.staff_count {
             if cond.eval(staff, day, schedule_prop) {
                 is_valid = true;
                 if schedule[staff][day] == *shift {
-                    cnt += 1;
+                    count += 1;
                 }
             }
         }
         if is_valid {
-            let cnt_needed = schedule_prop.day_attributes.get(attribute).unwrap()[day];
-            let d = (cnt - cnt_needed).abs() as Score;
+            let count_needed = schedule_prop.day_attributes.get(attribute).unwrap()[day];
+            let d = (count - count_needed).abs() as Score;
             let a = d * *score;
             sum += a * a;
         }
@@ -397,17 +397,17 @@ fn staff_count(
     let mut sum = 0.0;
     for day in 0..schedule_prop.day_count {
         let mut is_valid = false;
-        let mut cnt = 0;
+        let mut staff_count = 0;
         for staff in 0..schedule_prop.staff_count {
             if cond.eval(staff, day, schedule_prop) {
                 is_valid = true;
                 if schedule[staff][day] == *shift {
-                    cnt += 1;
+                    staff_count += 1;
                 }
             }
         }
         if is_valid {
-            let d = (cnt - *count).abs() as Score;
+            let d = (staff_count - *count).abs() as Score;
             let a = d * *score;
             sum += a * a;
         }
@@ -430,27 +430,27 @@ fn staff_count_with_premise(
 ) -> Score {
     let mut sum = 0.0;
     for day in 0..schedule_prop.day_count {
-        let mut cnt = 0;
+        let mut count = 0;
         for staff in 0..schedule_prop.staff_count {
             if cond_premise.eval(staff, day, schedule_prop) {
                 if schedule[staff][day] == *shift_premise {
-                    cnt += 1;
+                    count += 1;
                 }
             }
         }
-        if cnt == *count_premise {
+        if count == *count_premise {
             let mut is_valid = false;
-            let mut cnt2 = 0;
+            let mut count2 = 0;
             for staff in 0..schedule_prop.staff_count {
                 if cond_main.eval(staff, day, schedule_prop) {
                     is_valid = true;
                     if schedule[staff][day] == *shift_main {
-                        cnt2 += 1;
+                        count2 += 1;
                     }
                 }
             }
             if is_valid {
-                let d = (cnt2 - *count_main).abs() as Score;
+                let d = (count2 - *count_main).abs() as Score;
                 let a = d * *score;
                 sum += a * a;
             }
@@ -505,8 +505,8 @@ fn no_same_pair(
         }
     }
     let mut ans = 0.0;
-    for (_, cnt) in &pair_map {
-        let a = *cnt - *pair_limit + 1;
+    for (_, count) in &pair_map {
+        let a = *count - *pair_limit + 1;
         if a > 0 {
             ans += (a as Score) * *score
         }

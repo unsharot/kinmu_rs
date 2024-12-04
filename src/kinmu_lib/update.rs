@@ -114,13 +114,13 @@ fn update_randomly4<R: Rng>(
 
 macro_rules! count_waku_row {
     ($shift:expr, $schedule_prop: expr, $schedule:expr, $r:expr) => {{
-        let mut cnt: isize = 0;
+        let mut count: isize = 0;
         for i in $schedule_prop.buffer..$schedule_prop.day_count {
             if $schedule[$r][i] == $shift {
-                cnt += 1;
+                count += 1;
             }
         }
-        cnt
+        count
     }};
 }
 
@@ -201,8 +201,8 @@ fn update_randomly5<R: Rng>(
     let mut new_schedule = schedule.clone();
     for r in 0..schedule_prop.staff_count {
         // Iが入っていることを確認
-        let i_cnt = count_waku_row!(Shift::I, schedule_prop, schedule, r);
-        if i_cnt == 0 {
+        let i_count = count_waku_row!(Shift::I, schedule_prop, schedule, r);
+        if i_count == 0 {
             // ランダムなKを取り除き、Nを代わりに置く
             remove_random(Shift::K, &schedule_prop, &mut new_schedule, r, rng);
             // ランダムなNをKで置き換える
