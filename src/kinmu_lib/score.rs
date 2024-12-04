@@ -47,7 +47,6 @@ fn get_score(schedule_prop: &ScheduleProp, schedule: &Schedule, sp: &mut ScorePr
         ScoreProp::PatternGeneralAny(p) => pattern_general_any(schedule_prop, schedule, p),
         ScoreProp::PatternFixedAny(p) => pattern_fixed_any(schedule_prop, schedule, p),
         ScoreProp::Streak(p) => streak(schedule_prop, schedule, p),
-        ScoreProp::Need2Holidays(p) => need_2_holidays(schedule_prop, schedule, p),
         ScoreProp::ShiftsBalance(p) => shifts_balance(schedule_prop, schedule, p),
         ScoreProp::ShiftHalfBalance(p) => shift_half_balance(schedule_prop, schedule, p),
         ScoreProp::ShiftDirPriority(p) => shift_dir_priority(schedule_prop, schedule, p),
@@ -209,36 +208,6 @@ fn streak(
             }
         }
         sum += a;
-    }
-    sum
-}
-
-/// 休日として指定したシフトの2連休が月最低1回あるか判定するスコア
-fn need_2_holidays(
-    schedule_prop: &ScheduleProp,
-    schedule: &Schedule,
-    (cond, holidays, score): &mut (CondWrapper, Vec<Shift>, Score),
-) -> Score {
-    let mut sum = 0.0;
-    for staff in 0..schedule_prop.staff_count {
-        let mut has_2_holidays = false;
-        let mut accum = 0;
-        for day in 0..schedule_prop.day_count {
-            if cond.eval(staff, day, schedule_prop) {
-                if holidays.contains(&schedule[staff][day]) {
-                    accum += 1;
-                } else {
-                    accum = 0;
-                }
-                if accum >= 2 {
-                    has_2_holidays = true;
-                    break;
-                }
-            }
-        }
-        if !has_2_holidays {
-            sum += *score;
-        }
     }
     sum
 }

@@ -472,9 +472,6 @@ impl FromConfig for ScoreProp {
             ("Streak", p) => Ok(ScoreProp::Streak(
                 <(CondWrapper, Vec<Shift>, isize, Score)>::from_config(p)?,
             )),
-            ("Need2Holidays", p) => Ok(ScoreProp::Need2Holidays(
-                <(CondWrapper, Vec<Shift>, Score)>::from_config(p)?,
-            )),
             ("ShiftsBalance", p) => Ok(ScoreProp::ShiftsBalance(<(
                 CondWrapper,
                 Shift,
