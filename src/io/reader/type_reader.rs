@@ -455,6 +455,20 @@ impl FromConfig for ScoreProp {
             ("PatternFixed", p) => Ok(ScoreProp::PatternFixed(
                 <(CondWrapper, Vec<Shift>, Score)>::from_config(p)?,
             )),
+            ("PatternGeneralAny", p) => Ok(ScoreProp::PatternGeneralAny(<(
+                CondWrapper,
+                Vec<Vec<Shift>>,
+                Score,
+            )>::from_config(
+                p
+            )?)),
+            ("PatternFixedAny", p) => Ok(ScoreProp::PatternFixedAny(<(
+                CondWrapper,
+                Vec<Shift>,
+                Score,
+            )>::from_config(
+                p
+            )?)),
             ("Streak", p) => Ok(ScoreProp::Streak(
                 <(CondWrapper, Vec<Shift>, isize, Score)>::from_config(p)?,
             )),
