@@ -16,7 +16,7 @@ use crate::kinmu_lib::types::{
 
 type FilePath = String;
 
-pub fn load_main_config(path: &FilePath) -> Result<Vec<FilePath>, String> {
+pub fn load_main_config(path: &str) -> Result<Vec<FilePath>, String> {
     let contents = read_contents(path)?;
 
     let ss = sep_by_fields(&contents);
