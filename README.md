@@ -49,7 +49,7 @@ GCがないためC++並みの速度を持ち、Haskellと同等の型の表現�
 ### ソースファイルをダウンロードする場合
 
 リポジトリのクローン
-```
+```sh
 git clone https://github.com/unsharot/kinmu_rs
 ```
 
@@ -57,7 +57,7 @@ git clone https://github.com/unsharot/kinmu_rs
 
 リリースビルドでの実行
 
-```
+```sh
 cargo run --release
 ```
 
@@ -65,7 +65,7 @@ cargo run --release
 
 リリースビルドでのビルド
 
-```
+```sh
 cargo build --release
 ```
 
@@ -85,8 +85,8 @@ cargo build --release
 #### Files
 勤務表のconfigを列挙します。
 
-##### 例
-```
+例
+```yaml
 Files:
 ./config/configW.yaml
 ./config/configK.yaml
@@ -95,23 +95,44 @@ Files:
 ### 勤務表のconfig
 勤務表に使う基本的な値の設定です。
 
-#### 職員リスト
-職員の能力、公休数、夜勤数、遅番数、早番数、名前を列挙します。
+#### attributes
+職員ごとのパラメータ名を設定します。
+日本語でも可です。
 
-##### 例
+例
+```yaml
+attributes:
+KDayCount IDayCount ODayCount HDayCount
 ```
+```yaml
+attributes:
+公休数 夜勤数 遅番数 早番数
+```
+
+#### 職員リスト
+職員の能力、attributesで指定したパラメータ、名前を列挙します。
+コメントで項目名を記しておくと便利です。
+
+例
+```yaml
 職員リスト:
 0 8 3 -1 -1 職員A
-1 9 6  0  0 職員B
+1 9 6 0  0  職員B
+```
+```yaml
+職員リスト:
+#能力 公休 夜勤 遅番 早番 名前  番号
+0     8   3    -1   -1  職員A #1
+1     9   6    0    0   職員B #2
 ```
 
 #### NGリスト
 特定の職員同士が夜勤で同じ日の勤務にならないようにするための設定です。
-Workerのリストで上から1,2,3..と番号を振っていき、その番号で指定します。
+職員リストで上から1,2,3..と番号を振っていき、その番号で指定します。
 行ごとに必ず改行を挟んで設定してください。
 
-##### 例
-```
+例
+```yaml
 NGリスト:
 1 2
 6 2
@@ -121,8 +142,8 @@ NGリスト:
 職員の数を指定します。
 職員リストの長さより小さい数が指定された場合、職員リストの上からその数だけカウントされ、余剰分は無視されます。
 
-##### 例
-```
+例
+```yaml
 職員数:
 12
 ```
@@ -131,8 +152,8 @@ NGリスト:
 勤務表の日数を指定します。
 30日の月で、バッファー日数を3日に指定している場合、30日+バッファー日数3日 = 33日として指定してください。
 
-##### 例
-```
+例
+```yaml
 日数:
 33
 ```
@@ -146,8 +167,8 @@ NGリスト:
 - 2: Bath2 フロ2
 - G: Weight 体重測定
 
-##### 例
-```
+例
+```yaml
 DayState:
 W2WHHWFW2GHHWFW2WHHWFW2WHHWFW2WHH
 ```
@@ -157,8 +178,8 @@ W2WHHWFW2GHHWFW2WHHWFW2WHHWFW2WHH
 バッファーというのは、先月の終わり３日分など、考慮するべき日数です。
 3日分を考慮する際は3を設定してください。
 
-##### 例
-```
+例
+```yaml
 バッファー日数:
 3
 ```
@@ -182,9 +203,10 @@ W2WHHWFW2GHHWFW2WHHWFW2WHHWFW2WHH
 未定の場所以外は絶対条件としてカウントされ、出力で変化していることはありません。
 また、未定(U)はスペース( )での入力も可能です。
 バッファーが重要でない場合、Uとしても出力で変化することはありません。
+コメントで職員名と日付を記しておくと便利です。
 
-##### 例
-```
+例
+```yaml
 希望:
 AKNUUUUUUUUUUIAKYUUUUUUUUIAKUUUUU
 KHIAKUUUUUUUUUUUIAKYUUUUUUUUUUUUU
@@ -200,34 +222,39 @@ UUUKKUUUUYKKUUUUUKKUUUUUKKUUUUUKK
 UUUKKUUUUUKKUUUUUKKKUUUKKKUUUUUKK
 ```
 
-```
+```yaml
 希望:
-   KKNNNNNKKNNNNNKKNNNNNKKNNNNNKK
-NIAKKK    KKYK                   
-AKN KK                           
-NNIAK                        IAKY
-KNN       KK                     
-KNN                              
-KNN                  YKK         
-IAK               KK             
-UUUKKYYYYYKYYYYYYKKYYYYYKYYYYYYKK
-NKN      K                K      
-NIAK                             
-NNN             K   K     K      
-NON    KK       KK               
-ONK                              
-AKO        K             K       
-KNK                              
+#2WHHWFW2GHHWFW2WHHWFW2WHHWFW2WHH
+#00123456789012345678901234567890
+   KKNNNNNKKNNNNNKKNNNNNKKNNNNNKK#職員A
+NIAKKK    KKYK                   #職員B
+AKN KK                           #職員C
+NNIAK                        IAKY#職員D
+KNN       KK                     #職員E
+KNN                              #職員F
+KNN                  YKK         #職員G
+IAK               KK             #職員H
+UUUKKYYYYYKYYYYYYKKYYYYYKYYYYYYKK#職員I
+NKN      K                K      #職員J
+NIAK                             #職員K
+NNN             K   K     K      #職員L
+NON    KK       KK               #職員M
+ONK                              #職員N
+AKO        K             K       #職員O
+KNK                              #職員P
 ```
 
-#### 夜勤の人数リスト
-職員ごとの１カ月の夜勤(入り)の日数を指定します。
+#### day_attributes:
+日付ごとのパラメータ名と値を設定します。
+パラメータの数は任意です。
 値はスペースで区切ります。
 
-##### 例
-```
-夜勤の日数リスト:
-3 6 6 6 6 6 6 6 3 6 0 0
+```yaml
+day_attributes:
+IStaffCount
+0 0 0 1 1 1 1 1 2 1 1 1 1 1 1 1 2 1 1 1 1 1 2 2 1 2 1 1 1 1 1 1 1 2 1 1 2 
+OStaffCount
+1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 
 ```
 
 #### fillの関数
@@ -237,8 +264,8 @@ KNK
 - fill1: それぞれの枠をランダムな要素で埋めます。
 - fill2: 夜勤の数と公休の数を守り、入りと明けの連続やその後の休みも加味して埋めます。
 
-##### 例
-```
+例
+```yaml
 fillの関数:
 fill2
 ```
@@ -250,8 +277,8 @@ fillの乱数に用いるシード値を指定します。
 それ以外の場合固定です。
 再現性のあるテストがしたいときは固定し、実際に使う場合は0が良いでしょう。
 
-##### 例
-```
+例
+```yaml
 fillのシード値:
 53
 ```
@@ -260,8 +287,8 @@ fillのシード値:
 焼きなましの設定ファイルのパスを指定します。
 焼きなましはここで列挙した順に行われます。
 
-##### 例
-```
+例
+```yaml
 アニーリング:
 ./config/anconfigW/randomWalk.yaml
 ./config/anconfigW/W1.yaml
@@ -273,82 +300,94 @@ fillのシード値:
 スコアの名前と、そのスコアに用いるパラメータを指定します。
 順不同です。スコアは以下のとおりです。
 
+| Prop名                       | 引数の型                                        | 説明                                                                                                     |
+| :--------------------------- | :---------------------------------------------- | :------------------------------------------------------------------------------------------------------- |
+| PatternGeneral               | (Cond, [[Shift]], Score)                        | 指定したシフトパターンが出現した場合のペナルティを指定                                                   |
+| PatternFixed                 | (Cond, [Shift], Score)                          | 指定したシフトパターンが出現した場合のペナルティを指定                                                   |
+| PatternGeneralAny            | (Cond, [[Shift]], Score)                        | 指定したシフトパターンが出現する職員ごとにペナルティを指定                                               |
+| PatternFixedAny              | (Cond, [Shift], Score)                          | 指定したシフトパターンが出現する職員ごとにペナルティを指定                                               |
+| Streak                       | (Cond, [Shift], isize, Score)                   | 指定したシフトが指定した回数連続した場合のペナルティを指定                                               |
+| ShiftsBalance                | (Cond, Shift, Shift, Score)                     | 指定した2つのシフトのバランスが悪い場合のペナルティを指定                                                |
+| ShiftHalfBalance             | (Cond, Shift, Score)                            | 指定したシフトが指定範囲の前半と後半でバランスが取れていない場合のペナルティを指定                       |
+| ShiftDirPriority             | (Cond, Shift, Score)                            | 指定したシフトが指定範囲の前後どちらにあるほうが良いか指定 指定スコアが正なら前を優先、負なら後ろを優先  |
+| DayCountRegardStaffAttribute | (Cond, Shift, StaffAttributeName, Score)        | 職員ごとの指定したパラメータと指定したシフトの数の差によるペナルティを指定                               |
+| StaffCountRegardDayAttribute | (Cond, Shift, DayAttributeName, Score)          | 日付ごとの指定したパラメータと指定したシフトの数の差によるペナルティを指定                               |
+| StaffCount                   | (Cond, Shift, isize, Score)                     | 指定した値と指定したシフトの人数の差によるペナルティを指定                                               |
+| StaffCountWithPremise        | (Cond, Shift, isize, Cond, Shift, isize, Score) | 指定したシフトの人数を満たした日付に対して、指定した値と指定したシフトの人数の差によるペナルティを指定 |
+| NGPair                       | (Cond, Shift, Score)                            | NGに指定されたペアが指定したシフトで同じ日になる場合のペナルティを指定                                   |
+| NoSamePair                   | (Cond, isize, Shift, Score)                     | 指定したシフトで同じペアが指定回数以上ある場合のペナルティを指定                                         |
 
-| Prop名                 | 引数の型               | 説明                                                                                                                                                                                                                                   |
-| :--------------------- | :--------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| IAKpattern             | f32                    | 入り、明け、休みの順番が取れていない場合のペナルティを指定します。                                                                                                                                                                     |
-| KIApattern             | f32                    | 公休、入り、明けの順番になっている場合のペナルティを指定します。                                                                                                                                                                       |
-| KNIApattern            | f32                    | 公休、日勤、入り、明けの順番になっている場合のペナルティを指定します。                                                                                                                                                                 |
-| NNIApattern            | f32                    | 日勤、日勤、入り、明けの順番になっている場合の報酬を指定します。                                                                                                                                                                       |
-| ONpattern              | f32                    | 遅番、日勤の順番になっている場合のペナルティを指定します。                                                                                                                                                                             |
-| NHpattern              | f32                    | 日勤、早番の順番になっている場合のペナルティを指定します。                                                                                                                                                                             |
-| OHpattern              | f32                    | 遅番、早番の順番になっている場合のペナルティを指定します。                                                                                                                                                                             |
-| WorkingDayStreak4      | (f32, f32)             | 4日連続勤務の場合のペナルティを指定します。                                                                                                                                                                                            |
-| WorkingDayStreak5      | (f32, f32)             | WorkingDayStreak4同様、5日連続勤務の場合のペナルティを指定します。                                                                                                                                                                     |
-| WorkingDayStreak6      | (f32, f32)             | WorkingDayStreak4同様、6日連続勤務の場合のペナルティを指定します。                                                                                                                                                                     |
-| HolidayReward          | f32                    | 連休の場合の報酬を指定します。2日の連休ごとに発生します。                                                                                                                                                                              |
-| Need2Holidays          | f32                    | 職員ごとに、一カ月の間に2連休がない場合のペナルティを指定します。                                                                                                                                                                      |
-| Need2HolidaysNoBf      | f32                    | Need2Holidays同様のスコアですが、バッファーを含みません。                                                                                                                                                                              |
-| OHBalance              | f32                    | 職員ごとの、1か月の遅番と早番のバランスによるペナルティの倍率を指定します。                                                                                                                                                            |
-| ShiftHalfBalance       | (Shift, f32)           | 指定したシフトが夜勤の月の前半と後半でバランスが取れていない場合のペナルティの倍率を指定します。                                                                                                                                       |
-| ShiftDirPriority       | (Shift, f32)           | 指定したシフトが月の前後どちらにあるほうが良いか設定します。実数フィールドが正なら前を優先、負なら後ろを優先します。                                                                                                                   |
-| KDayCount              | f32                    | 職員ごとの公休の数がconfigファイルで設定した通りになっていない場合のペナルティの倍率を指定します。                                                                                                                                     |
-| IDayCount              | f32                    | 職員ごとの夜勤の数がconfigファイルで設定した通りになっていない場合のペナルティの倍率を指定します。                                                                                                                                     |
-| ODayCount              | f32                    | 職員ごとの遅番の数がconfigファイルで設定した通りになっていない場合のペナルティの倍率を指定します。                                                                                                                                     |
-| HDayCount              | f32                    | 職員ごとの早番の数がconfigファイルで設定した通りになっていない場合のペナルティの倍率を指定します。                                                                                                                                     |
-| IStaffCount            | f32                    | 夜勤の人数がconfigファイルで設定した通りになっていない場合のペナルティを指定します。                                                                                                                                                   |
-| NStaffCount            | (DayState, isize, f32) | 曜日ごとの日勤の人数と、その通りになっていない場合のペナルティの倍率を指定します。引数は3つで、1つ目が曜日、2つ目が人数、3つ目が倍率です。曜日は平日(W)、休日(H)、フロ(F)、フロ2(2)、Weight(G)に対応します。                           |
-| OStaffCount            | (isize, f32)           | 遅番の人数と、その通りになっていない場合のペナルティを指定します。                                                                                                                                                                     |
-| HStaffCount            | (isize, f32)           | 早番の人数と、その通りになっていない場合のペナルティを指定します。                                                                                                                                                                     |
-| NGPair                 | f32                    | NGに指定されたペアが夜勤で同じ日になる場合のペナルティを指定します。                                                                                                                                                                   |
-| LeaderAbility          | (isize, f32)           | リーダーとしての能力の番号と、祝日の日勤にリーダーがいない場合のペナルティを指定します。職員の能力を参照し、職員の能力がここで指定する番号で割り切れないならリーダーとします。                                                         |
-| IAloneAbility          | (isize, f32)           | 一人で夜勤ができるワーカーの能力の番号と、ワーカーの夜勤が一人で、それが看護にワーカーの仕事を教えられる人でない場合のペナルティを指定します。職員の能力を参照し、職員の能力がここで指定する番号で割り切れないなら能力があるとします。 |
-| IAloneBeforeBath       | f32                    | フロ日の前にワーカーの一人夜勤がある場合のペナルティを指定します。                                                                                                                                                                     |
-| NStaffCountWithAbility | (isize, isize, f32)    | 対象の能力の番号と、一日に必要な能力持ちの人数と、能力持ちの人数が十分でない場合のペナルティを指定します。                                                                                                                             |
-| NoSamePair3            | f32                    | 夜勤で同じペアが3回以上ある場合のペナルティを指定します。                                                                                                                                                                              |
-| NoSamePair2            | f32                    | 夜勤で同じペアが2回以上ある場合のペナルティを指定します。                                                                                                                                                                              |
-| NoUndef                | f32                    | 未定(U)の枠があった場合のペナルティの倍率を指定します。                                                                                                                                                                                |
+型の詳細は以下の通り
 
+| 型名      | 説明                             | 例                                             |
+| :-------- | :------------------------------- | :--------------------------------------------- |
+| Cond      | スコアを適用する勤務表の枠の条件 | And (DayExceptBuffer (), ParticularDayState B) |
+| Shift     | シフト N,K,I,A,O,H,Y,D,U         | N                                              |
+| [Shift]   | シフトのリスト                   | [N, O, H]                                      |
+| [[Shift]] | シフトのリストのリスト           | [[N], [K, Y]]                                  |
+| Score     | スコア 実数                      | -100.3                                         |
+| isize     | 整数                             | -3                                             |
+| usize     | 非負整数                         | 4                                              |
+| DayState  | 曜日 W,H,B,2,M                   | B                                              |
 
+Condの詳細は以下の通り
 
-##### 例
-```
+| 種類               | 引数の型       | 説明                                                               |
+| :----------------- | :------------- | :----------------------------------------------------------------- |
+| Every              | ()             | すべての枠を有効とする                                             |
+| Or                 | (Cond, Cond)   | 指定した2つのCondのどちらかを満たしていれば有効とする              |
+| And                | (Cond, Cond)   | 指定した2つのCondの両方を満たしていれば有効とする                  |
+| Not                | Cond           | 指定した条件を満たしていなければ有効とする                         |
+| DayExceptBuffer    | ()             | バッファーでないなら有効                                           |
+| DayInRange         | (usize, usize) | 指定した範囲の日付でないなら有効 日数はバッファーから0,1,2..と続く |
+| ParticularDayState | DayState       | 指定の曜日なら有効                                                 |
+| BeforeDayState     | DayState       | 指定の曜日の前日なら有効                                           |
+| ParticularDay      | usize          | 指定の日付のみ有効                                                 |
+| StaffInRange       | (usize, usize) | 指定した範囲のスタッフなら有効                                     |
+| StaffWithAbility   | isize          | 指定した番号の能力を持つスタッフなら有効                           |
+| ParticularStaff    | usize          | 指定した番号のスタッフなら有効                                     |
+
+例
+```yaml
 結果のスコア:
-IAKpattern 1000
-KIApattern 100
-KNIApattern 10
-NNIApattern 300
-ONpattern 100
-NHpattern 1000
-OHpattern 2000
-WorkingDayStreak4 (1000,200)
-WorkingDayStreak5 (4000,1000)
-WorkingDayStreak6 (10000,4000)
-NGPair 1000
-HolidayReward 2
-Need2Holidays 1000
-Need2HolidaysNoBf 1000
-OHBalance 3
-ShiftHalfBalance (I,10)
-ShiftHalfBalance (O,3)
-ShiftHalfBalance (H,3)
-KDayCount 10
-IDayCount 10
-ODayCount 100
-HDayCount 100
-IStaffCount 10
-NStaffCount (F,4,5)
-NStaffCount (2,2,5)
-NStaffCount (W,2,5)
-NStaffCount (H,2,5)
-NStaffCount (G,2,5)
-OStaffCount (1,100)
-HStaffCount (1,100)
-IAloneAbility (2,5000)
-IAloneBeforeBath 1000
-NoUndef 10
-NoSamePair3 1000
-NoSamePair2 500
+PatternGeneral (Every (), [[I], [N,O,H,I,K,Y]], 1000)
+PatternGeneral (Every (), [[A], [N,O,H,I,A]], 1000)
+PatternFixed (Every (), [K,I], 100)
+PatternFixed (Every (), [Y,I], 100)
+PatternGeneral (Every (), [[K,Y],[N,O,H],[I]], 10)
+PatternGeneral (Every (), [[N,O,H],[N,O,H],[I]], -300)
+PatternFixed (Every (), [O,N], 100)
+PatternFixed (Every (), [N,H], 1000)
+PatternFixed (Every (), [O,H], 2000)
+Streak (Every (), [N,O,H,I,A], 4, 200)
+Streak (Every (), [N,O,H,I,A], 5, 1000)
+Streak (Every (), [N,O,H,I,A], 6, 4000)
+Streak (Every (), [N,O,H,I,A], 7, 10000)
+NGPair (DayExceptBuffer (), I, 1000)
+Streak (Every (), [K,Y], 2, -100)
+Need2Holidays (Every (), [K,Y], 1000)
+Need2Holidays (DayExceptBuffer (), [K,Y], 1000)
+ShiftsBalance (DayExceptBuffer (), O, H, 3)
+ShiftHalfBalance (DayExceptBuffer (), I, 10)
+ShiftHalfBalance (DayExceptBuffer (), O, 3)
+ShiftHalfBalance (DayExceptBuffer (), H, 3)
+DayCountRegardStaffAttribute (DayExceptBuffer (), K, KDayCount, 10)
+DayCountRegardStaffAttribute (DayExceptBuffer (), I, IDayCount, 10)
+DayCountRegardStaffAttribute (DayExceptBuffer (), O, ODayCount, 100)
+DayCountRegardStaffAttribute (DayExceptBuffer (), H, HDayCount, 100)
+StaffCountRegardDayAttribute (DayExceptBuffer (), I, IStaffCount, 10)
+StaffCount (And (DayExceptBuffer (), ParticularDayState B), N, 4, 5)
+StaffCount (And (DayExceptBuffer (), ParticularDayState 2), N, 2, 5)
+StaffCount (And (DayExceptBuffer (), ParticularDayState W), N, 2, 5)
+StaffCount (And (DayExceptBuffer (), ParticularDayState H), N, 2, 5)
+StaffCount (And (DayExceptBuffer (), ParticularDayState M), N, 2, 5)
+StaffCount (DayExceptBuffer (), O, 1, 100)
+StaffCount (DayExceptBuffer (), H, 1, 100)
+StaffCountWithPremise (DayExceptBuffer (), I, 1, And (DayExceptBuffer (), StaffWithAbility 2), I, 1, 70)
+StaffCount (And (BeforeDayState B, DayExceptBuffer ()), I, 1, 30)
+StaffCount (DayExceptBuffer (), U, 0, 100000)
+NoSamePair (DayExceptBuffer (), 3, I, 1000)
+NoSamePair (DayExceptBuffer (), 2, I, 500)
 ```
 
 ### 焼きなましのconfig
@@ -357,8 +396,8 @@ NoSamePair2 500
 #### ステップ数
 焼きなましのステップ数を指定します。
 
-##### 例
-```
+例
+```yaml
 ステップ数:
 20000
 ```
@@ -370,41 +409,15 @@ NoSamePair2 500
 それ以外の場合固定です。
 再現性のあるテストがしたいときは固定し、実際に使う場合は0が良いでしょう。
 
-```
+例
+```yaml
 乱数のシード:
 6554
 ```
 
 #### 各スコアのパラメータ
-焼きなましに用いるスコアのパラメータを指定します。
-順不同です。
-パラメータは結果のスコアと同じです。
-
-
-##### 例
-```
-各スコアのパラメータ:
-KIApattern 100
-KNIApattern 10
-NNIApattern 300
-WorkingDayStreak4 (1000,200)
-WorkingDayStreak5 (4000,1000)
-WorkingDayStreak6 (10000,4000)
-Need2Holidays 1000
-Need2HolidaysNoBf 500
-NGPair 1000
-ShiftHalfBalance (I,10)
-IStaffCount 100
-NStaffCount (F,6,4)
-NStaffCount (2,4,4)
-NStaffCount (W,4,4)
-NStaffCount (H,4,4)
-NStaffCount (G,4,4)
-IAloneAbility (2,5000)
-IAloneBeforeBath 100
-NoSamePair3 1000
-NoSamePair2 500
-```
+焼きなましに用いるスコアとパラメータを指定します。
+記述方法は勤務表のconfigのスコアと同じです
 
 #### 更新関数
 焼きなましの更新に用いる更新関数を指定します。
@@ -413,8 +426,8 @@ NoSamePair2 500
 - update4: N,O,HをN,O,Hのうちのランダムな要素に入れ替えます。
 - update5: 夜勤と公休をランダムに移動します。夜勤の数や公休の数は維持されます。
 
-##### 例
-```
+例
+```yaml
 更例関数:
 update5
 ```
@@ -423,8 +436,8 @@ update5
 焼きなましの最高温度と最高温度を実数で指定します。
 序盤に許容するスコアの悪化幅を指定するとよいでしょう。
 
-##### 例
-```
+例
+```yaml
 max_and_min_temp:
 25 0
 ```
@@ -474,7 +487,7 @@ max_and_min_temp:
 
 CLIの出力形式を変更したかったり、GUIを実装したかったりする場合はsrc/io内のコードを
 
-職場に特有の考慮事項がある場合、kinmu_libを
+職場に特有の考慮事項があり、既存のスコアで評価不可能な場合、kinmu_libを
 
 アルゴリズムを焼きなまし法から山登り法などに変更したい場合、annealingを
 
