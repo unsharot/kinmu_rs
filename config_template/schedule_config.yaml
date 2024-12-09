@@ -1,0 +1,42 @@
+staff_attributes:
+
+staff_list:
+#name   number
+職員A   #1
+職員B   #2
+職員C   #3
+
+ng_list:
+
+staff_count:
+3
+
+day_count:
+13
+
+day_state:
+WWWHHHHHBBBBB
+
+buffer_count:
+3
+
+requested_schedule:
+#  HHHHHBBBBB
+#  1234567890
+UUUUUUUUUUUUU
+UUUUUUUUUUUUU
+UUUUUUUUUUUUU
+
+day_attributes:
+
+fill_function:
+fill1
+
+fill_seed:
+0
+
+annealing_config_paths:
+config_template/annealing_configs/annealing_config_1.yaml
+config_template/annealing_configs/annealing_config_2.yaml
+
+score_functions_for_result:
