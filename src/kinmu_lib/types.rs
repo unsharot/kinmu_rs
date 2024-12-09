@@ -69,7 +69,6 @@ pub type ScheduleState = Vec<Vec<ShiftState>>;
 
 pub struct Staff {
     pub name: String,
-    pub ability: isize,
     pub attributes: Vec<isize>,
 }
 
@@ -178,7 +177,7 @@ pub enum Cond {
     ParticularDay(usize),
 
     StaffInRange((usize, usize)),
-    StaffWithAbility(isize),
+    StaffWithAttribute((StaffAttributeName, isize)),
     ParticularStaff(usize),
 }
 
@@ -201,7 +200,9 @@ impl Cond {
             }
             Cond::ParticularDay(d) => *d == c,
             Cond::StaffInRange((staff_start, staff_end)) => *staff_start <= r && r <= *staff_end, // indexおかしいかも
-            Cond::StaffWithAbility(ability) => sp.staff_list[r].ability % ability != 0,
+            Cond::StaffWithAttribute((attribute, value)) => {
+                sp.get_attribute(r, attribute) == *value
+            }
             Cond::ParticularStaff(staff) => *staff == c, // indexおかしいかも
         }
     }

@@ -268,12 +268,11 @@ impl FromConfig for Staff {
         let words: Vec<String> = s.split_whitespace().map(|s| s.to_string()).collect();
         let l = words.len();
         let mut attributes = Vec::new();
-        for i in 1..(l - 1) {
+        for i in 0..(l - 1) {
             attributes.push(<isize>::from_config(&words[i])?);
         }
         let worker: Staff = Staff {
             name: words[l - 1].clone(),
-            ability: <isize>::from_config(&words[0])?,
             attributes: attributes,
         };
         Ok(worker)
@@ -379,7 +378,9 @@ impl FromConfig for Cond {
             ("BeforeDayState", p) => Ok(Cond::BeforeDayState(<DayState>::from_config(p)?)),
             ("ParticularDay", p) => Ok(Cond::ParticularDay(<usize>::from_config(p)?)),
             ("StaffInRange", p) => Ok(Cond::StaffInRange(<(usize, usize)>::from_config(p)?)),
-            ("StaffWithAbility", p) => Ok(Cond::StaffWithAbility(<isize>::from_config(p)?)),
+            ("StaffWithAttribute", p) => Ok(Cond::StaffWithAttribute(
+                <(StaffAttributeName, isize)>::from_config(p)?,
+            )),
             ("ParticularStaff", p) => Ok(Cond::ParticularStaff(<usize>::from_config(p)?)),
             (s, p) => Err(format!("Failed to parse Cond: {} {}", s, p)),
         }
@@ -418,9 +419,12 @@ impl FromConfig for Box<Cond> {
             ("StaffInRange", p) => Ok(Box::new(Cond::StaffInRange(<(usize, usize)>::from_config(
                 p,
             )?))),
-            ("StaffWithAbility", p) => {
-                Ok(Box::new(Cond::StaffWithAbility(<isize>::from_config(p)?)))
-            }
+            ("StaffWithAttribute", p) => Ok(Box::new(Cond::StaffWithAttribute(<(
+                StaffAttributeName,
+                isize,
+            )>::from_config(
+                p
+            )?))),
             ("ParticularStaff", p) => Ok(Box::new(Cond::ParticularStaff(<usize>::from_config(p)?))),
             (s, p) => Err(format!("Failed to parse Box<Cond>: {} {}", s, p)),
         }
