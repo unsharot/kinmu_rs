@@ -267,12 +267,6 @@ impl FromConfig for Staff {
     fn from_config(s: &str) -> Result<Self, String> {
         let words: Vec<String> = s.split_whitespace().map(|s| s.to_string()).collect();
         let l = words.len();
-        check_len(
-            6,
-            &words,
-            "Needs 6 fields, but not enough.",
-            "Needs 6 fields, but too much given.",
-        )?;
         let mut attributes = Vec::new();
         for i in 1..(l - 1) {
             attributes.push(<isize>::from_config(&words[i])?);
@@ -593,11 +587,20 @@ mod tests {
 
     #[test]
     fn parse_tuple_test() {
-        assert_eq!(<(isize, isize)>::from_config("(1,2"), Err("found '(', but ')' not found".to_string()));
-        assert_eq!(<(isize, isize)>::from_config("(1)"), Err("Needs 2 fields, but not enough.".to_string()));
-        assert_eq!(<(isize, isize)>::from_config("(1, 2, 3)"), Err("Needs 2 fields, but too much given.".to_string()));
-        assert_eq!(<(isize, isize)>::from_config("(1,2)"), Ok((1,2)));
-        assert_eq!(<(isize, isize)>::from_config("1,2"), Ok((1,2)));
-        assert_eq!(<(isize, isize)>::from_config(" 1, 2 "), Ok((1,2)));
+        assert_eq!(
+            <(isize, isize)>::from_config("(1,2"),
+            Err("found '(', but ')' not found".to_string())
+        );
+        assert_eq!(
+            <(isize, isize)>::from_config("(1)"),
+            Err("Needs 2 fields, but not enough.".to_string())
+        );
+        assert_eq!(
+            <(isize, isize)>::from_config("(1, 2, 3)"),
+            Err("Needs 2 fields, but too much given.".to_string())
+        );
+        assert_eq!(<(isize, isize)>::from_config("(1,2)"), Ok((1, 2)));
+        assert_eq!(<(isize, isize)>::from_config("1,2"), Ok((1, 2)));
+        assert_eq!(<(isize, isize)>::from_config(" 1, 2 "), Ok((1, 2)));
     }
 }

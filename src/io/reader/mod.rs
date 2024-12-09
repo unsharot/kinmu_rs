@@ -41,6 +41,18 @@ pub fn load_schedule_config(
     let StaffAttributeMapWrapper(staff_attribute_name_index_map) =
         <StaffAttributeMapWrapper>::from_config(&ss[0])?;
     let staff_list = <Vec<Staff>>::from_config(&ss[1])?;
+
+    // staffのattributesの項目数をチェック
+    let attribute_count = staff_attribute_name_index_map.names.len();
+    for staff in &staff_list {
+        check_len(
+            attribute_count,
+            &staff.attributes,
+            "staffのattributesの項目が足りません",
+            "staffのattributesの項目が余分です",
+        )?;
+    }
+
     let NGListWrapper(ng_list) = <NGListWrapper>::from_config(&ss[2])?;
     let staff_count = <usize>::from_config(&ss[3])?;
     let day_count = <usize>::from_config(&ss[4])?;
