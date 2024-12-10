@@ -89,86 +89,86 @@ cargo build --release
 設定ファイル内では#を用いたコメントアウトが使えます。
 また、改行やスペースの数は問題になりませんが、一行に書くべき情報を改行する場合はエラーとなります。
 
-### メインconfig
+### main_config
 呼び出すファイルを設定します。
 
-#### Files
+#### schedule_config_paths
 勤務表のconfigを列挙します。
 
 例
 ```yaml
-Files:
+schedule_config_paths:
 ./config/configW.yaml
 ./config/configK.yaml
 ```
 
-### 勤務表のconfig
+### schedule_config
 勤務表に使う基本的な値の設定です。
 
-#### attributes
+#### staff_attributes
 職員ごとのパラメータ名を設定します。
 日本語でも可です。
 
 例
 ```yaml
-attributes:
-KDayCount IDayCount ODayCount HDayCount
+staff_attributes:
+Ability KDayCount IDayCount ODayCount HDayCount
 ```
 ```yaml
-attributes:
-公休数 夜勤数 遅番数 早番数
+staff_attributes:
+能力 公休数 夜勤数 遅番数 早番数
 ```
 
-#### 職員リスト
+#### staff_list
 職員の能力、attributesで指定したパラメータ、名前を列挙します。
 コメントで項目名を記しておくと便利です。
 
 例
 ```yaml
-職員リスト:
+staff_list:
 0 8 3 -1 -1 職員A
 1 9 6 0  0  職員B
 ```
 ```yaml
-職員リスト:
+staff_list:
 #能力 公休 夜勤 遅番 早番 名前  番号
 0     8   3    -1   -1  職員A #1
 1     9   6    0    0   職員B #2
 ```
 
-#### NGリスト
+#### ng_list
 特定の職員同士が夜勤で同じ日の勤務にならないようにするための設定です。
 職員リストで上から1,2,3..と番号を振っていき、その番号で指定します。
 行ごとに必ず改行を挟んで設定してください。
 
 例
 ```yaml
-NGリスト:
+ng_list:
 1 2
 6 2
 ```
 
-#### 職員数
+#### staff_count
 職員の数を指定します。
 職員リストの長さより小さい数が指定された場合、職員リストの上からその数だけカウントされ、余剰分は無視されます。
 
 例
 ```yaml
-職員数:
+staff_count:
 12
 ```
 
-#### 日数
+#### day_count
 勤務表の日数を指定します。
 30日の月で、バッファー日数を3日に指定している場合、30日+バッファー日数3日 = 33日として指定してください。
 
 例
 ```yaml
-日数:
+day_count:
 33
 ```
 
-#### DayState
+#### day_state
 日数で指定した日数分の日ごとのステータスを設定します。ステータスは以下の通りです。
 
 - W: WeekDay 平日
@@ -179,22 +179,22 @@ NGリスト:
 
 例
 ```yaml
-DayState:
+day_state:
 W2WHHWFW2GHHWFW2WHHWFW2WHHWFW2WHH
 ```
 
-#### バッファー日数
+#### buffer_count
 バッファーの日数を指定します。
 バッファーというのは、先月の終わり３日分など、考慮するべき日数です。
 3日分を考慮する際は3を設定してください。
 
 例
 ```yaml
-バッファー日数:
+buffer_count:
 3
 ```
 
-#### 希望
+#### requested_schedule
 希望として出された勤務表を指定します。
 横軸が日、縦軸が職員です。
 すなわち、行が職員ごとの希望、列が日ごとの希望となります。
@@ -217,7 +217,7 @@ W2WHHWFW2GHHWFW2WHHWFW2WHHWFW2WHH
 
 例
 ```yaml
-希望:
+requested_schedule:
 AKNUUUUUUUUUUIAKYUUUUUUUUIAKUUUUU
 KHIAKUUUUUUUUUUUIAKYUUUUUUUUUUUUU
 OIAKUUUUUUUUUUUUUUUUUUUIAKYUUUUUU
@@ -233,7 +233,7 @@ UUUKKUUUUUKKUUUUUKKKUUUKKKUUUUUKK
 ```
 
 ```yaml
-希望:
+requested_schedule:
 #2WHHWFW2GHHWFW2WHHWFW2WHHWFW2WHH
 #00123456789012345678901234567890
    KKNNNNNKKNNNNNKKNNNNNKKNNNNNKK#職員A
@@ -267,7 +267,7 @@ OStaffCount
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 
 ```
 
-#### fillの関数
+#### fill_function
 焼きなましの前に未定(U)の場所をうめるための関数を指定します。
 以下の関数があります。
 
@@ -276,11 +276,11 @@ OStaffCount
 
 例
 ```yaml
-fillの関数:
+fill_function:
 fill2
 ```
 
-#### fillのシード値
+#### fill_seed
 fillの乱数に用いるシード値を指定します。
 型はusizeで、最小値は0、最大値はusizeの上限で、64bitなら18446744073709551615、32bitなら4294967295です。
 0の場合、乱数に用いるシード値はランダムで選ばれます。
@@ -289,23 +289,23 @@ fillの乱数に用いるシード値を指定します。
 
 例
 ```yaml
-fillのシード値:
+fill_seed:
 53
 ```
 
-#### アニーリング
+#### annealing_config_paths
 焼きなましの設定ファイルのパスを指定します。
 焼きなましはここで列挙した順に行われます。
 
 例
 ```yaml
-アニーリング:
+annealing_config_paths:
 ./config/anconfigW/randomWalk.yaml
 ./config/anconfigW/W1.yaml
 ./config/anconfigW/W2.yaml
 ```
 
-#### 結果のスコア
+#### score_functions_for_result
 焼きなまし終了後、結果を表示する際に用いるスコアを列挙します。
 スコアの名前と、そのスコアに用いるパラメータを指定します。
 順不同です。スコアは以下のとおりです。
@@ -359,7 +359,7 @@ Condの詳細は以下の通り
 
 例
 ```yaml
-結果のスコア:
+score_functions_for_result:
 PatternGeneral (Every (), [[I], [N,O,H,I,K,Y]], 1000)
 PatternGeneral (Every (), [[A], [N,O,H,I,A]], 1000)
 PatternFixed (Every (), [K,I], 100)
@@ -400,19 +400,19 @@ NoSamePair (DayExceptBuffer (), 3, I, 1000)
 NoSamePair (DayExceptBuffer (), 2, I, 500)
 ```
 
-### 焼きなましのconfig
+### annealing_config
 焼きなまし法で用いるパラメータを設定します。
 
-#### ステップ数
+#### step_count
 焼きなましのステップ数を指定します。
 
 例
 ```yaml
-ステップ数:
+step_count:
 20000
 ```
 
-#### 乱数のシード
+#### seed
 焼きなまし法の更新関数に用いる乱数のシード値を指定します。
 型はusizeで、最小値は0、最大値はusizeの上限で、64bitなら18446744073709551615、32bitなら4294967295です。
 0の場合、乱数に用いるシード値はランダムで選ばれます。
@@ -421,15 +421,15 @@ NoSamePair (DayExceptBuffer (), 2, I, 500)
 
 例
 ```yaml
-乱数のシード:
+seed:
 6554
 ```
 
-#### 各スコアのパラメータ
+#### score_functions
 焼きなましに用いるスコアとパラメータを指定します。
 記述方法は勤務表のconfigのスコアと同じです
 
-#### 更新関数
+#### update_function
 焼きなましの更新に用いる更新関数を指定します。
 更新関数は以下の通りです。
 
@@ -438,7 +438,7 @@ NoSamePair (DayExceptBuffer (), 2, I, 500)
 
 例
 ```yaml
-更例関数:
+update_function:
 update5
 ```
 
