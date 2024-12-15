@@ -1,0 +1,67 @@
+[staff]
+
+attributes = [
+ "Ability1",
+ "Ability2",
+]
+
+list = [
+{name = "職員A", attributes = [1, 1]}, #0
+{name = "職員B", attributes = [1, 0]}, #1
+{name = "職員C", attributes = [0, 0]}, #2
+]
+
+ng_list = [
+# {from = "職員A", to = "職員B"},
+{from = 0, to = 1},
+# {from = "職員B", to = "職員C"},
+{from = 1, to = 2},
+]
+
+count = 3
+
+
+[day]
+
+day_count = 13
+
+states = "WWWHHHHHBBBBB"
+
+buffer_count = 3
+
+requested_schedule = [
+#  WWWHHHHHBBBBB
+#  0001234567890
+  "UUUUUUUUUUUUU", # 職員A
+  "UUUUUUUUUUUUU", # 職員B
+  "UUUUUUUUUUUUU", # 職員C
+]
+
+attributes = [
+{name = "Count1", values = [1,1,1,1,1,1,1,1,1,1,1,1,1]},
+{name = "Count2", values = [0,0,0,1,1,1,1,0,0,0,0,0,0]},
+]
+
+
+[fill]
+
+function = "fill1"
+
+seed = 0
+
+
+[annealing]
+
+config_paths = [
+"config_template/annealing_configs/annealing_config_1.toml",
+"config_template/annealing_configs/annealing_config_2.toml",
+]
+
+
+[result]
+
+# score_functions_for_result = [
+# "score_func_a",
+# "score_func_b",
+# ]
+score_functions = []
