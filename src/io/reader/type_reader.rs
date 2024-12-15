@@ -1,11 +1,10 @@
+///! ScoreProp読み込みのためのモジュール
 use crate::kinmu_lib::types::{
-    Cond, CondWrapper, DayAttributeName, DayState, Days, NGList, Schedule, Score, ScoreProp, Shift,
-    Staff, StaffAttributeName, StaffAttributeNameIndexMap, NG,
+    Cond, CondWrapper, DayAttributeName, DayState, Days, Score, ScoreProp, Shift, Staff,
+    StaffAttributeName,
 };
 
 use super::common::check_len;
-
-use std::collections::HashMap;
 
 pub trait FromConfig: Sized {
     fn from_config(s: &str) -> Result<Self, String>;
@@ -159,30 +158,6 @@ impl FromConfig for isize {
     }
 }
 
-pub struct DayAttributeWrapper(pub HashMap<DayAttributeName, Vec<isize>>);
-
-impl FromConfig for DayAttributeWrapper {
-    fn from_config(s: &str) -> Result<Self, String> {
-        let mut ans = HashMap::new();
-        let mut name_flag = true;
-        let mut name = "".to_string();
-        for line in s.lines() {
-            if name_flag {
-                name = line.to_string();
-                name_flag = false;
-            } else {
-                let att: Vec<isize> = line
-                    .split_whitespace()
-                    .map(|x| x.parse::<isize>().map_err(|e| e.to_string()))
-                    .collect::<Result<Vec<_>, String>>()?;
-                ans.insert(name.clone(), att);
-                name_flag = true;
-            }
-        }
-        Ok(DayAttributeWrapper(ans))
-    }
-}
-
 impl FromConfig for f32 {
     fn from_config(s: &str) -> Result<Self, String> {
         Ok(s.parse::<f32>().map_err(|e| e.to_string())?)
@@ -279,53 +254,6 @@ impl FromConfig for Staff {
     }
 }
 
-pub struct NGListWrapper(pub NGList);
-
-impl FromConfig for NGListWrapper {
-    fn from_config(s: &str) -> Result<Self, String> {
-        let mut ans: NGList = Vec::new();
-        for line in s.lines() {
-            let NGWrapper(ng) = <NGWrapper>::from_config(&line)?;
-            ans.push(ng);
-        }
-        Ok(NGListWrapper(ans))
-    }
-}
-
-struct NGWrapper(pub NG);
-
-impl FromConfig for NGWrapper {
-    fn from_config(s: &str) -> Result<Self, String> {
-        let words: Vec<String> = s.split_whitespace().map(|s| s.to_string()).collect();
-        check_len(
-            2,
-            &words,
-            "Needs 2 fields, but not enough.",
-            "Needs 2 fields, but too much given.",
-        )?;
-        let id1 = <usize>::from_config(&words[0])?;
-        let id2 = <usize>::from_config(&words[1])?;
-        Ok(NGWrapper((id1, id2)))
-    }
-}
-
-pub struct TempWrapper(pub f32, pub f32);
-
-impl FromConfig for TempWrapper {
-    fn from_config(s: &str) -> Result<Self, String> {
-        let words: Vec<String> = s.split_whitespace().map(|s| s.to_string()).collect();
-        check_len(
-            2,
-            &words,
-            "Needs 2 fields, but not enough.",
-            "Needs 2 fields, but too much given.",
-        )?;
-        let id1 = <f32>::from_config(&words[0])?;
-        let id2 = <f32>::from_config(&words[1])?;
-        Ok(TempWrapper(id1, id2))
-    }
-}
-
 impl FromConfig for Days {
     fn from_config(s: &str) -> Result<Self, String> {
         let mut ans: Days = Vec::new();
@@ -333,22 +261,6 @@ impl FromConfig for Days {
             ans.push(c.to_string().parse::<DayState>()?);
         }
         Ok(ans)
-    }
-}
-
-pub struct ScheduleWrapper(pub Schedule);
-
-impl FromConfig for ScheduleWrapper {
-    fn from_config(s: &str) -> Result<Self, String> {
-        let mut ans: Schedule = Vec::new();
-        for line in s.lines() {
-            let mut row = Vec::new();
-            for c in line.chars() {
-                row.push(c.to_string().parse::<Shift>()?);
-            }
-            ans.push(row);
-        }
-        Ok(ScheduleWrapper(ans))
     }
 }
 
@@ -527,23 +439,6 @@ impl FromConfig for Vec<ScoreProp> {
             ans.push(<ScoreProp>::from_config(&line)?);
         }
         Ok(ans)
-    }
-}
-
-pub struct StaffAttributeMapWrapper(pub StaffAttributeNameIndexMap);
-
-impl FromConfig for StaffAttributeMapWrapper {
-    fn from_config(s: &str) -> Result<Self, String> {
-        let names: Vec<String> = s.split_whitespace().map(|s| s.to_string()).collect();
-        let mut name_to_index = HashMap::new();
-        for (i, name) in names.iter().enumerate() {
-            name_to_index.insert(name.to_string(), i);
-        }
-        let sa_map = StaffAttributeNameIndexMap {
-            names: names,
-            name_to_index: name_to_index,
-        };
-        Ok(StaffAttributeMapWrapper(sa_map))
     }
 }
 

@@ -54,7 +54,7 @@ fn generate_schedule(p: &str) -> Result<(), String> {
 
     let mut model = fill::run(&mut fc, &schedule_prop)?;
 
-    print_check("K_I_COUNTS", check::k_i_counts(&schedule_prop, &model));
+    // print_check("K_I_COUNTS", check::k_i_counts(&schedule_prop, &model));
 
     print_check(
         "ABS_NOT_CHANGED",
