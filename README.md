@@ -41,19 +41,19 @@ GCがないためC++並みの速度を持ち、Haskellと同等の型の表現�
 
 - kinmu.exeを任意のフォルダAに入れる A/kinmu.exeという状態
 - ディレクトリA/configを作成
-- A/config.yamlを作成
-- A/config.yamlで指定したファイルに必要事項を記入
+- A/config.tomlを作成
+- A/config.tomlで指定したファイルに必要事項を記入
 - ターミナルを開く
 - Aへ移動する
 - ./kinmu.exeをターミナルで実行
 
-exeファイルを実行する際、デフォルトでメインconfigとしてconfig/config.yamlが読み込まれますが、
+exeファイルを実行する際、デフォルトでメインconfigとしてconfig/config.tomlが読み込まれますが、
 読み込むconfigを指定することもできます。
 以下のように引数にファイル名を指定することで、読み込むファイルを指定することができます。
 モードを切り替えて使いたい場合にご利用ください。
 
 ```sh
-./kinmu.exe config/hoge/config.yaml
+./kinmu.exe config/hoge/config.toml
 ```
 
 ### ソースファイルをダウンロードする場合
@@ -85,7 +85,7 @@ cargo build --release
 が生成されるので、「実行ファイルをダウンロードする場合」同様に実行
 
 ## 使い方
-ファイル構成は以下の通りですが、メインの設定ファイルであるconfig/config.yaml以外は自由に配置することが可能です。
+ファイル構成は以下の通りですが、メインの設定ファイルであるconfig/config.toml以外は自由に配置することが可能です。
 設定ファイル内では#を用いたコメントアウトが使えます。
 また、改行やスペースの数は問題になりませんが、一行に書くべき情報を改行する場合はエラーとなります。
 
@@ -96,80 +96,113 @@ cargo build --release
 勤務表のconfigを列挙します。
 
 例
-```yaml
-schedule_config_paths:
-./config/configW.yaml
-./config/configK.yaml
+```toml
+schedule_config_paths = [
+   "./config/configW.toml",
+   "./config/configK.toml",
+]
 ```
 
 ### schedule_config
 勤務表に使う基本的な値の設定です。
 
-#### staff_attributes
+#### staff
+スタッフに関する設定のグループです。
+以下のタグのもと設定してください。
+順不同です。
+
+```toml
+[staff]
+```
+
+##### attributes
 職員ごとのパラメータ名を設定します。
 日本語でも可です。
 
 例
-```yaml
-staff_attributes:
-Ability KDayCount IDayCount ODayCount HDayCount
+```toml
+[staff]
+attributes = [
+   "Ability",
+   "KDayCount",
+   "IDayCount",
+   "ODayCount",
+   "HDayCount",
+]
 ```
-```yaml
-staff_attributes:
-能力 公休数 夜勤数 遅番数 早番数
+```toml
+[staff]
+attributes = [
+   "能力",
+   "公休数",
+   "夜勤数",
+   "遅番数",
+   "早番数",
+]
 ```
 
-#### staff_list
+##### list
 職員の能力、attributesで指定したパラメータ、名前を列挙します。
 コメントで項目名を記しておくと便利です。
 
 例
-```yaml
-staff_list:
-0 8 3 -1 -1 職員A
-1 9 6 0  0  職員B
-```
-```yaml
-staff_list:
-#能力 公休 夜勤 遅番 早番 名前  番号
-0     8   3    -1   -1  職員A #1
-1     9   6    0    0   職員B #2
+```toml
+list = [
+   {name = "職員A", attributes = [0, 8, 3, -1, -1]},
+   {name = "職員B", attributes = [1, 9, 6,  0,  0]},
+]
 ```
 
-#### ng_list
+```toml
+list = [
+   #        名前                  能力 公休   夜勤   遅番  早番  番号
+   {name = "職員A", attributes = [0,   8,    3,    -1,   -1]}, #0
+   {name = "職員B", attributes = [1,   9,    6,     0,    0]}, #1
+]
+```
+
+##### ng_list
 特定の職員同士が夜勤で同じ日の勤務にならないようにするための設定です。
-職員リストで上から1,2,3..と番号を振っていき、その番号で指定します。
+職員リストで上から0,1,2..と番号を振っていき、その番号で指定します。
 行ごとに必ず改行を挟んで設定してください。
 
 例
-```yaml
-ng_list:
-1 2
-6 2
+```toml
+ng_list = [
+   {from = 0, to = 1},
+   {from = 5, to = 1},
+]
 ```
 
-#### staff_count
+##### count
 職員の数を指定します。
 職員リストの長さより小さい数が指定された場合、職員リストの上からその数だけカウントされ、余剰分は無視されます。
 
 例
-```yaml
-staff_count:
-12
+```toml
+count = 12
 ```
 
-#### day_count
+#### day
+日付に関する設定のグループです。
+以下のタグのもと設定してください。
+順不同です。
+
+```toml
+[day]
+```
+
+##### day_count
 勤務表の日数を指定します。
 30日の月で、バッファー日数を3日に指定している場合、30日+バッファー日数3日 = 33日として指定してください。
 
 例
-```yaml
-day_count:
-33
+```toml
+day_count = 33
 ```
 
-#### day_state
-日数で指定した日数分の日ごとのステータスを設定します。ステータスは以下の通りです。
+##### states
+日数で指定した日数分の日ごとの状態を設定します。状態は以下の通りです。
 
 - W: WeekDay 平日
 - H: Holiday 休日
@@ -178,27 +211,25 @@ day_count:
 - G: Weight 体重測定
 
 例
-```yaml
-day_state:
-W2WHHWFW2GHHWFW2WHHWFW2WHHWFW2WHH
+```toml
+states = "W2WHHWFW2GHHWFW2WHHWFW2WHHWFW2WHH"
 ```
 
-#### buffer_count
+##### buffer_count
 バッファーの日数を指定します。
 バッファーというのは、先月の終わり３日分など、考慮するべき日数です。
 3日分を考慮する際は3を設定してください。
 
 例
-```yaml
-buffer_count:
-3
+```toml
+buffer_count = 3
 ```
 
-#### requested_schedule
+##### requested_schedule
 希望として出された勤務表を指定します。
 横軸が日、縦軸が職員です。
 すなわち、行が職員ごとの希望、列が日ごとの希望となります。
-ステータスは以下の通りです。
+シフトは以下の通りです。
 
 - N: 日勤
 - K: 公休
@@ -216,58 +247,68 @@ buffer_count:
 コメントで職員名と日付を記しておくと便利です。
 
 例
-```yaml
-requested_schedule:
-AKNUUUUUUUUUUIAKYUUUUUUUUIAKUUUUU
-KHIAKUUUUUUUUUUUIAKYUUUUUUUUUUUUU
-OIAKUUUUUUUUUUUUUUUUUUUIAKYUUUUUU
-NOKKUUUUUUUUUUUUUUUUUUUUUUUUUUUUY
-IAKUUUUUUUUUUUUUUYUUUUUUUKUUUUUUU
-HYNUUUUUUUUUUUUUKUUUUYUUUUUUUUUUU
-KNOUUUUUUUUUUUUUUUUUUUYUUUUUUUUUU
-KNIAIAKKIAKUUUUUUUUUUUUUUUUUUUYUU
-KNHUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU
-IAKUUUUUUUUUUUIAKUUUUUUUUUUUUUUUU
-UUUKKUUUUYKKUUUUUKKUUUUUKKUUUUUKK
-UUUKKUUUUUKKUUUUUKKKUUUKKKUUUUUKK
+```toml
+requested_schedule = [
+   "AKNUUUUUUUUUUIAKYUUUUUUUUIAKUUUUU",
+   "KHIAKUUUUUUUUUUUIAKYUUUUUUUUUUUUU",
+   "OIAKUUUUUUUUUUUUUUUUUUUIAKYUUUUUU",
+   "NOKKUUUUUUUUUUUUUUUUUUUUUUUUUUUUY",
+   "IAKUUUUUUUUUUUUUUYUUUUUUUKUUUUUUU",
+   "HYNUUUUUUUUUUUUUKUUUUYUUUUUUUUUUU",
+   "KNOUUUUUUUUUUUUUUUUUUUYUUUUUUUUUU",
+   "KNIAIAKKIAKUUUUUUUUUUUUUUUUUUUYUU",
+   "KNHUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU",
+   "IAKUUUUUUUUUUUIAKUUUUUUUUUUUUUUUU",
+   "UUUKKUUUUYKKUUUUUKKUUUUUKKUUUUUKK",
+   "UUUKKUUUUUKKUUUUUKKKUUUKKKUUUUUKK",
+]
 ```
 
-```yaml
-requested_schedule:
-#2WHHWFW2GHHWFW2WHHWFW2WHHWFW2WHH
-#00123456789012345678901234567890
-   KKNNNNNKKNNNNNKKNNNNNKKNNNNNKK#職員A
-NIAKKK    KKYK                   #職員B
-AKN KK                           #職員C
-NNIAK                        IAKY#職員D
-KNN       KK                     #職員E
-KNN                              #職員F
-KNN                  YKK         #職員G
-IAK               KK             #職員H
-UUUKKYYYYYKYYYYYYKKYYYYYKYYYYYYKK#職員I
-NKN      K                K      #職員J
-NIAK                             #職員K
-NNN             K   K     K      #職員L
-NON    KK       KK               #職員M
-ONK                              #職員N
-AKO        K             K       #職員O
-KNK                              #職員P
+```toml
+requested_schedule = [
+   #W2WHHWFW2GHHWFW2WHHWFW2WHHWFW2WHH
+   #000123456789012345678901234567890
+   "   KKNNNNNKKNNNNNKKNNNNNKKNNNNNKK", #職員A
+   "NIAKKK    KKYK                   ", #職員B
+   "AKN KK                           ", #職員C
+   "NNIAK                        IAKY", #職員D
+   "KNN       KK                     ", #職員E
+   "KNN                              ", #職員F
+   "KNN                  YKK         ", #職員G
+   "IAK               KK             ", #職員H
+   "UUUKKYYYYYKYYYYYYKKYYYYYKYYYYYYKK", #職員I
+   "NKN      K                K      ", #職員J
+   "NIAK                             ", #職員K
+   "NNN             K   K     K      ", #職員L
+   "NON    KK       KK               ", #職員M
+   "ONK                              ", #職員N
+   "AKO        K             K       ", #職員O
+   "KNK                              ", #職員P
+]
 ```
 
-#### day_attributes:
+##### attributes
 日付ごとのパラメータ名と値を設定します。
 パラメータの数は任意です。
 値はスペースで区切ります。
 
-```yaml
-day_attributes:
-IStaffCount
-0 0 0 1 1 1 1 1 2 1 1 1 1 1 1 1 2 1 1 1 1 1 2 2 1 2 1 1 1 1 1 1 1 2 1 1 2 
-OStaffCount
-1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 
+```toml
+attributes = [
+   {name = "IStaffCount", values = [0, 0, 0, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2]},
+   {name = "OStaffCount", values = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]},
+]
 ```
 
-#### fill_function
+#### fill
+fillに関する設定のグループです。
+以下のタグのもと設定してください。
+順不同です。
+
+```toml
+[fill]
+```
+
+##### function
 焼きなましの前に未定(U)の場所をうめるための関数を指定します。
 以下の関数があります。
 
@@ -275,12 +316,11 @@ OStaffCount
 - fill2: 夜勤の数と公休の数を守り、入りと明けの連続やその後の休みも加味して埋めます。
 
 例
-```yaml
-fill_function:
-fill2
+```toml
+function = "fill2"
 ```
 
-#### fill_seed
+##### seed
 fillの乱数に用いるシード値を指定します。
 型はusizeで、最小値は0、最大値はusizeの上限で、64bitなら18446744073709551615、32bitなら4294967295です。
 0の場合、乱数に用いるシード値はランダムで選ばれます。
@@ -288,44 +328,62 @@ fillの乱数に用いるシード値を指定します。
 再現性のあるテストがしたいときは固定し、実際に使う場合は0が良いでしょう。
 
 例
-```yaml
-fill_seed:
-53
+```toml
+seed = 53
 ```
 
-#### annealing_config_paths
+#### annealing
+焼きなましに関する設定のグループです。
+以下のタグのもと設定してください。
+順不同です。
+
+```toml
+[annealing]
+```
+
+##### config_paths
 焼きなましの設定ファイルのパスを指定します。
 焼きなましはここで列挙した順に行われます。
 
 例
-```yaml
-annealing_config_paths:
-./config/anconfigW/randomWalk.yaml
-./config/anconfigW/W1.yaml
-./config/anconfigW/W2.yaml
+```toml
+config_paths = [
+   "./config/anconfigW/randomWalk.toml",
+   "./config/anconfigW/W1.toml",
+   "./config/anconfigW/W2.toml",
+]
 ```
 
-#### score_functions_for_result
+#### result
+結果に関する設定のグループです。
+以下のタグのもと設定してください。
+順不同です。
+
+```toml
+[result]
+```
+
+##### score_functions
 焼きなまし終了後、結果を表示する際に用いるスコアを列挙します。
 スコアの名前と、そのスコアに用いるパラメータを指定します。
 順不同です。スコアは以下のとおりです。
 
-| Prop名                       | 引数の型                                        | 説明                                                                                                     |
-| :--------------------------- | :---------------------------------------------- | :------------------------------------------------------------------------------------------------------- |
-| PatternGeneral               | (Cond, [[Shift]], Score)                        | 指定したシフトパターンが出現した場合のペナルティを指定                                                   |
-| PatternFixed                 | (Cond, [Shift], Score)                          | 指定したシフトパターンが出現した場合のペナルティを指定                                                   |
-| PatternGeneralAny            | (Cond, [[Shift]], Score)                        | 指定したシフトパターンが出現する職員ごとにペナルティを指定                                               |
-| PatternFixedAny              | (Cond, [Shift], Score)                          | 指定したシフトパターンが出現する職員ごとにペナルティを指定                                               |
-| Streak                       | (Cond, [Shift], isize, Score)                   | 指定したシフトが指定した回数連続した場合のペナルティを指定                                               |
-| ShiftsBalance                | (Cond, Shift, Shift, Score)                     | 指定した2つのシフトのバランスが悪い場合のペナルティを指定                                                |
-| ShiftHalfBalance             | (Cond, Shift, Score)                            | 指定したシフトが指定範囲の前半と後半でバランスが取れていない場合のペナルティを指定                       |
-| ShiftDirPriority             | (Cond, Shift, Score)                            | 指定したシフトが指定範囲の前後どちらにあるほうが良いか指定 指定スコアが正なら前を優先、負なら後ろを優先  |
-| DayCountRegardStaffAttribute | (Cond, Shift, StaffAttributeName, Score)        | 職員ごとの指定したパラメータと指定したシフトの数の差によるペナルティを指定                               |
-| StaffCountRegardDayAttribute | (Cond, Shift, DayAttributeName, Score)          | 日付ごとの指定したパラメータと指定したシフトの数の差によるペナルティを指定                               |
-| StaffCount                   | (Cond, Shift, isize, Score)                     | 指定した値と指定したシフトの人数の差によるペナルティを指定                                               |
-| StaffCountWithPremise        | (Cond, Shift, isize, Cond, Shift, isize, Score) | 指定したシフトの人数を満たした日付に対して、指定した値と指定したシフトの人数の差によるペナルティを指定 |
-| NGPair                       | (Cond, Shift, Score)                            | NGに指定されたペアが指定したシフトで同じ日になる場合のペナルティを指定                                   |
-| NoSamePair                   | (Cond, isize, Shift, Score)                     | 指定したシフトで同じペアが指定回数以上ある場合のペナルティを指定                                         |
+| Prop名                       | 引数の型                                        | 説明                                                                                                    |
+| :--------------------------- | :---------------------------------------------- | :------------------------------------------------------------------------------------------------------ |
+| PatternGeneral               | (Cond, [[Shift]], Score)                        | 指定したシフトパターンが出現した場合のペナルティを指定                                                  |
+| PatternFixed                 | (Cond, [Shift], Score)                          | 指定したシフトパターンが出現した場合のペナルティを指定                                                  |
+| PatternGeneralAny            | (Cond, [[Shift]], Score)                        | 指定したシフトパターンが出現する職員ごとにペナルティを指定                                              |
+| PatternFixedAny              | (Cond, [Shift], Score)                          | 指定したシフトパターンが出現する職員ごとにペナルティを指定                                              |
+| Streak                       | (Cond, [Shift], isize, Score)                   | 指定したシフトが指定した回数連続した場合のペナルティを指定                                              |
+| ShiftsBalance                | (Cond, Shift, Shift, Score)                     | 指定した2つのシフトのバランスが悪い場合のペナルティを指定                                               |
+| ShiftHalfBalance             | (Cond, Shift, Score)                            | 指定したシフトが指定範囲の前半と後半でバランスが取れていない場合のペナルティを指定                      |
+| ShiftDirPriority             | (Cond, Shift, Score)                            | 指定したシフトが指定範囲の前後どちらにあるほうが良いか指定 指定スコアが正なら前を優先、負なら後ろを優先 |
+| DayCountRegardStaffAttribute | (Cond, Shift, StaffAttributeName, Score)        | 職員ごとの指定したパラメータと指定したシフトの数の差によるペナルティを指定                              |
+| StaffCountRegardDayAttribute | (Cond, Shift, DayAttributeName, Score)          | 日付ごとの指定したパラメータと指定したシフトの数の差によるペナルティを指定                              |
+| StaffCount                   | (Cond, Shift, isize, Score)                     | 指定した値と指定したシフトの人数の差によるペナルティを指定                                              |
+| StaffCountWithPremise        | (Cond, Shift, isize, Cond, Shift, isize, Score) | 指定したシフトの人数を満たした日付に対して、指定した値と指定したシフトの人数の差によるペナルティを指定  |
+| NGPair                       | (Cond, Shift, Score)                            | NGに指定されたペアが指定したシフトで同じ日になる場合のペナルティを指定                                  |
+| NoSamePair                   | (Cond, isize, Shift, Score)                     | 指定したシフトで同じペアが指定回数以上ある場合のペナルティを指定                                        |
 
 型の詳細は以下の通り
 
@@ -358,46 +416,47 @@ Condの詳細は以下の通り
 | ParticularStaff    | usize          | 指定した番号のスタッフなら有効                                     |
 
 例
-```yaml
-score_functions_for_result:
-PatternGeneral (Every (), [[I], [N,O,H,I,K,Y]], 1000)
-PatternGeneral (Every (), [[A], [N,O,H,I,A]], 1000)
-PatternFixed (Every (), [K,I], 100)
-PatternFixed (Every (), [Y,I], 100)
-PatternGeneral (Every (), [[K,Y],[N,O,H],[I]], 10)
-PatternGeneral (Every (), [[N,O,H],[N,O,H],[I]], -300)
-PatternFixed (Every (), [O,N], 100)
-PatternFixed (Every (), [N,H], 1000)
-PatternFixed (Every (), [O,H], 2000)
-Streak (Every (), [N,O,H,I,A], 4, 200)
-Streak (Every (), [N,O,H,I,A], 5, 1000)
-Streak (Every (), [N,O,H,I,A], 6, 4000)
-Streak (Every (), [N,O,H,I,A], 7, 10000)
-NGPair (DayExceptBuffer (), I, 1000)
-Streak (Every (), [K,Y], 2, -100)
-Need2Holidays (Every (), [K,Y], 1000)
-Need2Holidays (DayExceptBuffer (), [K,Y], 1000)
-ShiftsBalance (DayExceptBuffer (), O, H, 3)
-ShiftHalfBalance (DayExceptBuffer (), I, 10)
-ShiftHalfBalance (DayExceptBuffer (), O, 3)
-ShiftHalfBalance (DayExceptBuffer (), H, 3)
-DayCountRegardStaffAttribute (DayExceptBuffer (), K, KDayCount, 10)
-DayCountRegardStaffAttribute (DayExceptBuffer (), I, IDayCount, 10)
-DayCountRegardStaffAttribute (DayExceptBuffer (), O, ODayCount, 100)
-DayCountRegardStaffAttribute (DayExceptBuffer (), H, HDayCount, 100)
-StaffCountRegardDayAttribute (DayExceptBuffer (), I, IStaffCount, 10)
-StaffCount (And (DayExceptBuffer (), ParticularDayState B), N, 4, 5)
-StaffCount (And (DayExceptBuffer (), ParticularDayState 2), N, 2, 5)
-StaffCount (And (DayExceptBuffer (), ParticularDayState W), N, 2, 5)
-StaffCount (And (DayExceptBuffer (), ParticularDayState H), N, 2, 5)
-StaffCount (And (DayExceptBuffer (), ParticularDayState M), N, 2, 5)
-StaffCount (DayExceptBuffer (), O, 1, 100)
-StaffCount (DayExceptBuffer (), H, 1, 100)
-StaffCountWithPremise (DayExceptBuffer (), I, 1, And (DayExceptBuffer (), StaffWithAbility 2), I, 1, 70)
-StaffCount (And (BeforeDayState B, DayExceptBuffer ()), I, 1, 30)
-StaffCount (DayExceptBuffer (), U, 0, 100000)
-NoSamePair (DayExceptBuffer (), 3, I, 1000)
-NoSamePair (DayExceptBuffer (), 2, I, 500)
+```toml
+score_functions = [
+   "PatternGeneral (Every (), [[I], [N,O,H,I,K,Y]], 1000)",
+   "PatternGeneral (Every (), [[A], [N,O,H,I,A]], 1000)",
+   "PatternFixed (Every (), [K,I], 100)",
+   "PatternFixed (Every (), [Y,I], 100)",
+   "PatternGeneral (Every (), [[K,Y],[N,O,H],[I]], 10)",
+   "PatternGeneral (Every (), [[N,O,H],[N,O,H],[I]], -300)",
+   "PatternFixed (Every (), [O,N], 100)",
+   "PatternFixed (Every (), [N,H], 1000)",
+   "PatternFixed (Every (), [O,H], 2000)",
+   "Streak (Every (), [N,O,H,I,A], 4, 200)",
+   "Streak (Every (), [N,O,H,I,A], 5, 1000)",
+   "Streak (Every (), [N,O,H,I,A], 6, 4000)",
+   "Streak (Every (), [N,O,H,I,A], 7, 10000)",
+   "NGPair (DayExceptBuffer (), I, 1000)",
+   "Streak (Every (), [K,Y], 2, -100)",
+   "Need2Holidays (Every (), [K,Y], 1000)",
+   "Need2Holidays (DayExceptBuffer (), [K,Y], 1000)",
+   "ShiftsBalance (DayExceptBuffer (), O, H, 3)",
+   "ShiftHalfBalance (DayExceptBuffer (), I, 10)",
+   "ShiftHalfBalance (DayExceptBuffer (), O, 3)",
+   "ShiftHalfBalance (DayExceptBuffer (), H, 3)",
+   "DayCountRegardStaffAttribute (DayExceptBuffer (), K, KDayCount, 10)",
+   "DayCountRegardStaffAttribute (DayExceptBuffer (), I, IDayCount, 10)",
+   "DayCountRegardStaffAttribute (DayExceptBuffer (), O, ODayCount, 100)",
+   "DayCountRegardStaffAttribute (DayExceptBuffer (), H, HDayCount, 100)",
+   "StaffCountRegardDayAttribute (DayExceptBuffer (), I, IStaffCount, 10)",
+   "StaffCount (And (DayExceptBuffer (), ParticularDayState B), N, 4, 5)",
+   "StaffCount (And (DayExceptBuffer (), ParticularDayState 2), N, 2, 5)",
+   "StaffCount (And (DayExceptBuffer (), ParticularDayState W), N, 2, 5)",
+   "StaffCount (And (DayExceptBuffer (), ParticularDayState H), N, 2, 5)",
+   "StaffCount (And (DayExceptBuffer (), ParticularDayState M), N, 2, 5)",
+   "StaffCount (DayExceptBuffer (), O, 1, 100)",
+   "StaffCount (DayExceptBuffer (), H, 1, 100)",
+   "StaffCountWithPremise (DayExceptBuffer (), I, 1, And (DayExceptBuffer (), StaffWithAbility 2), I, 1, 70)",
+   "StaffCount (And (BeforeDayState B, DayExceptBuffer ()), I, 1, 30)",
+   "StaffCount (DayExceptBuffer (), U, 0, 100000)",
+   "NoSamePair (DayExceptBuffer (), 3, I, 1000)",
+   "NoSamePair (DayExceptBuffer (), 2, I, 500)",
+]
 ```
 
 ### annealing_config
@@ -407,9 +466,8 @@ NoSamePair (DayExceptBuffer (), 2, I, 500)
 焼きなましのステップ数を指定します。
 
 例
-```yaml
-step_count:
-20000
+```toml
+step_count = 20000
 ```
 
 #### seed
@@ -420,9 +478,8 @@ step_count:
 再現性のあるテストがしたいときは固定し、実際に使う場合は0が良いでしょう。
 
 例
-```yaml
-seed:
-6554
+```toml
+seed = 6554
 ```
 
 #### score_functions
@@ -437,19 +494,17 @@ seed:
 - update5: 夜勤と公休をランダムに移動します。夜勤の数や公休の数は維持されます。
 
 例
-```yaml
-update_function:
-update5
+```toml
+update_function = "update5"
 ```
 
-#### max_and_min_temp
+#### temp
 焼きなましの最高温度と最高温度を実数で指定します。
 序盤に許容するスコアの悪化幅を指定するとよいでしょう。
 
 例
-```yaml
-max_and_min_temp:
-25 0
+```toml
+temp = {max = 25, min = 0}
 ```
 
 ## ファイル構成
