@@ -93,15 +93,13 @@ fn generate_schedule(p: &str, thread_count: usize) -> Result<(), String> {
 
         println!("thread: {}", i + 1);
 
-        println!();
-
         let score = score::assess_score(
             &mut schedule_prop.score_props.clone(),
             &mut schedule_prop,
             &model,
         );
 
-        println!("{}", score);
+        println!("score: {}", score);
         display::print_schedule(&schedule_prop, &model);
 
         println!();
@@ -115,10 +113,10 @@ fn generate_schedule(p: &str, thread_count: usize) -> Result<(), String> {
             )
         );
 
-        println!();
+        // println!();
     }
 
-    println!("time: {:?}", start.elapsed());
+    println!("total time: {:?}", start.elapsed());
 
     Ok(())
 }
