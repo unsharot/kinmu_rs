@@ -59,7 +59,7 @@ pub type Schedule = Vec<Vec<Shift>>;
 
 pub type Score = f32;
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub enum ShiftState {
     Absolute,
     Random,
@@ -67,6 +67,7 @@ pub enum ShiftState {
 
 pub type ScheduleState = Vec<Vec<ShiftState>>;
 
+#[derive(Clone)]
 pub struct Staff {
     pub name: String,
     pub attributes: Vec<isize>,
@@ -246,6 +247,7 @@ impl fmt::Debug for CondWrapper {
 }
 
 /// 勤務表ごとの設定
+#[derive(Clone)]
 pub struct ScheduleProp {
     pub staff_list: Vec<Staff>,
     pub ng_list: NGList,
@@ -271,6 +273,7 @@ impl ScheduleProp {
     }
 }
 
+#[derive(Clone)]
 pub struct StaffAttributeNameIndexMap {
     pub names: Vec<StaffAttributeName>,
     pub name_to_index: HashMap<StaffAttributeName, usize>,
