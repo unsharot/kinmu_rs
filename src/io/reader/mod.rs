@@ -5,6 +5,7 @@ mod common;
 mod toml_reader;
 mod type_reader;
 
+use toml_reader::MainConfig;
 use type_reader::*;
 
 use crate::kinmu_lib::types::{
@@ -14,9 +15,8 @@ use crate::kinmu_lib::types::{
 
 type FilePath = String;
 
-pub fn load_main_config(path: &str) -> Result<Vec<FilePath>, String> {
-    let config = toml_reader::read_main_config(path)?;
-    Ok(config.schedule_config_paths)
+pub fn load_main_config(path: &str) -> Result<MainConfig, String> {
+    Ok(toml_reader::read_main_config(path)?)
 }
 
 /// 勤務表で使う値を読み込む

@@ -8,6 +8,7 @@ type FilePath = String;
 #[derive(Debug, serde::Deserialize)]
 pub struct MainConfig {
     pub schedule_config_paths: Vec<FilePath>,
+    pub thread_count: Option<usize>,
 }
 
 pub fn read_main_config(path: &str) -> Result<MainConfig, String> {
