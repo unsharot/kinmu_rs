@@ -2,7 +2,6 @@
 
 mod checker;
 mod common;
-mod seed;
 mod toml_reader;
 mod type_reader;
 
@@ -89,7 +88,7 @@ pub fn load_schedule_config(
     let annealing_file_paths = config.annealing.config_paths;
     let fill_config = FillConfig {
         name: config.fill.function,
-        rng: seed::gen_rng_from_seed(config.fill.seed).1,
+        seed: config.fill.seed,
     };
     checker::check_schedule_prop(&schedule_prop)?;
     Ok((schedule_prop, annealing_file_paths, fill_config))
@@ -101,7 +100,7 @@ pub fn load_annealing_config(path: &str) -> Result<AnnealingConfig, String> {
 
     let ac = AnnealingConfig {
         step: config.step_count,
-        rng: seed::gen_rng_from_seed(config.seed).1,
+        seed: config.seed,
         score_props: config
             .score_functions
             .iter()

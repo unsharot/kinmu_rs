@@ -1,6 +1,6 @@
 use annealing::annealing;
 use kinmu::io::{display, reader};
-use kinmu::kinmu_lib::{fill, score, update};
+use kinmu::kinmu_lib::{fill, score, seed, update};
 
 use std::env;
 use std::thread;
@@ -68,7 +68,7 @@ fn generate_schedule(p: &str) -> Result<(), String> {
 
             let mut score;
             for mut ac in annealing_configs {
-                let mut rng = ac.rng;
+                let mut rng = seed::gen_rng_from_seed(ac.seed);
                 score = score::assess_score(&mut ac.score_props, &schedule_prop, &model);
                 (_, model) = annealing::annealing(
                     score,
