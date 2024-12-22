@@ -20,23 +20,25 @@ fn main() {
     }
 }
 
-fn generate_schedules(config_path: &str) -> Result<(), String> {
-    let schedule_config_paths: Vec<String> =
-        reader::load_main_config(config_path).map_err(|e| {
-            format!(
-                "[エラー] メインconfigの読み込みに失敗しました\n対象ファイル: {}\n理由: {}",
-                config_path, e
-            )
-        })?;
+fn generate_schedules(main_config_path: &str) -> Result<(), String> {
+    let main_config = reader::load_main_config(main_config_path).map_err(|e| {
+        format!(
+            "[エラー] メインconfigの読み込みに失敗しました\n対象ファイル: {}\n理由: {}",
+            main_config_path, e
+        )
+    })?;
+
+    let schedule_config_paths = main_config.schedule_config_paths;
+    let thread_count = main_config.thread_count.unwrap_or(1);
 
     for path in schedule_config_paths {
-        generate_schedule(&path)?;
+        generate_schedule(&path, thread_count)?;
     }
 
     Ok(())
 }
 
-fn generate_schedule(p: &str) -> Result<(), String> {
+fn generate_schedule(p: &str, thread_count: usize) -> Result<(), String> {
     let (mut schedule_prop, ac_paths, fc) = reader::load_schedule_config(p).map_err(|e| {
         format!(
             "[エラー] 勤務表configの読み込みに失敗しました\n対象ファイル: {}\n理由: {}",
@@ -54,12 +56,10 @@ fn generate_schedule(p: &str) -> Result<(), String> {
         })?);
     }
 
-    let n = 6;
-
     let start = Instant::now();
 
     let mut hs: Vec<thread::JoinHandle<Result<_, String>>> = vec![];
-    for _ in 0..n {
+    for _ in 0..thread_count {
         let schedule_prop = schedule_prop.clone();
         let annealing_configs = annealing_configs.clone();
         let mut fc = fc.clone();
@@ -91,7 +91,7 @@ fn generate_schedule(p: &str) -> Result<(), String> {
     for (i, h) in hs.into_iter().enumerate() {
         let model = h.join().unwrap().clone()?;
 
-        println!("thread: {}", i);
+        println!("thread: {}", i + 1);
 
         println!();
 
