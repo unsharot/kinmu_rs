@@ -4,6 +4,7 @@ use kinmu::kinmu_lib::{fill, score, update};
 
 use std::env;
 use std::thread;
+use std::time::Instant;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -54,6 +55,8 @@ fn generate_schedule(p: &str) -> Result<(), String> {
     }
 
     let n = 6;
+
+    let start = Instant::now();
 
     let mut hs: Vec<thread::JoinHandle<Result<_, String>>> = vec![];
     for _ in 0..n {
@@ -114,6 +117,8 @@ fn generate_schedule(p: &str) -> Result<(), String> {
 
         println!();
     }
+
+    println!("time: {:?}", start.elapsed());
 
     Ok(())
 }
