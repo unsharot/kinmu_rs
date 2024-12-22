@@ -5,13 +5,14 @@ fill1はUをランダムな枠に
 fill2はIとKの数合わせてうまいこと埋める
 */
 
+use super::seed;
 use super::types::{FillConfig, Schedule, ScheduleProp, Shift, ShiftState};
 
 use rand::Rng;
 
 pub fn run(fc: &mut FillConfig, schedule_prop: &ScheduleProp) -> Result<Schedule, String> {
     println!("{}", fc.name);
-    let mut rng = &mut fc.rng;
+    let mut rng = &mut seed::gen_rng_from_seed(fc.seed);
     match fc.name.as_str() {
         "fill1" => Ok(fill_randomly1(schedule_prop, &mut rng)),
         "fill2" => Ok(fill_randomly2(schedule_prop, &mut rng)),
