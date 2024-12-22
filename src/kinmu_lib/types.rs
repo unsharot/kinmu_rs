@@ -1,6 +1,6 @@
 //! 勤務表に使う型の宣言
 
-use rand::RngCore;
+use rand::rngs::StdRng;
 use std::collections::HashMap;
 use std::fmt;
 use std::str::FromStr;
@@ -279,15 +279,17 @@ pub struct StaffAttributeNameIndexMap {
     pub name_to_index: HashMap<StaffAttributeName, usize>,
 }
 
+#[derive(Clone)]
 pub struct FillConfig {
     pub name: String,
-    pub rng: Box<dyn RngCore>,
+    pub rng: StdRng,
 }
 
 /// 焼きなましの段階ごとの設定
+#[derive(Clone)]
 pub struct AnnealingConfig {
     pub step: usize,                 // 焼きなましのステップ数
-    pub rng: Box<dyn RngCore>,       // 焼きなましのupdate関数の乱数生成器
+    pub rng: StdRng,                 // 焼きなましのupdate関数の乱数生成器
     pub score_props: Vec<ScoreProp>, // 焼きなましのためのスコア
     pub update_func: String,
     pub max_temp: f32,
