@@ -8,7 +8,6 @@ pub fn gen_update_func<'a, R: Rng>(
     text: &str,
     schedule_prop: &'a ScheduleProp,
 ) -> Result<Box<dyn FnMut(&Schedule, &mut R) -> Schedule + 'a>, String> {
-    println!("{}", text);
     let schedule_state = &schedule_prop.schedule_st;
     match text {
         "update1" => Ok(Box::new(move |schedule, rng| {
