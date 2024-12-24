@@ -84,6 +84,16 @@ schedule_config_paths = [
 ]
 ```
 
+#### thread_count
+焼きなましに用いるスレッド数を指定します。
+結果もここで指定した数だけ表示されます。
+CPUの論理プロセッサ数を指定すると高速に動作します。
+
+例
+```toml
+thread_count = 8
+```
+
 ### schedule_config
 勤務表に使う基本的な値の設定です。
 
