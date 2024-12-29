@@ -74,7 +74,11 @@ fn generate_schedule(p: &str, thread_count: usize) -> Result<(), String> {
         println!("thread: {}", i + 1);
 
         print_model(&mut schedule_prop, &model);
+
+        println!();
     }
+
+    println!();
 
     println!("total time: {:?}", start.elapsed());
 
