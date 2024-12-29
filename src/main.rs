@@ -1,5 +1,6 @@
 use annealing::annealing;
 use kinmu::io::{display, reader};
+use kinmu::kinmu_lib::types::{AnnealingConfig, FillConfig, Schedule, ScheduleProp};
 use kinmu::kinmu_lib::{fill, score, seed, update};
 
 use std::env;
@@ -13,7 +14,6 @@ fn main() {
     } else {
         "config/config.yaml"
     };
-    // match generate_schedules(main_file_path) {
     match generate_schedules(main_file_path) {
         Ok(_) => {}
         Err(e) => println!("{}", e),
@@ -62,29 +62,9 @@ fn generate_schedule(p: &str, thread_count: usize) -> Result<(), String> {
     for _ in 0..thread_count {
         let schedule_prop = schedule_prop.clone();
         let annealing_configs = annealing_configs.clone();
-        let mut fc = fc.clone();
+        let fc = fc.clone();
         hs.push(thread::spawn(move || {
-            let mut model = fill::run(&mut fc, &schedule_prop)?;
-
-            let mut score;
-            for mut ac in annealing_configs {
-                let mut rng = seed::gen_rng_from_seed(ac.seed);
-                score = score::assess_score(&mut ac.score_props, &schedule_prop, &model);
-                (_, model) = annealing::annealing(
-                    score,
-                    &model,
-                    ac.step,
-                    update::gen_update_func(&ac.update_func, &schedule_prop)?,
-                    |m| score::assess_score(&mut ac.score_props, &schedule_prop, m),
-                    ac.max_temp,
-                    ac.min_temp,
-                    annealing::basic_temp_func,
-                    annealing::basic_prob_func,
-                    &mut rng,
-                );
-            }
-
-            Ok(model)
+            annealing(schedule_prop, fc, annealing_configs)
         }))
     }
 
@@ -93,30 +73,60 @@ fn generate_schedule(p: &str, thread_count: usize) -> Result<(), String> {
 
         println!("thread: {}", i + 1);
 
-        let score = score::assess_score(
-            &mut schedule_prop.score_props.clone(),
-            &mut schedule_prop,
-            &model,
-        );
-
-        println!("score: {}", score);
-        display::print_schedule(&schedule_prop, &model);
-
-        println!();
-
-        println!(
-            "{}",
-            score::show_score(
-                &mut schedule_prop.score_props.clone(),
-                &mut schedule_prop,
-                &model
-            )
-        );
-
-        // println!();
+        print_model(&mut schedule_prop, &model);
     }
 
     println!("total time: {:?}", start.elapsed());
 
     Ok(())
+}
+
+fn annealing(
+    schedule_prop: ScheduleProp,
+    mut fc: FillConfig,
+    annealing_configs: Vec<AnnealingConfig>,
+) -> Result<Schedule, String> {
+    let mut model = fill::run(&mut fc, &schedule_prop)?;
+
+    let mut score;
+    for mut ac in annealing_configs {
+        let mut rng = seed::gen_rng_from_seed(ac.seed);
+        score = score::assess_score(&mut ac.score_props, &schedule_prop, &model);
+        (_, model) = annealing::annealing(
+            score,
+            &model,
+            ac.step,
+            update::gen_update_func(&ac.update_func, &schedule_prop)?,
+            |m| score::assess_score(&mut ac.score_props, &schedule_prop, m),
+            ac.max_temp,
+            ac.min_temp,
+            annealing::basic_temp_func,
+            annealing::basic_prob_func,
+            &mut rng,
+        );
+    }
+
+    Ok(model)
+}
+
+fn print_model(mut schedule_prop: &mut ScheduleProp, model: &Schedule) {
+    let score = score::assess_score(
+        &mut schedule_prop.score_props.clone(),
+        &mut schedule_prop,
+        &model,
+    );
+
+    println!("score: {}", score);
+    display::print_schedule(&schedule_prop, &model);
+
+    println!();
+
+    println!(
+        "{}",
+        score::show_score(
+            &mut schedule_prop.score_props.clone(),
+            &mut schedule_prop,
+            &model
+        )
+    );
 }
