@@ -96,7 +96,7 @@ fn annealing(
     for mut ac in annealing_configs {
         let mut rng = seed::gen_rng_from_seed(ac.seed);
         score = score::assess_score(&mut ac.score_props, &schedule_prop, &model);
-        (_, model) = annealing::annealing(
+        (_, model) = annealing::run(
             score,
             &model,
             ac.step,

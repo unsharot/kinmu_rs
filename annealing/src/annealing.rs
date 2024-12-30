@@ -20,7 +20,7 @@ use rand::Rng;
 /// let best_score: f32;
 /// let best_model: f32;
 ///
-/// (best_score, best_model) = annealing::annealing(
+/// (best_score, best_model) = annealing::run(
 ///     10000.0,
 ///     &0.0,
 ///     100000,
@@ -33,7 +33,7 @@ use rand::Rng;
 ///     &mut rand::thread_rng(),
 /// );
 ///```
-pub fn annealing<M, S, U, E, T, P, R>(
+pub fn run<M, S, U, E, T, P, R>(
     initial_score: S,
     initial_model: &M,
     loop_count: usize,
