@@ -7,12 +7,14 @@ use std::env;
 use std::thread;
 use std::time::Instant;
 
+const DEFALUT_MAIN_CONFIG_PATH: &str = "config/config.yaml";
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     let main_file_path = if args.len() >= 2 {
         &args[1]
     } else {
-        "config/config.yaml"
+        DEFALUT_MAIN_CONFIG_PATH
     };
     match generate_schedules(main_file_path) {
         Ok(_) => {}
@@ -23,8 +25,8 @@ fn main() {
 fn generate_schedules(main_config_path: &str) -> Result<(), String> {
     let main_config = reader::load_main_config(main_config_path).map_err(|e| {
         format!(
-            "[エラー] メインconfigの読み込みに失敗しました\n対象ファイル: {}\n理由: {}",
-            main_config_path, e
+            "[エラー] メインconfigの読み込みに失敗しました\n対象ファイル: {}\n理由: {}\nヒント: {}以外のファイルを指定する場合、引数でパスを指定してください",
+            main_config_path, e, DEFALUT_MAIN_CONFIG_PATH
         )
     })?;
 
