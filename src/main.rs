@@ -40,7 +40,7 @@ fn generate_schedules(main_config_path: &str) -> Result<(), String> {
     Ok(())
 }
 
-fn generate_schedule(p: &str, thread_count: usize) -> Result<(), String> {
+fn generate_schedule(p: &str, thread_count: u32) -> Result<(), String> {
     let (mut schedule_prop, ac_paths, fc) = reader::load_schedule_config(p).map_err(|e| {
         format!(
             "[エラー] 勤務表configの読み込みに失敗しました\n対象ファイル: {}\n理由: {}",
