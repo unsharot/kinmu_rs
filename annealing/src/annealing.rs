@@ -36,7 +36,7 @@ use rand::Rng;
 pub fn run<M, S, U, E, T, P, R>(
     initial_score: S,
     initial_model: &M,
-    loop_count: usize,
+    loop_count: u32,
     mut update: U,
     mut eval: E,
     temp_max: f32,
@@ -50,7 +50,7 @@ where
     S: std::cmp::PartialOrd + Copy,
     U: FnMut(&M, &mut R) -> M,
     E: FnMut(&M) -> S,
-    T: FnMut(f32, f32, usize, usize) -> f32,
+    T: FnMut(f32, f32, u32, u32) -> f32,
     P: FnMut(S, S, f32) -> f32,
     R: Rng,
 {
@@ -84,7 +84,7 @@ where
 
 /// 標準の温度関数
 /// 与えられた最大温度と最低温度から、ステップに対して線形な温度を返す
-pub fn basic_temp_func(temp_max: f32, temp_min: f32, loop_end: usize, loop_now: usize) -> f32 {
+pub fn basic_temp_func(temp_max: f32, temp_min: f32, loop_end: u32, loop_now: u32) -> f32 {
     let r: f32 = (loop_end - loop_now) as f32 / loop_end as f32;
     temp_max - ((temp_max - temp_min) * r)
 }

@@ -87,7 +87,7 @@ pub fn read_schedule_config(path: &str) -> Result<ScheduleConfig, String> {
 
 #[derive(Debug, serde::Deserialize)]
 pub struct AnnealingC {
-    pub step_count: usize,
+    pub step_count: u32,
     pub seed: usize,
     pub score_functions: Vec<String>,
     pub update_function: String,

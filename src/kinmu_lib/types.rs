@@ -287,7 +287,7 @@ pub struct FillConfig {
 /// 焼きなましの段階ごとの設定
 #[derive(Clone)]
 pub struct AnnealingConfig {
-    pub step: usize,                 // 焼きなましのステップ数
+    pub step: u32,                   // 焼きなましのステップ数
     pub seed: usize,                 // 焼きなましのupdate関数の乱数のシード
     pub score_props: Vec<ScoreProp>, // 焼きなましのためのスコア
     pub update_func: String,
