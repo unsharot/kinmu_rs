@@ -158,6 +158,12 @@ impl FromConfig for isize {
     }
 }
 
+impl FromConfig for i32 {
+    fn from_config(s: &str) -> Result<Self, String> {
+        Ok(s.parse::<i32>().map_err(|e| e.to_string())?)
+    }
+}
+
 impl FromConfig for f32 {
     fn from_config(s: &str) -> Result<Self, String> {
         Ok(s.parse::<f32>().map_err(|e| e.to_string())?)
@@ -244,7 +250,7 @@ impl FromConfig for Staff {
         let l = words.len();
         let mut attributes = Vec::new();
         for i in 0..(l - 1) {
-            attributes.push(<isize>::from_config(&words[i])?);
+            attributes.push(<i32>::from_config(&words[i])?);
         }
         let worker: Staff = Staff {
             name: words[l - 1].clone(),
@@ -291,7 +297,7 @@ impl FromConfig for Cond {
             ("ParticularDay", p) => Ok(Cond::ParticularDay(<usize>::from_config(p)?)),
             ("StaffInRange", p) => Ok(Cond::StaffInRange(<(usize, usize)>::from_config(p)?)),
             ("StaffWithAttribute", p) => Ok(Cond::StaffWithAttribute(
-                <(StaffAttributeName, isize)>::from_config(p)?,
+                <(StaffAttributeName, i32)>::from_config(p)?,
             )),
             ("ParticularStaff", p) => Ok(Cond::ParticularStaff(<usize>::from_config(p)?)),
             (s, p) => Err(format!("Failed to parse Cond: {} {}", s, p)),
@@ -333,7 +339,7 @@ impl FromConfig for Box<Cond> {
             )?))),
             ("StaffWithAttribute", p) => Ok(Box::new(Cond::StaffWithAttribute(<(
                 StaffAttributeName,
-                isize,
+                i32,
             )>::from_config(
                 p
             )?))),

@@ -101,7 +101,7 @@ fn make_schedule(config: &ScheduleConfig) -> Result<Schedule, String> {
     Ok(ans)
 }
 
-fn make_day_attributes(config: &ScheduleConfig) -> HashMap<DayAttributeName, Vec<isize>> {
+fn make_day_attributes(config: &ScheduleConfig) -> HashMap<DayAttributeName, Vec<i32>> {
     let mut ans = HashMap::new();
     for att in &config.day.attributes {
         ans.insert(att.name.clone(), att.values.clone());

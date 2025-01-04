@@ -338,7 +338,7 @@ fn day_count_regard_staff_attribute(
     let mut sum = 0.0;
     for staff in 0..schedule_prop.staff_count {
         let mut is_valid = false;
-        let mut count: isize = 0;
+        let mut count = 0;
         for day in 0..schedule_prop.day_count {
             if cond.eval(staff, day, schedule_prop) {
                 is_valid = true;
@@ -369,7 +369,7 @@ fn staff_count_regard_day_attribute(
     let mut sum = 0.0;
     for day in 0..schedule_prop.day_count {
         let mut is_valid = false;
-        let mut count: isize = 0;
+        let mut count = 0;
         for staff in 0..schedule_prop.staff_count {
             if cond.eval(staff, day, schedule_prop) {
                 is_valid = true;
