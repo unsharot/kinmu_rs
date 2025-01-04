@@ -45,7 +45,7 @@ fill2のアルゴリズム
 
 macro_rules! count_waku_row {
     ($shift:expr, $schedule_prop: expr, $schedule:expr, $r:expr) => {{
-        let mut count: isize = 0;
+        let mut count = 0;
         for i in $schedule_prop.buffer..$schedule_prop.day_count {
             if $schedule[$r][i] == $shift {
                 count += 1;

@@ -20,7 +20,7 @@ pub fn read_main_config(path: &str) -> Result<MainConfig, String> {
 #[derive(Debug, serde::Deserialize)]
 pub struct StaffListNode {
     pub name: String,
-    pub attributes: Vec<isize>,
+    pub attributes: Vec<i32>,
 }
 
 #[derive(Debug, serde::Deserialize)]
@@ -49,7 +49,7 @@ pub struct DayC {
 #[derive(Debug, serde::Deserialize)]
 pub struct Att {
     pub name: String,
-    pub values: Vec<isize>,
+    pub values: Vec<i32>,
 }
 
 #[derive(Debug, serde::Deserialize)]

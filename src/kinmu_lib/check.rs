@@ -36,7 +36,7 @@ pub fn safe_iak(schedule_prop: &ScheduleProp) -> bool {
 
 macro_rules! count_waku_row {
     ($w:expr, $schedule_prop: expr, $schedule:expr, $r:expr) => {{
-        let mut count: isize = 0;
+        let mut count = 0;
         for i in $schedule_prop.buffer..$schedule_prop.day_count {
             if $schedule[$r][i] == $w {
                 count += 1;
