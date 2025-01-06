@@ -1,3 +1,5 @@
+//! 内部で使用するconfigを読み込むモジュール
+
 mod annealing_config;
 mod main_config;
 mod schedule_config;

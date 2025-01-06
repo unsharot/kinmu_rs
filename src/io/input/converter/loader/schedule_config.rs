@@ -1,3 +1,5 @@
+//! schedule_configを読み込むモジュール
+
 use std::collections::HashMap;
 
 use crate::io::input::reader::types::RawScheduleConfig;

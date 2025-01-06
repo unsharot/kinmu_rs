@@ -1,3 +1,5 @@
+//! 内部で使うための整形されたconfigを定義
+
 mod annealing_config;
 mod main_config;
 mod schedule_config;

@@ -1,3 +1,5 @@
+//! toml形式のconfigをそのまま取り込むモジュール
+
 use types::{RawAnnealingConfig, RawMainConfig, RawScheduleConfig};
 
 pub mod types;

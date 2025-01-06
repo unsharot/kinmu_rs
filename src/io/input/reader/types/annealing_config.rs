@@ -1,3 +1,5 @@
+//! annealing_configを読み込むための構造体
+
 #[derive(Debug, serde::Deserialize)]
 pub struct RawAnnealingConfig {
     pub step_count: u32,

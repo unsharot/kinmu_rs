@@ -1,3 +1,5 @@
+//! schedule_configを読み込むための構造体
+
 #[derive(Debug, serde::Deserialize)]
 pub struct RawScheduleConfig {
     pub staff: RawStaffTable,
