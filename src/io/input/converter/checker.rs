@@ -1,4 +1,5 @@
-///! 読み込んだconfigが正常か判定するモジュール
+//! 読み込んだconfigが正常か判定するモジュール
+
 use std::cmp::Ordering;
 
 use crate::kinmu_lib::types::ScheduleProp;

@@ -1,4 +1,4 @@
-//! 読み込んだconfigを内部で使用するconfigに変換するモジュール
+//! 内部で使用するconfigを読み込むモジュール
 
 mod checker;
 mod common;

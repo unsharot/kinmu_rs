@@ -1,3 +1,5 @@
+//! main_configを定義
+
 type FilePath = String;
 
 pub struct MainConfig {

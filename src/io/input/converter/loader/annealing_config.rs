@@ -1,3 +1,5 @@
+//! annealing_configを読み込むモジュール
+
 use crate::kinmu_lib::types::{AnnealingConfig, ScoreProp};
 
 use super::super::super::reader;

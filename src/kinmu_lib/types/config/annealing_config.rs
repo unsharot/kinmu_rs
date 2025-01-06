@@ -1,3 +1,5 @@
+//! annealing_configを定義
+
 use crate::kinmu_lib::types::ScoreProp;
 
 /// 焼きなましの段階ごとの設定

@@ -1,3 +1,5 @@
+//! main_configを読み込むモジュール
+
 use crate::kinmu_lib::types::MainConfig;
 
 use super::super::super::reader;

@@ -1,4 +1,5 @@
-///! ScoreProp読み込みのためのモジュール
+//! ScoreProp読み込みのためのモジュール
+
 use crate::kinmu_lib::types::{
     Cond, CondWrapper, DayAttributeName, DayState, Days, Score, ScoreProp, Shift, Staff,
     StaffAttributeName,
