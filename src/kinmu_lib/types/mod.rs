@@ -1,5 +1,9 @@
 //! 勤務表に使う型の宣言
 
+mod config;
+
+pub use config::*;
+
 use std::collections::HashMap;
 use std::fmt;
 use std::str::FromStr;
@@ -245,52 +249,8 @@ impl fmt::Debug for CondWrapper {
     }
 }
 
-/// 勤務表ごとの設定
-#[derive(Clone)]
-pub struct ScheduleProp {
-    pub staff_list: Vec<Staff>,
-    pub ng_list: NGList,
-    pub staff_count: usize,
-    pub day_count: usize,
-    pub days: Days,
-    pub buffer: usize,
-    pub request: Schedule,
-    pub schedule_st: ScheduleState,
-    pub day_attributes: HashMap<DayAttributeName, Vec<i32>>,
-    pub staff_attribute_map: StaffAttributeNameIndexMap,
-    pub score_props: Vec<ScoreProp>, // 結果表示のためのスコア
-}
-
-impl ScheduleProp {
-    pub fn get_attribute(&self, staff: usize, attribute: &StaffAttributeName) -> i32 {
-        let att_index = self
-            .staff_attribute_map
-            .name_to_index
-            .get(attribute)
-            .unwrap();
-        self.staff_list[staff].attributes[*att_index]
-    }
-}
-
 #[derive(Clone)]
 pub struct StaffAttributeNameIndexMap {
     pub names: Vec<StaffAttributeName>,
     pub name_to_index: HashMap<StaffAttributeName, usize>,
-}
-
-#[derive(Clone)]
-pub struct FillConfig {
-    pub name: String,
-    pub seed: usize,
-}
-
-/// 焼きなましの段階ごとの設定
-#[derive(Clone)]
-pub struct AnnealingConfig {
-    pub step: u32,                   // 焼きなましのステップ数
-    pub seed: usize,                 // 焼きなましのupdate関数の乱数のシード
-    pub score_props: Vec<ScoreProp>, // 焼きなましのためのスコア
-    pub update_func: String,
-    pub max_temp: f32,
-    pub min_temp: f32,
 }

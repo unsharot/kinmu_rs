@@ -1,31 +1,22 @@
-//! config読み込みのモジュール
-
-mod checker;
-mod common;
-mod toml_reader;
-mod type_reader;
-
-use toml_reader::{MainConfig, ScheduleConfig};
-use type_reader::*;
-
-use crate::kinmu_lib::types::{
-    AnnealingConfig, DayAttributeName, Days, FillConfig, Schedule, ScheduleProp, ScheduleState,
-    ScoreProp, Shift, ShiftState, Staff, StaffAttributeNameIndexMap,
-};
-
 use std::collections::HashMap;
 
-type FilePath = String;
+use crate::io::input::reader::types::RawScheduleConfig;
+use crate::kinmu_lib::types::{
+    DayAttributeName, Days, FillConfig, Schedule, ScheduleProp, ScheduleState, ScoreProp, Shift,
+    ShiftState, Staff, StaffAttributeNameIndexMap,
+};
 
-pub fn load_main_config(path: &str) -> Result<MainConfig, String> {
-    Ok(toml_reader::read_main_config(path)?)
-}
+use super::super::super::reader;
+use super::super::checker;
+use super::super::parser::*;
+
+type FilePath = String;
 
 /// 勤務表で使う値を読み込む
 pub fn load_schedule_config(
     path: &str,
 ) -> Result<(ScheduleProp, Vec<FilePath>, FillConfig), String> {
-    let config = toml_reader::read_schedule_config(path)?;
+    let config = reader::read_schedule_config(path)?;
 
     let schedule = make_schedule(&config)?;
 
@@ -63,33 +54,17 @@ pub fn load_schedule_config(
     let annealing_file_paths = config.annealing.config_paths;
     let fill_config = FillConfig {
         name: config.fill.function,
-        seed: config.fill.seed,
+        //TODO ここ要修正 Optionのまま渡してgeneratorで処理したい
+        seed: match config.fill.seed {
+            Some(x) => x,
+            None => 0,
+        },
     };
     checker::check_schedule_prop(&schedule_prop)?;
     Ok((schedule_prop, annealing_file_paths, fill_config))
 }
 
-/// 焼きなましの段階ごとの設定を読み込む
-pub fn load_annealing_config(path: &str) -> Result<AnnealingConfig, String> {
-    let config = toml_reader::read_annealing_config(path)?;
-
-    let ac = AnnealingConfig {
-        step: config.step_count,
-        seed: config.seed,
-        score_props: config
-            .score_functions
-            .iter()
-            .map(|s| ScoreProp::from_config(s))
-            .collect::<Result<Vec<ScoreProp>, String>>()?,
-        update_func: config.update_function,
-        max_temp: config.temp.max,
-        min_temp: config.temp.min,
-    };
-
-    Ok(ac)
-}
-
-fn make_schedule(config: &ScheduleConfig) -> Result<Schedule, String> {
+fn make_schedule(config: &RawScheduleConfig) -> Result<Schedule, String> {
     let mut ans: Schedule = Vec::new();
     for s in &config.day.requested_schedule {
         let mut row = Vec::new();
@@ -101,7 +76,7 @@ fn make_schedule(config: &ScheduleConfig) -> Result<Schedule, String> {
     Ok(ans)
 }
 
-fn make_day_attributes(config: &ScheduleConfig) -> HashMap<DayAttributeName, Vec<i32>> {
+fn make_day_attributes(config: &RawScheduleConfig) -> HashMap<DayAttributeName, Vec<i32>> {
     let mut ans = HashMap::new();
     for att in &config.day.attributes {
         ans.insert(att.name.clone(), att.values.clone());
@@ -109,7 +84,7 @@ fn make_day_attributes(config: &ScheduleConfig) -> HashMap<DayAttributeName, Vec
     ans
 }
 
-fn make_staff_attribute_map(config: &ScheduleConfig) -> StaffAttributeNameIndexMap {
+fn make_staff_attribute_map(config: &RawScheduleConfig) -> StaffAttributeNameIndexMap {
     let mut name_to_index = HashMap::new();
     for (i, name) in config.staff.attributes.iter().enumerate() {
         name_to_index.insert(name.to_string(), i);

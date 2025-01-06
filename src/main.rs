@@ -1,5 +1,5 @@
 use annealing::annealing;
-use kinmu::io::{display, reader};
+use kinmu::io::{input, output};
 use kinmu::kinmu_lib::types::{AnnealingConfig, FillConfig, Schedule, ScheduleProp};
 use kinmu::kinmu_lib::{fill, score, seed, update};
 
@@ -23,7 +23,7 @@ fn main() {
 }
 
 fn generate_schedules(main_config_path: &str) -> Result<(), String> {
-    let main_config = reader::load_main_config(main_config_path).map_err(|e| {
+    let main_config = input::load_main_config(main_config_path).map_err(|e| {
         format!(
             "[エラー] メインconfigの読み込みに失敗しました\n対象ファイル: {}\n理由: {}\nヒント: {}以外のファイルを指定する場合、引数でパスを指定してください",
             main_config_path, e, DEFALUT_MAIN_CONFIG_PATH
@@ -41,7 +41,7 @@ fn generate_schedules(main_config_path: &str) -> Result<(), String> {
 }
 
 fn generate_schedule(p: &str, thread_count: u32) -> Result<(), String> {
-    let (mut schedule_prop, ac_paths, fc) = reader::load_schedule_config(p).map_err(|e| {
+    let (mut schedule_prop, ac_paths, fc) = input::load_schedule_config(p).map_err(|e| {
         format!(
             "[エラー] 勤務表configの読み込みに失敗しました\n対象ファイル: {}\n理由: {}",
             p, e
@@ -50,7 +50,7 @@ fn generate_schedule(p: &str, thread_count: u32) -> Result<(), String> {
 
     let mut annealing_configs = vec![];
     for ac_path in ac_paths {
-        annealing_configs.push(reader::load_annealing_config(&ac_path).map_err(|e| {
+        annealing_configs.push(input::load_annealing_config(&ac_path).map_err(|e| {
             format!(
                 "[エラー] 焼きなましconfigの読み込みに失敗しました\n対象ファイル: {}\n理由: {}",
                 ac_path, e
@@ -123,7 +123,7 @@ fn print_model(mut schedule_prop: &mut ScheduleProp, model: &Schedule) {
     );
 
     println!("score: {}", score);
-    display::print_schedule(&schedule_prop, &model);
+    output::print_schedule(&schedule_prop, &model);
 
     println!();
 
