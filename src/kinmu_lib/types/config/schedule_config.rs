@@ -10,7 +10,7 @@ use std::collections::HashMap;
 #[derive(Clone)]
 pub struct FillConfig {
     pub name: String,
-    pub seed: u64,
+    pub seed: Option<u64>,
 }
 
 /// 勤務表ごとの設定

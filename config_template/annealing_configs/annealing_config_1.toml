@@ -1,6 +1,6 @@
 step_count = 100
 
-seed = 0
+# seed = 0
 
 score_functions = []
 
