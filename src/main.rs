@@ -1,7 +1,7 @@
-use annealing::annealing;
-use kinmu::io::{input, output};
-use kinmu::kinmu_lib::types::{AnnealingConfig, FillConfig, Schedule, ScheduleProp};
-use kinmu::kinmu_lib::{fill, score, seed, update};
+use ::annealing::annealing;
+use ::kinmu::io::{input, output};
+use ::kinmu::kinmu_lib::types::{AnnealingConfig, FillConfig, Schedule, ScheduleProp};
+use ::kinmu::kinmu_lib::{fill, score, seed, update};
 
 use std::env;
 use std::thread;

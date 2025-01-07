@@ -3,4 +3,4 @@
 
 mod display;
 
-pub use display::*;
+pub use self::display::*;

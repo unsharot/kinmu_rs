@@ -2,7 +2,7 @@
 
 mod config;
 
-pub use config::*;
+pub use self::config::*;
 
 use std::collections::HashMap;
 use std::fmt;

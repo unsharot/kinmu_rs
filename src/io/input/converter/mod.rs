@@ -5,4 +5,4 @@ mod common;
 mod loader;
 mod parser;
 
-pub use loader::*;
+pub use self::loader::*;
