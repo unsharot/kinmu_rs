@@ -1,14 +1,12 @@
 //! annealing_configを読み込むモジュール
 
+use crate::io::input::reader::types::RawAnnealingConfig;
 use crate::kinmu_lib::types::{AnnealingConfig, ScoreProp};
 
-use super::super::super::reader;
-use super::super::parser::*;
+use super::util::parser::*;
 
 /// 焼きなましの段階ごとの設定を読み込む
-pub fn load_annealing_config(path: &str) -> Result<AnnealingConfig, String> {
-    let config = reader::read_annealing_config(path)?;
-
+pub fn convert_annealing_config(config: RawAnnealingConfig) -> Result<AnnealingConfig, String> {
     let ac = AnnealingConfig {
         step: config.step_count,
         seed: config.seed,
