@@ -188,7 +188,7 @@ fn pattern_fixed_any(
 fn streak(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
-    (cond, target_shifts, streak_count, score): &mut (CondWrapper, Vec<Shift>, isize, Score),
+    (cond, target_shifts, streak_count, score): &mut (CondWrapper, Vec<Shift>, i32, Score),
 ) -> Score {
     let mut sum = 0.0;
     for staff in 0..schedule_prop.staff_count {
@@ -221,8 +221,8 @@ fn shifts_balance(
     let mut sum = 0.0;
     for day in 0..schedule_prop.day_count {
         let mut is_valid = false;
-        let mut count1: isize = 0;
-        let mut count2: isize = 0;
+        let mut count1: i32 = 0;
+        let mut count2: i32 = 0;
         for staff in 0..schedule_prop.staff_count {
             if cond.eval(staff, day, schedule_prop) {
                 is_valid = true;
@@ -264,8 +264,8 @@ fn shift_half_balance(
         }
         let mid = len / 2;
 
-        let mut cf: isize = 0;
-        let mut cl: isize = 0;
+        let mut cf: i32 = 0;
+        let mut cl: i32 = 0;
         let mut i = 0;
         for day in 0..schedule_prop.day_count {
             if cond.eval(staff, day, schedule_prop) {
@@ -392,7 +392,7 @@ fn staff_count_regard_day_attribute(
 fn staff_count(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
-    (cond, shift, count, score): &mut (CondWrapper, Shift, isize, Score),
+    (cond, shift, count, score): &mut (CondWrapper, Shift, i32, Score),
 ) -> Score {
     let mut sum = 0.0;
     for day in 0..schedule_prop.day_count {
@@ -421,10 +421,10 @@ fn staff_count_with_premise(
     (cond_premise, shift_premise, count_premise, cond_main, shift_main, count_main, score): &mut (
         CondWrapper,
         Shift,
-        isize,
+        i32,
         CondWrapper,
         Shift,
-        isize,
+        i32,
         Score,
     ),
 ) -> Score {
@@ -487,9 +487,9 @@ fn ng_pair(
 fn no_same_pair(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
-    (cond, pair_limit, shift, score): &mut (CondWrapper, isize, Shift, Score),
+    (cond, pair_limit, shift, score): &mut (CondWrapper, i32, Shift, Score),
 ) -> Score {
-    let mut pair_map: HashMap<Vec<usize>, isize> = HashMap::new();
+    let mut pair_map: HashMap<Vec<usize>, i32> = HashMap::new();
     for day in 0..schedule_prop.day_count {
         let mut i_list: Vec<usize> = Vec::new();
         for staff in 0..schedule_prop.staff_count {

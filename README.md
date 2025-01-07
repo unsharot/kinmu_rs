@@ -407,22 +407,22 @@ config_paths = [
 スコアの名前と、そのスコアに用いるパラメータを指定します。
 順不同です。スコアは以下のとおりです。
 
-| Prop名                       | 引数の型                                        | 説明                                                                                                    |
-| :--------------------------- | :---------------------------------------------- | :------------------------------------------------------------------------------------------------------ |
-| PatternGeneral               | (Cond, [[Shift]], Score)                        | 指定したシフトパターンが出現した場合のペナルティを指定                                                  |
-| PatternFixed                 | (Cond, [Shift], Score)                          | 指定したシフトパターンが出現した場合のペナルティを指定                                                  |
-| PatternGeneralAny            | (Cond, [[Shift]], Score)                        | 指定したシフトパターンが出現する職員ごとにペナルティを指定                                              |
-| PatternFixedAny              | (Cond, [Shift], Score)                          | 指定したシフトパターンが出現する職員ごとにペナルティを指定                                              |
-| Streak                       | (Cond, [Shift], isize, Score)                   | 指定したシフトが指定した回数連続した場合のペナルティを指定                                              |
-| ShiftsBalance                | (Cond, Shift, Shift, Score)                     | 指定した2つのシフトのバランスが悪い場合のペナルティを指定                                               |
-| ShiftHalfBalance             | (Cond, Shift, Score)                            | 指定したシフトが指定範囲の前半と後半でバランスが取れていない場合のペナルティを指定                      |
-| ShiftDirPriority             | (Cond, Shift, Score)                            | 指定したシフトが指定範囲の前後どちらにあるほうが良いか指定 指定スコアが正なら前を優先、負なら後ろを優先 |
-| DayCountRegardStaffAttribute | (Cond, Shift, StaffAttributeName, Score)        | 職員ごとの指定したパラメータと指定したシフトの数の差によるペナルティを指定                              |
-| StaffCountRegardDayAttribute | (Cond, Shift, DayAttributeName, Score)          | 日付ごとの指定したパラメータと指定したシフトの数の差によるペナルティを指定                              |
-| StaffCount                   | (Cond, Shift, isize, Score)                     | 指定した値と指定したシフトの人数の差によるペナルティを指定                                              |
-| StaffCountWithPremise        | (Cond, Shift, isize, Cond, Shift, isize, Score) | 指定したシフトの人数を満たした日付に対して、指定した値と指定したシフトの人数の差によるペナルティを指定  |
-| NGPair                       | (Cond, Shift, Score)                            | NGに指定されたペアが指定したシフトで同じ日になる場合のペナルティを指定                                  |
-| NoSamePair                   | (Cond, isize, Shift, Score)                     | 指定したシフトで同じペアが指定回数以上ある場合のペナルティを指定                                        |
+| Prop名                       | 引数の型                                    | 説明                                                                                                    |
+| :--------------------------- | :------------------------------------------ | :------------------------------------------------------------------------------------------------------ |
+| PatternGeneral               | (Cond, [[Shift]], Score)                    | 指定したシフトパターンが出現した場合のペナルティを指定                                                  |
+| PatternFixed                 | (Cond, [Shift], Score)                      | 指定したシフトパターンが出現した場合のペナルティを指定                                                  |
+| PatternGeneralAny            | (Cond, [[Shift]], Score)                    | 指定したシフトパターンが出現する職員ごとにペナルティを指定                                              |
+| PatternFixedAny              | (Cond, [Shift], Score)                      | 指定したシフトパターンが出現する職員ごとにペナルティを指定                                              |
+| Streak                       | (Cond, [Shift], i32, Score)                 | 指定したシフトが指定した回数連続した場合のペナルティを指定                                              |
+| ShiftsBalance                | (Cond, Shift, Shift, Score)                 | 指定した2つのシフトのバランスが悪い場合のペナルティを指定                                               |
+| ShiftHalfBalance             | (Cond, Shift, Score)                        | 指定したシフトが指定範囲の前半と後半でバランスが取れていない場合のペナルティを指定                      |
+| ShiftDirPriority             | (Cond, Shift, Score)                        | 指定したシフトが指定範囲の前後どちらにあるほうが良いか指定 指定スコアが正なら前を優先、負なら後ろを優先 |
+| DayCountRegardStaffAttribute | (Cond, Shift, StaffAttributeName, Score)    | 職員ごとの指定したパラメータと指定したシフトの数の差によるペナルティを指定                              |
+| StaffCountRegardDayAttribute | (Cond, Shift, DayAttributeName, Score)      | 日付ごとの指定したパラメータと指定したシフトの数の差によるペナルティを指定                              |
+| StaffCount                   | (Cond, Shift, i32, Score)                   | 指定した値と指定したシフトの人数の差によるペナルティを指定                                              |
+| StaffCountWithPremise        | (Cond, Shift, i32, Cond, Shift, i32, Score) | 指定したシフトの人数を満たした日付に対して、指定した値と指定したシフトの人数の差によるペナルティを指定  |
+| NGPair                       | (Cond, Shift, Score)                        | NGに指定されたペアが指定したシフトで同じ日になる場合のペナルティを指定                                  |
+| NoSamePair                   | (Cond, i32, Shift, Score)                   | 指定したシフトで同じペアが指定回数以上ある場合のペナルティを指定                                        |
 
 型の詳細は以下の通り
 
@@ -433,7 +433,7 @@ config_paths = [
 | [Shift]   | シフトのリスト                   | [N, O, H]                                      |
 | [[Shift]] | シフトのリストのリスト           | [[N], [K, Y]]                                  |
 | Score     | スコア 実数                      | -100.3                                         |
-| isize     | 整数                             | -3                                             |
+| i32       | 整数                             | -3                                             |
 | usize     | 非負整数                         | 4                                              |
 | DayState  | 曜日 W,H,B,2,M                   | B                                              |
 
@@ -451,7 +451,7 @@ Condの詳細は以下の通り
 | BeforeDayState     | DayState       | 指定の曜日の前日なら有効                                           |
 | ParticularDay      | usize          | 指定の日付のみ有効                                                 |
 | StaffInRange       | (usize, usize) | 指定した範囲のスタッフなら有効                                     |
-| StaffWithAbility   | isize          | 指定した番号の能力を持つスタッフなら有効                           |
+| StaffWithAbility   | i32            | 指定した番号の能力を持つスタッフなら有効                           |
 | ParticularStaff    | usize          | 指定した番号のスタッフなら有効                                     |
 
 ```toml
