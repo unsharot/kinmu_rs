@@ -3,7 +3,7 @@
 #[derive(Debug, serde::Deserialize)]
 pub struct RawAnnealingConfig {
     pub step_count: u32,
-    pub seed: u64,
+    pub seed: Option<u64>,
     pub score_functions: Vec<String>,
     pub update_function: String,
     pub temp: RawTempKey,

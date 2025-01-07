@@ -47,19 +47,13 @@ pub struct RawAttributeTable {
 #[derive(Debug, serde::Deserialize)]
 pub struct RawFillTable {
     pub function: String,
-    // pub use_seed: bool,
     pub seed: Option<u64>,
 }
-// use_seed挟んだほうがいいか?
-// あるかないかで処理変えるべきでない？
-// use_seedあった場合、use_seedがtrueでseedが未記入の場合どうするか
-// エラー出すのか0とかで適当にするのか、threadrngにするのか
 
 #[derive(Debug, serde::Deserialize)]
 pub struct RawAnnealingTable {
     pub config_paths: Vec<String>,
 }
-// 下のAnnealingConfigとかぶる
 
 #[derive(Debug, serde::Deserialize)]
 pub struct RawResultTable {

@@ -52,10 +52,7 @@ pub fn convert_schedule_config(
     let fill_config = FillConfig {
         name: config.fill.function,
         //TODO ここ要修正 Optionのまま渡してgeneratorで処理したい
-        seed: match config.fill.seed {
-            Some(x) => x,
-            None => 0,
-        },
+        seed: config.fill.seed,
     };
     checker::check_schedule_prop(&schedule_prop)?;
     Ok((schedule_prop, annealing_file_paths, fill_config))
