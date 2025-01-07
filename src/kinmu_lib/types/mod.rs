@@ -6,7 +6,6 @@ pub use self::config::*;
 
 use std::collections::HashMap;
 use std::fmt;
-use std::str::FromStr;
 
 #[derive(Debug, Clone, PartialEq, Copy)]
 pub enum Shift {
@@ -19,26 +18,6 @@ pub enum Shift {
     Y,
     D,
     U,
-}
-
-impl FromStr for Shift {
-    type Err = String;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "N" => Ok(Shift::N),
-            "K" => Ok(Shift::K),
-            "I" => Ok(Shift::I),
-            "A" => Ok(Shift::A),
-            "O" => Ok(Shift::O),
-            "H" => Ok(Shift::H),
-            "Y" => Ok(Shift::Y),
-            "D" => Ok(Shift::D),
-            "U" => Ok(Shift::U),
-            " " => Ok(Shift::U),
-            _ => Err(format!("Failed to parse Shift: {}", s)),
-        }
-    }
 }
 
 impl fmt::Display for Shift {
@@ -95,21 +74,6 @@ impl fmt::Display for DayState {
             DayState::Measure => "M",
         };
         write!(f, "{}", s)
-    }
-}
-
-impl FromStr for DayState {
-    type Err = String;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "W" => Ok(DayState::Weekday),
-            "H" => Ok(DayState::Holiday),
-            "B" => Ok(DayState::Bath),
-            "2" => Ok(DayState::Bath2),
-            "M" => Ok(DayState::Measure),
-            _ => Err(format!("Failed to parse DayState: {}", s)),
-        }
     }
 }
 

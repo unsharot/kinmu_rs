@@ -1,7 +1,7 @@
-//! ScoreProp読み込みのためのモジュール
+//! ScoreProp, Shift, Daysを文字列から変換するためのモジュール
 
 use crate::kinmu_lib::types::{
-    Cond, CondWrapper, DayAttributeName, DayState, Days, Score, ScoreProp, Shift, Staff,
+    Cond, CondWrapper, DayAttributeName, DayState, Days, Score, ScoreProp, Shift,
     StaffAttributeName,
 };
 
@@ -172,7 +172,19 @@ impl FromConfig for f32 {
 
 impl FromConfig for Shift {
     fn from_config(s: &str) -> Result<Self, String> {
-        s.parse::<Shift>().map_err(|e| e.to_string())
+        match s {
+            "N" => Ok(Shift::N),
+            "K" => Ok(Shift::K),
+            "I" => Ok(Shift::I),
+            "A" => Ok(Shift::A),
+            "O" => Ok(Shift::O),
+            "H" => Ok(Shift::H),
+            "Y" => Ok(Shift::Y),
+            "D" => Ok(Shift::D),
+            "U" => Ok(Shift::U),
+            " " => Ok(Shift::U),
+            _ => Err(format!("Failed to parse Shift: {}", s)),
+        }
     }
 }
 
@@ -233,38 +245,11 @@ impl FromConfig for Vec<Vec<Shift>> {
     }
 }
 
-impl FromConfig for Vec<Staff> {
-    fn from_config(s: &str) -> Result<Self, String> {
-        let mut staff: Vec<Staff> = Vec::new();
-        for line in s.lines() {
-            let a_staff = <Staff>::from_config(line)?;
-            staff.push(a_staff);
-        }
-        Ok(staff)
-    }
-}
-
-impl FromConfig for Staff {
-    fn from_config(s: &str) -> Result<Self, String> {
-        let words: Vec<String> = s.split_whitespace().map(|s| s.to_string()).collect();
-        let l = words.len();
-        let mut attributes = Vec::new();
-        for i in 0..(l - 1) {
-            attributes.push(<i32>::from_config(&words[i])?);
-        }
-        let worker: Staff = Staff {
-            name: words[l - 1].clone(),
-            attributes,
-        };
-        Ok(worker)
-    }
-}
-
 impl FromConfig for Days {
     fn from_config(s: &str) -> Result<Self, String> {
         let mut ans: Days = Vec::new();
         for c in s.chars() {
-            ans.push(c.to_string().parse::<DayState>()?);
+            ans.push(<DayState>::from_config(&c.to_string())?);
         }
         Ok(ans)
     }
@@ -272,7 +257,14 @@ impl FromConfig for Days {
 
 impl FromConfig for DayState {
     fn from_config(s: &str) -> Result<Self, String> {
-        s.parse::<DayState>().map_err(|e| e.to_string())
+        match s {
+            "W" => Ok(DayState::Weekday),
+            "H" => Ok(DayState::Holiday),
+            "B" => Ok(DayState::Bath),
+            "2" => Ok(DayState::Bath2),
+            "M" => Ok(DayState::Measure),
+            _ => Err(format!("Failed to parse DayState: {}", s)),
+        }
     }
 }
 
@@ -307,45 +299,8 @@ impl FromConfig for Cond {
 
 impl FromConfig for Box<Cond> {
     fn from_config(s: &str) -> Result<Self, String> {
-        let words: Vec<&str> = s.splitn(2, ' ').collect();
-        check_len(
-            2,
-            &words,
-            "Needs 2 fields, but not enough.",
-            "Needs 2 fields, but too much given.",
-        )?;
-        match (words[0], words[1]) {
-            ("Every", _) => Ok(Box::new(Cond::Every)),
-            ("Or", p) => Ok(Box::new(Cond::Or(<(Box<Cond>, Box<Cond>)>::from_config(
-                p,
-            )?))),
-            ("And", p) => Ok(Box::new(Cond::And(<(Box<Cond>, Box<Cond>)>::from_config(
-                p,
-            )?))),
-            ("Not", p) => Ok(Box::new(Cond::Not(Box::new(<Cond>::from_config(p)?)))),
-            ("DayExceptBuffer", _) => Ok(Box::new(Cond::DayExceptBuffer)),
-            ("DayInRange", p) => Ok(Box::new(Cond::DayInRange(<(usize, usize)>::from_config(
-                p,
-            )?))),
-            ("ParticularDayState", p) => Ok(Box::new(Cond::ParticularDayState(
-                <DayState>::from_config(p)?,
-            ))),
-            ("BeforeDayState", p) => Ok(Box::new(Cond::ParticularDayState(
-                <DayState>::from_config(p)?,
-            ))),
-            ("ParticularDay", p) => Ok(Box::new(Cond::ParticularDay(<usize>::from_config(p)?))),
-            ("StaffInRange", p) => Ok(Box::new(Cond::StaffInRange(<(usize, usize)>::from_config(
-                p,
-            )?))),
-            ("StaffWithAttribute", p) => Ok(Box::new(Cond::StaffWithAttribute(<(
-                StaffAttributeName,
-                i32,
-            )>::from_config(
-                p
-            )?))),
-            ("ParticularStaff", p) => Ok(Box::new(Cond::ParticularStaff(<usize>::from_config(p)?))),
-            (s, p) => Err(format!("Failed to parse Box<Cond>: {} {}", s, p)),
-        }
+        let cond = Cond::from_config(s)?;
+        Ok(Box::new(cond))
     }
 }
 
@@ -445,6 +400,20 @@ impl FromConfig for Vec<ScoreProp> {
             ans.push(<ScoreProp>::from_config(line)?);
         }
         Ok(ans)
+    }
+}
+
+pub struct ScheduleRowWrapper {
+    pub value: Vec<Shift>,
+}
+
+impl FromConfig for ScheduleRowWrapper {
+    fn from_config(s: &str) -> Result<Self, String> {
+        let mut ans = Vec::new();
+        for c in s.chars() {
+            ans.push(<Shift>::from_config(&c.to_string())?);
+        }
+        Ok(ScheduleRowWrapper { value: ans })
     }
 }
 

@@ -15,7 +15,12 @@ use super::util::parser::*;
 pub fn convert_schedule_config(
     config: RawScheduleConfig,
 ) -> Result<(ScheduleProp, Vec<FilePath>, FillConfig), String> {
-    let schedule = make_schedule(&config)?;
+    let schedule = config
+        .day
+        .requested_schedule
+        .iter()
+        .map(|s| <ScheduleRowWrapper>::from_config(s).map(|w| w.value))
+        .collect::<Result<Schedule, String>>()?;
 
     let schedule_prop: ScheduleProp = ScheduleProp {
         staff_list: config
@@ -56,18 +61,6 @@ pub fn convert_schedule_config(
     };
     checker::check_schedule_prop(&schedule_prop)?;
     Ok((schedule_prop, annealing_file_paths, fill_config))
-}
-
-fn make_schedule(config: &RawScheduleConfig) -> Result<Schedule, String> {
-    let mut ans: Schedule = Vec::new();
-    for s in &config.day.requested_schedule {
-        let mut row = Vec::new();
-        for c in s.chars() {
-            row.push(c.to_string().parse::<Shift>().map_err(|e| e.to_string())?);
-        }
-        ans.push(row);
-    }
-    Ok(ans)
 }
 
 fn make_day_attributes(config: &RawScheduleConfig) -> HashMap<DayAttributeName, Vec<i32>> {
