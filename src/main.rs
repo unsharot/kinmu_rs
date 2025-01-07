@@ -115,24 +115,16 @@ fn annealing(
     Ok(model)
 }
 
-fn print_model(mut schedule_prop: &mut ScheduleProp, model: &Schedule) {
-    let score = score::assess_score(
-        &mut schedule_prop.score_props.clone(),
-        &mut schedule_prop,
-        &model,
-    );
+fn print_model(schedule_prop: &mut ScheduleProp, model: &Schedule) {
+    let score = score::assess_score(&mut schedule_prop.score_props.clone(), schedule_prop, model);
 
     println!("score: {}", score);
-    output::print_schedule(&schedule_prop, &model);
+    output::print_schedule(schedule_prop, model);
 
     println!();
 
     println!(
         "{}",
-        score::show_score(
-            &mut schedule_prop.score_props.clone(),
-            &mut schedule_prop,
-            &model
-        )
+        score::show_score(&mut schedule_prop.score_props.clone(), schedule_prop, model)
     );
 }

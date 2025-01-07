@@ -50,7 +50,7 @@ fn update_randomly1<R: Rng>(
             [Shift::N, Shift::K, Shift::I, Shift::A, Shift::O, Shift::H][rng.gen_range(0..6)];
         new_schedule
     } else {
-        update_randomly1(&schedule_prop, &schedule_state, &schedule, rng)
+        update_randomly1(schedule_prop, schedule_state, schedule, rng)
     }
 }
 
@@ -90,7 +90,7 @@ fn update_randomly4<R: Rng>(
         new_schedule[rx][ry] = [Shift::N, Shift::O, Shift::H][rng.gen_range(0..3)];
         new_schedule
     } else {
-        update_randomly4(&schedule_prop, &schedule_state, &schedule, rng)
+        update_randomly4(schedule_prop, schedule_state, schedule, rng)
         // 合わない場合表を何個も生成することになる
         // 更新確率をpとすると、更新に必要な平均の呼び出し回数は1/p回なのでそれほど問題はない
         // むしろ何も更新せずに評価するほうが問題
@@ -203,22 +203,22 @@ fn update_randomly5<R: Rng>(
         let i_count = count_waku_row!(Shift::I, schedule_prop, schedule, r);
         if i_count == 0 {
             // ランダムなKを取り除き、Nを代わりに置く
-            remove_random(Shift::K, &schedule_prop, &mut new_schedule, r, rng);
+            remove_random(Shift::K, schedule_prop, &mut new_schedule, r, rng);
             // ランダムなNをKで置き換える
-            add_random(Shift::K, &schedule_prop, &mut new_schedule, r, rng);
+            add_random(Shift::K, schedule_prop, &mut new_schedule, r, rng);
         } else {
             // ランダムなIを取り除き、Nを代わりに置く
-            remove_random(Shift::I, &schedule_prop, &mut new_schedule, r, rng);
+            remove_random(Shift::I, schedule_prop, &mut new_schedule, r, rng);
             // 孤立したAを取り除き、Nを代わりに置く
-            remove_improper_a(&schedule_prop, &mut new_schedule, r);
+            remove_improper_a(schedule_prop, &mut new_schedule, r);
             // ランダムなKを取り除き、Nを代わりに置く
-            remove_random(Shift::K, &schedule_prop, &mut new_schedule, r, rng);
+            remove_random(Shift::K, schedule_prop, &mut new_schedule, r, rng);
             // ランダムなNをIで置き換える
-            add_random(Shift::I, &schedule_prop, &mut new_schedule, r, rng);
+            add_random(Shift::I, schedule_prop, &mut new_schedule, r, rng);
             // Aを必要なら追加する (適当なものを置き換える あらゆる可能性あり)
-            add_proper_a(&schedule_prop, &mut new_schedule, r);
+            add_proper_a(schedule_prop, &mut new_schedule, r);
             // ランダムなNをKで置き換える
-            add_random(Shift::K, &schedule_prop, &mut new_schedule, r, rng);
+            add_random(Shift::K, schedule_prop, &mut new_schedule, r, rng);
         }
 
         // 条件に合うかのチェック

@@ -11,7 +11,7 @@ pub fn all_absolute(schedule_prop: &ScheduleProp) -> bool {
             }
         }
     }
-    return false;
+    false
 }
 
 /// IAKがすべて埋められているかチェック
@@ -31,7 +31,7 @@ pub fn safe_iak(schedule_prop: &ScheduleProp) -> bool {
             }
         }
     }
-    return true;
+    true
 }
 
 macro_rules! count_waku_row {
@@ -58,19 +58,19 @@ pub fn k_i_counts(schedule_prop: &ScheduleProp, schedule: &Schedule) -> bool {
             return false;
         }
     }
-    return true;
+    true
 }
 
 /// Absoluteが変化していないことをチェック
 pub fn abs_not_changed(schedule_prop: &ScheduleProp, schedule: &Schedule) -> bool {
     for r in 0..schedule_prop.staff_count {
         for c in 0..schedule_prop.day_count {
-            if schedule_prop.schedule_st[r][c] == ShiftState::Absolute {
-                if schedule[r][c] != schedule_prop.request[r][c] {
-                    return false;
-                }
+            if schedule_prop.schedule_st[r][c] == ShiftState::Absolute
+                && schedule[r][c] != schedule_prop.request[r][c]
+            {
+                return false;
             }
         }
     }
-    return true;
+    true
 }

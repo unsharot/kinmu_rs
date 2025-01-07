@@ -197,7 +197,7 @@ impl Cond {
             Cond::ParticularDayState(ds) => sp.days[c] == *ds, // indexおかしいかも
             Cond::BeforeDayState(ds) => {
                 if c == 0 {
-                    return false;
+                    false
                 } else {
                     sp.days[c - 1] == *ds
                 }
@@ -222,7 +222,7 @@ pub struct CondWrapper {
 impl CondWrapper {
     pub fn new(cond: Cond) -> Self {
         CondWrapper {
-            cond: cond,
+            cond,
             memo: <Vec<Vec<Option<bool>>>>::new(),
         }
     }

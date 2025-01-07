@@ -146,11 +146,11 @@ fn fill_randomly2<R: Rng>(schedule_prop: &ScheduleProp, rng: &mut R) -> Schedule
 
         // 余分なIをランダムに消す
         for _ in 0..i_dif {
-            remove_random(Shift::I, &schedule_prop, &mut schedule, r, rng);
+            remove_random(Shift::I, schedule_prop, &mut schedule, r, rng);
         }
 
         // 孤立したAを消す
-        remove_improper_a(&schedule_prop, &mut schedule, r);
+        remove_improper_a(schedule_prop, &mut schedule, r);
 
         // Kの差分を計算
         let k_dif = schedule_prop.get_attribute(r, &"KDayCount".to_string())
@@ -159,7 +159,7 @@ fn fill_randomly2<R: Rng>(schedule_prop: &ScheduleProp, rng: &mut R) -> Schedule
         if k_dif > 0 {
             // 不足したKをランダムに足す
             for _ in 0..k_dif {
-                add_random(Shift::K, &schedule_prop, &mut schedule, r, rng);
+                add_random(Shift::K, schedule_prop, &mut schedule, r, rng);
             }
         } else {
             // 孤立したKとそうでないKのインデックスをとる

@@ -22,15 +22,14 @@ impl FromConfig for String {
 /// 括弧がない場合も対応
 fn format_str_tuple_to_words(s: &str) -> Result<Vec<&str>, String> {
     let trimmed_s = s.trim();
-    let bare_s;
-    if trimmed_s.starts_with("(") {
-        if !trimmed_s.ends_with(")") {
+    let bare_s = if trimmed_s.starts_with('(') {
+        if !trimmed_s.ends_with(')') {
             return Err("found '(', but ')' not found".to_string());
         }
-        bare_s = &trimmed_s[1..(trimmed_s.len() - 1)];
+        &trimmed_s[1..(trimmed_s.len() - 1)]
     } else {
-        bare_s = trimmed_s;
-    }
+        trimmed_s
+    };
     let mut words = Vec::new();
     let mut bracket_count = 0;
     let mut start_idx = 0;
@@ -149,31 +148,31 @@ where
 
 impl FromConfig for usize {
     fn from_config(s: &str) -> Result<Self, String> {
-        Ok(s.parse::<usize>().map_err(|e| e.to_string())?)
+        s.parse::<usize>().map_err(|e| e.to_string())
     }
 }
 
 impl FromConfig for isize {
     fn from_config(s: &str) -> Result<Self, String> {
-        Ok(s.parse::<isize>().map_err(|e| e.to_string())?)
+        s.parse::<isize>().map_err(|e| e.to_string())
     }
 }
 
 impl FromConfig for i32 {
     fn from_config(s: &str) -> Result<Self, String> {
-        Ok(s.parse::<i32>().map_err(|e| e.to_string())?)
+        s.parse::<i32>().map_err(|e| e.to_string())
     }
 }
 
 impl FromConfig for f32 {
     fn from_config(s: &str) -> Result<Self, String> {
-        Ok(s.parse::<f32>().map_err(|e| e.to_string())?)
+        s.parse::<f32>().map_err(|e| e.to_string())
     }
 }
 
 impl FromConfig for Shift {
     fn from_config(s: &str) -> Result<Self, String> {
-        Ok(s.parse::<Shift>().map_err(|e| e.to_string())?)
+        s.parse::<Shift>().map_err(|e| e.to_string())
     }
 }
 
@@ -181,10 +180,10 @@ impl FromConfig for Shift {
 /// 2重入れ子構造になったVecにも対応
 fn format_str_vec_to_words(s: &str) -> Result<Vec<&str>, String> {
     let trimmed_s = s.trim();
-    if !trimmed_s.starts_with("[") {
+    if !trimmed_s.starts_with('[') {
         return Err("\'[\' not found".to_string());
     }
-    if !trimmed_s.ends_with("]") {
+    if !trimmed_s.ends_with(']') {
         return Err("\']\' not found".to_string());
     }
     let bare_s = &trimmed_s[1..(trimmed_s.len() - 1)];
@@ -238,7 +237,7 @@ impl FromConfig for Vec<Staff> {
     fn from_config(s: &str) -> Result<Self, String> {
         let mut staff: Vec<Staff> = Vec::new();
         for line in s.lines() {
-            let a_staff = <Staff>::from_config(&line)?;
+            let a_staff = <Staff>::from_config(line)?;
             staff.push(a_staff);
         }
         Ok(staff)
@@ -255,7 +254,7 @@ impl FromConfig for Staff {
         }
         let worker: Staff = Staff {
             name: words[l - 1].clone(),
-            attributes: attributes,
+            attributes,
         };
         Ok(worker)
     }
@@ -273,7 +272,7 @@ impl FromConfig for Days {
 
 impl FromConfig for DayState {
     fn from_config(s: &str) -> Result<Self, String> {
-        Ok(s.parse::<DayState>().map_err(|e| e.to_string())?)
+        s.parse::<DayState>().map_err(|e| e.to_string())
     }
 }
 
@@ -443,7 +442,7 @@ impl FromConfig for Vec<ScoreProp> {
     fn from_config(s: &str) -> Result<Self, String> {
         let mut ans: Vec<ScoreProp> = Vec::new();
         for line in s.lines() {
-            ans.push(<ScoreProp>::from_config(&line)?);
+            ans.push(<ScoreProp>::from_config(line)?);
         }
         Ok(ans)
     }
