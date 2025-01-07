@@ -432,10 +432,10 @@ fn staff_count_with_premise(
     for day in 0..schedule_prop.day_count {
         let mut count = 0;
         for staff in 0..schedule_prop.staff_count {
-            if cond_premise.eval(staff, day, schedule_prop) {
-                if schedule[staff][day] == *shift_premise {
-                    count += 1;
-                }
+            if cond_premise.eval(staff, day, schedule_prop)
+                && schedule[staff][day] == *shift_premise
+            {
+                count += 1;
             }
         }
         if count == *count_premise {
@@ -493,10 +493,8 @@ fn no_same_pair(
     for day in 0..schedule_prop.day_count {
         let mut i_list: Vec<usize> = Vec::new();
         for staff in 0..schedule_prop.staff_count {
-            if cond.eval(staff, day, schedule_prop) {
-                if schedule[staff][day] == *shift {
-                    i_list.push(staff);
-                }
+            if cond.eval(staff, day, schedule_prop) && schedule[staff][day] == *shift {
+                i_list.push(staff);
             }
         }
         // ある日の夜勤の人数が2人以上ならペアのマップに加算
@@ -505,7 +503,7 @@ fn no_same_pair(
         }
     }
     let mut ans = 0.0;
-    for (_, count) in &pair_map {
+    for count in pair_map.values() {
         let a = *count - *pair_limit + 1;
         if a > 0 {
             ans += (a as Score) * *score

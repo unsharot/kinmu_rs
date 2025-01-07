@@ -43,7 +43,7 @@ pub fn print_schedule(schedule_prop: &ScheduleProp, schedule: &Schedule) {
 /// Shiftの行を出力
 fn print_shift_row(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize) {
     for c in 0..schedule_prop.day_count {
-        print!("{}", schedule[r][c].to_string());
+        print!("{}", schedule[r][c]);
         if c + 1 == schedule_prop.buffer {
             print!("|");
         }
@@ -71,7 +71,7 @@ fn print_shift_count_row(
 /// 曜日を表示
 fn print_days(schedule_prop: &ScheduleProp) {
     for c in 0..schedule_prop.day_count {
-        print!("{}", schedule_prop.days[c].to_string());
+        print!("{}", schedule_prop.days[c]);
         if c + 1 == schedule_prop.buffer {
             print!("|");
         }
@@ -113,7 +113,7 @@ fn print_shift_count_columns(
             }
         }
         if l == 0 {
-            print!(" {}", target_shift.to_string());
+            print!(" {}", target_shift);
         }
         println!();
     }
