@@ -390,7 +390,7 @@ impl FromConfig for ScoreProp {
                 p
             )?)),
             ("Streak", p) => Ok(ScoreProp::Streak(
-                <(CondWrapper, Vec<Shift>, isize, Score)>::from_config(p)?,
+                <(CondWrapper, Vec<Shift>, i32, Score)>::from_config(p)?,
             )),
             ("ShiftsBalance", p) => Ok(ScoreProp::ShiftsBalance(<(
                 CondWrapper,
@@ -415,15 +415,15 @@ impl FromConfig for ScoreProp {
                 <(CondWrapper, Shift, DayAttributeName, Score)>::from_config(p)?,
             )),
             ("StaffCount", p) => Ok(ScoreProp::StaffCount(
-                <(CondWrapper, Shift, isize, Score)>::from_config(p)?,
+                <(CondWrapper, Shift, i32, Score)>::from_config(p)?,
             )),
             ("StaffCountWithPremise", p) => Ok(ScoreProp::StaffCountWithPremise(<(
                 CondWrapper,
                 Shift,
-                isize,
+                i32,
                 CondWrapper,
                 Shift,
-                isize,
+                i32,
                 Score,
             )>::from_config(
                 p
@@ -432,7 +432,7 @@ impl FromConfig for ScoreProp {
                 <(CondWrapper, Shift, Score)>::from_config(p)?,
             )),
             ("NoSamePair", p) => Ok(ScoreProp::NoSamePair(
-                <(CondWrapper, isize, Shift, Score)>::from_config(p)?,
+                <(CondWrapper, i32, Shift, Score)>::from_config(p)?,
             )),
             (s, p) => Err(format!("Failed to parse ScoreProp: {} {}", s, p)),
         }
