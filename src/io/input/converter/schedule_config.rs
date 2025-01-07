@@ -4,22 +4,17 @@ use std::collections::HashMap;
 
 use crate::io::input::reader::types::RawScheduleConfig;
 use crate::kinmu_lib::types::{
-    DayAttributeName, Days, FillConfig, Schedule, ScheduleProp, ScheduleState, ScoreProp, Shift,
-    ShiftState, Staff, StaffAttributeNameIndexMap,
+    DayAttributeName, Days, FilePath, FillConfig, Schedule, ScheduleProp, ScheduleState, ScoreProp,
+    Shift, ShiftState, Staff, StaffAttributeNameIndexMap,
 };
 
-use super::super::super::reader;
-use super::super::checker;
-use super::super::parser::*;
-
-type FilePath = String;
+use super::util::checker;
+use super::util::parser::*;
 
 /// 勤務表で使う値を読み込む
-pub fn load_schedule_config(
-    path: &str,
+pub fn convert_schedule_config(
+    config: RawScheduleConfig,
 ) -> Result<(ScheduleProp, Vec<FilePath>, FillConfig), String> {
-    let config = reader::read_schedule_config(path)?;
-
     let schedule = make_schedule(&config)?;
 
     let schedule_prop: ScheduleProp = ScheduleProp {
