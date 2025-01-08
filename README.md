@@ -58,7 +58,7 @@
 - `A`へ移動する
 - `./kinmu.exe`をターミナルで実行
 
-exeファイルを実行する際、デフォルトでメインconfigとして`config/config.toml`が読み込まれますが、読み込むconfigを指定することもできます。
+exeファイルを実行する際、デフォルトでメインconfigとして`example/main_config.toml`が読み込まれますが、読み込むconfigを指定することもできます。
 以下のように引数にファイル名を指定することで、読み込むファイルを指定することができます。
 モードを切り替えて使いたい場合にご利用ください。
 
@@ -67,8 +67,8 @@ exeファイルを実行する際、デフォルトでメインconfigとして`c
 ```
 
 ```sh
-# 付属のtemplateを実行する場合
-./kinmu.exe config_template/main_config.toml
+# 指定しない場合、付属のexample/main_config.tomlが実行される
+./kinmu.exe
 ```
 
 ### ソースファイルをダウンロードする場合
@@ -144,7 +144,7 @@ foo =
 foo = 1
 ```
 
-各ファイルの設定方法については、以下の説明や付属のconfig_templateフォルダを参照してください。
+各ファイルの設定方法については、以下の説明と付属の`example`フォルダを参照してください。
 
 ### main_config
 呼び出すファイルを設定します。

@@ -7,7 +7,7 @@ use std::env;
 use std::thread;
 use std::time::Instant;
 
-const DEFALUT_MAIN_CONFIG_PATH: &str = "config/config.yaml";
+const DEFALUT_MAIN_CONFIG_PATH: &str = "example/main_config.toml";
 
 fn main() {
     let args: Vec<String> = env::args().collect();
