@@ -6,6 +6,7 @@ pub use self::config::*;
 
 use std::collections::HashMap;
 use std::fmt;
+use std::time::Duration;
 
 #[derive(Debug, Clone, PartialEq, Copy)]
 pub enum Shift {
@@ -24,7 +25,7 @@ pub type Schedule = Vec<Vec<Shift>>;
 
 pub type Score = f32;
 
-#[derive(PartialEq, Clone)]
+#[derive(PartialEq, Clone, Debug)]
 pub enum ShiftState {
     Absolute,
     Random,
@@ -32,7 +33,7 @@ pub enum ShiftState {
 
 pub type ScheduleState = Vec<Vec<ShiftState>>;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Staff {
     pub name: String,
     pub attributes: Vec<i32>,
@@ -157,8 +158,15 @@ impl fmt::Debug for CondWrapper {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct StaffAttributeNameIndexMap {
     pub names: Vec<StaffAttributeName>,
     pub name_to_index: HashMap<StaffAttributeName, usize>,
+}
+
+#[derive(Debug, Clone)]
+pub struct Answer {
+    pub models: Vec<Schedule>,
+    pub schedule_prop: ScheduleProp,
+    pub total_time: Duration,
 }

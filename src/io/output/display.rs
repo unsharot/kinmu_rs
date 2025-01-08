@@ -1,13 +1,28 @@
 //! 生成した勤務表を標準出力するモジュール
 
+use crate::kinmu_lib::score;
 use crate::kinmu_lib::types::{DayState, Schedule, ScheduleProp, ScoreProp, Shift};
 
 use std::fmt;
 
 const ROW_STATS_DIGIT: usize = 2;
 
+pub fn print_model(schedule_prop: &ScheduleProp, model: &Schedule) {
+    let score = score::assess_score(&mut schedule_prop.score_props.clone(), schedule_prop, model);
+
+    println!("score: {}", score);
+    print_schedule(schedule_prop, model);
+
+    println!();
+
+    println!(
+        "{}",
+        score::show_score(&mut schedule_prop.score_props.clone(), schedule_prop, model)
+    );
+}
+
 /// 表を出力
-pub fn print_schedule(schedule_prop: &ScheduleProp, schedule: &Schedule) {
+fn print_schedule(schedule_prop: &ScheduleProp, schedule: &Schedule) {
     for r in 0..schedule_prop.staff_count {
         // Shiftの行を出力
         print_shift_row(schedule_prop, schedule, r);
@@ -107,7 +122,7 @@ fn print_shift_count_columns(
     for l in 0..max_length {
         for (c, num) in str_nums.iter().enumerate() {
             if l < num.len() {
-                print!("{}", &num[l..l+1]);
+                print!("{}", &num[l..l + 1]);
             } else {
                 print!(" ");
             }
