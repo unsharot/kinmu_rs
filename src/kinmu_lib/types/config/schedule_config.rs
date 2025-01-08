@@ -14,7 +14,7 @@ pub struct FillConfig {
 }
 
 /// 勤務表ごとの設定
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct ScheduleProp {
     pub staff_list: Vec<Staff>,
     pub ng_list: NGList,
