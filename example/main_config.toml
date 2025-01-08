@@ -1,5 +1,5 @@
 schedule_config_paths = [
-"config_template/schedule_config.toml"
+"example/schedule_config.toml"
 ]
 
 thread_count = 1

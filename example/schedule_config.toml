@@ -53,8 +53,8 @@ function = "fill1"
 [annealing]
 
 config_paths = [
-"config_template/annealing_configs/annealing_config_1.toml",
-"config_template/annealing_configs/annealing_config_2.toml",
+"example/annealing_configs/annealing_config_1.toml",
+"example/annealing_configs/annealing_config_2.toml",
 ]
 
 
