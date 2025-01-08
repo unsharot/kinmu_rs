@@ -11,10 +11,9 @@ pub(super) fn print_answer(ans: Answer) {
     for (t, model) in ans.models.iter().enumerate() {
         println!("thread: {}", t + 1);
         print_model(&ans.schedule_prop, model);
-        println!();
     }
-    println!();
     println!("total time: {:?}", ans.total_time);
+    println!();
 }
 
 fn print_model(schedule_prop: &ScheduleProp, model: &Schedule) {
