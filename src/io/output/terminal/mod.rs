@@ -1,9 +1,9 @@
-//! 結果を標準出力するモジュール
+//! 結果をターミナルに標準出力するモジュール
+
+mod display;
 
 use crate::kinmu_lib::score;
-use crate::kinmu_lib::types::{Answer, DayState, Schedule, ScheduleProp, ScoreProp, Shift};
-
-use std::fmt;
+use crate::kinmu_lib::types::{Answer, Schedule, ScheduleProp, Shift};
 
 const ROW_STATS_DIGIT: usize = 2;
 
@@ -62,8 +62,6 @@ fn print_schedule(schedule_prop: &ScheduleProp, schedule: &Schedule) {
     print_shift_count_columns(Shift::K, schedule_prop, schedule);
     print_shift_count_columns(Shift::O, schedule_prop, schedule);
     print_shift_count_columns(Shift::H, schedule_prop, schedule);
-
-    // スコア表示
 }
 
 /// Shiftの行を出力
@@ -144,61 +142,5 @@ fn print_shift_count_columns(
             print!(" {}", target_shift);
         }
         println!();
-    }
-}
-
-impl fmt::Display for Shift {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let s = match self {
-            Shift::N => "N",
-            Shift::K => "K",
-            Shift::I => "I",
-            Shift::A => "A",
-            Shift::O => "O",
-            Shift::H => "H",
-            Shift::Y => "Y",
-            Shift::D => "D",
-            Shift::U => "U",
-        };
-        write!(f, "{}", s)
-    }
-}
-
-impl fmt::Display for DayState {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let s = match self {
-            DayState::Weekday => "W",
-            DayState::Holiday => "H",
-            DayState::Bath => "B",
-            DayState::Bath2 => "2",
-            DayState::Measure => "M",
-        };
-        write!(f, "{}", s)
-    }
-}
-
-impl fmt::Display for ScoreProp {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let s = match self {
-            ScoreProp::PatternGeneral(p) => format!("PatternGeneral {:?}", p),
-            ScoreProp::PatternFixed(p) => format!("PatternFixed {:?}", p),
-            ScoreProp::PatternGeneralAny(p) => format!("PatternGeneralAny {:?}", p),
-            ScoreProp::PatternFixedAny(p) => format!("PatternFixedAny {:?}", p),
-            ScoreProp::Streak(p) => format!("Streak {:?}", p),
-            ScoreProp::ShiftsBalance(p) => format!("ShiftsBalance {:?}", p),
-            ScoreProp::ShiftHalfBalance(p) => format!("ShiftHalfBalance {:?}", p),
-            ScoreProp::ShiftDirPriority(p) => format!("ShiftDirPriority {:?}", p),
-            ScoreProp::DayCountRegardStaffAttribute(p) => {
-                format!("DayCountRegardStaffAttribute {:?}", p)
-            }
-            ScoreProp::StaffCountRegardDayAttribute(p) => {
-                format!("StaffCountRegardDayAttribute {:?}", p)
-            }
-            ScoreProp::StaffCount(p) => format!("StaffCount {:?}", p),
-            ScoreProp::StaffCountWithPremise(p) => format!("StaffCountWithPremise {:?}", p),
-            ScoreProp::NGPair(p) => format!("NGPair {:?}", p),
-            ScoreProp::NoSamePair(p) => format!("NoSamePair {:?}", p),
-        };
-        write!(f, "{}", s)
     }
 }
