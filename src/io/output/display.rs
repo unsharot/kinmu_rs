@@ -87,7 +87,8 @@ fn print_shift_count_columns(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
 ) {
-    let mut v: Vec<String> = Vec::new();
+    // 数値を文字列として保存するベクトル
+    let mut str_nums: Vec<String> = Vec::new();
     let mut max_length = 0;
     for c in 0..schedule_prop.day_count {
         let mut sum = 0;
@@ -97,16 +98,16 @@ fn print_shift_count_columns(
             }
         }
         let s = sum.to_string();
-        v.push(s.clone());
+        str_nums.push(s.clone());
         if max_length < s.len() {
             max_length = s.len();
         }
     }
 
     for l in 0..max_length {
-        for c in 0..schedule_prop.day_count {
-            if l < v[c].len() {
-                print!("{}", &v[c][l..l + 1]);
+        for (c, num) in str_nums.iter().enumerate() {
+            if l < num.len() {
+                print!("{}", &num[l..l+1]);
             } else {
                 print!(" ");
             }
