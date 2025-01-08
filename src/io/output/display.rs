@@ -1,13 +1,23 @@
-//! 生成した勤務表を標準出力するモジュール
+//! 結果を標準出力するモジュール
 
 use crate::kinmu_lib::score;
-use crate::kinmu_lib::types::{DayState, Schedule, ScheduleProp, ScoreProp, Shift};
+use crate::kinmu_lib::types::{Answer, DayState, Schedule, ScheduleProp, ScoreProp, Shift};
 
 use std::fmt;
 
 const ROW_STATS_DIGIT: usize = 2;
 
-pub fn print_model(schedule_prop: &ScheduleProp, model: &Schedule) {
+pub(super) fn print_answer(ans: Answer) {
+    for (t, model) in ans.models.iter().enumerate() {
+        println!("thread: {}", t + 1);
+        print_model(&ans.schedule_prop, model);
+        println!();
+    }
+    println!();
+    println!("total time: {:?}", ans.total_time);
+}
+
+fn print_model(schedule_prop: &ScheduleProp, model: &Schedule) {
     let score = score::assess_score(&mut schedule_prop.score_props.clone(), schedule_prop, model);
 
     println!("score: {}", score);

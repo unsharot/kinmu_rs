@@ -15,7 +15,7 @@ fn main() {
     match generator::run(main_file_path) {
         Ok(answers) => {
             for ans in answers {
-                output::show(ans);
+                output::run(ans);
             }
         }
         Err(e) => println!("{}", e),
