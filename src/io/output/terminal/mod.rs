@@ -5,8 +5,6 @@ mod display;
 use crate::kinmu_lib::score;
 use crate::kinmu_lib::types::{Answer, Schedule, ScheduleProp, Shift};
 
-const ROW_STATS_DIGIT: usize = 2;
-
 pub(super) fn print_answer(ans: Answer) {
     for (t, model) in ans.models.iter().enumerate() {
         println!("thread: {}", t + 1);
@@ -88,7 +86,8 @@ fn print_shift_count_row(
         }
     }
     // 桁を指定して出力
-    let f = format!(" {:>stats$}", sum, stats = ROW_STATS_DIGIT);
+    let digit = schedule_prop.day_count.to_string().len();
+    let f = format!(" {:>stats$}", sum, stats = digit);
     print!("{}", f);
 }
 
