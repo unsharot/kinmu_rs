@@ -1,6 +1,6 @@
 //! main_configを定義
 
-pub type FilePath = String;
+use super::super::FilePath;
 
 pub struct MainConfig {
     pub schedule_config_paths: Vec<FilePath>,
