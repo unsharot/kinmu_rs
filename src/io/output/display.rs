@@ -107,6 +107,7 @@ fn print_days(schedule_prop: &ScheduleProp) {
 }
 
 /// 指定したシフトの列の和を表示
+#[allow(clippy::needless_range_loop)]
 fn print_shift_count_columns(
     target_shift: Shift,
     schedule_prop: &ScheduleProp,

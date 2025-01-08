@@ -33,6 +33,7 @@ use rand::Rng;
 ///     &mut rand::thread_rng(),
 /// );
 ///```
+#[allow(clippy::too_many_arguments)]
 pub fn run<M, S, U, E, T, P, R>(
     initial_score: S,
     initial_model: &M,

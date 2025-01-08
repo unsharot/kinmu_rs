@@ -30,6 +30,7 @@ pub fn show_score(
     zipped.join("\n")
 }
 
+#[allow(clippy::ptr_arg)]
 fn get_score_list(
     sps: &mut Vec<ScoreProp>,
     schedule_prop: &ScheduleProp,
@@ -66,6 +67,7 @@ fn get_score(schedule_prop: &ScheduleProp, schedule: &Schedule, sp: &mut ScorePr
 /// 指定したシフトパターンの数に応じて発火するスコア
 /// ただし、シフトパターンは複数候補を指定可能
 /// 配置がかぶる場合、うまく判定されない可能性あり
+#[allow(clippy::needless_range_loop)]
 fn pattern_general(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
@@ -95,6 +97,7 @@ fn pattern_general(
 
 /// 指定したシフトパターンの数に応じて発火するスコア
 /// 配置がかぶる場合、うまく判定されない可能性あり
+#[allow(clippy::needless_range_loop)]
 fn pattern_fixed(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
@@ -123,6 +126,7 @@ fn pattern_fixed(
 }
 
 /// 指定したパターンが存在するスタッフに対して発火するスコア
+#[allow(clippy::needless_range_loop)]
 fn pattern_general_any(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
@@ -154,6 +158,7 @@ fn pattern_general_any(
 
 /// 指定したパターンが存在するスタッフに対して発火するスコア
 /// ただし、パターンは固定
+#[allow(clippy::needless_range_loop)]
 fn pattern_fixed_any(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
@@ -185,6 +190,7 @@ fn pattern_fixed_any(
 
 /// 指定したシフトが指定回数連続して存在するか判定するスコア
 /// 指定回数+1回連続は1回分としてカウントされる
+#[allow(clippy::needless_range_loop)]
 fn streak(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
@@ -213,6 +219,7 @@ fn streak(
 }
 
 /// 指定した2つのシフト数がスタッフあたりでバランス良いか判定するスコア
+#[allow(clippy::needless_range_loop)]
 fn shifts_balance(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
@@ -244,6 +251,7 @@ fn shifts_balance(
 }
 
 /// 指定したシフトが月の前後でバランスよく配置されているかを判定するスコア
+#[allow(clippy::needless_range_loop)]
 fn shift_half_balance(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
@@ -291,6 +299,7 @@ fn shift_half_balance(
 
 /// 指定したシフトが月の前後どちらにあるほうが良いか設定する
 /// Scoreのフィールドが正なら前を優先、負なら後ろを優先
+#[allow(clippy::needless_range_loop)]
 fn shift_dir_priority(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
@@ -330,6 +339,7 @@ fn shift_dir_priority(
 }
 
 /// 指定したシフトをStaffAttributeで指定した数入らなかった場合に発火するスコア
+#[allow(clippy::needless_range_loop)]
 fn day_count_regard_staff_attribute(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
@@ -361,6 +371,7 @@ fn day_count_regard_staff_attribute(
 }
 
 /// 指定したシフトがDayAttributeで指定した数いない場合に発火するスコア
+#[allow(clippy::needless_range_loop)]
 fn staff_count_regard_day_attribute(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
@@ -389,6 +400,7 @@ fn staff_count_regard_day_attribute(
 }
 
 /// 指定したシフトが指定した数いない場合に発火するスコア
+#[allow(clippy::needless_range_loop)]
 fn staff_count(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
@@ -415,6 +427,7 @@ fn staff_count(
     sum
 }
 
+#[allow(clippy::needless_range_loop)]
 fn staff_count_with_premise(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
@@ -484,6 +497,7 @@ fn ng_pair(
 }
 
 /// 指定回数以上同じペアなら発火するスコア
+#[allow(clippy::needless_range_loop)]
 fn no_same_pair(
     schedule_prop: &ScheduleProp,
     schedule: &Schedule,
