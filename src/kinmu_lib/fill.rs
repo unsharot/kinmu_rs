@@ -19,6 +19,7 @@ pub fn run(fc: &mut FillConfig, schedule_prop: &ScheduleProp) -> Result<Schedule
     }
 }
 
+#[allow(clippy::needless_range_loop)]
 fn fill_randomly1<R: Rng>(schedule_prop: &ScheduleProp, rng: &mut R) -> Schedule {
     let mut schedule = schedule_prop.request.clone();
     for r in 0..schedule_prop.staff_count {

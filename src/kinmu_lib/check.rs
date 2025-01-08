@@ -47,6 +47,7 @@ macro_rules! count_waku_row {
 }
 
 /// fillした後の表のKとIの数がちゃんとしてるかチェック
+#[allow(clippy::needless_range_loop)]
 pub fn k_i_counts(schedule_prop: &ScheduleProp, schedule: &Schedule) -> bool {
     for r in 0..schedule_prop.staff_count {
         let k_count = count_waku_row!(Shift::K, schedule_prop, schedule, r);
@@ -62,6 +63,7 @@ pub fn k_i_counts(schedule_prop: &ScheduleProp, schedule: &Schedule) -> bool {
 }
 
 /// Absoluteが変化していないことをチェック
+#[allow(clippy::needless_range_loop)]
 pub fn abs_not_changed(schedule_prop: &ScheduleProp, schedule: &Schedule) -> bool {
     for r in 0..schedule_prop.staff_count {
         for c in 0..schedule_prop.day_count {

@@ -4,6 +4,7 @@ use super::types::{Schedule, ScheduleProp, ScheduleState, Score, Shift, ShiftSta
 
 use rand::Rng;
 
+#[allow(clippy::type_complexity)]
 pub fn gen_update_func<'a, R: Rng>(
     text: &str,
     schedule_prop: &'a ScheduleProp,
