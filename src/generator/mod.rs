@@ -41,12 +41,14 @@ fn generate_schedule(p: &str, thread_count: u32) -> Result<Answer, String> {
 
     let mut annealing_configs = vec![];
     for ac_path in ac_paths {
-        annealing_configs.push(input::load_annealing_config(&ac_path).map_err(|e| {
-            format!(
-                "[エラー] 焼きなましconfigの読み込みに失敗しました\n対象ファイル: {}\n理由: {}",
-                ac_path, e
-            )
-        })?);
+        annealing_configs.push(
+            input::load_annealing_config(&ac_path, &schedule_config).map_err(|e| {
+                format!(
+                    "[エラー] 焼きなましconfigの読み込みに失敗しました\n対象ファイル: {}\n理由: {}",
+                    ac_path, e
+                )
+            })?,
+        );
     }
 
     let start = Instant::now();

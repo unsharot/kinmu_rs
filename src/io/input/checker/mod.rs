@@ -2,7 +2,10 @@
 
 use std::cmp::Ordering;
 
-use crate::kinmu_lib::types::ScheduleConfig;
+use crate::kinmu_lib::types::{
+    AnnealingConfig, Cond, CondWrapper, DayAttributeName, ScheduleConfig, ScoreProp,
+    StaffAttributeName,
+};
 
 pub fn check_schedule_config(schedule_config: &ScheduleConfig) -> Result<(), String> {
     check_staff_attributes(schedule_config)?;
@@ -20,6 +23,17 @@ pub fn check_schedule_config(schedule_config: &ScheduleConfig) -> Result<(), Str
     check_ng_list(schedule_config)?;
 
     check_buffer(schedule_config)?;
+
+    check_score_props(&schedule_config.result.score_props, schedule_config)?;
+
+    Ok(())
+}
+
+pub fn check_annealing_config(
+    annealing_config: &AnnealingConfig,
+    schedule_config: &ScheduleConfig,
+) -> Result<(), String> {
+    check_score_props(&annealing_config.score_props, schedule_config)?;
 
     Ok(())
 }
@@ -143,4 +157,92 @@ fn check_buffer(schedule_config: &ScheduleConfig) -> Result<(), String> {
         Err("bufferがday_countを超えています")?;
     }
     Ok(())
+}
+
+/// ScorePropの中のStaffAttributeNameやDayAttributeNameが有効か
+fn check_score_props(score_props: &Vec<ScoreProp>, sc: &ScheduleConfig) -> Result<(), String> {
+    for score_prop in score_props {
+        match score_prop {
+            ScoreProp::PatternGeneral((c, _, _)) => check_cond_wrapper(c, sc)?,
+            ScoreProp::PatternFixed((c, _, _)) => check_cond_wrapper(c, sc)?,
+            ScoreProp::PatternGeneralAny((c, _, _)) => check_cond_wrapper(c, sc)?,
+            ScoreProp::PatternFixedAny((c, _, _)) => check_cond_wrapper(c, sc)?,
+            ScoreProp::Streak((c, _, _, _)) => check_cond_wrapper(c, sc)?,
+            ScoreProp::ShiftsBalance((c, _, _, _)) => check_cond_wrapper(c, sc)?,
+            ScoreProp::ShiftHalfBalance((c, _, _)) => check_cond_wrapper(c, sc)?,
+            ScoreProp::ShiftDirPriority((c, _, _)) => check_cond_wrapper(c, sc)?,
+            ScoreProp::DayCountRegardStaffAttribute((c, _, da, _)) => {
+                check_cond_wrapper(c, sc)?;
+                check_day_attribute_exists(da, sc)?;
+            }
+            ScoreProp::StaffCountRegardDayAttribute((c, _, sa, _)) => {
+                check_cond_wrapper(c, sc)?;
+                check_staff_attribute_exists(sa, sc)?;
+            }
+            ScoreProp::StaffCount((c, _, _, _)) => check_cond_wrapper(c, sc)?,
+            ScoreProp::StaffCountWithPremise((c1, _, _, c2, _, _, _)) => {
+                check_cond_wrapper(c1, sc)?;
+                check_cond_wrapper(c2, sc)?;
+            }
+            ScoreProp::NGPair((c, _, _)) => check_cond_wrapper(c, sc)?,
+            ScoreProp::NoSamePair((c, _, _, _)) => check_cond_wrapper(c, sc)?,
+        };
+    }
+    Ok(())
+}
+
+/// CondWrapperの中のStaffAttributeNameやDayAttributeNameが有効か
+fn check_cond_wrapper(c: &CondWrapper, sc: &ScheduleConfig) -> Result<(), String> {
+    check_cond(&c.cond, sc)?;
+    Ok(())
+}
+
+/// Condの中のStaffAttributeNameやDayAttributeNameが有効か
+fn check_cond(c: &Cond, sc: &ScheduleConfig) -> Result<(), String> {
+    match c {
+        Cond::Every => (),
+        Cond::Or((c1, c2)) => {
+            check_cond(c1, sc)?;
+            check_cond(c2, sc)?;
+        }
+        Cond::And((c1, c2)) => {
+            check_cond(c1, sc)?;
+            check_cond(c2, sc)?;
+        }
+        Cond::Not(c) => {
+            check_cond(c, sc)?;
+        }
+
+        Cond::DayExceptBuffer => (),
+        Cond::DayInRange(_) => (),
+        Cond::ParticularDayState(_) => (),
+        Cond::BeforeDayState(_) => (),
+        Cond::ParticularDay(_) => (),
+
+        Cond::StaffInRange(_) => (),
+        Cond::StaffWithAttribute((sa, _)) => check_staff_attribute_exists(sa, sc)?,
+        Cond::ParticularStaff(_) => (),
+    };
+    Ok(())
+}
+
+/// StaffAttributeNameが有効か
+fn check_staff_attribute_exists(
+    sa: &StaffAttributeName,
+    sc: &ScheduleConfig,
+) -> Result<(), String> {
+    if sc.staff.attribute_map.names.contains(sa) {
+        Ok(())
+    } else {
+        Err(format!("{}はstaff_attributeとして登録されていません", sa))
+    }
+}
+
+/// DayAttributeNameが有効か
+fn check_day_attribute_exists(da: &DayAttributeName, sc: &ScheduleConfig) -> Result<(), String> {
+    if sc.day.attributes.contains_key(da) {
+        Ok(())
+    } else {
+        Err(format!("{}はday_attributeとして登録されていません", da))
+    }
 }

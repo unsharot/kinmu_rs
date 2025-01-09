@@ -52,7 +52,7 @@ impl Cond {
 /// Condをメモ化して高速化するためのラッパー
 #[derive(PartialEq, Clone)]
 pub struct CondWrapper {
-    cond: Cond,
+    pub cond: Cond,
     memo: Vec<Vec<Option<bool>>>,
 }
 

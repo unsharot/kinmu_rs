@@ -9,7 +9,6 @@ use crate::kinmu_lib::types::{
     StaffConfig,
 };
 
-use super::util::checker;
 use super::util::parser::*;
 
 /// 勤務表で使う値を読み込む
@@ -73,8 +72,6 @@ pub fn convert_schedule_config(
         name: config.fill.function,
         seed: config.fill.seed,
     };
-
-    checker::check_schedule_config(&schedule_config)?;
 
     Ok((schedule_config, annealing_file_paths, fill_config))
 }
