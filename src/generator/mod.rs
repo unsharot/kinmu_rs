@@ -1,7 +1,7 @@
 //! 生成を行うモジュール
 
 use crate::io::input;
-use crate::kinmu_lib::types::{AnnealingConfig, Answer, FillConfig, Schedule, ScheduleProp};
+use crate::kinmu_lib::types::{AnnealingConfig, Answer, FillConfig, Schedule, ScheduleConfig};
 use crate::kinmu_lib::{fill, score, seed, update};
 use ::annealing::annealing;
 
@@ -32,7 +32,7 @@ fn generate_schedules(main_config_path: &str) -> Result<Vec<Answer>, String> {
 }
 
 fn generate_schedule(p: &str, thread_count: u32) -> Result<Answer, String> {
-    let (schedule_prop, ac_paths, fc) = input::load_schedule_config(p).map_err(|e| {
+    let (schedule_config, ac_paths, fc) = input::load_schedule_config(p).map_err(|e| {
         format!(
             "[エラー] 勤務表configの読み込みに失敗しました\n対象ファイル: {}\n理由: {}",
             p, e
@@ -53,11 +53,11 @@ fn generate_schedule(p: &str, thread_count: u32) -> Result<Answer, String> {
 
     let mut hs: Vec<thread::JoinHandle<Result<_, String>>> = vec![];
     for _ in 0..thread_count {
-        let schedule_prop = schedule_prop.clone();
+        let schedule_config = schedule_config.clone();
         let annealing_configs = annealing_configs.clone();
         let fc = fc.clone();
         hs.push(thread::spawn(move || {
-            annealing(schedule_prop, fc, annealing_configs)
+            annealing(schedule_config, fc, annealing_configs)
         }))
     }
 
@@ -70,28 +70,28 @@ fn generate_schedule(p: &str, thread_count: u32) -> Result<Answer, String> {
 
     Ok(Answer {
         models,
-        schedule_prop,
+        schedule_config,
         total_time: start.elapsed(),
     })
 }
 
 fn annealing(
-    schedule_prop: ScheduleProp,
+    schedule_config: ScheduleConfig,
     mut fc: FillConfig,
     annealing_configs: Vec<AnnealingConfig>,
 ) -> Result<Schedule, String> {
-    let mut model = fill::run(&mut fc, &schedule_prop)?;
+    let mut model = fill::run(&mut fc, &schedule_config)?;
 
     let mut score;
     for mut ac in annealing_configs {
         let mut rng = seed::gen_rng_from_seed(ac.seed);
-        score = score::assess_score(&mut ac.score_props, &schedule_prop, &model);
+        score = score::assess_score(&mut ac.score_props, &schedule_config, &model);
         (_, model) = annealing::run(
             score,
             &model,
             ac.step,
-            update::gen_update_func(&ac.update_func, &schedule_prop)?,
-            |m| score::assess_score(&mut ac.score_props, &schedule_prop, m),
+            update::gen_update_func(&ac.update_func, &schedule_config)?,
+            |m| score::assess_score(&mut ac.score_props, &schedule_config, m),
             ac.max_temp,
             ac.min_temp,
             annealing::basic_temp_func,

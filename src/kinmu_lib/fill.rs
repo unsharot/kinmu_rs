@@ -6,25 +6,26 @@ fill2はIとKの数合わせてうまいこと埋める
 */
 
 use super::seed;
-use super::types::{FillConfig, Schedule, ScheduleProp, Shift, ShiftState};
+use super::types::{FillConfig, Schedule, ScheduleConfig, Shift, ShiftState};
 
 use rand::Rng;
 
-pub fn run(fc: &mut FillConfig, schedule_prop: &ScheduleProp) -> Result<Schedule, String> {
+pub fn run(fc: &mut FillConfig, schedule_config: &ScheduleConfig) -> Result<Schedule, String> {
     let mut rng = &mut seed::gen_rng_from_seed(fc.seed);
     match fc.name.as_str() {
-        "fill1" => Ok(fill_randomly1(schedule_prop, &mut rng)),
-        "fill2" => Ok(fill_randomly2(schedule_prop, &mut rng)),
+        "fill1" => Ok(fill_randomly1(schedule_config, &mut rng)),
+        "fill2" => Ok(fill_randomly2(schedule_config, &mut rng)),
         _ => Err(format!("Failed to parse fill function {}", fc.name)),
     }
 }
 
 #[allow(clippy::needless_range_loop)]
-fn fill_randomly1<R: Rng>(schedule_prop: &ScheduleProp, rng: &mut R) -> Schedule {
-    let mut schedule = schedule_prop.request.clone();
-    for r in 0..schedule_prop.staff_count {
-        for c in schedule_prop.buffer..schedule_prop.day_count {
-            if schedule_prop.schedule_st[r][c] != ShiftState::Absolute && schedule[r][c] == Shift::U
+fn fill_randomly1<R: Rng>(schedule_config: &ScheduleConfig, rng: &mut R) -> Schedule {
+    let mut schedule = schedule_config.day.requested_schedule.clone();
+    for r in 0..schedule_config.staff.count {
+        for c in schedule_config.day.buffer_count..schedule_config.day.count {
+            if schedule_config.day.schedule_states[r][c] != ShiftState::Absolute
+                && schedule[r][c] == Shift::U
             {
                 schedule[r][c] = [Shift::N, Shift::O, Shift::H][rng.gen_range(0..3)];
             }
@@ -45,9 +46,9 @@ fill2のアルゴリズム
 */
 
 macro_rules! count_waku_row {
-    ($shift:expr, $schedule_prop: expr, $schedule:expr, $r:expr) => {{
+    ($shift:expr, $schedule_config: expr, $schedule:expr, $r:expr) => {{
         let mut count = 0;
-        for i in $schedule_prop.buffer..$schedule_prop.day_count {
+        for i in $schedule_config.day.buffer_count..$schedule_config.day.count {
             if $schedule[$r][i] == $shift {
                 count += 1;
             }
@@ -58,14 +59,16 @@ macro_rules! count_waku_row {
 
 fn remove_random<R: Rng>(
     shift: Shift,
-    schedule_prop: &ScheduleProp,
+    schedule_config: &ScheduleConfig,
     new_schedule: &mut Schedule,
     r: usize,
     rng: &mut R,
 ) {
     let mut is: Vec<usize> = Vec::new();
-    for c in schedule_prop.buffer..schedule_prop.day_count {
-        if new_schedule[r][c] == shift && schedule_prop.schedule_st[r][c] != ShiftState::Absolute {
+    for c in schedule_config.day.buffer_count..schedule_config.day.count {
+        if new_schedule[r][c] == shift
+            && schedule_config.day.schedule_states[r][c] != ShiftState::Absolute
+        {
             is.push(c);
         }
     }
@@ -73,11 +76,11 @@ fn remove_random<R: Rng>(
     new_schedule[r][is[rnd]] = Shift::N;
 }
 
-fn remove_improper_a(schedule_prop: &ScheduleProp, new_schedule: &mut Schedule, r: usize) {
-    for c in schedule_prop.buffer..schedule_prop.day_count {
+fn remove_improper_a(schedule_config: &ScheduleConfig, new_schedule: &mut Schedule, r: usize) {
+    for c in schedule_config.day.buffer_count..schedule_config.day.count {
         if new_schedule[r][c] == Shift::A
             && new_schedule[r][c - 1] != Shift::I
-            && schedule_prop.schedule_st[r][c] != ShiftState::Absolute
+            && schedule_config.day.schedule_states[r][c] != ShiftState::Absolute
         {
             new_schedule[r][c] = Shift::N;
         }
@@ -86,14 +89,15 @@ fn remove_improper_a(schedule_prop: &ScheduleProp, new_schedule: &mut Schedule, 
 
 fn add_random<R: Rng>(
     shift: Shift,
-    schedule_prop: &ScheduleProp,
+    schedule_config: &ScheduleConfig,
     new_schedule: &mut Schedule,
     r: usize,
     rng: &mut R,
 ) {
     let mut is: Vec<usize> = Vec::new();
-    for c in schedule_prop.buffer..schedule_prop.day_count {
-        if new_schedule[r][c] == Shift::N && schedule_prop.schedule_st[r][c] != ShiftState::Absolute
+    for c in schedule_config.day.buffer_count..schedule_config.day.count {
+        if new_schedule[r][c] == Shift::N
+            && schedule_config.day.schedule_states[r][c] != ShiftState::Absolute
         {
             is.push(c);
         }
@@ -102,14 +106,15 @@ fn add_random<R: Rng>(
     new_schedule[r][is[rnd]] = shift;
 }
 
-fn fill_randomly2<R: Rng>(schedule_prop: &ScheduleProp, rng: &mut R) -> Schedule {
-    let mut schedule = schedule_prop.request.clone();
-    for r in 0..schedule_prop.staff_count {
+fn fill_randomly2<R: Rng>(schedule_config: &ScheduleConfig, rng: &mut R) -> Schedule {
+    let mut schedule = schedule_config.day.requested_schedule.clone();
+    for r in 0..schedule_config.staff.count {
         let mut r_count = 0;
-        for c in schedule_prop.buffer..(schedule_prop.day_count + 1) {
+        for c in schedule_config.day.buffer_count..(schedule_config.day.count + 1) {
             // Randomが途切れることを検知して、途切れるなら入るだけIAKを入れる
             // なお、最後は途切れないとしてIAKが埋まるだけ埋める
-            if c != schedule_prop.day_count && schedule_prop.schedule_st[r][c] == ShiftState::Random
+            if c != schedule_config.day.count
+                && schedule_config.day.schedule_states[r][c] == ShiftState::Random
             {
                 r_count += 1;
                 if r_count == 3 {
@@ -118,7 +123,7 @@ fn fill_randomly2<R: Rng>(schedule_prop: &ScheduleProp, rng: &mut R) -> Schedule
                     schedule[r][c - 1] = Shift::A;
                     schedule[r][c] = Shift::K;
                 }
-            } else if c == schedule_prop.day_count {
+            } else if c == schedule_config.day.count {
                 if r_count == 1 {
                     schedule[r][c - 1] = Shift::I;
                 } else if r_count == 2 {
@@ -142,33 +147,33 @@ fn fill_randomly2<R: Rng>(schedule_prop: &ScheduleProp, rng: &mut R) -> Schedule
         }
 
         // Iの差分を計算
-        let i_dif = count_waku_row!(Shift::I, schedule_prop, schedule, r)
-            - schedule_prop.get_attribute(r, &"IDayCount".to_string());
+        let i_dif = count_waku_row!(Shift::I, schedule_config, schedule, r)
+            - schedule_config.get_attribute(r, &"IDayCount".to_string());
 
         // 余分なIをランダムに消す
         for _ in 0..i_dif {
-            remove_random(Shift::I, schedule_prop, &mut schedule, r, rng);
+            remove_random(Shift::I, schedule_config, &mut schedule, r, rng);
         }
 
         // 孤立したAを消す
-        remove_improper_a(schedule_prop, &mut schedule, r);
+        remove_improper_a(schedule_config, &mut schedule, r);
 
         // Kの差分を計算
-        let k_dif = schedule_prop.get_attribute(r, &"KDayCount".to_string())
-            - count_waku_row!(Shift::K, schedule_prop, schedule, r);
+        let k_dif = schedule_config.get_attribute(r, &"KDayCount".to_string())
+            - count_waku_row!(Shift::K, schedule_config, schedule, r);
 
         if k_dif > 0 {
             // 不足したKをランダムに足す
             for _ in 0..k_dif {
-                add_random(Shift::K, schedule_prop, &mut schedule, r, rng);
+                add_random(Shift::K, schedule_config, &mut schedule, r, rng);
             }
         } else {
             // 孤立したKとそうでないKのインデックスをとる
             let mut k_nc_ids = Vec::new();
             let mut k_ng_ids = Vec::new();
-            for c in schedule_prop.buffer..schedule_prop.day_count {
+            for c in schedule_config.day.buffer_count..schedule_config.day.count {
                 if (schedule[r][c] == Shift::K)
-                    && (schedule_prop.schedule_st[r][c] == ShiftState::Random)
+                    && (schedule_config.day.schedule_states[r][c] == ShiftState::Random)
                 {
                     if schedule[r][c - 1] == Shift::A {
                         k_ng_ids.push(c);

@@ -1,6 +1,6 @@
 //! 条件に関わる型の定義
 
-use super::{DayState, ScheduleProp, StaffAttributeName};
+use super::{DayState, ScheduleConfig, StaffAttributeName};
 
 use std::fmt;
 
@@ -23,20 +23,20 @@ pub enum Cond {
 }
 
 impl Cond {
-    pub fn eval(&self, r: usize, c: usize, sp: &ScheduleProp) -> bool {
+    pub fn eval(&self, r: usize, c: usize, sp: &ScheduleConfig) -> bool {
         match self {
             Cond::Every => true,
             Cond::Or((cond1, cond2)) => cond1.eval(r, c, sp) || cond2.eval(r, c, sp),
             Cond::And((cond1, cond2)) => cond1.eval(r, c, sp) && cond2.eval(r, c, sp),
             Cond::Not(cond) => !cond.eval(r, c, sp),
-            Cond::DayExceptBuffer => sp.buffer <= c,
+            Cond::DayExceptBuffer => sp.day.buffer_count <= c,
             Cond::DayInRange((day_start, day_end)) => *day_start <= c && c <= *day_end, // indexおかしいかも
-            Cond::ParticularDayState(ds) => sp.days[c] == *ds, // indexおかしいかも
+            Cond::ParticularDayState(ds) => sp.day.days[c] == *ds, // indexおかしいかも
             Cond::BeforeDayState(ds) => {
                 if c == 0 {
                     false
                 } else {
-                    sp.days[c - 1] == *ds
+                    sp.day.days[c - 1] == *ds
                 }
             }
             Cond::ParticularDay(d) => *d == c,
@@ -64,10 +64,10 @@ impl CondWrapper {
         }
     }
 
-    /// SchedulePropが焼きなましの過程で変化しない制限の上で
-    pub fn eval(&mut self, r: usize, c: usize, sp: &ScheduleProp) -> bool {
+    /// ScheduleConfigが焼きなましの過程で変化しない制限の上で
+    pub fn eval(&mut self, r: usize, c: usize, sp: &ScheduleConfig) -> bool {
         if self.memo.is_empty() {
-            self.memo = vec![vec![None; sp.day_count]; sp.staff_count];
+            self.memo = vec![vec![None; sp.day.count]; sp.staff.count];
         }
         match self.memo[r][c] {
             Some(ans) => ans,

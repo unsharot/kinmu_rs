@@ -3,47 +3,55 @@
 mod display;
 
 use crate::kinmu_lib::score;
-use crate::kinmu_lib::types::{Answer, Schedule, ScheduleProp, Shift};
+use crate::kinmu_lib::types::{Answer, Schedule, ScheduleConfig, Shift};
 
 pub(super) fn print_answer(ans: Answer) {
     for (t, model) in ans.models.iter().enumerate() {
         println!("thread: {}", t + 1);
-        print_model(&ans.schedule_prop, model);
+        print_model(&ans.schedule_config, model);
     }
     println!("total time: {:?}", ans.total_time);
     println!();
 }
 
-fn print_model(schedule_prop: &ScheduleProp, model: &Schedule) {
-    let score = score::assess_score(&mut schedule_prop.score_props.clone(), schedule_prop, model);
+fn print_model(schedule_config: &ScheduleConfig, model: &Schedule) {
+    let score = score::assess_score(
+        &mut schedule_config.result.score_props.clone(),
+        schedule_config,
+        model,
+    );
 
     println!("score: {}", score);
-    print_schedule(schedule_prop, model);
+    print_schedule(schedule_config, model);
 
     println!();
 
     println!(
         "{}",
-        score::show_score(&mut schedule_prop.score_props.clone(), schedule_prop, model)
+        score::show_score(
+            &mut schedule_config.result.score_props.clone(),
+            schedule_config,
+            model
+        )
     );
 }
 
 /// 表を出力
-fn print_schedule(schedule_prop: &ScheduleProp, schedule: &Schedule) {
-    for r in 0..schedule_prop.staff_count {
+fn print_schedule(schedule_config: &ScheduleConfig, schedule: &Schedule) {
+    for r in 0..schedule_config.staff.count {
         // Shiftの行を出力
-        print_shift_row(schedule_prop, schedule, r);
+        print_shift_row(schedule_config, schedule, r);
 
         // 統計情報
-        print_shift_count_row(Shift::H, schedule_prop, schedule, r);
-        print_shift_count_row(Shift::O, schedule_prop, schedule, r);
-        print_shift_count_row(Shift::I, schedule_prop, schedule, r);
-        print_shift_count_row(Shift::N, schedule_prop, schedule, r);
-        print_shift_count_row(Shift::K, schedule_prop, schedule, r);
-        print_shift_count_row(Shift::Y, schedule_prop, schedule, r);
+        print_shift_count_row(Shift::H, schedule_config, schedule, r);
+        print_shift_count_row(Shift::O, schedule_config, schedule, r);
+        print_shift_count_row(Shift::I, schedule_config, schedule, r);
+        print_shift_count_row(Shift::N, schedule_config, schedule, r);
+        print_shift_count_row(Shift::K, schedule_config, schedule, r);
+        print_shift_count_row(Shift::Y, schedule_config, schedule, r);
 
         // 名前
-        print!(" {}", schedule_prop.staff_list[r].name);
+        print!(" {}", schedule_config.staff.list[r].name);
 
         println!();
     }
@@ -51,22 +59,22 @@ fn print_schedule(schedule_prop: &ScheduleProp, schedule: &Schedule) {
     println!();
 
     // 曜日を表示
-    print_days(schedule_prop);
+    print_days(schedule_config);
 
     // 日ごとの統計を表示
-    print_shift_count_columns(Shift::N, schedule_prop, schedule);
-    print_shift_count_columns(Shift::I, schedule_prop, schedule);
-    print_shift_count_columns(Shift::A, schedule_prop, schedule);
-    print_shift_count_columns(Shift::K, schedule_prop, schedule);
-    print_shift_count_columns(Shift::O, schedule_prop, schedule);
-    print_shift_count_columns(Shift::H, schedule_prop, schedule);
+    print_shift_count_columns(Shift::N, schedule_config, schedule);
+    print_shift_count_columns(Shift::I, schedule_config, schedule);
+    print_shift_count_columns(Shift::A, schedule_config, schedule);
+    print_shift_count_columns(Shift::K, schedule_config, schedule);
+    print_shift_count_columns(Shift::O, schedule_config, schedule);
+    print_shift_count_columns(Shift::H, schedule_config, schedule);
 }
 
 /// Shiftの行を出力
-fn print_shift_row(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize) {
-    for c in 0..schedule_prop.day_count {
+fn print_shift_row(schedule_config: &ScheduleConfig, schedule: &Schedule, r: usize) {
+    for c in 0..schedule_config.day.count {
         print!("{}", schedule[r][c]);
-        if c + 1 == schedule_prop.buffer {
+        if c + 1 == schedule_config.day.buffer_count {
             print!("|");
         }
     }
@@ -75,27 +83,27 @@ fn print_shift_row(schedule_prop: &ScheduleProp, schedule: &Schedule, r: usize) 
 /// 指定したシフトの数を出力
 fn print_shift_count_row(
     target_shift: Shift,
-    schedule_prop: &ScheduleProp,
+    schedule_config: &ScheduleConfig,
     schedule: &Schedule,
     r: usize,
 ) {
     let mut sum = 0;
-    for c in schedule_prop.buffer..schedule_prop.day_count {
+    for c in schedule_config.day.buffer_count..schedule_config.day.count {
         if schedule[r][c] == target_shift {
             sum += 1;
         }
     }
     // 桁を指定して出力
-    let digit = schedule_prop.day_count.to_string().len();
+    let digit = schedule_config.day.count.to_string().len();
     let f = format!(" {:>stats$}", sum, stats = digit);
     print!("{}", f);
 }
 
 /// 曜日を表示
-fn print_days(schedule_prop: &ScheduleProp) {
-    for c in 0..schedule_prop.day_count {
-        print!("{}", schedule_prop.days[c]);
-        if c + 1 == schedule_prop.buffer {
+fn print_days(schedule_config: &ScheduleConfig) {
+    for c in 0..schedule_config.day.count {
+        print!("{}", schedule_config.day.days[c]);
+        if c + 1 == schedule_config.day.buffer_count {
             print!("|");
         }
     }
@@ -106,15 +114,15 @@ fn print_days(schedule_prop: &ScheduleProp) {
 #[allow(clippy::needless_range_loop)]
 fn print_shift_count_columns(
     target_shift: Shift,
-    schedule_prop: &ScheduleProp,
+    schedule_config: &ScheduleConfig,
     schedule: &Schedule,
 ) {
     // 数値を文字列として保存するベクトル
     let mut str_nums: Vec<String> = Vec::new();
     let mut max_length = 0;
-    for c in 0..schedule_prop.day_count {
+    for c in 0..schedule_config.day.count {
         let mut sum = 0;
-        for r in 0..schedule_prop.staff_count {
+        for r in 0..schedule_config.staff.count {
             if schedule[r][c] == target_shift {
                 sum += 1;
             }
@@ -133,7 +141,7 @@ fn print_shift_count_columns(
             } else {
                 print!(" ");
             }
-            if c + 1 == schedule_prop.buffer {
+            if c + 1 == schedule_config.day.buffer_count {
                 print!("|");
             }
         }

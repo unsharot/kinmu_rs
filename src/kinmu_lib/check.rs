@@ -1,12 +1,12 @@
 //! 各段階が問題なく動いているか確認する関数のモジュール
 
-use super::types::{Schedule, ScheduleProp, Shift, ShiftState};
+use super::types::{Schedule, ScheduleConfig, Shift, ShiftState};
 
 /// すべてAbsoluteになっていないかチェック
-pub fn all_absolute(schedule_prop: &ScheduleProp) -> bool {
-    for r in 0..schedule_prop.staff_count {
-        for c in schedule_prop.buffer..schedule_prop.day_count {
-            if schedule_prop.schedule_st[r][c] != ShiftState::Absolute {
+pub fn all_absolute(schedule_config: &ScheduleConfig) -> bool {
+    for r in 0..schedule_config.staff.count {
+        for c in schedule_config.day.buffer_count..schedule_config.day.count {
+            if schedule_config.day.schedule_states[r][c] != ShiftState::Absolute {
                 return true;
             }
         }
@@ -15,10 +15,13 @@ pub fn all_absolute(schedule_prop: &ScheduleProp) -> bool {
 }
 
 /// IAKがすべて埋められているかチェック
-pub fn safe_iak(schedule_prop: &ScheduleProp) -> bool {
-    for r in 0..schedule_prop.staff_count {
-        for c in 0..(schedule_prop.day_count - 1) {
-            if match (schedule_prop.request[r][c], schedule_prop.request[r][c + 1]) {
+pub fn safe_iak(schedule_config: &ScheduleConfig) -> bool {
+    for r in 0..schedule_config.staff.count {
+        for c in 0..(schedule_config.day.count - 1) {
+            if match (
+                schedule_config.day.requested_schedule[r][c],
+                schedule_config.day.requested_schedule[r][c + 1],
+            ) {
                 (Shift::A, Shift::U) => true,
                 (Shift::A, _) => false,
                 (Shift::I, Shift::U) => true,
@@ -35,9 +38,9 @@ pub fn safe_iak(schedule_prop: &ScheduleProp) -> bool {
 }
 
 macro_rules! count_waku_row {
-    ($w:expr, $schedule_prop: expr, $schedule:expr, $r:expr) => {{
+    ($w:expr, $schedule_config: expr, $schedule:expr, $r:expr) => {{
         let mut count = 0;
-        for i in $schedule_prop.buffer..$schedule_prop.day_count {
+        for i in $schedule_config.day.buffer_count..$schedule_config.day.count {
             if $schedule[$r][i] == $w {
                 count += 1;
             }
@@ -48,14 +51,14 @@ macro_rules! count_waku_row {
 
 /// fillした後の表のKとIの数がちゃんとしてるかチェック
 #[allow(clippy::needless_range_loop)]
-pub fn k_i_counts(schedule_prop: &ScheduleProp, schedule: &Schedule) -> bool {
-    for r in 0..schedule_prop.staff_count {
-        let k_count = count_waku_row!(Shift::K, schedule_prop, schedule, r);
-        let i_count = count_waku_row!(Shift::I, schedule_prop, schedule, r);
-        if schedule_prop.get_attribute(r, &"KDayCount".to_string()) != k_count {
+pub fn k_i_counts(schedule_config: &ScheduleConfig, schedule: &Schedule) -> bool {
+    for r in 0..schedule_config.staff.count {
+        let k_count = count_waku_row!(Shift::K, schedule_config, schedule, r);
+        let i_count = count_waku_row!(Shift::I, schedule_config, schedule, r);
+        if schedule_config.get_attribute(r, &"KDayCount".to_string()) != k_count {
             return false;
         }
-        if schedule_prop.get_attribute(r, &"IDayCount".to_string()) != i_count {
+        if schedule_config.get_attribute(r, &"IDayCount".to_string()) != i_count {
             return false;
         }
     }
@@ -64,11 +67,11 @@ pub fn k_i_counts(schedule_prop: &ScheduleProp, schedule: &Schedule) -> bool {
 
 /// Absoluteが変化していないことをチェック
 #[allow(clippy::needless_range_loop)]
-pub fn abs_not_changed(schedule_prop: &ScheduleProp, schedule: &Schedule) -> bool {
-    for r in 0..schedule_prop.staff_count {
-        for c in 0..schedule_prop.day_count {
-            if schedule_prop.schedule_st[r][c] == ShiftState::Absolute
-                && schedule[r][c] != schedule_prop.request[r][c]
+pub fn abs_not_changed(schedule_config: &ScheduleConfig, schedule: &Schedule) -> bool {
+    for r in 0..schedule_config.staff.count {
+        for c in 0..schedule_config.day.count {
+            if schedule_config.day.schedule_states[r][c] == ShiftState::Absolute
+                && schedule[r][c] != schedule_config.day.requested_schedule[r][c]
             {
                 return false;
             }

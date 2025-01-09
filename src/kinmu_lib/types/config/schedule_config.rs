@@ -13,29 +13,46 @@ pub struct FillConfig {
     pub seed: Option<u64>,
 }
 
-/// 勤務表ごとの設定
-#[derive(Clone, Debug)]
-pub struct ScheduleProp {
-    pub staff_list: Vec<Staff>,
-    pub ng_list: NGList,
-    pub staff_count: usize,
-    pub day_count: usize,
-    pub days: Days,
-    pub buffer: usize,
-    pub request: Schedule,
-    pub schedule_st: ScheduleState,
-    pub day_attributes: HashMap<DayAttributeName, Vec<i32>>,
-    pub staff_attribute_map: StaffAttributeNameIndexMap,
-    pub score_props: Vec<ScoreProp>, // 結果表示のためのスコア
+#[derive(Debug, Clone)]
+pub struct ResultConfig {
+    pub score_props: Vec<ScoreProp>,
 }
 
-impl ScheduleProp {
+#[derive(Debug, Clone)]
+pub struct StaffConfig {
+    pub attribute_map: StaffAttributeNameIndexMap,
+    pub list: Vec<Staff>,
+    pub ng_list: NGList,
+    pub count: usize,
+}
+
+#[derive(Debug, Clone)]
+pub struct DayConfig {
+    pub count: usize,
+    pub buffer_count: usize,
+    pub days: Days,
+    pub requested_schedule: Schedule,
+    pub schedule_states: ScheduleState,
+    pub attributes: HashMap<DayAttributeName, Vec<i32>>,
+}
+
+#[derive(Debug, Clone)]
+pub struct ScheduleConfig {
+    pub staff: StaffConfig,
+    pub day: DayConfig,
+    // pub fill: FillConfig,
+    // pub annealing: Vec<AnnealingConfig>,
+    pub result: ResultConfig,
+}
+
+impl ScheduleConfig {
     pub fn get_attribute(&self, staff: usize, attribute: &StaffAttributeName) -> i32 {
         let att_index = self
-            .staff_attribute_map
+            .staff
+            .attribute_map
             .name_to_index
             .get(attribute)
             .unwrap();
-        self.staff_list[staff].attributes[*att_index]
+        self.staff.list[staff].attributes[*att_index]
     }
 }

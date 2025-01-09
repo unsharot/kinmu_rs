@@ -19,6 +19,6 @@ pub type FilePath = String;
 #[derive(Debug, Clone)]
 pub struct Answer {
     pub models: Vec<Schedule>,
-    pub schedule_prop: ScheduleProp,
+    pub schedule_config: ScheduleConfig,
     pub total_time: Duration,
 }

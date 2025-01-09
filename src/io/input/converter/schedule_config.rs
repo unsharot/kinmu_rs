@@ -4,8 +4,9 @@ use std::collections::HashMap;
 
 use crate::io::input::reader::types::RawScheduleConfig;
 use crate::kinmu_lib::types::{
-    DayAttributeName, Days, FilePath, FillConfig, Schedule, ScheduleProp, ScheduleState, ScoreProp,
-    Shift, ShiftState, Staff, StaffAttributeNameIndexMap,
+    DayAttributeName, DayConfig, Days, FilePath, FillConfig, ResultConfig, Schedule,
+    ScheduleConfig, ScheduleState, ScoreProp, Shift, ShiftState, Staff, StaffAttributeNameIndexMap,
+    StaffConfig,
 };
 
 use super::util::checker;
@@ -14,7 +15,7 @@ use super::util::parser::*;
 /// 勤務表で使う値を読み込む
 pub fn convert_schedule_config(
     config: RawScheduleConfig,
-) -> Result<(ScheduleProp, Vec<FilePath>, FillConfig), String> {
+) -> Result<(ScheduleConfig, Vec<FilePath>, FillConfig), String> {
     let schedule = config
         .day
         .requested_schedule
@@ -22,8 +23,9 @@ pub fn convert_schedule_config(
         .map(|s| <ScheduleRowWrapper>::from_config(s).map(|w| w.value))
         .collect::<Result<Schedule, String>>()?;
 
-    let schedule_prop: ScheduleProp = ScheduleProp {
-        staff_list: config
+    let staff_config = StaffConfig {
+        attribute_map: make_staff_attribute_map(&config),
+        list: config
             .staff
             .list
             .iter()
@@ -38,14 +40,19 @@ pub fn convert_schedule_config(
             .iter()
             .map(|x| (x.from, x.to))
             .collect(),
-        staff_count: config.staff.count,
-        day_count: config.day.day_count,
+        count: config.staff.count,
+    };
+
+    let day_config = DayConfig {
+        count: config.day.day_count,
+        buffer_count: config.day.buffer_count,
         days: Days::from_config(&config.day.states)?,
-        buffer: config.day.buffer_count,
-        request: schedule.clone(),
-        schedule_st: make_schedule_state(&schedule, config.day.buffer_count),
-        day_attributes: make_day_attributes(&config),
-        staff_attribute_map: make_staff_attribute_map(&config),
+        schedule_states: make_schedule_state(&schedule, config.day.buffer_count),
+        requested_schedule: schedule,
+        attributes: make_day_attributes(&config),
+    };
+
+    let result_config = ResultConfig {
         score_props: config
             .result
             .score_functions
@@ -53,14 +60,23 @@ pub fn convert_schedule_config(
             .map(|s| <ScoreProp>::from_config(s))
             .collect::<Result<Vec<ScoreProp>, String>>()?,
     };
+
+    let schedule_config: ScheduleConfig = ScheduleConfig {
+        staff: staff_config,
+        day: day_config,
+        result: result_config,
+    };
+
     let annealing_file_paths = config.annealing.config_paths;
+
     let fill_config = FillConfig {
         name: config.fill.function,
-        //TODO ここ要修正 Optionのまま渡してgeneratorで処理したい
         seed: config.fill.seed,
     };
-    checker::check_schedule_prop(&schedule_prop)?;
-    Ok((schedule_prop, annealing_file_paths, fill_config))
+
+    checker::check_schedule_config(&schedule_config)?;
+
+    Ok((schedule_config, annealing_file_paths, fill_config))
 }
 
 fn make_day_attributes(config: &RawScheduleConfig) -> HashMap<DayAttributeName, Vec<i32>> {
