@@ -19,7 +19,7 @@ pub fn convert_schedule_config(
         .day
         .requested_schedule
         .iter()
-        .map(|s| <ScheduleRowWrapper>::from_config(s).map(|w| w.value))
+        .map(|s| <ScheduleRowWrapper>::from_config(s).map(|w| w.0))
         .collect::<Result<Schedule, String>>()?;
 
     let staff_config = StaffConfig {

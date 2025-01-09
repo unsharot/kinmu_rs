@@ -403,9 +403,7 @@ impl FromConfig for Vec<ScoreProp> {
     }
 }
 
-pub struct ScheduleRowWrapper {
-    pub value: Vec<Shift>,
-}
+pub struct ScheduleRowWrapper(pub Vec<Shift>);
 
 impl FromConfig for ScheduleRowWrapper {
     fn from_config(s: &str) -> Result<Self, String> {
@@ -413,7 +411,7 @@ impl FromConfig for ScheduleRowWrapper {
         for c in s.chars() {
             ans.push(<Shift>::from_config(&c.to_string())?);
         }
-        Ok(ScheduleRowWrapper { value: ans })
+        Ok(ScheduleRowWrapper(ans))
     }
 }
 
