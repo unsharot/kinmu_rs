@@ -31,5 +31,3 @@ pub enum DayState {
     Bath2,
     Measure,
 }
-
-pub type Days = Vec<DayState>;

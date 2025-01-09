@@ -4,9 +4,7 @@ use std::collections::HashMap;
 
 use crate::io::input::reader::types::RawScheduleConfig;
 use crate::kinmu_lib::types::{
-    DayAttributeName, DayConfig, Days, FilePath, FillConfig, ResultConfig, Schedule,
-    ScheduleConfig, ScheduleState, ScoreProp, Shift, ShiftState, Staff, StaffAttributeNameIndexMap,
-    StaffConfig,
+    DayAttributeName, DayConfig, DayState, FilePath, FillConfig, ResultConfig, Schedule, ScheduleConfig, ScheduleState, ScoreProp, Shift, ShiftState, Staff, StaffAttributeNameIndexMap, StaffConfig
 };
 
 use super::util::parser::*;
@@ -45,7 +43,7 @@ pub fn convert_schedule_config(
     let day_config = DayConfig {
         count: config.day.day_count,
         buffer_count: config.day.buffer_count,
-        days: Days::from_config(&config.day.states)?,
+        days: <Vec<DayState>>::from_config(&config.day.states)?,
         schedule_states: make_schedule_state(&schedule, config.day.buffer_count),
         requested_schedule: schedule,
         attributes: make_day_attributes(&config),

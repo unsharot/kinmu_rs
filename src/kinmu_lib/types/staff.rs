@@ -10,8 +10,6 @@ pub struct Staff {
 
 pub type NG = (usize, usize);
 
-pub type NGList = Vec<NG>;
-
 pub type StaffAttributeName = String;
 
 #[derive(Clone, Debug)]

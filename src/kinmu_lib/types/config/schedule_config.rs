@@ -1,8 +1,7 @@
 //! schedule_configから生成できる構造体を定義
 
 use crate::kinmu_lib::types::{
-    DayAttributeName, Days, NGList, Schedule, ScheduleState, ScoreProp, Staff, StaffAttributeName,
-    StaffAttributeNameIndexMap,
+    DayAttributeName, DayState, Schedule, ScheduleState, ScoreProp, Staff, StaffAttributeName, StaffAttributeNameIndexMap, NG
 };
 
 use std::collections::HashMap;
@@ -22,7 +21,7 @@ pub struct ResultConfig {
 pub struct StaffConfig {
     pub attribute_map: StaffAttributeNameIndexMap,
     pub list: Vec<Staff>,
-    pub ng_list: NGList,
+    pub ng_list: Vec<NG>,
     pub count: usize,
 }
 
@@ -30,7 +29,7 @@ pub struct StaffConfig {
 pub struct DayConfig {
     pub count: usize,
     pub buffer_count: usize,
-    pub days: Days,
+    pub days: Vec<DayState>,
     pub requested_schedule: Schedule,
     pub schedule_states: ScheduleState,
     pub attributes: HashMap<DayAttributeName, Vec<i32>>,

@@ -1,7 +1,7 @@
 //! ScoreProp, Shift, Daysを文字列から変換するためのモジュール
 
 use crate::kinmu_lib::types::{
-    Cond, CondWrapper, DayAttributeName, DayState, Days, Score, ScoreProp, Shift,
+    Cond, CondWrapper, DayAttributeName, DayState, Score, ScoreProp, Shift,
     StaffAttributeName,
 };
 
@@ -245,9 +245,9 @@ impl FromConfig for Vec<Vec<Shift>> {
     }
 }
 
-impl FromConfig for Days {
+impl FromConfig for Vec<DayState> {
     fn from_config(s: &str) -> Result<Self, String> {
-        let mut ans: Days = Vec::new();
+        let mut ans: Vec<DayState> = Vec::new();
         for c in s.chars() {
             ans.push(<DayState>::from_config(&c.to_string())?);
         }
