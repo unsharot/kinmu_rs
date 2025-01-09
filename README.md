@@ -195,7 +195,7 @@ thread_count = 8
 ```toml
 [staff]
 attributes = [
-   "Ability",
+   "Leader",
    "KDayCount",
    "IDayCount",
    "ODayCount",
@@ -205,7 +205,7 @@ attributes = [
 ```toml
 [staff]
 attributes = [
-   "能力",
+   "リーダー",
    "公休数",
    "夜勤数",
    "遅番数",
@@ -226,9 +226,9 @@ list = [
 
 ```toml
 list = [
-   #        名前                  能力 公休   夜勤   遅番  早番  番号
-   {name = "職員A", attributes = [0,   8,    3,    -1,   -1]}, #0
-   {name = "職員B", attributes = [1,   9,    6,     0,    0]}, #1
+   #        名前                  リーダー 公休   夜勤   遅番  早番  番号
+   {name = "職員A", attributes = [0,      8,    3,    -1,   -1]}, #0
+   {name = "職員B", attributes = [1,      9,    6,     0,    0]}, #1
 ]
 ```
 
@@ -468,20 +468,20 @@ config_paths = [
 
 Condの詳細は以下の通り
 
-| 種類               | 引数の型       | 説明                                                               |
-| :----------------- | :------------- | :----------------------------------------------------------------- |
-| Every              | ()             | すべての枠を有効とする                                             |
-| Or                 | (Cond, Cond)   | 指定した2つのCondのどちらかを満たしていれば有効とする              |
-| And                | (Cond, Cond)   | 指定した2つのCondの両方を満たしていれば有効とする                  |
-| Not                | Cond           | 指定した条件を満たしていなければ有効とする                         |
-| DayExceptBuffer    | ()             | バッファーでないなら有効                                           |
-| DayInRange         | (usize, usize) | 指定した範囲の日付でないなら有効 日数はバッファーから0,1,2..と続く |
-| ParticularDayState | DayState       | 指定の曜日なら有効                                                 |
-| BeforeDayState     | DayState       | 指定の曜日の前日なら有効                                           |
-| ParticularDay      | usize          | 指定の日付のみ有効                                                 |
-| StaffInRange       | (usize, usize) | 指定した範囲のスタッフなら有効                                     |
-| StaffWithAbility   | i32            | 指定した番号の能力を持つスタッフなら有効                           |
-| ParticularStaff    | usize          | 指定した番号のスタッフなら有効                                     |
+| 種類               | 引数の型                  | 説明                                                               |
+| :----------------- | :------------------------ | :----------------------------------------------------------------- |
+| Every              | ()                        | すべての枠を有効とする                                             |
+| Or                 | (Cond, Cond)              | 指定した2つのCondのどちらかを満たしていれば有効とする              |
+| And                | (Cond, Cond)              | 指定した2つのCondの両方を満たしていれば有効とする                  |
+| Not                | Cond                      | 指定した条件を満たしていなければ有効とする                         |
+| DayExceptBuffer    | ()                        | バッファーでないなら有効                                           |
+| DayInRange         | (usize, usize)            | 指定した範囲の日付でないなら有効 日数はバッファーから0,1,2..と続く |
+| ParticularDayState | DayState                  | 指定の曜日なら有効                                                 |
+| BeforeDayState     | DayState                  | 指定の曜日の前日なら有効                                           |
+| ParticularDay      | usize                     | 指定の日付のみ有効                                                 |
+| StaffInRange       | (usize, usize)            | 指定した範囲のスタッフなら有効                                     |
+| StaffWithAttribute | (StaffAttributeName, i32) | 指定した職員ごとのパラメータが指定した整数であるスタッフなら有効   |
+| ParticularStaff    | usize                     | 指定した番号のスタッフなら有効                                     |
 
 ```toml
 score_functions = [
@@ -518,7 +518,7 @@ score_functions = [
    "StaffCount (And (DayExceptBuffer (), ParticularDayState M), N, 2, 5)",
    "StaffCount (DayExceptBuffer (), O, 1, 100)",
    "StaffCount (DayExceptBuffer (), H, 1, 100)",
-   "StaffCountWithPremise (DayExceptBuffer (), I, 1, And (DayExceptBuffer (), StaffWithAbility 2), I, 1, 70)",
+   "StaffCountWithPremise (DayExceptBuffer (), I, 1, And (DayExceptBuffer (), StaffWithAttribute (ベテラン, 1)), I, 1, 70)",
    "StaffCount (And (BeforeDayState B, DayExceptBuffer ()), I, 1, 30)",
    "StaffCount (DayExceptBuffer (), U, 0, 100000)",
    "NoSamePair (DayExceptBuffer (), 3, I, 1000)",
