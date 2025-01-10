@@ -1,4 +1,5 @@
 use ::kinmu::generator;
+use ::kinmu::io::input;
 use ::kinmu::io::output;
 
 use std::env;
@@ -12,12 +13,21 @@ fn main() {
     } else {
         DEFALUT_MAIN_CONFIG_PATH
     };
-    match generator::run(main_file_path) {
-        Ok(answers) => {
-            for ans in answers {
-                output::run(ans);
-            }
-        }
+
+    match run(main_file_path) {
+        Ok(_) => {}
         Err(e) => println!("{}", e),
+    };
+}
+
+fn run(main_file_path: &str) -> Result<(), String> {
+    let config = input::load_config(main_file_path)?;
+
+    let answers = generator::run(&config)?;
+
+    for ans in answers {
+        output::run(ans);
     }
+
+    Ok(())
 }

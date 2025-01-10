@@ -4,7 +4,7 @@ use crate::{io::input::reader::types::RawMainConfig, kinmu_lib::types::MainConfi
 
 pub fn convert_main_config(config: RawMainConfig) -> Result<MainConfig, String> {
     Ok(MainConfig {
-        schedule_config_paths: config.schedule_config_paths,
+        schedule_configs: Default::default(),
         thread_count: config.thread_count,
     })
 }

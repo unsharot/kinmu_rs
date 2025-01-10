@@ -3,11 +3,21 @@
 use std::cmp::Ordering;
 
 use crate::kinmu_lib::types::{
-    AnnealingConfig, Cond, CondWrapper, DayAttributeName, ScheduleConfig, ScoreProp,
+    AnnealingConfig, Cond, CondWrapper, DayAttributeName, MainConfig, ScheduleConfig, ScoreProp,
     StaffAttributeName,
 };
 
-pub fn check_schedule_config(schedule_config: &ScheduleConfig) -> Result<(), String> {
+pub fn run(config: &MainConfig) -> Result<(), String> {
+    for schedule_config in &config.schedule_configs {
+        check_schedule_config(schedule_config)?;
+        for annealing_config in &schedule_config.annealing_configs {
+            check_annealing_config(annealing_config, schedule_config)?;
+        }
+    }
+    Ok(())
+}
+
+fn check_schedule_config(schedule_config: &ScheduleConfig) -> Result<(), String> {
     check_staff_attributes(schedule_config)?;
 
     check_day_attributes(schedule_config)?;
@@ -29,7 +39,7 @@ pub fn check_schedule_config(schedule_config: &ScheduleConfig) -> Result<(), Str
     Ok(())
 }
 
-pub fn check_annealing_config(
+fn check_annealing_config(
     annealing_config: &AnnealingConfig,
     schedule_config: &ScheduleConfig,
 ) -> Result<(), String> {

@@ -1,8 +1,7 @@
 //! ScoreProp, Shift, Daysを文字列から変換するためのモジュール
 
 use crate::kinmu_lib::types::{
-    Cond, CondWrapper, DayAttributeName, DayState, Score, ScoreProp, Shift,
-    StaffAttributeName,
+    Cond, CondWrapper, DayAttributeName, DayState, Score, ScoreProp, Shift, StaffAttributeName,
 };
 
 use super::common::check_len;

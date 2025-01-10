@@ -3,7 +3,7 @@
 use crate::kinmu_lib::types::ScoreProp;
 
 /// 焼きなましの段階ごとの設定
-#[derive(Clone)]
+#[derive(Clone, Debug, Default)]
 pub struct AnnealingConfig {
     pub step: u32,                   // 焼きなましのステップ数
     pub seed: Option<u64>,           // 焼きなましのupdate関数の乱数のシード

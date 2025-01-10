@@ -1,65 +1,42 @@
 //! 生成を行うモジュール
 
-use crate::io::input;
-use crate::kinmu_lib::types::{AnnealingConfig, Answer, FillConfig, Schedule, ScheduleConfig};
+use crate::kinmu_lib::types::{
+    AnnealingConfig, Answer, FillConfig, MainConfig, Schedule, ScheduleConfig,
+};
 use crate::kinmu_lib::{fill, score, seed, update};
 use ::annealing::annealing;
 
 use std::thread;
 use std::time::Instant;
 
-pub fn run(main_config_path: &str) -> Result<Vec<Answer>, String> {
-    generate_schedules(main_config_path)
+pub fn run(config: &MainConfig) -> Result<Vec<Answer>, String> {
+    generate_schedules(config)
 }
 
-fn generate_schedules(main_config_path: &str) -> Result<Vec<Answer>, String> {
-    let main_config = input::load_main_config(main_config_path).map_err(|e| {
-        format!(
-            "[エラー] メインconfigの読み込みに失敗しました\n対象ファイル: {}\n理由: {}\nヒント: デフォルト以外のファイルを指定する場合、引数でパスを指定してください",
-            main_config_path, e,
-        )
-    })?;
-
-    let schedule_config_paths = main_config.schedule_config_paths;
-    let thread_count = main_config.thread_count.unwrap_or(1);
+fn generate_schedules(config: &MainConfig) -> Result<Vec<Answer>, String> {
+    let thread_count = config.thread_count.unwrap_or(1);
 
     let mut answers = Vec::new();
-    for path in schedule_config_paths {
-        answers.push(generate_schedule(&path, thread_count)?);
+    for schedule_config in &config.schedule_configs {
+        answers.push(generate_schedule(schedule_config, thread_count)?);
     }
 
     Ok(answers)
 }
 
-fn generate_schedule(p: &str, thread_count: u32) -> Result<Answer, String> {
-    let (schedule_config, ac_paths, fc) = input::load_schedule_config(p).map_err(|e| {
-        format!(
-            "[エラー] 勤務表configの読み込みに失敗しました\n対象ファイル: {}\n理由: {}",
-            p, e
-        )
-    })?;
-
-    let mut annealing_configs = vec![];
-    for ac_path in ac_paths {
-        annealing_configs.push(
-            input::load_annealing_config(&ac_path, &schedule_config).map_err(|e| {
-                format!(
-                    "[エラー] 焼きなましconfigの読み込みに失敗しました\n対象ファイル: {}\n理由: {}",
-                    ac_path, e
-                )
-            })?,
-        );
-    }
-
+fn generate_schedule(
+    schedule_config: &ScheduleConfig,
+    thread_count: u32,
+) -> Result<Answer, String> {
     let start = Instant::now();
 
     let mut hs: Vec<thread::JoinHandle<Result<_, String>>> = vec![];
     for _ in 0..thread_count {
         let schedule_config = schedule_config.clone();
-        let annealing_configs = annealing_configs.clone();
-        let fc = fc.clone();
+        let annealing_configs = schedule_config.annealing_configs.clone();
+        let fill_config = schedule_config.fill.clone();
         hs.push(thread::spawn(move || {
-            annealing(schedule_config, fc, annealing_configs)
+            annealing(schedule_config, fill_config, annealing_configs)
         }))
     }
 
@@ -72,17 +49,17 @@ fn generate_schedule(p: &str, thread_count: u32) -> Result<Answer, String> {
 
     Ok(Answer {
         models,
-        schedule_config,
+        schedule_config: schedule_config.clone(),
         total_time: start.elapsed(),
     })
 }
 
 fn annealing(
     schedule_config: ScheduleConfig,
-    mut fc: FillConfig,
+    mut fill_config: FillConfig,
     annealing_configs: Vec<AnnealingConfig>,
 ) -> Result<Schedule, String> {
-    let mut model = fill::run(&mut fc, &schedule_config)?;
+    let mut model = fill::run(&mut fill_config, &schedule_config)?;
 
     let mut score;
     for mut ac in annealing_configs {

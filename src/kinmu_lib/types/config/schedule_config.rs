@@ -1,23 +1,26 @@
 //! schedule_configから生成できる構造体を定義
 
 use crate::kinmu_lib::types::{
-    DayAttributeName, DayState, Schedule, ScheduleState, ScoreProp, Staff, StaffAttributeName, StaffAttributeNameIndexMap, NG
+    DayAttributeName, DayState, Schedule, ScheduleState, ScoreProp, Staff, StaffAttributeName,
+    StaffAttributeNameIndexMap, NG,
 };
 
 use std::collections::HashMap;
 
-#[derive(Clone)]
+use super::AnnealingConfig;
+
+#[derive(Clone, Debug, Default)]
 pub struct FillConfig {
     pub name: String,
     pub seed: Option<u64>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug, Default)]
 pub struct ResultConfig {
     pub score_props: Vec<ScoreProp>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug, Default)]
 pub struct StaffConfig {
     pub attribute_map: StaffAttributeNameIndexMap,
     pub list: Vec<Staff>,
@@ -25,7 +28,7 @@ pub struct StaffConfig {
     pub count: usize,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug, Default)]
 pub struct DayConfig {
     pub count: usize,
     pub buffer_count: usize,
@@ -35,12 +38,12 @@ pub struct DayConfig {
     pub attributes: HashMap<DayAttributeName, Vec<i32>>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug, Default)]
 pub struct ScheduleConfig {
     pub staff: StaffConfig,
     pub day: DayConfig,
-    // pub fill: FillConfig,
-    // pub annealing: Vec<AnnealingConfig>,
+    pub fill: FillConfig,
+    pub annealing_configs: Vec<AnnealingConfig>,
     pub result: ResultConfig,
 }
 

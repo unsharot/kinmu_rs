@@ -4,15 +4,14 @@ use std::collections::HashMap;
 
 use crate::io::input::reader::types::RawScheduleConfig;
 use crate::kinmu_lib::types::{
-    DayAttributeName, DayConfig, DayState, FilePath, FillConfig, ResultConfig, Schedule, ScheduleConfig, ScheduleState, ScoreProp, Shift, ShiftState, Staff, StaffAttributeNameIndexMap, StaffConfig
+    DayAttributeName, DayConfig, DayState, FillConfig, ResultConfig, Schedule, ScheduleConfig,
+    ScheduleState, ScoreProp, Shift, ShiftState, Staff, StaffAttributeNameIndexMap, StaffConfig,
 };
 
 use super::util::parser::*;
 
 /// 勤務表で使う値を読み込む
-pub fn convert_schedule_config(
-    config: RawScheduleConfig,
-) -> Result<(ScheduleConfig, Vec<FilePath>, FillConfig), String> {
+pub fn convert_schedule_config(config: RawScheduleConfig) -> Result<ScheduleConfig, String> {
     let schedule = config
         .day
         .requested_schedule
@@ -49,6 +48,11 @@ pub fn convert_schedule_config(
         attributes: make_day_attributes(&config),
     };
 
+    let fill_config = FillConfig {
+        name: config.fill.function,
+        seed: config.fill.seed,
+    };
+
     let result_config = ResultConfig {
         score_props: config
             .result
@@ -61,17 +65,12 @@ pub fn convert_schedule_config(
     let schedule_config: ScheduleConfig = ScheduleConfig {
         staff: staff_config,
         day: day_config,
+        fill: fill_config,
+        annealing_configs: Default::default(),
         result: result_config,
     };
 
-    let annealing_file_paths = config.annealing.config_paths;
-
-    let fill_config = FillConfig {
-        name: config.fill.function,
-        seed: config.fill.seed,
-    };
-
-    Ok((schedule_config, annealing_file_paths, fill_config))
+    Ok(schedule_config)
 }
 
 fn make_day_attributes(config: &RawScheduleConfig) -> HashMap<DayAttributeName, Vec<i32>> {
