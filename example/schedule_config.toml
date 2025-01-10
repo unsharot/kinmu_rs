@@ -1,67 +1,95 @@
+# 職員に関する設定
 [staff]
 
+# 職員ごとに定めるパラメータの種類を宣言
 attributes = [
  "Ability1",
  "Ability2",
 ]
 
+# 職員リスト
 list = [
 {name = "職員A", attributes = [1, 1]}, #0
 {name = "職員B", attributes = [1, 0]}, #1
 {name = "職員C", attributes = [0, 0]}, #2
+{name = "職員D", attributes = [0, 0]}, #3
+{name = "職員E", attributes = [0, 0]}, #4
+{name = "職員F", attributes = [0, 0]}, #5
 ]
 
+# 職員のNGリスト
+# スコアで使う
 ng_list = [
-# {from = "職員A", to = "職員B"},
 {from = 0, to = 1},
-# {from = "職員B", to = "職員C"},
 {from = 1, to = 2},
 ]
 
-count = 3
+# 職員数
+count = 6
 
 
+# 日付に関する設定
 [day]
 
+# バッファーを含めた全体の日数
 day_count = 13
 
+# 日ごとのステータス
 states = "WWWHHHHHBBBBB"
 
+# バッファーの日数
 buffer_count = 3
 
+# 絶対に満たすべきシフト割り当てを指定
+# 職員の希望を入力する
 requested_schedule = [
 #  WWWHHHHHBBBBB
 #  0001234567890
-  "UUUUUUUUUUUUU", # 職員A
-  "UUUUUUUUUUUUU", # 職員B
-  "UUUUUUUUUUUUU", # 職員C
+  "UUU Y     Y  ", # 職員A
+  "UUU   Y      ", # 職員B
+  "UUU     Y    ", # 職員C
+  "UUU       Y  ", # 職員D
+  "UUU  Y       ", # 職員E
+  "UUU  Y       ", # 職員F
 ]
 
+# 日ごとのパラメータを指定
+# スコアで使う
 attributes = [
-{name = "Count1", values = [1,1,1,1,1,1,1,1,1,1,1,1,1]},
-{name = "Count2", values = [0,0,0,1,1,1,1,0,0,0,0,0,0]},
+{name = "yakin", values = [0,0,0,0,1,0,0,1,0,1,0,0,1]},
+{name = "早番", values = [0,0,0,1,1,1,1,0,0,0,0,0,0]},
 ]
 
 
+# fillに関する設定
 [fill]
 
+# fillに用いる関数
 function = "fill1"
 
+# fillに用いる乱数シード値
+# 指定する場合、有効化する
 # seed = 0
 
 
+# 焼きなましに関する設定
 [annealing]
 
+# 焼きなましの設定ファイルのパス
 config_paths = [
 "example/annealing_configs/annealing_config_1.toml",
 "example/annealing_configs/annealing_config_2.toml",
 ]
 
 
+# 結果表示に関する設定
 [result]
 
-# score_functions_for_result = [
-# "score_func_a",
-# "score_func_b",
-# ]
-score_functions = []
+# 結果表示に用いるスコア関数
+score_functions = [
+  "StaffCount (DayExceptBuffer (), N, 2, 100)",
+  "StaffCountRegardDayAttribute (DayExceptBuffer (), I, yakin, 1000)",
+  "PatternGeneral (Every (), [[I], [N,O,H,I,K,Y]], 100000)",
+  "PatternGeneral (Every (), [[A], [N,O,H,I,A]], 100000)",
+  "PatternGeneral (Every (), [[N,O,H,A,K,Y], [A]], 100000)",
+]

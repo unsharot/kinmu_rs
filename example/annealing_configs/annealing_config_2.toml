@@ -1,9 +1,21 @@
-step_count = 100
+# 焼きなましのステップ数
+step_count = 10000
 
+# 焼きなましに用いる乱数シード値
+# 指定する場合、有効化する
 # seed = 0
 
-score_functions = []
+# 焼きなましに用いるスコア関数
+score_functions = [
+"StaffCount (DayExceptBuffer (), N, 2, 100)",
+"StaffCountRegardDayAttribute (DayExceptBuffer (), I, yakin, 1000)",
+"PatternGeneral (Every (), [[I], [N,O,H,I,K,Y]], 100000)",
+"PatternGeneral (Every (), [[A], [N,O,H,I,A]], 100000)",
+"PatternGeneral (Every (), [[N,O,H,A,K,Y], [A]], 100000)",
+]
 
+# 更新に用いる関数
 update_function = "update1"
 
+# 焼きなましの温度を指定
 temp = {max = 0, min = 0}

@@ -1,5 +1,7 @@
+# 勤務表の設定ファイルのパス
 schedule_config_paths = [
-"example/schedule_config.toml"
+"example/schedule_config.toml",
 ]
 
-thread_count = 1
+# スレッド数
+thread_count = 3
