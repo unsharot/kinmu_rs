@@ -527,3 +527,31 @@ fn no_same_pair(
     }
     ans
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::kinmu_lib::types::Cond;
+
+    use super::*;
+
+    #[test]
+    fn general_pattern_test() {
+        let mut sc: ScheduleConfig = Default::default();
+        sc.staff.count = 1;
+        sc.day.count = 4;
+
+        let score = pattern_general(
+            &sc,
+            &vec![vec![Shift::H, Shift::H, Shift::A, Shift::Y]],
+            &mut (
+                CondWrapper::new(Cond::Every),
+                vec![
+                    vec![Shift::N, Shift::O, Shift::H, Shift::A, Shift::K, Shift::Y],
+                    vec![Shift::A],
+                ],
+                1.0,
+            ),
+        );
+        assert_eq!(1.0, score);
+    }
+}
