@@ -34,6 +34,8 @@ fn print_model(schedule_config: &ScheduleConfig, model: &Schedule) {
             model
         )
     );
+
+    println!();
 }
 
 /// 表を出力
