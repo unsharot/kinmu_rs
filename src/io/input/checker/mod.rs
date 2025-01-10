@@ -181,13 +181,13 @@ fn check_score_props(score_props: &Vec<ScoreProp>, sc: &ScheduleConfig) -> Resul
             ScoreProp::ShiftsBalance((c, _, _, _)) => check_cond_wrapper(c, sc)?,
             ScoreProp::ShiftHalfBalance((c, _, _)) => check_cond_wrapper(c, sc)?,
             ScoreProp::ShiftDirPriority((c, _, _)) => check_cond_wrapper(c, sc)?,
-            ScoreProp::DayCountRegardStaffAttribute((c, _, da, _)) => {
-                check_cond_wrapper(c, sc)?;
-                check_day_attribute_exists(da, sc)?;
-            }
-            ScoreProp::StaffCountRegardDayAttribute((c, _, sa, _)) => {
+            ScoreProp::DayCountRegardStaffAttribute((c, _, sa, _)) => {
                 check_cond_wrapper(c, sc)?;
                 check_staff_attribute_exists(sa, sc)?;
+            }
+            ScoreProp::StaffCountRegardDayAttribute((c, _, da, _)) => {
+                check_cond_wrapper(c, sc)?;
+                check_day_attribute_exists(da, sc)?;
             }
             ScoreProp::StaffCount((c, _, _, _)) => check_cond_wrapper(c, sc)?,
             ScoreProp::StaffCountWithPremise((c1, _, _, c2, _, _, _)) => {
