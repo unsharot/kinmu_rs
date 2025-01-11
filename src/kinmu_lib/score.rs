@@ -78,22 +78,29 @@ fn pattern_general(
     let mut sum = 0.0;
     for staff in 0..schedule_config.staff.count {
         let mut a = 0.0;
+        let mut is_valid = false;
         for day in 0..schedule_config.day.count {
             let mut hit = true;
             for dd in 0..shift_pattern.len() {
-                if schedule_config.day.count <= day + dd
-                    || cond.eval(staff, day + dd, schedule_config)
-                        && !shift_pattern[dd].contains(&schedule[staff][day + dd])
-                {
+                if schedule_config.day.count <= day + dd {
                     hit = false;
                     break;
+                } else if cond.eval(staff, day + dd, schedule_config) {
+                    is_valid = true;
+                    if !(shift_pattern[dd].contains(&schedule[staff][day + dd])) {
+                        is_valid = true;
+                        hit = false;
+                        break;
+                    }
                 }
             }
             if hit {
                 a += *score;
             }
         }
-        sum += a;
+        if is_valid {
+            sum += a;
+        }
     }
     sum
 }
@@ -109,22 +116,29 @@ fn pattern_fixed(
     let mut sum = 0.0;
     for staff in 0..schedule_config.staff.count {
         let mut a = 0.0;
+        let mut is_valid = false;
         for day in 0..schedule_config.day.count {
             let mut hit = true;
             for dd in 0..shift_pattern.len() {
-                if schedule_config.day.count <= day + dd
-                    || cond.eval(staff, day + dd, schedule_config)
-                        && shift_pattern[dd] != schedule[staff][day + dd]
-                {
+                if schedule_config.day.count <= day + dd {
                     hit = false;
                     break;
+                } else if cond.eval(staff, day + dd, schedule_config) {
+                    is_valid = true;
+                    if shift_pattern[dd] != schedule[staff][day + dd] {
+                        is_valid = true;
+                        hit = false;
+                        break;
+                    }
                 }
             }
             if hit {
                 a += *score;
             }
         }
-        sum += a;
+        if is_valid {
+            sum += a;
+        }
     }
     sum
 }
@@ -140,15 +154,20 @@ fn pattern_general_any(
     let mut sum = 0.0;
     for staff in 0..schedule_config.staff.count {
         let mut any = false;
+        let mut is_valid = false;
         for day in 0..schedule_config.day.count {
             let mut hit = true;
             for dd in 0..shift_pattern.len() {
-                if schedule_config.day.count <= day + dd
-                    || cond.eval(staff, day + dd, schedule_config)
-                        && !shift_pattern[dd].contains(&schedule[staff][day + dd])
-                {
+                if schedule_config.day.count <= day + dd {
                     hit = false;
                     break;
+                } else if cond.eval(staff, day + dd, schedule_config) {
+                    is_valid = true;
+                    if !(shift_pattern[dd].contains(&schedule[staff][day + dd])) {
+                        is_valid = true;
+                        hit = false;
+                        break;
+                    }
                 }
             }
             if hit {
@@ -156,7 +175,7 @@ fn pattern_general_any(
                 break;
             }
         }
-        if any {
+        if is_valid && any {
             sum += *score;
         }
     }
@@ -175,15 +194,20 @@ fn pattern_fixed_any(
     let mut sum = 0.0;
     for staff in 0..schedule_config.staff.count {
         let mut any = false;
+        let mut is_valid = false;
         for day in 0..schedule_config.day.count {
             let mut hit = true;
             for dd in 0..shift_pattern.len() {
-                if schedule_config.day.count <= day + dd
-                    || cond.eval(staff, day + dd, schedule_config)
-                        && shift_pattern[dd] != schedule[staff][day + dd]
-                {
+                if schedule_config.day.count <= day + dd {
                     hit = false;
                     break;
+                } else if cond.eval(staff, day + dd, schedule_config) {
+                    is_valid = true;
+                    if shift_pattern[dd] != schedule[staff][day + dd] {
+                        is_valid = true;
+                        hit = false;
+                        break;
+                    }
                 }
             }
             if hit {
@@ -191,7 +215,7 @@ fn pattern_fixed_any(
                 break;
             }
         }
-        if any {
+        if is_valid && any {
             sum += *score;
         }
     }
