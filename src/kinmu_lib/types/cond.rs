@@ -44,7 +44,7 @@ impl Cond {
             Cond::StaffWithAttribute((attribute, value)) => {
                 sp.get_attribute(r, attribute) == *value
             }
-            Cond::ParticularStaff(staff) => *staff == c, // indexおかしいかも
+            Cond::ParticularStaff(staff) => *staff == r, // indexおかしいかも
         }
     }
 }
