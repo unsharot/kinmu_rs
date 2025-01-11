@@ -23,28 +23,30 @@ pub enum Cond {
 }
 
 impl Cond {
-    pub fn eval(&self, r: usize, c: usize, sp: &ScheduleConfig) -> bool {
+    pub fn eval(&self, staff: usize, day: usize, sc: &ScheduleConfig) -> bool {
         match self {
             Cond::Every => true,
-            Cond::Or((cond1, cond2)) => cond1.eval(r, c, sp) || cond2.eval(r, c, sp),
-            Cond::And((cond1, cond2)) => cond1.eval(r, c, sp) && cond2.eval(r, c, sp),
-            Cond::Not(cond) => !cond.eval(r, c, sp),
-            Cond::DayExceptBuffer => sp.day.buffer_count <= c,
-            Cond::DayInRange((day_start, day_end)) => *day_start <= c && c <= *day_end, // indexおかしいかも
-            Cond::ParticularDayState(ds) => sp.day.days[c] == *ds, // indexおかしいかも
+            Cond::Or((cond1, cond2)) => cond1.eval(staff, day, sc) || cond2.eval(staff, day, sc),
+            Cond::And((cond1, cond2)) => cond1.eval(staff, day, sc) && cond2.eval(staff, day, sc),
+            Cond::Not(cond) => !cond.eval(staff, day, sc),
+            Cond::DayExceptBuffer => sc.day.buffer_count <= day,
+            Cond::DayInRange((day_start, day_end)) => *day_start <= day && day <= *day_end,
+            Cond::ParticularDayState(ds) => sc.day.days[day] == *ds,
             Cond::BeforeDayState(ds) => {
-                if c == 0 {
+                if day == 0 {
                     false
                 } else {
-                    sp.day.days[c - 1] == *ds
+                    sc.day.days[day - 1] == *ds
                 }
             }
-            Cond::ParticularDay(d) => *d == c,
-            Cond::StaffInRange((staff_start, staff_end)) => *staff_start <= r && r <= *staff_end, // indexおかしいかも
-            Cond::StaffWithAttribute((attribute, value)) => {
-                sp.get_attribute(r, attribute) == *value
+            Cond::ParticularDay(d) => *d == day,
+            Cond::StaffInRange((staff_start, staff_end)) => {
+                *staff_start <= staff && staff <= *staff_end
             }
-            Cond::ParticularStaff(staff) => *staff == r, // indexおかしいかも
+            Cond::StaffWithAttribute((attribute, value)) => {
+                sc.get_attribute(staff, attribute) == *value
+            }
+            Cond::ParticularStaff(s) => *s == staff,
         }
     }
 }
@@ -65,15 +67,15 @@ impl CondWrapper {
     }
 
     /// ScheduleConfigが焼きなましの過程で変化しない制限の上で
-    pub fn eval(&mut self, r: usize, c: usize, sp: &ScheduleConfig) -> bool {
+    pub fn eval(&mut self, staff: usize, day: usize, sc: &ScheduleConfig) -> bool {
         if self.memo.is_empty() {
-            self.memo = vec![vec![None; sp.day.count]; sp.staff.count];
+            self.memo = vec![vec![None; sc.day.count]; sc.staff.count];
         }
-        match self.memo[r][c] {
+        match self.memo[staff][day] {
             Some(ans) => ans,
             None => {
-                let ans = self.cond.eval(r, c, sp);
-                self.memo[r][c] = Some(ans);
+                let ans = self.cond.eval(staff, day, sc);
+                self.memo[staff][day] = Some(ans);
                 ans
             }
         }
