@@ -52,6 +52,7 @@ impl fmt::Display for ScoreProp {
                 format!("StaffCountRegardDayAttribute {:?}", p)
             }
             ScoreProp::StaffCount(p) => format!("StaffCount {:?}", p),
+            ScoreProp::StaffCountAtLeast(p) => format!("StaffCountAtLeast {:?}", p),
             ScoreProp::StaffCountWithPremise(p) => format!("StaffCountWithPremise {:?}", p),
             ScoreProp::NGPair(p) => format!("NGPair {:?}", p),
             ScoreProp::NoSamePair(p) => format!("NoSamePair {:?}", p),

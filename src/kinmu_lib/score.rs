@@ -58,6 +58,7 @@ fn get_score(schedule_config: &ScheduleConfig, schedule: &Schedule, sp: &mut Sco
             staff_count_regard_day_attribute(schedule_config, schedule, p)
         }
         ScoreProp::StaffCount(p) => staff_count(schedule_config, schedule, p),
+        ScoreProp::StaffCountAtLeast(p) => staff_count_at_least(schedule_config, schedule, p),
         ScoreProp::StaffCountWithPremise(p) => {
             staff_count_with_premise(schedule_config, schedule, p)
         }
@@ -454,6 +455,34 @@ fn staff_count(
         }
         if is_valid {
             let d = (staff_count - *count).abs() as Score;
+            let a = d * *score;
+            sum += a * a;
+        }
+    }
+    sum
+}
+
+/// 指定したシフトが指定した数より少ない場合に発火するスコア
+#[allow(clippy::needless_range_loop)]
+fn staff_count_at_least(
+    schedule_config: &ScheduleConfig,
+    schedule: &Schedule,
+    (cond, shift, count, score): &mut (CondWrapper, Shift, i32, Score),
+) -> Score {
+    let mut sum = 0.0;
+    for day in 0..schedule_config.day.count {
+        let mut is_valid = false;
+        let mut staff_count = 0;
+        for staff in 0..schedule_config.staff.count {
+            if cond.eval(staff, day, schedule_config) {
+                is_valid = true;
+                if schedule[staff][day] == *shift {
+                    staff_count += 1;
+                }
+            }
+        }
+        if is_valid {
+            let d = std::cmp::min(staff_count - *count, 0) as Score;
             let a = d * *score;
             sum += a * a;
         }

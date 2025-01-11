@@ -21,6 +21,7 @@ pub enum ScoreProp {
     DayCountRegardStaffAttribute((CondWrapper, Shift, StaffAttributeName, Score)),
     StaffCountRegardDayAttribute((CondWrapper, Shift, DayAttributeName, Score)),
     StaffCount((CondWrapper, Shift, i32, Score)),
+    StaffCountAtLeast((CondWrapper, Shift, i32, Score)),
     StaffCountWithPremise((CondWrapper, Shift, i32, CondWrapper, Shift, i32, Score)),
     NGPair((CondWrapper, Shift, Score)),
     NoSamePair((CondWrapper, i32, Shift, Score)),

@@ -190,6 +190,7 @@ fn check_score_props(score_props: &Vec<ScoreProp>, sc: &ScheduleConfig) -> Resul
                 check_day_attribute_exists(da, sc)?;
             }
             ScoreProp::StaffCount((c, _, _, _)) => check_cond_wrapper(c, sc)?,
+            ScoreProp::StaffCountAtLeast((c, _, _, _)) => check_cond_wrapper(c, sc)?,
             ScoreProp::StaffCountWithPremise((c1, _, _, c2, _, _, _)) => {
                 check_cond_wrapper(c1, sc)?;
                 check_cond_wrapper(c2, sc)?;

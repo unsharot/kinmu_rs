@@ -370,6 +370,14 @@ impl FromConfig for ScoreProp {
             ("StaffCount", p) => Ok(ScoreProp::StaffCount(
                 <(CondWrapper, Shift, i32, Score)>::from_config(p)?,
             )),
+            ("StaffCountAtLeast", p) => Ok(ScoreProp::StaffCountAtLeast(<(
+                CondWrapper,
+                Shift,
+                i32,
+                Score,
+            )>::from_config(
+                p
+            )?)),
             ("StaffCountWithPremise", p) => Ok(ScoreProp::StaffCountWithPremise(<(
                 CondWrapper,
                 Shift,
