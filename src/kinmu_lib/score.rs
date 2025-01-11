@@ -68,7 +68,7 @@ fn get_score(schedule_config: &ScheduleConfig, schedule: &Schedule, sp: &mut Sco
 
 /// 指定したシフトパターンの数に応じて発火するスコア
 /// ただし、シフトパターンは複数候補を指定可能
-/// 配置がかぶる場合、うまく判定されない可能性あり
+/// TODO: HashMapやTrie木を用いた高速化
 #[allow(clippy::needless_range_loop)]
 fn pattern_general(
     schedule_config: &ScheduleConfig,
@@ -78,18 +78,19 @@ fn pattern_general(
     let mut sum = 0.0;
     for staff in 0..schedule_config.staff.count {
         let mut a = 0.0;
-        let mut accum = 0;
         for day in 0..schedule_config.day.count {
-            if cond.eval(staff, day, schedule_config) {
-                if shift_pattern[accum].contains(&schedule[staff][day]) {
-                    accum += 1;
-                    if accum == shift_pattern.len() {
-                        accum = 0;
-                        a += *score;
-                    }
-                } else {
-                    accum = 0;
+            let mut hit = true;
+            for dd in 0..shift_pattern.len() {
+                if schedule_config.day.count <= day + dd
+                    || cond.eval(staff, day + dd, schedule_config)
+                        && !shift_pattern[dd].contains(&schedule[staff][day + dd])
+                {
+                    hit = false;
+                    break;
                 }
+            }
+            if hit {
+                a += *score;
             }
         }
         sum += a;
@@ -98,7 +99,7 @@ fn pattern_general(
 }
 
 /// 指定したシフトパターンの数に応じて発火するスコア
-/// 配置がかぶる場合、うまく判定されない可能性あり
+/// TODO: HashMapやTrie木を用いた高速化
 #[allow(clippy::needless_range_loop)]
 fn pattern_fixed(
     schedule_config: &ScheduleConfig,
@@ -108,18 +109,19 @@ fn pattern_fixed(
     let mut sum = 0.0;
     for staff in 0..schedule_config.staff.count {
         let mut a = 0.0;
-        let mut accum = 0;
         for day in 0..schedule_config.day.count {
-            if cond.eval(staff, day, schedule_config) {
-                if shift_pattern[accum] == schedule[staff][day] {
-                    accum += 1;
-                    if accum == shift_pattern.len() {
-                        accum = 0;
-                        a += *score;
-                    }
-                } else {
-                    accum = 0;
+            let mut hit = true;
+            for dd in 0..shift_pattern.len() {
+                if schedule_config.day.count <= day + dd
+                    || cond.eval(staff, day + dd, schedule_config)
+                        && shift_pattern[dd] != schedule[staff][day + dd]
+                {
+                    hit = false;
+                    break;
                 }
+            }
+            if hit {
+                a += *score;
             }
         }
         sum += a;
@@ -128,6 +130,7 @@ fn pattern_fixed(
 }
 
 /// 指定したパターンが存在するスタッフに対して発火するスコア
+/// TODO: HashMapやTrie木を用いた高速化
 #[allow(clippy::needless_range_loop)]
 fn pattern_general_any(
     schedule_config: &ScheduleConfig,
@@ -137,18 +140,20 @@ fn pattern_general_any(
     let mut sum = 0.0;
     for staff in 0..schedule_config.staff.count {
         let mut any = false;
-        let mut accum = 0;
         for day in 0..schedule_config.day.count {
-            if cond.eval(staff, day, schedule_config) {
-                if shift_pattern[accum].contains(&schedule[staff][day]) {
-                    accum += 1;
-                    if accum == shift_pattern.len() {
-                        any = true;
-                        break;
-                    }
-                } else {
-                    accum = 0;
+            let mut hit = true;
+            for dd in 0..shift_pattern.len() {
+                if schedule_config.day.count <= day + dd
+                    || cond.eval(staff, day + dd, schedule_config)
+                        && !shift_pattern[dd].contains(&schedule[staff][day + dd])
+                {
+                    hit = false;
+                    break;
                 }
+            }
+            if hit {
+                any = true;
+                break;
             }
         }
         if any {
@@ -160,6 +165,7 @@ fn pattern_general_any(
 
 /// 指定したパターンが存在するスタッフに対して発火するスコア
 /// ただし、パターンは固定
+/// TODO: HashMapやTrie木を用いた高速化
 #[allow(clippy::needless_range_loop)]
 fn pattern_fixed_any(
     schedule_config: &ScheduleConfig,
@@ -169,22 +175,24 @@ fn pattern_fixed_any(
     let mut sum = 0.0;
     for staff in 0..schedule_config.staff.count {
         let mut any = false;
-        let mut accum = 0;
         for day in 0..schedule_config.day.count {
-            if cond.eval(staff, day, schedule_config) {
-                if shift_pattern[accum] == schedule[staff][day] {
-                    accum += 1;
-                    if accum == shift_pattern.len() {
-                        any = true;
-                        break;
-                    }
-                } else {
-                    accum = 0;
+            let mut hit = true;
+            for dd in 0..shift_pattern.len() {
+                if schedule_config.day.count <= day + dd
+                    || cond.eval(staff, day + dd, schedule_config)
+                        && shift_pattern[dd] != schedule[staff][day + dd]
+                {
+                    hit = false;
+                    break;
                 }
+            }
+            if hit {
+                any = true;
+                break;
             }
         }
         if any {
-            sum += *score
+            sum += *score;
         }
     }
     sum
