@@ -25,7 +25,13 @@ pub fn load_config(path: &str) -> Result<MainConfig, String> {
             )
         })?;
         let annealing_config_paths = raw_schedule.annealing.config_paths.clone();
-        let mut converted_schedule = converter::convert_schedule_config(raw_schedule)?;
+        let mut converted_schedule =
+            converter::convert_schedule_config(raw_schedule).map_err(|e| {
+                format!(
+                    "[エラー] 勤務表configの読み込みに失敗しました\n対象ファイル: {}\n理由: {}",
+                    path, e
+                )
+            })?;
 
         for path in annealing_config_paths {
             let raw_annealing = reader::read_annealing_config(&path).map_err(|e| {
@@ -34,7 +40,13 @@ pub fn load_config(path: &str) -> Result<MainConfig, String> {
                     path, e
                 )
             })?;
-            let converted_annealing = converter::convert_annealing_config(raw_annealing)?;
+            let converted_annealing =
+                converter::convert_annealing_config(raw_annealing).map_err(|e| {
+                    format!(
+                    "[エラー] 焼きなましconfigの読み込みに失敗しました\n対象ファイル: {}\n理由: {}",
+                    path, e
+                )
+                })?;
             converted_schedule
                 .annealing_configs
                 .push(converted_annealing);
@@ -43,7 +55,8 @@ pub fn load_config(path: &str) -> Result<MainConfig, String> {
         converted_main.schedule_configs.push(converted_schedule);
     }
 
-    checker::run(&converted_main)?;
+    checker::run(&converted_main)
+        .map_err(|e| format!("[エラー] configの変換チェックに失敗しました\n理由: {}", e,))?;
 
     Ok(converted_main)
 }

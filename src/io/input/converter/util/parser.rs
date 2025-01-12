@@ -318,95 +318,81 @@ impl FromConfig for ScoreProp {
             &words,
             "Needs 2 fields, but not enough.",
             "Needs 2 fields, but too much given.",
-        )?;
-        match (words[0], words[1]) {
-            ("PatternGeneral", p) => Ok(ScoreProp::PatternGeneral(<(
-                CondWrapper,
-                Vec<Vec<Shift>>,
-                Score,
-            )>::from_config(p)?)),
-            ("PatternFixed", p) => Ok(ScoreProp::PatternFixed(
-                <(CondWrapper, Vec<Shift>, Score)>::from_config(p)?,
-            )),
-            ("PatternGeneralAny", p) => Ok(ScoreProp::PatternGeneralAny(<(
-                CondWrapper,
-                Vec<Vec<Shift>>,
-                Score,
-            )>::from_config(
-                p
-            )?)),
-            ("PatternFixedAny", p) => Ok(ScoreProp::PatternFixedAny(<(
-                CondWrapper,
-                Vec<Shift>,
-                Score,
-            )>::from_config(
-                p
-            )?)),
-            ("Streak", p) => Ok(ScoreProp::Streak(
-                <(CondWrapper, Vec<Shift>, i32, Score)>::from_config(p)?,
-            )),
-            ("ShiftsBalance", p) => Ok(ScoreProp::ShiftsBalance(<(
-                CondWrapper,
-                Shift,
-                Shift,
-                Score,
-            )>::from_config(p)?)),
-            ("ShiftHalfBalance", p) => {
-                Ok(ScoreProp::ShiftHalfBalance(
-                    <(CondWrapper, Shift, Score)>::from_config(p)?,
-                ))
-            }
-            ("ShiftDirPriority", p) => {
-                Ok(ScoreProp::ShiftDirPriority(
-                    <(CondWrapper, Shift, Score)>::from_config(p)?,
-                ))
-            }
-            ("DayCountRegardStaffAttribute", p) => Ok(ScoreProp::DayCountRegardStaffAttribute(
-                <(CondWrapper, Shift, StaffAttributeName, Score)>::from_config(p)?,
-            )),
-            ("StaffCountRegardDayAttribute", p) => Ok(ScoreProp::StaffCountRegardDayAttribute(
-                <(CondWrapper, Shift, DayAttributeName, Score)>::from_config(p)?,
-            )),
-            ("StaffCount", p) => Ok(ScoreProp::StaffCount(
-                <(CondWrapper, Shift, i32, Score)>::from_config(p)?,
-            )),
-            ("StaffCountAtLeast", p) => Ok(ScoreProp::StaffCountAtLeast(<(
-                CondWrapper,
-                Shift,
-                i32,
-                Score,
-            )>::from_config(
-                p
-            )?)),
-            ("StaffCountWithPremise", p) => Ok(ScoreProp::StaffCountWithPremise(<(
-                CondWrapper,
-                Shift,
-                i32,
-                CondWrapper,
-                Shift,
-                i32,
-                Score,
-            )>::from_config(
-                p
-            )?)),
-            ("NGPair", p) => Ok(ScoreProp::NGPair(
-                <(CondWrapper, Shift, Score)>::from_config(p)?,
-            )),
-            ("NoSamePair", p) => Ok(ScoreProp::NoSamePair(
-                <(CondWrapper, i32, Shift, Score)>::from_config(p)?,
-            )),
-            (s, p) => Err(format!("Failed to parse ScoreProp: {} {}", s, p)),
-        }
+        )
+        .map_err(|e| format!("error loading {}\n{}", s, e))?;
+        helper_sp(words[0], words[1]).map_err(|e| format!("error loading {}\n{}", s, e))
     }
 }
 
-impl FromConfig for Vec<ScoreProp> {
-    fn from_config(s: &str) -> Result<Self, String> {
-        let mut ans: Vec<ScoreProp> = Vec::new();
-        for line in s.lines() {
-            ans.push(<ScoreProp>::from_config(line)?);
-        }
-        Ok(ans)
+#[inline(always)]
+fn helper_sp(w1: &str, w2: &str) -> Result<ScoreProp, String> {
+    match (w1, w2) {
+        ("PatternGeneral", p) => Ok(ScoreProp::PatternGeneral(<(
+            CondWrapper,
+            Vec<Vec<Shift>>,
+            Score,
+        )>::from_config(p)?)),
+        ("PatternFixed", p) => Ok(ScoreProp::PatternFixed(
+            <(CondWrapper, Vec<Shift>, Score)>::from_config(p)?,
+        )),
+        ("PatternGeneralAny", p) => Ok(ScoreProp::PatternGeneralAny(<(
+            CondWrapper,
+            Vec<Vec<Shift>>,
+            Score,
+        )>::from_config(p)?)),
+        ("PatternFixedAny", p) => Ok(ScoreProp::PatternFixedAny(<(
+            CondWrapper,
+            Vec<Shift>,
+            Score,
+        )>::from_config(p)?)),
+        ("Streak", p) => Ok(ScoreProp::Streak(
+            <(CondWrapper, Vec<Shift>, i32, Score)>::from_config(p)?,
+        )),
+        ("ShiftsBalance", p) => Ok(ScoreProp::ShiftsBalance(<(
+            CondWrapper,
+            Shift,
+            Shift,
+            Score,
+        )>::from_config(p)?)),
+        ("ShiftHalfBalance", p) => Ok(ScoreProp::ShiftHalfBalance(
+            <(CondWrapper, Shift, Score)>::from_config(p)?,
+        )),
+        ("ShiftDirPriority", p) => Ok(ScoreProp::ShiftDirPriority(
+            <(CondWrapper, Shift, Score)>::from_config(p)?,
+        )),
+        ("DayCountRegardStaffAttribute", p) => Ok(ScoreProp::DayCountRegardStaffAttribute(
+            <(CondWrapper, Shift, StaffAttributeName, Score)>::from_config(p)?,
+        )),
+        ("StaffCountRegardDayAttribute", p) => Ok(ScoreProp::StaffCountRegardDayAttribute(
+            <(CondWrapper, Shift, DayAttributeName, Score)>::from_config(p)?,
+        )),
+        ("StaffCount", p) => Ok(ScoreProp::StaffCount(
+            <(CondWrapper, Shift, i32, Score)>::from_config(p)?,
+        )),
+        ("StaffCountAtLeast", p) => Ok(ScoreProp::StaffCountAtLeast(<(
+            CondWrapper,
+            Shift,
+            i32,
+            Score,
+        )>::from_config(p)?)),
+        ("StaffCountWithPremise", p) => Ok(ScoreProp::StaffCountWithPremise(<(
+            CondWrapper,
+            Shift,
+            i32,
+            CondWrapper,
+            Shift,
+            i32,
+            Score,
+        )>::from_config(
+            p
+        )?)),
+        ("NGPair", p) => Ok(ScoreProp::NGPair(
+            <(CondWrapper, Shift, Score)>::from_config(p)?,
+        )),
+        ("NoSamePair", p) => Ok(ScoreProp::NoSamePair(
+            <(CondWrapper, i32, Shift, Score)>::from_config(p)?,
+        )),
+        (s, p) => Err(format!("Failed to parse ScoreProp: {} {}", s, p)),
     }
 }
 
