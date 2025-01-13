@@ -7,6 +7,7 @@ use crate::kinmu_lib::types::{
     StaffAttributeName,
 };
 
+/// チェックの関数
 pub fn run(config: &MainConfig) -> Result<(), String> {
     for schedule_config in &config.schedule_configs {
         check_schedule_config(schedule_config)?;
@@ -17,28 +18,30 @@ pub fn run(config: &MainConfig) -> Result<(), String> {
     Ok(())
 }
 
+/// 勤務表configのチェック
 fn check_schedule_config(schedule_config: &ScheduleConfig) -> Result<(), String> {
     check_staff_attributes(schedule_config)?;
 
-    check_day_attributes(schedule_config)?;
-
     check_staff_list(schedule_config)?;
 
+    check_ng_list(schedule_config)?;
+
     check_day_states(schedule_config)?;
+
+    check_buffer(schedule_config)?;
 
     check_schedule_staff(schedule_config)?;
 
     check_schedule_day(schedule_config)?;
 
-    check_ng_list(schedule_config)?;
-
-    check_buffer(schedule_config)?;
+    check_day_attributes(schedule_config)?;
 
     check_score_props(&schedule_config.result.score_props, schedule_config)?;
 
     Ok(())
 }
 
+/// 焼きなましconfigのチェック
 fn check_annealing_config(
     annealing_config: &AnnealingConfig,
     schedule_config: &ScheduleConfig,
@@ -54,25 +57,17 @@ fn check_staff_attributes(schedule_config: &ScheduleConfig) -> Result<(), String
     for staff in &schedule_config.staff.list {
         match staff.attributes.len().cmp(&l) {
             Ordering::Less => Err(format!(
-                "staff {} のattributeが設定より少ないです",
-                staff.name
+                "staff {} のattributesの長さ({})がstaff.attributesの長さ({})より小さいです",
+                staff.name,
+                staff.attributes.len(),
+                &l
             )),
             Ordering::Greater => Err(format!(
-                "staff {} のattributeが設定より多いです",
-                staff.name
+                "staff {} のattributesの長さ({})がstaff.attributesの長さ({})より大きいです",
+                staff.name,
+                staff.attributes.len(),
+                &l
             )),
-            Ordering::Equal => Ok(()),
-        }?;
-    }
-    Ok(())
-}
-
-/// DayAttributeが日数分か
-fn check_day_attributes(schedule_config: &ScheduleConfig) -> Result<(), String> {
-    for (k, v) in schedule_config.day.attributes.iter() {
-        match v.len().cmp(&schedule_config.day.count) {
-            Ordering::Less => Err(format!("day_attribute {} が指定日数より少ないです", k)),
-            Ordering::Greater => Err(format!("day_attribute {} が指定日数より多いです", k)),
             Ordering::Equal => Ok(()),
         }?;
     }
@@ -87,10 +82,41 @@ fn check_staff_list(schedule_config: &ScheduleConfig) -> Result<(), String> {
         .len()
         .cmp(&schedule_config.staff.count)
     {
-        Ordering::Less => Err("staff_listのstaffの数が設定人数より少ないです"),
-        Ordering::Greater => Err("staff_listのstaffの数が設定人数より多いです"),
+        Ordering::Less => Err(format!(
+            "staff.listの長さ({})がstaff.count({})より小さいです",
+            schedule_config.staff.list.len(),
+            &schedule_config.staff.count
+        )),
+        Ordering::Greater => Err(format!(
+            "staff.listの長さ({})がstaff.count({})より大きいです",
+            schedule_config.staff.list.len(),
+            &schedule_config.staff.count
+        )),
         Ordering::Equal => Ok(()),
     }?;
+    Ok(())
+}
+
+/// NGリストが正常か
+fn check_ng_list(schedule_config: &ScheduleConfig) -> Result<(), String> {
+    for (i, (from, to)) in schedule_config.staff.ng_list.iter().enumerate() {
+        if schedule_config.staff.count <= *from {
+            Err(format!(
+                "staff.ng_listの{}番目のfrom({})がstaffの番号の最大値({})より大きいです",
+                i + 1,
+                *from,
+                schedule_config.staff.count - 1
+            ))?;
+        }
+        if schedule_config.staff.count <= *to {
+            Err(format!(
+                "staff.ng_listの{}番目のto({})がstaffの番号の最大値({})より大きいです",
+                i + 1,
+                *to,
+                schedule_config.staff.count - 1
+            ))?;
+        }
+    }
     Ok(())
 }
 
@@ -102,10 +128,29 @@ fn check_day_states(schedule_config: &ScheduleConfig) -> Result<(), String> {
         .len()
         .cmp(&schedule_config.day.count)
     {
-        Ordering::Less => Err("day_statesが設定日数より少ないです"),
-        Ordering::Greater => Err("day_statesが設定日数より多いです"),
+        Ordering::Less => Err(format!(
+            "day.statesの長さ({})がday.count({})より小さいです",
+            schedule_config.day.days.len(),
+            &schedule_config.day.count
+        )),
+        Ordering::Greater => Err(format!(
+            "day.statesの長さ({})がday.count({})より大きいです",
+            schedule_config.day.days.len(),
+            &schedule_config.day.count
+        )),
         Ordering::Equal => Ok(()),
     }?;
+    Ok(())
+}
+
+/// bufferがday_countを超えない
+fn check_buffer(schedule_config: &ScheduleConfig) -> Result<(), String> {
+    if schedule_config.day.buffer_count > schedule_config.day.count {
+        Err(format!(
+            "buffer({})がday_count({})より大きいです",
+            schedule_config.day.buffer_count, schedule_config.day.count
+        ))?;
+    }
     Ok(())
 }
 
@@ -117,8 +162,16 @@ fn check_schedule_staff(schedule_config: &ScheduleConfig) -> Result<(), String> 
         .len()
         .cmp(&schedule_config.staff.count)
     {
-        Ordering::Less => Err("requested_scheduleが設定人数より少ないです"),
-        Ordering::Greater => Err("requested_scheduleが設定人数より多いです"),
+        Ordering::Less => Err(format!(
+            "day.requested_scheduleの長さ({})からstaff.count({})より小さいです",
+            schedule_config.day.requested_schedule.len(),
+            &schedule_config.staff.count
+        )),
+        Ordering::Greater => Err(format!(
+            "day.requested_scheduleの長さ({})からstaff.count({})より大きいです",
+            schedule_config.day.requested_schedule.len(),
+            &schedule_config.staff.count
+        )),
         Ordering::Equal => Ok(()),
     }?;
     Ok(())
@@ -129,12 +182,16 @@ fn check_schedule_day(schedule_config: &ScheduleConfig) -> Result<(), String> {
     for (i, row) in schedule_config.day.requested_schedule.iter().enumerate() {
         match row.len().cmp(&schedule_config.day.count) {
             Ordering::Less => Err(format!(
-                "requested_scheduleの{}行目が設定日数より少ないです",
-                i + 1
+                "day.requested_scheduleの{}行目の長さ({})がday.count({})より大きいです",
+                i + 1,
+                row.len(),
+                &schedule_config.day.count
             )),
             Ordering::Greater => Err(format!(
-                "requested_scheduleの{}行目が設定日数より少ないです",
-                i + 1
+                "day.requested_scheduleの{}行目の長さ({})がday.count({})より小さいです",
+                i + 1,
+                row.len(),
+                &schedule_config.day.count
             )),
             Ordering::Equal => Ok(()),
         }?;
@@ -142,29 +199,24 @@ fn check_schedule_day(schedule_config: &ScheduleConfig) -> Result<(), String> {
     Ok(())
 }
 
-/// NGリストが正常か
-fn check_ng_list(schedule_config: &ScheduleConfig) -> Result<(), String> {
-    for (i, (from, to)) in schedule_config.staff.ng_list.iter().enumerate() {
-        if schedule_config.staff.count <= *from {
-            Err(format!(
-                "ng_listの{}番目のfromがstaffの番号の範囲より大きいです",
-                i + 1
-            ))?;
-        }
-        if schedule_config.staff.count <= *to {
-            Err(format!(
-                "ng_listの{}番目のtoがstaffの番号の範囲より大きいです",
-                i + 1
-            ))?;
-        }
-    }
-    Ok(())
-}
-
-/// bufferがday_countを超えない
-fn check_buffer(schedule_config: &ScheduleConfig) -> Result<(), String> {
-    if schedule_config.day.buffer_count > schedule_config.day.count {
-        Err("bufferがday_countを超えています")?;
+/// DayAttributeが日数分か
+fn check_day_attributes(schedule_config: &ScheduleConfig) -> Result<(), String> {
+    for (k, v) in schedule_config.day.attributes.iter() {
+        match v.len().cmp(&schedule_config.day.count) {
+            Ordering::Less => Err(format!(
+                "day.attributes {} のvaluesの長さ({})がday.count({})より小さいです",
+                k,
+                v.len(),
+                schedule_config.day.count
+            )),
+            Ordering::Greater => Err(format!(
+                "day.attributes {} のvaluesの長さ({})がday.count({})より大きいです",
+                k,
+                v.len(),
+                schedule_config.day.count
+            )),
+            Ordering::Equal => Ok(()),
+        }?;
     }
     Ok(())
 }
@@ -245,7 +297,7 @@ fn check_staff_attribute_exists(
     if sc.staff.attribute_map.names.contains(sa) {
         Ok(())
     } else {
-        Err(format!("{}はstaff_attributeとして登録されていません", sa))
+        Err(format!("{}はstaff.attributesに登録されていません", sa))
     }
 }
 
@@ -254,6 +306,6 @@ fn check_day_attribute_exists(da: &DayAttributeName, sc: &ScheduleConfig) -> Res
     if sc.day.attributes.contains_key(da) {
         Ok(())
     } else {
-        Err(format!("{}はday_attributeとして登録されていません", da))
+        Err(format!("{}はday.attributesに登録されていません", da))
     }
 }
