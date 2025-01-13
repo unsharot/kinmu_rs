@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-use crate::io::input::reader::types::RawScheduleConfig;
+use crate::io::input::reader::types::{RawAttributeTable, RawScheduleConfig};
 use crate::kinmu_lib::types::{
     DayAttributeName, DayConfig, DayState, FillConfig, ResultConfig, Schedule, ScheduleConfig,
     ScheduleState, ScoreProp, Shift, ShiftState, Staff, StaffAttributeNameIndexMap, StaffConfig,
@@ -20,14 +20,14 @@ pub fn convert_schedule_config(config: RawScheduleConfig) -> Result<ScheduleConf
         .collect::<Result<Schedule, String>>()?;
 
     let staff_config = StaffConfig {
-        attribute_map: make_staff_attribute_map(&config),
+        attribute_map: make_staff_attribute_map(config.staff.attributes),
         list: config
             .staff
             .list
-            .iter()
+            .into_iter()
             .map(|x| Staff {
-                name: x.name.clone(),
-                attributes: x.attributes.clone(),
+                name: x.name,
+                attributes: x.attributes,
             })
             .collect(),
         ng_list: config
@@ -45,7 +45,7 @@ pub fn convert_schedule_config(config: RawScheduleConfig) -> Result<ScheduleConf
         days: <Vec<DayState>>::from_config(&config.day.states)?,
         schedule_states: make_schedule_state(&schedule, config.day.buffer_count),
         requested_schedule: schedule,
-        attributes: make_day_attributes(&config),
+        attributes: make_day_attributes(config.day.attributes),
     };
 
     let fill_config = FillConfig {
@@ -73,21 +73,21 @@ pub fn convert_schedule_config(config: RawScheduleConfig) -> Result<ScheduleConf
     Ok(schedule_config)
 }
 
-fn make_day_attributes(config: &RawScheduleConfig) -> HashMap<DayAttributeName, Vec<i32>> {
+fn make_day_attributes(attributes: Vec<RawAttributeTable>) -> HashMap<DayAttributeName, Vec<i32>> {
     let mut ans = HashMap::new();
-    for att in &config.day.attributes {
-        ans.insert(att.name.clone(), att.values.clone());
+    for att in attributes {
+        ans.insert(att.name, att.values);
     }
     ans
 }
 
-fn make_staff_attribute_map(config: &RawScheduleConfig) -> StaffAttributeNameIndexMap {
+fn make_staff_attribute_map(attributes: Vec<String>) -> StaffAttributeNameIndexMap {
     let mut name_to_index = HashMap::new();
-    for (i, name) in config.staff.attributes.iter().enumerate() {
+    for (i, name) in attributes.iter().enumerate() {
         name_to_index.insert(name.to_string(), i);
     }
     StaffAttributeNameIndexMap {
-        names: config.staff.attributes.clone(),
+        names: attributes,
         name_to_index,
     }
 }
