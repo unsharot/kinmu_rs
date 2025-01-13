@@ -56,7 +56,7 @@ requested_schedule = [
 # 日ごとのパラメータを指定
 # スコアで使う
 attributes = [
-{name = "yakin", values = [0,0,0,0,1,0,0,1,0,1,0,0,1]},
+{name = "夜勤", values = [0,0,0,0,1,0,0,1,0,1,0,0,1]},
 {name = "早番", values = [0,0,0,1,1,1,1,0,0,0,0,0,0]},
 ]
 
@@ -88,7 +88,7 @@ config_paths = [
 # 結果表示に用いるスコア関数
 score_functions = [
   "StaffCount (DayExceptBuffer (), N, 2, 100)",
-  "StaffCountRegardDayAttribute (DayExceptBuffer (), I, yakin, 1000)",
+  "StaffCountRegardDayAttribute (DayExceptBuffer (), I, 夜勤, 1000)",
   "PatternGeneral (Every (), [[I], [N,O,H,I,K,Y]], 100000)",
   "PatternGeneral (Every (), [[A], [N,O,H,I,A]], 100000)",
   "PatternGeneral (Every (), [[N,O,H,A,K,Y], [A]], 100000)",

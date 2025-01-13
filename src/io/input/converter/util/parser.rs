@@ -36,7 +36,7 @@ fn format_str_tuple_to_words(s: &str) -> Result<Vec<&str>, String> {
     for c in bare_s.chars() {
         if bracket_count == 0 && c == ',' {
             words.push(bare_s[start_idx..end_idx].trim());
-            start_idx = end_idx + 1;
+            start_idx = end_idx + c.len_utf8();
         }
         if c == '(' || c == '[' {
             bracket_count += 1;
@@ -44,7 +44,7 @@ fn format_str_tuple_to_words(s: &str) -> Result<Vec<&str>, String> {
         if c == ')' || c == ']' {
             bracket_count -= 1;
         }
-        end_idx += 1;
+        end_idx += c.len_utf8();
     }
     if !bare_s[start_idx..end_idx].trim().is_empty() {
         words.push(bare_s[start_idx..end_idx].trim());
@@ -205,7 +205,7 @@ fn format_str_vec_to_words(s: &str) -> Result<Vec<&str>, String> {
     for c in bare_s.chars() {
         if !bracket_flag && c == ',' {
             words.push(bare_s[start_idx..end_idx].trim());
-            start_idx = end_idx + 1;
+            start_idx = end_idx + c.len_utf8();
         }
         if c == '[' {
             bracket_flag = true;
@@ -213,7 +213,7 @@ fn format_str_vec_to_words(s: &str) -> Result<Vec<&str>, String> {
         if c == ']' {
             bracket_flag = false;
         }
-        end_idx += 1;
+        end_idx += c.len_utf8();
     }
     if !bare_s[start_idx..end_idx].trim().is_empty() {
         words.push(bare_s[start_idx..end_idx].trim());
@@ -467,5 +467,19 @@ mod tests {
         assert_eq!(<(isize, isize)>::from_config("(1,2)"), Ok((1, 2)));
         assert_eq!(<(isize, isize)>::from_config("1,2"), Ok((1, 2)));
         assert_eq!(<(isize, isize)>::from_config(" 1, 2 "), Ok((1, 2)));
+    }
+
+    #[test]
+    fn parse_japanese() {
+        let s = "StaffCountRegardDayAttribute (DayExceptBuffer (), I, 夜勤, 1000)";
+        assert_eq!(
+            ScoreProp::from_config(s).unwrap(),
+            ScoreProp::StaffCountRegardDayAttribute((
+                CondWrapper::from_config("DayExceptBuffer ()").unwrap(),
+                Shift::I,
+                String::from("夜勤"),
+                1000.0
+            ))
+        );
     }
 }
