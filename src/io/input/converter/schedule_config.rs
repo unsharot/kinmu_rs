@@ -5,7 +5,8 @@ use std::collections::HashMap;
 use crate::io::input::reader::types::{RawAttributeTable, RawScheduleConfig};
 use crate::kinmu_lib::types::{
     DayAttributeName, DayConfig, DayState, FillConfig, ResultConfig, Schedule, ScheduleConfig,
-    ScheduleState, ScoreProp, Shift, ShiftState, Staff, StaffAttributeNameIndexMap, StaffConfig,
+    ScheduleState, ScoreFilter, ScoreFunction, ScoreProp, Shift, ShiftState, Staff,
+    StaffAttributeNameIndexMap, StaffConfig,
 };
 
 use super::util::parser::*;
@@ -54,12 +55,25 @@ pub fn convert_schedule_config(config: RawScheduleConfig) -> Result<ScheduleConf
     };
 
     let result_config = ResultConfig {
-        score_props: config
+        score_functions: config
             .result
             .score_functions
-            .iter()
-            .map(|s| <ScoreProp>::from_config(s))
-            .collect::<Result<Vec<ScoreProp>, String>>()?,
+            .into_iter()
+            .map(|sf| {
+                Ok(ScoreFunction {
+                    display_name: sf.display_name,
+                    scores: sf
+                        .scores
+                        .iter()
+                        .map(|s| <ScoreProp>::from_config(s))
+                        .collect::<Result<Vec<ScoreProp>, String>>()?,
+                    filter: sf.filter.map(|f| ScoreFilter{
+                        low_pass: f.low_pass,
+                        high_pass: f.high_pass,
+                    })
+                })
+            })
+            .collect::<Result<Vec<ScoreFunction>, String>>()?,
     };
 
     let schedule_config: ScheduleConfig = ScheduleConfig {

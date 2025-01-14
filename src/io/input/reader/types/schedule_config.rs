@@ -1,5 +1,7 @@
 //! schedule_configを読み込むための構造体
 
+use crate::kinmu_lib::types::Score;
+
 #[derive(Debug, serde::Deserialize)]
 pub struct RawScheduleConfig {
     pub staff: RawStaffTable,
@@ -57,5 +59,18 @@ pub struct RawAnnealingTable {
 
 #[derive(Debug, serde::Deserialize)]
 pub struct RawResultTable {
-    pub score_functions: Vec<String>,
+    pub score_functions: Vec<RawScoreFunction>,
+}
+
+#[derive(Debug, serde::Deserialize)]
+pub struct RawScoreFunction {
+    pub display_name: String,
+    pub scores: Vec<String>,
+    pub filter: Option<RawScoreFilter>,
+}
+
+#[derive(Debug, serde::Deserialize)]
+pub struct RawScoreFilter {
+    pub low_pass: Option<Score>,
+    pub high_pass: Option<Score>,
 }

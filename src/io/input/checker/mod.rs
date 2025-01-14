@@ -3,8 +3,8 @@
 use std::cmp::Ordering;
 
 use crate::kinmu_lib::types::{
-    AnnealingConfig, Cond, CondWrapper, DayAttributeName, MainConfig, ScheduleConfig, ScoreProp,
-    StaffAttributeName,
+    AnnealingConfig, Cond, CondWrapper, DayAttributeName, MainConfig, ScheduleConfig,
+    ScoreFunction, ScoreProp, StaffAttributeName,
 };
 
 /// チェックの関数
@@ -36,7 +36,7 @@ fn check_schedule_config(schedule_config: &ScheduleConfig) -> Result<(), String>
 
     check_day_attributes(schedule_config)?;
 
-    check_score_props(&schedule_config.result.score_props, schedule_config)?;
+    check_score_functions(&schedule_config.result.score_functions, schedule_config)?;
 
     Ok(())
 }
@@ -217,6 +217,17 @@ fn check_day_attributes(schedule_config: &ScheduleConfig) -> Result<(), String> 
             )),
             Ordering::Equal => Ok(()),
         }?;
+    }
+    Ok(())
+}
+
+/// ScoreFunctionsが有効か
+fn check_score_functions(
+    score_functions: &Vec<ScoreFunction>,
+    sc: &ScheduleConfig,
+) -> Result<(), String> {
+    for sf in score_functions {
+        check_score_props(&sf.scores, sc)?;
     }
     Ok(())
 }

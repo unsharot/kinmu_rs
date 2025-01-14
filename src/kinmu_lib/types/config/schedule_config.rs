@@ -1,8 +1,8 @@
 //! schedule_configから生成できる構造体を定義
 
 use crate::kinmu_lib::types::{
-    DayAttributeName, DayState, Schedule, ScheduleState, ScoreProp, Staff, StaffAttributeName,
-    StaffAttributeNameIndexMap, NG,
+    DayAttributeName, DayState, Schedule, ScheduleState, Score, ScoreProp, Staff,
+    StaffAttributeName, StaffAttributeNameIndexMap, NG,
 };
 
 use std::collections::HashMap;
@@ -17,7 +17,20 @@ pub struct FillConfig {
 
 #[derive(Clone, Debug, Default)]
 pub struct ResultConfig {
-    pub score_props: Vec<ScoreProp>,
+    pub score_functions: Vec<ScoreFunction>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct ScoreFunction {
+    pub display_name: String,
+    pub scores: Vec<ScoreProp>,
+    pub filter: Option<ScoreFilter>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct ScoreFilter {
+    pub low_pass: Option<Score>,
+    pub high_pass: Option<Score>,
 }
 
 #[derive(Clone, Debug, Default)]

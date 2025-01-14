@@ -87,9 +87,11 @@ config_paths = [
 
 # 結果表示に用いるスコア関数
 score_functions = [
-  "StaffCount (DayExceptBuffer (), N, 2, 100)",
-  "StaffCountRegardDayAttribute (DayExceptBuffer (), I, 夜勤, 1000)",
-  "PatternGeneral (Every (), [[I], [N,O,H,I,K,Y]], 100000)",
-  "PatternGeneral (Every (), [[A], [N,O,H,I,A]], 100000)",
-  "PatternGeneral (Every (), [[N,O,H,A,K,Y], [A]], 100000)",
+  {display_name = "日勤", scores = ["StaffCount (DayExceptBuffer (), N, 2, 100)"], filter = {low_pass = 1000}},
+  {display_name = "夜勤人数", scores = ["StaffCountRegardDayAttribute (DayExceptBuffer (), I, 夜勤, 1000)"], filter = {low_pass = 1000}},
+  {display_name = "夜勤制約", scores = [
+    "PatternGeneral (Every (), [[I], [N,O,H,I,K,Y]], 100000)",
+    "PatternGeneral (Every (), [[A], [N,O,H,I,A]], 100000)",
+    "PatternGeneral (Every (), [[N,O,H,A,K,Y], [A]], 100000)"
+  ], filter = {low_pass = 10000}}
 ]

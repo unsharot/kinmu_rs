@@ -16,7 +16,12 @@ pub(super) fn print_answer(ans: Answer) {
 
 fn print_model(schedule_config: &ScheduleConfig, model: &Schedule) {
     let score = score::assess_score(
-        &mut schedule_config.result.score_props.clone(),
+        &mut schedule_config
+            .result
+            .score_functions
+            .iter()
+            .flat_map(|x| x.scores.clone())
+            .collect(),
         schedule_config,
         model,
     );
@@ -26,14 +31,10 @@ fn print_model(schedule_config: &ScheduleConfig, model: &Schedule) {
 
     println!();
 
-    println!(
-        "{}",
-        score::show_score(
-            &mut schedule_config.result.score_props.clone(),
-            schedule_config,
-            model
-        )
-    );
+    for sf in &schedule_config.result.score_functions {
+        let s = score::assess_score(&mut sf.scores.clone(), schedule_config, model);
+        println!("{} : {}", sf.display_name, s)
+    }
 
     println!();
 }
