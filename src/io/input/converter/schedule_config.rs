@@ -67,10 +67,10 @@ pub fn convert_schedule_config(config: RawScheduleConfig) -> Result<ScheduleConf
                         .iter()
                         .map(|s| <ScoreProp>::from_config(s))
                         .collect::<Result<Vec<ScoreProp>, String>>()?,
-                    filter: sf.filter.map(|f| ScoreFilter{
+                    filter: sf.filter.map(|f| ScoreFilter {
                         low_pass: f.low_pass,
                         high_pass: f.high_pass,
-                    })
+                    }),
                 })
             })
             .collect::<Result<Vec<ScoreFunction>, String>>()?,

@@ -33,7 +33,24 @@ fn print_model(schedule_config: &ScheduleConfig, model: &Schedule) {
 
     for sf in &schedule_config.result.score_functions {
         let s = score::assess_score(&mut sf.scores.clone(), schedule_config, model);
-        println!("{} : {}", sf.display_name, s)
+        let mut ok = true;
+        if let Some(f) = &sf.filter {
+            if let Some(h) = f.high_pass {
+                if s <= h {
+                    ok = false;
+                }
+            }
+            if let Some(l) = f.low_pass {
+                if l <= s {
+                    ok = false;
+                }
+            }
+        }
+        if ok {
+            println!("{} : {}", sf.display_name, s);
+        } else {
+            println!("{} : {} \x1b[31m[Warning]\x1b[m", sf.display_name, s);
+        }
     }
 
     println!();
