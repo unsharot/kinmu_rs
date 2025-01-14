@@ -5,6 +5,8 @@ mod display;
 use crate::kinmu_lib::score;
 use crate::kinmu_lib::types::{Answer, Schedule, ScheduleConfig, Shift};
 
+use color_print;
+
 pub(super) fn print_answer(ans: Answer) {
     for (t, model) in ans.models.iter().enumerate() {
         println!("thread: {}", t + 1);
@@ -49,7 +51,7 @@ fn print_model(schedule_config: &ScheduleConfig, model: &Schedule) {
         if ok {
             println!("{} : {}", sf.display_name, s);
         } else {
-            println!("{} : {} \x1b[31m[Warning]\x1b[m", sf.display_name, s);
+            color_print::cprintln!("{} : {} <red>[Warning]</red>", sf.display_name, s);
         }
     }
 
