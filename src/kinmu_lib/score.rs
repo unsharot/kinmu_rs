@@ -15,21 +15,6 @@ pub fn assess_score(
     get_score_list(sps, schedule_config, schedule).iter().sum()
 }
 
-pub fn show_score(
-    sps: &mut Vec<ScoreProp>,
-    schedule_config: &ScheduleConfig,
-    schedule: &Schedule,
-) -> String {
-    let sl = get_score_list(sps, schedule_config, schedule);
-    let ss: Vec<String> = sps.iter().map(|x| x.to_string()).collect();
-    let zipped: Vec<String> = ss
-        .iter()
-        .zip(sl.iter())
-        .map(|(x, y)| x.to_string() + " : " + &y.to_string())
-        .collect();
-    zipped.join("\n")
-}
-
 #[allow(clippy::ptr_arg)]
 fn get_score_list(
     sps: &mut Vec<ScoreProp>,
