@@ -68,12 +68,14 @@ https://github.com/unsharot/kinmu_rs
 7. `./kinmu.exe`をターミナルで実行
 
 exeファイルを実行する際、デフォルトでメインconfigとして`example/main_config.toml`が読み込まれますが、読み込むconfigを指定することもできます。
-以下のように引数にファイルのパスを指定することで、読み込むファイルを指定することができます。
+以下のように引数に`-l, -load`オプションからファイルのパスを指定することで、読み込むファイルを指定できます。
 絶対パスと現在のディレクトリからの相対パスの両方に対応しています。
 モードを切り替えて使いたい場合にご利用ください。
 
 ```sh
-./kinmu.exe config/hoge/config.toml
+# 指定する場合、-lオプションからメインconfigのパスを指定
+# config/hoge/config.tomlをメインとする場合
+./kinmu.exe -l config/hoge/config.toml
 ```
 
 ```sh
@@ -107,6 +109,11 @@ git checkout v2.1.0
 
 ```sh
 cargo run -r
+```
+
+```sh
+# 読み込むファイルを指定する場合
+cargo run -r -- -l config/hoge/config.toml
 ```
 
 #### ビルドする場合
