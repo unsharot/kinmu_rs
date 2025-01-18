@@ -74,7 +74,7 @@ fn run(main_file_path: &str) -> Result<(), String> {
     let answers = generator::run(&config)?;
 
     for ans in answers {
-        output::run(ans);
+        output::run(ans)?;
     }
 
     Ok(())
