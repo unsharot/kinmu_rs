@@ -1,10 +1,10 @@
 //! 結果をターミナルに標準出力するモジュール
 
-mod color;
 mod display;
 
 use crate::kinmu_lib::score;
 use crate::kinmu_lib::types::{Answer, Schedule, ScheduleConfig, Shift};
+use crate::utils::color;
 
 use std::io;
 
