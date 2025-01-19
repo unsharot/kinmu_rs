@@ -4,7 +4,7 @@ use crate::kinmu_lib::types::{
     AnnealingConfig, Answer, FillConfig, MainConfig, Schedule, ScheduleConfig,
 };
 use crate::kinmu_lib::{fill, score, seed, update};
-use ::annealing::annealing;
+use ::annealing;
 
 use std::thread;
 use std::time::Instant;

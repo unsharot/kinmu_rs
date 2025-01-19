@@ -1,1 +1,3 @@
-pub mod annealing;
+mod annealing;
+
+pub use annealing::*;
