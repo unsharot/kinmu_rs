@@ -18,26 +18,22 @@ mod streak;
 
 use super::types::{Schedule, ScheduleConfig, Score, ScoreProp};
 
-pub fn assess_score(
+/// 複数のスコアを評価する
+#[allow(clippy::ptr_arg)]
+pub fn eval_scores(
     sps: &mut Vec<ScoreProp>,
     schedule_config: &ScheduleConfig,
     schedule: &Schedule,
 ) -> Score {
-    get_score_list(sps, schedule_config, schedule).iter().sum()
-}
-
-#[allow(clippy::ptr_arg)]
-fn get_score_list(
-    sps: &mut Vec<ScoreProp>,
-    schedule_config: &ScheduleConfig,
-    schedule: &Schedule,
-) -> Vec<Score> {
     sps.iter_mut()
-        .map(|sp: &mut ScoreProp| get_score(schedule_config, schedule, sp))
-        .collect()
+        .map(|sp: &mut ScoreProp| eval_score(sp, schedule_config, schedule))
+        .collect::<Vec<_>>()
+        .iter()
+        .sum()
 }
 
-fn get_score(schedule_config: &ScheduleConfig, schedule: &Schedule, sp: &mut ScoreProp) -> Score {
+/// スコアを評価する
+fn eval_score(sp: &mut ScoreProp, schedule_config: &ScheduleConfig, schedule: &Schedule) -> Score {
     match sp {
         ScoreProp::PatternGeneral(p) => pattern_general::eval(schedule_config, schedule, p),
         ScoreProp::PatternFixed(p) => pattern_fixed::eval(schedule_config, schedule, p),

@@ -28,7 +28,7 @@ fn write_model<W: io::Write>(
     model: &Schedule,
     use_color: bool,
 ) -> io::Result<()> {
-    let score = score::assess_score(
+    let score = score::eval_scores(
         &mut schedule_config
             .result
             .score_functions
@@ -45,7 +45,7 @@ fn write_model<W: io::Write>(
     writeln!(out)?;
 
     for sf in &schedule_config.result.score_functions {
-        let s = score::assess_score(&mut sf.scores.clone(), schedule_config, model);
+        let s = score::eval_scores(&mut sf.scores.clone(), schedule_config, model);
         let mut ok = true;
         if let Some(f) = &sf.filter {
             if let Some(h) = f.high_pass {

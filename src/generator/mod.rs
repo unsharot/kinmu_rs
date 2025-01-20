@@ -64,13 +64,13 @@ fn annealing(
     let mut score;
     for mut ac in annealing_configs {
         let mut rng = seed::gen_rng_from_seed(ac.seed);
-        score = score::assess_score(&mut ac.score_props, &schedule_config, &model);
+        score = score::eval_scores(&mut ac.score_props, &schedule_config, &model);
         (_, model) = annealing::run(
             score,
             &model,
             ac.step,
             update::gen_update_func(&ac.update_func, &schedule_config)?,
-            |m| score::assess_score(&mut ac.score_props, &schedule_config, m),
+            |m| score::eval_scores(&mut ac.score_props, &schedule_config, m),
             ac.max_temp,
             ac.min_temp,
             annealing::basic_temp_func,
