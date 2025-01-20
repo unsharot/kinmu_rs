@@ -49,12 +49,12 @@ fn write_model<W: io::Write>(
         let mut ok = true;
         if let Some(f) = &sf.filter {
             if let Some(h) = f.high_pass {
-                if s <= h {
+                if s < h {
                     ok = false;
                 }
             }
             if let Some(l) = f.low_pass {
-                if l <= s {
+                if l < s {
                     ok = false;
                 }
             }
