@@ -40,3 +40,53 @@ pub(super) fn eval(
     }
     sum
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::kinmu_lib::types::Cond;
+
+    use super::*;
+
+    #[test]
+    fn general_pattern_test() {
+        let mut sc: ScheduleConfig = Default::default();
+        sc.staff.count = 1;
+        sc.day.count = 4;
+
+        let score = eval(
+            &sc,
+            &vec![vec![Shift::H, Shift::H, Shift::A, Shift::Y]],
+            &mut (
+                CondWrapper::new(Cond::Every),
+                vec![
+                    vec![Shift::N, Shift::O, Shift::H, Shift::A, Shift::K, Shift::Y],
+                    vec![Shift::A],
+                ],
+                1.0,
+            ),
+        );
+        assert_eq!(1.0, score);
+
+        sc.day.count = 37;
+
+        let score = eval(
+            &sc,
+            {
+                use Shift::*;
+                &vec![vec![
+                    N, N, K, K, A, N, N, N, N, K, K, N, A, A, N, K, K, K, N, N, A, A, A, K, K, N,
+                    N, N, N, N, K, K, A, N, A, N, A,
+                ]]
+            },
+            &mut (
+                CondWrapper::new(Cond::Every),
+                {
+                    use Shift::*;
+                    vec![vec![N, O, H, A, K, Y], vec![A]]
+                },
+                1.0,
+            ),
+        );
+        assert_eq!(9.0, score);
+    }
+}
