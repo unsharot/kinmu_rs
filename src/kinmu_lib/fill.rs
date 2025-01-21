@@ -13,10 +13,15 @@ use rand::Rng;
 pub fn run(fc: &mut FillConfig, schedule_config: &ScheduleConfig) -> Result<Schedule, String> {
     let mut rng = &mut seed::gen_rng_from_seed(fc.seed);
     match fc.name.as_str() {
+        "no_fill" => Ok(no_fill(schedule_config, &mut rng)),
         "fill1" => Ok(fill_randomly1(schedule_config, &mut rng)),
         "fill2" => Ok(fill_randomly2(schedule_config, &mut rng)),
         _ => Err(format!("Failed to parse fill function {}", fc.name)),
     }
+}
+
+fn no_fill<R: Rng>(schedule_config: &ScheduleConfig, _rng: &mut R) -> Schedule {
+    schedule_config.day.requested_schedule.clone()
 }
 
 #[allow(clippy::needless_range_loop)]
