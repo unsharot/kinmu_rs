@@ -33,7 +33,6 @@ pub(super) fn eval(
             }
             if hit && is_valid {
                 a += *score;
-                break;
             }
         }
         sum += a;
