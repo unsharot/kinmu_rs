@@ -34,3 +34,63 @@ pub(super) fn eval(
     }
     sum
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::kinmu_lib::types::{Cond, Staff};
+
+    use super::*;
+
+    #[test]
+    fn dayc() {
+        let mut schedule_config: ScheduleConfig = Default::default();
+        schedule_config.staff.count = 1;
+        schedule_config.staff.list.push(Staff {
+            name: String::from(""),
+            attributes: vec![1],
+        });
+        schedule_config.day.count = 4;
+        schedule_config
+            .staff
+            .attribute_map
+            .names
+            .push(String::from("some_attribute"));
+        schedule_config
+            .staff
+            .attribute_map
+            .name_to_index
+            .insert(String::from("some_attribute"), 0);
+
+        let score = eval(
+            &schedule_config,
+            {
+                use Shift::*;
+                &vec![vec![I, A, K, N]]
+            },
+            &mut (
+                CondWrapper::new(Cond::Every),
+                Shift::N,
+                String::from("some_attribute"),
+                1.0,
+            ),
+        );
+
+        assert_eq!(0.0, score);
+
+        let score = eval(
+            &schedule_config,
+            {
+                use Shift::*;
+                &vec![vec![I, A, N, N]]
+            },
+            &mut (
+                CondWrapper::new(Cond::Every),
+                Shift::N,
+                String::from("some_attribute"),
+                1.0,
+            ),
+        );
+
+        assert_eq!(1.0, score);
+    }
+}
