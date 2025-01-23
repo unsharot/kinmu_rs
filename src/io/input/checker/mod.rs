@@ -1,5 +1,6 @@
 //! 読み込んだconfigが正常か判定するモジュール
 
+use anyhow::Context as _;
 use std::cmp::Ordering;
 
 use crate::kinmu_lib::types::{
@@ -10,9 +11,11 @@ use crate::kinmu_lib::types::{
 /// チェックの関数
 pub fn run(config: &MainConfig) -> anyhow::Result<()> {
     for schedule_config in &config.schedule_configs {
-        check_schedule_config(schedule_config)?;
+        check_schedule_config(schedule_config)
+            .context("schedule_configの変換チェックに失敗しました")?;
         for annealing_config in &schedule_config.annealing_configs {
-            check_annealing_config(annealing_config, schedule_config)?;
+            check_annealing_config(annealing_config, schedule_config)
+                .context("annealing_configの変換チェックに失敗しました")?;
         }
     }
     Ok(())
@@ -20,23 +23,27 @@ pub fn run(config: &MainConfig) -> anyhow::Result<()> {
 
 /// 勤務表configのチェック
 fn check_schedule_config(schedule_config: &ScheduleConfig) -> anyhow::Result<()> {
-    check_staff_attributes(schedule_config)?;
+    check_staff_attributes(schedule_config)
+        .context("staff.attributesの変換チェックに失敗しました")?;
 
-    check_staff_list(schedule_config)?;
+    check_staff_list(schedule_config).context("staff.listの変換チェックに失敗しました")?;
 
-    check_ng_list(schedule_config)?;
+    check_ng_list(schedule_config).context("staff.ng_listの変換チェックに失敗しました")?;
 
-    check_day_states(schedule_config)?;
+    check_day_states(schedule_config).context("day.statesの変換チェックに失敗しました")?;
 
-    check_buffer(schedule_config)?;
+    check_buffer(schedule_config).context("day.buffer_countの変換チェックに失敗しました")?;
 
-    check_schedule_staff(schedule_config)?;
+    check_schedule_staff(schedule_config)
+        .context("day.requested_scheduleの変換チェックに失敗しました")?;
 
-    check_schedule_day(schedule_config)?;
+    check_schedule_day(schedule_config)
+        .context("day.requested_scheduleの変換チェックに失敗しました")?;
 
-    check_day_attributes(schedule_config)?;
+    check_day_attributes(schedule_config).context("day.attributesの変換チェックに失敗しました")?;
 
-    check_score_functions(&schedule_config.result.score_functions, schedule_config)?;
+    check_score_functions(&schedule_config.result.score_functions, schedule_config)
+        .context("result.score_functionsの変換チェックに失敗しました")?;
 
     Ok(())
 }
@@ -46,7 +53,8 @@ fn check_annealing_config(
     annealing_config: &AnnealingConfig,
     schedule_config: &ScheduleConfig,
 ) -> anyhow::Result<()> {
-    check_score_props(&annealing_config.score_props, schedule_config)?;
+    check_score_props(&annealing_config.score_props, schedule_config)
+        .context("score_functionsの変換チェックに失敗しました")?;
 
     Ok(())
 }
@@ -228,7 +236,12 @@ fn check_score_functions(
     sc: &ScheduleConfig,
 ) -> anyhow::Result<()> {
     for sf in score_functions {
-        check_score_props(&sf.scores, sc)?;
+        check_score_props(&sf.scores, sc).with_context(|| {
+            format!(
+                "スコア関数 {} の変換チェックに失敗しました",
+                &sf.display_name
+            )
+        })?;
     }
     Ok(())
 }
@@ -237,67 +250,59 @@ fn check_score_functions(
 fn check_score_props(score_props: &Vec<ScoreProp>, sc: &ScheduleConfig) -> anyhow::Result<()> {
     for score_prop in score_props {
         match score_prop {
-            ScoreProp::PatternGeneral((c, _, _)) => check_cond_wrapper(c, sc)?,
-            ScoreProp::PatternFixed((c, _, _)) => check_cond_wrapper(c, sc)?,
-            ScoreProp::PatternGeneralAny((c, _, _)) => check_cond_wrapper(c, sc)?,
-            ScoreProp::PatternFixedAny((c, _, _)) => check_cond_wrapper(c, sc)?,
-            ScoreProp::Streak((c, _, _, _)) => check_cond_wrapper(c, sc)?,
-            ScoreProp::ShiftsBalance((c, _, _, _)) => check_cond_wrapper(c, sc)?,
-            ScoreProp::ShiftHalfBalance((c, _, _)) => check_cond_wrapper(c, sc)?,
-            ScoreProp::ShiftDirPriority((c, _, _)) => check_cond_wrapper(c, sc)?,
+            ScoreProp::PatternGeneral((c, _, _)) => check_cond_wrapper(c, sc),
+            ScoreProp::PatternFixed((c, _, _)) => check_cond_wrapper(c, sc),
+            ScoreProp::PatternGeneralAny((c, _, _)) => check_cond_wrapper(c, sc),
+            ScoreProp::PatternFixedAny((c, _, _)) => check_cond_wrapper(c, sc),
+            ScoreProp::Streak((c, _, _, _)) => check_cond_wrapper(c, sc),
+            ScoreProp::ShiftsBalance((c, _, _, _)) => check_cond_wrapper(c, sc),
+            ScoreProp::ShiftHalfBalance((c, _, _)) => check_cond_wrapper(c, sc),
+            ScoreProp::ShiftDirPriority((c, _, _)) => check_cond_wrapper(c, sc),
             ScoreProp::DayCountRegardStaffAttribute((c, _, sa, _)) => {
-                check_cond_wrapper(c, sc)?;
-                check_staff_attribute_exists(sa, sc)?;
+                check_cond_wrapper(c, sc).and(check_staff_attribute_exists(sa, sc))
             }
             ScoreProp::StaffCountRegardDayAttribute((c, _, da, _)) => {
-                check_cond_wrapper(c, sc)?;
-                check_day_attribute_exists(da, sc)?;
+                check_cond_wrapper(c, sc).and(check_day_attribute_exists(da, sc))
             }
-            ScoreProp::StaffCount((c, _, _, _)) => check_cond_wrapper(c, sc)?,
-            ScoreProp::StaffCountAtLeast((c, _, _, _)) => check_cond_wrapper(c, sc)?,
+            ScoreProp::StaffCount((c, _, _, _)) => check_cond_wrapper(c, sc),
+            ScoreProp::StaffCountAtLeast((c, _, _, _)) => check_cond_wrapper(c, sc),
             ScoreProp::StaffCountWithPremise((c1, _, _, c2, _, _, _)) => {
-                check_cond_wrapper(c1, sc)?;
-                check_cond_wrapper(c2, sc)?;
+                check_cond_wrapper(c1, sc).and(check_cond_wrapper(c2, sc))
             }
-            ScoreProp::NGPair((c, _, _)) => check_cond_wrapper(c, sc)?,
-            ScoreProp::NoSamePair((c, _, _, _)) => check_cond_wrapper(c, sc)?,
-        };
+            ScoreProp::NGPair((c, _, _)) => check_cond_wrapper(c, sc),
+            ScoreProp::NoSamePair((c, _, _, _)) => check_cond_wrapper(c, sc),
+        }
+        .with_context(|| format!("スコア {:?} の変換チェックに失敗しました", score_prop))?;
     }
     Ok(())
 }
 
 /// CondWrapperの中のStaffAttributeNameやDayAttributeNameが有効か
 fn check_cond_wrapper(c: &CondWrapper, sc: &ScheduleConfig) -> anyhow::Result<()> {
-    check_cond(&c.cond, sc)?;
+    check_cond(&c.cond, sc)
+        .with_context(|| format!("CondWrapper {:?} の変換チェックに失敗しました", &c.cond))?;
     Ok(())
 }
 
 /// Condの中のStaffAttributeNameやDayAttributeNameが有効か
 fn check_cond(c: &Cond, sc: &ScheduleConfig) -> anyhow::Result<()> {
     match c {
-        Cond::Every => (),
-        Cond::Or((c1, c2)) => {
-            check_cond(c1, sc)?;
-            check_cond(c2, sc)?;
-        }
-        Cond::And((c1, c2)) => {
-            check_cond(c1, sc)?;
-            check_cond(c2, sc)?;
-        }
-        Cond::Not(c) => {
-            check_cond(c, sc)?;
-        }
+        Cond::Every => Ok(()),
+        Cond::Or((c1, c2)) => check_cond(c1, sc).and(check_cond(c2, sc)),
+        Cond::And((c1, c2)) => check_cond(c1, sc).and(check_cond(c2, sc)),
+        Cond::Not(c) => check_cond(c, sc),
 
-        Cond::DayExceptBuffer => (),
-        Cond::DayInRange(_) => (),
-        Cond::ParticularDayState(_) => (),
-        Cond::BeforeDayState(_) => (),
-        Cond::ParticularDay(_) => (),
+        Cond::DayExceptBuffer => Ok(()),
+        Cond::DayInRange(_) => Ok(()),
+        Cond::ParticularDayState(_) => Ok(()),
+        Cond::BeforeDayState(_) => Ok(()),
+        Cond::ParticularDay(_) => Ok(()),
 
-        Cond::StaffInRange(_) => (),
-        Cond::StaffWithAttribute((sa, _)) => check_staff_attribute_exists(sa, sc)?,
-        Cond::ParticularStaff(_) => (),
-    };
+        Cond::StaffInRange(_) => Ok(()),
+        Cond::StaffWithAttribute((sa, _)) => check_staff_attribute_exists(sa, sc),
+        Cond::ParticularStaff(_) => Ok(()),
+    }
+    .with_context(|| format!("Cond {:?} の変換チェックに失敗しました", c))?;
     Ok(())
 }
 
@@ -310,7 +315,7 @@ fn check_staff_attribute_exists(
         Ok(())
     } else {
         Err(anyhow::anyhow!(
-            "{}はstaff.attributesに登録されていません",
+            "{} はstaff.attributesに登録されていません",
             sa
         ))
     }
@@ -322,7 +327,7 @@ fn check_day_attribute_exists(da: &DayAttributeName, sc: &ScheduleConfig) -> any
         Ok(())
     } else {
         Err(anyhow::anyhow!(
-            "{}はday.attributesに登録されていません",
+            "{} はday.attributesに登録されていません",
             da
         ))
     }

@@ -94,7 +94,7 @@ fn main() -> io::Result<()> {
     // 実行
     match run(&mut out, main_file_path, use_color) {
         Ok(_) => {}
-        Err(e) => writeln!(out, "{}", e)?,
+        Err(e) => writeln!(out, "{:?}", e)?,
     };
 
     Ok(())
