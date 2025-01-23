@@ -2,6 +2,8 @@
 
 use std::collections::HashMap;
 
+use anyhow::Context;
+
 use crate::io::input::reader::types::{RawAttributeTable, RawScheduleConfig};
 use crate::kinmu_lib::types::{
     DayAttributeName, DayConfig, DayState, FillConfig, ResultConfig, Schedule, ScheduleConfig,
@@ -17,8 +19,13 @@ pub fn convert_schedule_config(config: RawScheduleConfig) -> anyhow::Result<Sche
         .day
         .requested_schedule
         .iter()
-        .map(|s| <ScheduleRowWrapper>::from_config(s).map(|w| w.0))
-        .collect::<anyhow::Result<Schedule>>()?;
+        .map(|s| {
+            <ScheduleRowWrapper>::from_config(s)
+                .map(|w| w.0)
+                .with_context(|| format!("Failed to parse schedule row \"{}\"", s))
+        })
+        .collect::<anyhow::Result<Schedule>>()
+        .context("Failed to parse day.requested_schedule")?;
 
     let staff_config = StaffConfig {
         attribute_map: make_staff_attribute_map(config.staff.attributes),
@@ -43,7 +50,8 @@ pub fn convert_schedule_config(config: RawScheduleConfig) -> anyhow::Result<Sche
     let day_config = DayConfig {
         count: config.day.day_count,
         buffer_count: config.day.buffer_count,
-        days: <Vec<DayState>>::from_config(&config.day.states)?,
+        days: <Vec<DayState>>::from_config(&config.day.states)
+            .context("Failed to parse day.states")?,
         schedule_states: make_schedule_state(&schedule, config.day.buffer_count),
         requested_schedule: schedule,
         attributes: make_day_attributes(config.day.attributes),
@@ -61,19 +69,23 @@ pub fn convert_schedule_config(config: RawScheduleConfig) -> anyhow::Result<Sche
             .into_iter()
             .map(|sf| {
                 Ok(ScoreFunction {
-                    display_name: sf.display_name,
                     scores: sf
                         .scores
                         .iter()
                         .map(|s| <ScoreProp>::from_config(s))
-                        .collect::<anyhow::Result<Vec<ScoreProp>>>()?,
+                        .collect::<anyhow::Result<Vec<ScoreProp>>>()
+                        .with_context(|| {
+                            format!("Failed to parse score_function named {}", &sf.display_name)
+                        })?,
+                    display_name: sf.display_name,
                     filter: sf.filter.map(|f| ScoreFilter {
                         low_pass: f.low_pass,
                         high_pass: f.high_pass,
                     }),
                 })
             })
-            .collect::<anyhow::Result<Vec<ScoreFunction>>>()?,
+            .collect::<anyhow::Result<Vec<ScoreFunction>>>()
+            .context("Failed to parse result.score_functions")?,
     };
 
     let schedule_config: ScheduleConfig = ScheduleConfig {

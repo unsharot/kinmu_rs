@@ -311,7 +311,7 @@ impl FromConfig for ScoreProp {
         let words: Vec<&str> = s.splitn(2, ' ').collect();
         anyhow::ensure!(words.len() >= 2, "Needs 2 fields, but not enough.");
         anyhow::ensure!(2 >= words.len(), "Needs 2 fields, but too much given.");
-        helper_sp(words[0], words[1]).with_context(|| format!("Failed to load {}", s))
+        helper_sp(words[0], words[1]).with_context(|| format!("Failed to parse {}", s))
     }
 }
 
@@ -383,7 +383,7 @@ fn helper_sp(w1: &str, w2: &str) -> anyhow::Result<ScoreProp> {
         ("NoSamePair", p) => Ok(ScoreProp::NoSamePair(
             <(CondWrapper, i32, Shift, Score)>::from_config(p)?,
         )),
-        (s, p) => Err(anyhow::anyhow!("Failed to parse ScoreProp: {} {}", s, p)),
+        (s, _) => Err(anyhow::anyhow!("Unexpected ScoreProp {}", s)),
     }
 }
 
