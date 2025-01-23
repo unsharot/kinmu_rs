@@ -3,7 +3,8 @@ name = "kinmu"
 version = "2.2.2"
 authors = ["unsharot"]
 edition = "2021"
-description = "A project that solves specific nurse scheduling problem."
+license = "MIT"
+description = "Practical solver for real-world nurse scheduling problems."
 repository = "https://github.com/unsharot/kinmu_rs"
 
 [workspace]
