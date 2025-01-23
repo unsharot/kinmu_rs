@@ -8,7 +8,7 @@ use rand::Rng;
 pub fn gen_update_func<'a, R: Rng>(
     text: &str,
     schedule_config: &'a ScheduleConfig,
-) -> Result<Box<dyn FnMut(&Schedule, &mut R) -> Schedule + 'a>, String> {
+) -> anyhow::Result<Box<dyn FnMut(&Schedule, &mut R) -> Schedule + 'a>> {
     let schedule_state = &schedule_config.day.schedule_states;
     match text {
         "update1" => Ok(Box::new(move |schedule, rng| {
@@ -23,7 +23,10 @@ pub fn gen_update_func<'a, R: Rng>(
         "update5" => Ok(Box::new(move |schedule, rng| {
             update_randomly5(schedule_config, schedule_state, schedule, rng)
         })),
-        _ => Err(format!("Failed to generate update function {}", text)),
+        _ => Err(anyhow::anyhow!(
+            "Failed to generate update function {}",
+            text
+        )),
     }
 }
 

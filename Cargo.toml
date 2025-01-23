@@ -18,3 +18,4 @@ serde = { version = "1.0.145", features = ["derive"] }
 toml = "0.8.19"
 color-print = "0.3.7"
 getopts = "0.2.21"
+anyhow = "1.0.95"

@@ -9,11 +9,11 @@ use ::annealing;
 use std::thread;
 use std::time::Instant;
 
-pub fn run(config: &MainConfig) -> Result<Vec<Answer>, String> {
+pub fn run(config: &MainConfig) -> anyhow::Result<Vec<Answer>> {
     generate_schedules(config)
 }
 
-fn generate_schedules(config: &MainConfig) -> Result<Vec<Answer>, String> {
+fn generate_schedules(config: &MainConfig) -> anyhow::Result<Vec<Answer>> {
     let thread_count = config.thread_count.unwrap_or(1);
 
     let mut answers = Vec::new();
@@ -27,10 +27,10 @@ fn generate_schedules(config: &MainConfig) -> Result<Vec<Answer>, String> {
 fn generate_schedule(
     schedule_config: &ScheduleConfig,
     thread_count: u32,
-) -> Result<Answer, String> {
+) -> anyhow::Result<Answer> {
     let start = Instant::now();
 
-    let mut hs: Vec<thread::JoinHandle<Result<_, String>>> = vec![];
+    let mut hs: Vec<thread::JoinHandle<anyhow::Result<_>>> = vec![];
     for _ in 0..thread_count {
         let schedule_config = schedule_config.clone();
         let annealing_configs = schedule_config.annealing_configs.clone();
@@ -42,7 +42,7 @@ fn generate_schedule(
 
     let mut models = Vec::new();
     for h in hs.into_iter() {
-        let model = h.join().unwrap().clone()?;
+        let model = h.join().unwrap()?.clone();
 
         models.push(model);
     }
@@ -58,7 +58,7 @@ fn annealing(
     schedule_config: ScheduleConfig,
     mut fill_config: FillConfig,
     annealing_configs: Vec<AnnealingConfig>,
-) -> Result<Schedule, String> {
+) -> anyhow::Result<Schedule> {
     let mut model = fill::run(&mut fill_config, &schedule_config)?;
 
     let mut score;

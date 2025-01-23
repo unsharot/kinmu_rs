@@ -10,13 +10,13 @@ use super::types::{FillConfig, Schedule, ScheduleConfig, Shift, ShiftState};
 
 use rand::Rng;
 
-pub fn run(fc: &mut FillConfig, schedule_config: &ScheduleConfig) -> Result<Schedule, String> {
+pub fn run(fc: &mut FillConfig, schedule_config: &ScheduleConfig) -> anyhow::Result<Schedule> {
     let mut rng = &mut seed::gen_rng_from_seed(fc.seed);
     match fc.name.as_str() {
         "no_fill" => Ok(no_fill(schedule_config, &mut rng)),
         "fill1" => Ok(fill_randomly1(schedule_config, &mut rng)),
         "fill2" => Ok(fill_randomly2(schedule_config, &mut rng)),
-        _ => Err(format!("Failed to parse fill function {}", fc.name)),
+        _ => Err(anyhow::anyhow!("Failed to parse fill function {}", fc.name)),
     }
 }
 

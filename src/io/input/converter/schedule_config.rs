@@ -12,13 +12,13 @@ use crate::kinmu_lib::types::{
 use super::util::parser::*;
 
 /// 勤務表で使う値を読み込む
-pub fn convert_schedule_config(config: RawScheduleConfig) -> Result<ScheduleConfig, String> {
+pub fn convert_schedule_config(config: RawScheduleConfig) -> anyhow::Result<ScheduleConfig> {
     let schedule = config
         .day
         .requested_schedule
         .iter()
         .map(|s| <ScheduleRowWrapper>::from_config(s).map(|w| w.0))
-        .collect::<Result<Schedule, String>>()?;
+        .collect::<anyhow::Result<Schedule>>()?;
 
     let staff_config = StaffConfig {
         attribute_map: make_staff_attribute_map(config.staff.attributes),
@@ -66,14 +66,14 @@ pub fn convert_schedule_config(config: RawScheduleConfig) -> Result<ScheduleConf
                         .scores
                         .iter()
                         .map(|s| <ScoreProp>::from_config(s))
-                        .collect::<Result<Vec<ScoreProp>, String>>()?,
+                        .collect::<anyhow::Result<Vec<ScoreProp>>>()?,
                     filter: sf.filter.map(|f| ScoreFilter {
                         low_pass: f.low_pass,
                         high_pass: f.high_pass,
                     }),
                 })
             })
-            .collect::<Result<Vec<ScoreFunction>, String>>()?,
+            .collect::<anyhow::Result<Vec<ScoreFunction>>>()?,
     };
 
     let schedule_config: ScheduleConfig = ScheduleConfig {

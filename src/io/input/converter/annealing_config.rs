@@ -6,7 +6,7 @@ use crate::kinmu_lib::types::{AnnealingConfig, ScoreProp};
 use super::util::parser::*;
 
 /// 焼きなましの段階ごとの設定を読み込む
-pub fn convert_annealing_config(config: RawAnnealingConfig) -> Result<AnnealingConfig, String> {
+pub fn convert_annealing_config(config: RawAnnealingConfig) -> anyhow::Result<AnnealingConfig> {
     let ac = AnnealingConfig {
         step: config.step_count,
         seed: config.seed,
@@ -14,7 +14,7 @@ pub fn convert_annealing_config(config: RawAnnealingConfig) -> Result<AnnealingC
             .score_functions
             .iter()
             .map(|s| ScoreProp::from_config(s))
-            .collect::<Result<Vec<ScoreProp>, String>>()?,
+            .collect::<anyhow::Result<Vec<ScoreProp>>>()?,
         update_func: config.update_function,
         max_temp: config.temp.max,
         min_temp: config.temp.min,

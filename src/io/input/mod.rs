@@ -7,9 +7,9 @@ mod checker;
 mod converter;
 mod reader;
 
-pub fn load_config(path: &str) -> Result<MainConfig, String> {
+pub fn load_config(path: &str) -> anyhow::Result<MainConfig> {
     let raw_main = reader::read_main_config(path).map_err(|e| {
-        format!(
+        anyhow::anyhow!(
             "[エラー] メインconfigの読み込みに失敗しました\n対象ファイル: {}\n理由: {}\nヒント: デフォルト以外のファイルを指定する場合、引数でパスを指定してください",
             path, e,
         )
@@ -19,30 +19,33 @@ pub fn load_config(path: &str) -> Result<MainConfig, String> {
 
     for path in schedule_config_paths {
         let raw_schedule = reader::read_schedule_config(&path).map_err(|e| {
-            format!(
+            anyhow::anyhow!(
                 "[エラー] 勤務表configの読み込みに失敗しました\n対象ファイル: {}\n理由: {}",
-                path, e
+                path,
+                e
             )
         })?;
         let annealing_config_paths = raw_schedule.annealing.config_paths.clone();
         let mut converted_schedule =
             converter::convert_schedule_config(raw_schedule).map_err(|e| {
-                format!(
+                anyhow::anyhow!(
                     "[エラー] 勤務表configの読み込みに失敗しました\n対象ファイル: {}\n理由: {}",
-                    path, e
+                    path,
+                    e
                 )
             })?;
 
         for path in annealing_config_paths {
             let raw_annealing = reader::read_annealing_config(&path).map_err(|e| {
-                format!(
+                anyhow::anyhow!(
                     "[エラー] 焼きなましconfigの読み込みに失敗しました\n対象ファイル: {}\n理由: {}",
-                    path, e
+                    path,
+                    e
                 )
             })?;
             let converted_annealing =
                 converter::convert_annealing_config(raw_annealing).map_err(|e| {
-                    format!(
+                    anyhow::anyhow!(
                     "[エラー] 焼きなましconfigの読み込みに失敗しました\n対象ファイル: {}\n理由: {}",
                     path, e
                 )
@@ -55,8 +58,9 @@ pub fn load_config(path: &str) -> Result<MainConfig, String> {
         converted_main.schedule_configs.push(converted_schedule);
     }
 
-    checker::run(&converted_main)
-        .map_err(|e| format!("[エラー] configの変換チェックに失敗しました\n理由: {}", e,))?;
+    checker::run(&converted_main).map_err(|e| {
+        anyhow::anyhow!("[エラー] configの変換チェックに失敗しました\n理由: {}", e,)
+    })?;
 
     Ok(converted_main)
 }

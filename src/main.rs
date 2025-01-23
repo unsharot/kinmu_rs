@@ -100,7 +100,7 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-fn run<W: io::Write>(mut out: &mut W, main_file_path: &str, use_color: bool) -> Result<(), String> {
+fn run<W: io::Write>(mut out: &mut W, main_file_path: &str, use_color: bool) -> anyhow::Result<()> {
     let config = input::load_config(main_file_path)?;
 
     let answers = generator::run(&config)?;

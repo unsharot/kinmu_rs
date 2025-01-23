@@ -4,14 +4,14 @@ use crate::kinmu_lib::types::{
     Cond, CondWrapper, DayAttributeName, DayState, Score, ScoreProp, Shift, StaffAttributeName,
 };
 
-use super::common::check_len;
+use anyhow::Context as _;
 
 pub trait FromConfig: Sized {
-    fn from_config(s: &str) -> Result<Self, String>;
+    fn from_config(s: &str) -> anyhow::Result<Self>;
 }
 
 impl FromConfig for String {
-    fn from_config(s: &str) -> Result<Self, String> {
+    fn from_config(s: &str) -> anyhow::Result<Self> {
         Ok(s.to_string())
     }
 }
@@ -19,11 +19,11 @@ impl FromConfig for String {
 /// タプルを読み込む
 /// Vecやタプルの複数の入れ子構造になったタプルにも対応
 /// 括弧がない場合も対応
-fn format_str_tuple_to_words(s: &str) -> Result<Vec<&str>, String> {
+fn format_str_tuple_to_words(s: &str) -> anyhow::Result<Vec<&str>> {
     let trimmed_s = s.trim();
     let bare_s = if trimmed_s.starts_with('(') {
         if !trimmed_s.ends_with(')') {
-            return Err("found '(', but ')' not found".to_string());
+            return Err(anyhow::anyhow!("found '(', but ')' not found"));
         }
         &trimmed_s[1..(trimmed_s.len() - 1)]
     } else {
@@ -58,16 +58,14 @@ where
     T: FromConfig,
     U: FromConfig,
 {
-    fn from_config(s: &str) -> Result<Self, String> {
+    fn from_config(s: &str) -> anyhow::Result<Self> {
         let words = format_str_tuple_to_words(s)?;
-        check_len(
-            2,
-            &words,
-            "Needs 2 fields, but not enough.",
-            "Needs 2 fields, but too much given.",
-        )?;
-        let t = T::from_config(words[0]).map_err(|e| e.to_string())?;
-        let u = U::from_config(words[1]).map_err(|e| e.to_string())?;
+        anyhow::ensure!(words.len() >= 2, "Needs 2 fields, but not enough.");
+        anyhow::ensure!(2 >= words.len(), "Needs 2 fields, but too much given.");
+        let t = T::from_config(words[0])
+            .with_context(|| format!("Failed to parse 1st field of {}", s))?;
+        let u = U::from_config(words[1])
+            .with_context(|| format!("Failed to parse 2nd field of {}", s))?;
         Ok((t, u))
     }
 }
@@ -78,17 +76,16 @@ where
     U: FromConfig,
     V: FromConfig,
 {
-    fn from_config(s: &str) -> Result<Self, String> {
+    fn from_config(s: &str) -> anyhow::Result<Self> {
         let words = format_str_tuple_to_words(s)?;
-        check_len(
-            3,
-            &words,
-            "Needs 3 fields, but not enough.",
-            "Needs 3 fields, but too much given.",
-        )?;
-        let t = T::from_config(words[0]).map_err(|e| e.to_string())?;
-        let u = U::from_config(words[1]).map_err(|e| e.to_string())?;
-        let v = V::from_config(words[2]).map_err(|e| e.to_string())?;
+        anyhow::ensure!(words.len() >= 3, "Needs 3 fields, but not enough.");
+        anyhow::ensure!(3 >= words.len(), "Needs 3 fields, but too much given.");
+        let t = T::from_config(words[0])
+            .with_context(|| format!("Failed to parse 1st field of {}", s))?;
+        let u = U::from_config(words[1])
+            .with_context(|| format!("Failed to parse 2nd field of {}", s))?;
+        let v = V::from_config(words[2])
+            .with_context(|| format!("Failed to parse 3rd field of {}", s))?;
         Ok((t, u, v))
     }
 }
@@ -100,18 +97,18 @@ where
     V: FromConfig,
     W: FromConfig,
 {
-    fn from_config(s: &str) -> Result<Self, String> {
+    fn from_config(s: &str) -> anyhow::Result<Self> {
         let words = format_str_tuple_to_words(s)?;
-        check_len(
-            4,
-            &words,
-            "Needs 4 fields, but not enough.",
-            "Needs 4 fields, but too much given.",
-        )?;
-        let t = T::from_config(words[0]).map_err(|e| e.to_string())?;
-        let u = U::from_config(words[1]).map_err(|e| e.to_string())?;
-        let v = V::from_config(words[2]).map_err(|e| e.to_string())?;
-        let w = W::from_config(words[3]).map_err(|e| e.to_string())?;
+        anyhow::ensure!(words.len() >= 4, "Needs 4 fields, but not enough.");
+        anyhow::ensure!(4 >= words.len(), "Needs 4 fields, but too much given.");
+        let t = T::from_config(words[0])
+            .with_context(|| format!("Failed to parse 1st field of {}", s))?;
+        let u = U::from_config(words[1])
+            .with_context(|| format!("Failed to parse 2nd field of {}", s))?;
+        let v = V::from_config(words[2])
+            .with_context(|| format!("Failed to parse 3rd field of {}", s))?;
+        let w = W::from_config(words[3])
+            .with_context(|| format!("Failed to parse 4th field of {}", s))?;
         Ok((t, u, v, w))
     }
 }
@@ -126,51 +123,54 @@ where
     Y: FromConfig,
     Z: FromConfig,
 {
-    fn from_config(s: &str) -> Result<Self, String> {
+    fn from_config(s: &str) -> anyhow::Result<Self> {
         let words = format_str_tuple_to_words(s)?;
-        check_len(
-            7,
-            &words,
-            "Needs 7 fields, but not enough.",
-            "Needs 7 fields, but too much given.",
-        )?;
-        let t = T::from_config(words[0]).map_err(|e| e.to_string())?;
-        let u = U::from_config(words[1]).map_err(|e| e.to_string())?;
-        let v = V::from_config(words[2]).map_err(|e| e.to_string())?;
-        let w = W::from_config(words[3]).map_err(|e| e.to_string())?;
-        let x = X::from_config(words[4]).map_err(|e| e.to_string())?;
-        let y = Y::from_config(words[5]).map_err(|e| e.to_string())?;
-        let z = Z::from_config(words[6]).map_err(|e| e.to_string())?;
+        anyhow::ensure!(words.len() >= 7, "Needs 7 fields, but not enough.");
+        anyhow::ensure!(7 >= words.len(), "Needs 7 fields, but too much given.");
+        let t = T::from_config(words[0])
+            .with_context(|| format!("Failed to parse 1st field of {}", s))?;
+        let u = U::from_config(words[1])
+            .with_context(|| format!("Failed to parse 2nd field of {}", s))?;
+        let v = V::from_config(words[2])
+            .with_context(|| format!("Failed to parse 3rd field of {}", s))?;
+        let w = W::from_config(words[3])
+            .with_context(|| format!("Failed to parse 4th field of {}", s))?;
+        let x = X::from_config(words[4])
+            .with_context(|| format!("Failed to parse 5th field of {}", s))?;
+        let y = Y::from_config(words[5])
+            .with_context(|| format!("Failed to parse 6th field of {}", s))?;
+        let z = Z::from_config(words[6])
+            .with_context(|| format!("Failed to parse 7th field of {}", s))?;
         Ok((t, u, v, w, x, y, z))
     }
 }
 
 impl FromConfig for usize {
-    fn from_config(s: &str) -> Result<Self, String> {
-        s.parse::<usize>().map_err(|e| e.to_string())
+    fn from_config(s: &str) -> anyhow::Result<Self> {
+        Ok(s.parse::<usize>()?)
     }
 }
 
 impl FromConfig for isize {
-    fn from_config(s: &str) -> Result<Self, String> {
-        s.parse::<isize>().map_err(|e| e.to_string())
+    fn from_config(s: &str) -> anyhow::Result<Self> {
+        Ok(s.parse::<isize>()?)
     }
 }
 
 impl FromConfig for i32 {
-    fn from_config(s: &str) -> Result<Self, String> {
-        s.parse::<i32>().map_err(|e| e.to_string())
+    fn from_config(s: &str) -> anyhow::Result<Self> {
+        Ok(s.parse::<i32>()?)
     }
 }
 
 impl FromConfig for f32 {
-    fn from_config(s: &str) -> Result<Self, String> {
-        s.parse::<f32>().map_err(|e| e.to_string())
+    fn from_config(s: &str) -> anyhow::Result<Self> {
+        Ok(s.parse::<f32>()?)
     }
 }
 
 impl FromConfig for Shift {
-    fn from_config(s: &str) -> Result<Self, String> {
+    fn from_config(s: &str) -> anyhow::Result<Self> {
         match s {
             "N" => Ok(Shift::N),
             "K" => Ok(Shift::K),
@@ -182,20 +182,20 @@ impl FromConfig for Shift {
             "D" => Ok(Shift::D),
             "U" => Ok(Shift::U),
             " " => Ok(Shift::U),
-            _ => Err(format!("Failed to parse Shift: {}", s)),
+            _ => Err(anyhow::anyhow!("Failed to parse Shift: {}", s)),
         }
     }
 }
 
 /// Vecを読み込む
 /// 2重入れ子構造になったVecにも対応
-fn format_str_vec_to_words(s: &str) -> Result<Vec<&str>, String> {
+fn format_str_vec_to_words(s: &str) -> anyhow::Result<Vec<&str>> {
     let trimmed_s = s.trim();
     if !trimmed_s.starts_with('[') {
-        return Err("\'[\' not found".to_string());
+        return Err(anyhow::anyhow!("\'[\' not found"));
     }
     if !trimmed_s.ends_with(']') {
-        return Err("\']\' not found".to_string());
+        return Err(anyhow::anyhow!("\']\' not found"));
     }
     let bare_s = &trimmed_s[1..(trimmed_s.len() - 1)];
     let mut words = Vec::new();
@@ -223,7 +223,7 @@ fn format_str_vec_to_words(s: &str) -> Result<Vec<&str>, String> {
 }
 
 impl FromConfig for Vec<Shift> {
-    fn from_config(s: &str) -> Result<Self, String> {
+    fn from_config(s: &str) -> anyhow::Result<Self> {
         let words = format_str_vec_to_words(s)?;
         let mut ans = Vec::new();
         for w in words {
@@ -234,7 +234,7 @@ impl FromConfig for Vec<Shift> {
 }
 
 impl FromConfig for Vec<Vec<Shift>> {
-    fn from_config(s: &str) -> Result<Self, String> {
+    fn from_config(s: &str) -> anyhow::Result<Self> {
         let words = format_str_vec_to_words(s)?;
         let mut ans = Vec::new();
         for w in words {
@@ -245,7 +245,7 @@ impl FromConfig for Vec<Vec<Shift>> {
 }
 
 impl FromConfig for Vec<DayState> {
-    fn from_config(s: &str) -> Result<Self, String> {
+    fn from_config(s: &str) -> anyhow::Result<Self> {
         let mut ans: Vec<DayState> = Vec::new();
         for c in s.chars() {
             ans.push(<DayState>::from_config(&c.to_string())?);
@@ -255,27 +255,23 @@ impl FromConfig for Vec<DayState> {
 }
 
 impl FromConfig for DayState {
-    fn from_config(s: &str) -> Result<Self, String> {
+    fn from_config(s: &str) -> anyhow::Result<Self> {
         match s {
             "W" => Ok(DayState::Weekday),
             "H" => Ok(DayState::Holiday),
             "B" => Ok(DayState::Bath),
             "2" => Ok(DayState::Bath2),
             "M" => Ok(DayState::Measure),
-            _ => Err(format!("Failed to parse DayState: {}", s)),
+            _ => Err(anyhow::anyhow!("Failed to parse DayState: {}", s)),
         }
     }
 }
 
 impl FromConfig for Cond {
-    fn from_config(s: &str) -> Result<Self, String> {
+    fn from_config(s: &str) -> anyhow::Result<Self> {
         let words: Vec<&str> = s.splitn(2, ' ').collect();
-        check_len(
-            2,
-            &words,
-            "Needs 2 fields, but not enough.",
-            "Needs 2 fields, but too much given.",
-        )?;
+        anyhow::ensure!(words.len() >= 2, "Needs 2 fields, but not enough.");
+        anyhow::ensure!(2 >= words.len(), "Needs 2 fields, but too much given.");
         match (words[0], words[1]) {
             ("Every", _) => Ok(Cond::Every),
             ("Or", p) => Ok(Cond::Or(<(Box<Cond>, Box<Cond>)>::from_config(p)?)),
@@ -291,41 +287,36 @@ impl FromConfig for Cond {
                 <(StaffAttributeName, i32)>::from_config(p)?,
             )),
             ("ParticularStaff", p) => Ok(Cond::ParticularStaff(<usize>::from_config(p)?)),
-            (s, p) => Err(format!("Failed to parse Cond: {} {}", s, p)),
+            (s, p) => Err(anyhow::anyhow!("Failed to parse Cond: {} {}", s, p)),
         }
     }
 }
 
 impl FromConfig for Box<Cond> {
-    fn from_config(s: &str) -> Result<Self, String> {
+    fn from_config(s: &str) -> anyhow::Result<Self> {
         let cond = Cond::from_config(s)?;
         Ok(Box::new(cond))
     }
 }
 
 impl FromConfig for CondWrapper {
-    fn from_config(s: &str) -> Result<Self, String> {
+    fn from_config(s: &str) -> anyhow::Result<Self> {
         let cond = Cond::from_config(s)?;
         Ok(CondWrapper::new(cond))
     }
 }
 
 impl FromConfig for ScoreProp {
-    fn from_config(s: &str) -> Result<Self, String> {
+    fn from_config(s: &str) -> anyhow::Result<Self> {
         let words: Vec<&str> = s.splitn(2, ' ').collect();
-        check_len(
-            2,
-            &words,
-            "Needs 2 fields, but not enough.",
-            "Needs 2 fields, but too much given.",
-        )
-        .map_err(|e| format!("error loading {}\n{}", s, e))?;
-        helper_sp(words[0], words[1]).map_err(|e| format!("error loading {}\n{}", s, e))
+        anyhow::ensure!(words.len() >= 2, "Needs 2 fields, but not enough.");
+        anyhow::ensure!(2 >= words.len(), "Needs 2 fields, but too much given.");
+        helper_sp(words[0], words[1]).with_context(|| format!("Failed to load {}", s))
     }
 }
 
 #[inline(always)]
-fn helper_sp(w1: &str, w2: &str) -> Result<ScoreProp, String> {
+fn helper_sp(w1: &str, w2: &str) -> anyhow::Result<ScoreProp> {
     match (w1, w2) {
         ("PatternGeneral", p) => Ok(ScoreProp::PatternGeneral(<(
             CondWrapper,
@@ -392,14 +383,14 @@ fn helper_sp(w1: &str, w2: &str) -> Result<ScoreProp, String> {
         ("NoSamePair", p) => Ok(ScoreProp::NoSamePair(
             <(CondWrapper, i32, Shift, Score)>::from_config(p)?,
         )),
-        (s, p) => Err(format!("Failed to parse ScoreProp: {} {}", s, p)),
+        (s, p) => Err(anyhow::anyhow!("Failed to parse ScoreProp: {} {}", s, p)),
     }
 }
 
 pub struct ScheduleRowWrapper(pub Vec<Shift>);
 
 impl FromConfig for ScheduleRowWrapper {
-    fn from_config(s: &str) -> Result<Self, String> {
+    fn from_config(s: &str) -> anyhow::Result<Self> {
         let mut ans = Vec::new();
         for c in s.chars() {
             ans.push(<Shift>::from_config(&c.to_string())?);
@@ -453,20 +444,26 @@ mod tests {
     #[test]
     fn parse_tuple_test() {
         assert_eq!(
-            <(isize, isize)>::from_config("(1,2"),
-            Err("found '(', but ')' not found".to_string())
+            <(isize, isize)>::from_config("(1,2")
+                .unwrap_err()
+                .to_string(),
+            String::from("found '(', but ')' not found")
         );
         assert_eq!(
-            <(isize, isize)>::from_config("(1)"),
-            Err("Needs 2 fields, but not enough.".to_string())
+            <(isize, isize)>::from_config("(1)")
+                .unwrap_err()
+                .to_string(),
+            String::from("Needs 2 fields, but not enough.")
         );
         assert_eq!(
-            <(isize, isize)>::from_config("(1, 2, 3)"),
-            Err("Needs 2 fields, but too much given.".to_string())
+            <(isize, isize)>::from_config("(1, 2, 3)")
+                .unwrap_err()
+                .to_string(),
+            String::from("Needs 2 fields, but too much given.")
         );
-        assert_eq!(<(isize, isize)>::from_config("(1,2)"), Ok((1, 2)));
-        assert_eq!(<(isize, isize)>::from_config("1,2"), Ok((1, 2)));
-        assert_eq!(<(isize, isize)>::from_config(" 1, 2 "), Ok((1, 2)));
+        assert_eq!(<(isize, isize)>::from_config("(1,2)").unwrap(), (1, 2));
+        assert_eq!(<(isize, isize)>::from_config("1,2").unwrap(), (1, 2));
+        assert_eq!(<(isize, isize)>::from_config(" 1, 2 ").unwrap(), (1, 2));
     }
 
     #[test]
