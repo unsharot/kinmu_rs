@@ -1,6 +1,7 @@
 //! 指定したシフトパターンの数に応じて発火するスコア
 //! ただし、シフトパターンは複数候補を指定可能
-//! TODO: HashMapやTrie木を用いた高速化
+//! 計算量はO(NM)
+//! TODO: RollingHash、FSMやTrie木を用いた高速化
 
 use super::super::types::{CondWrapper, Schedule, ScheduleConfig, Score, Shift};
 

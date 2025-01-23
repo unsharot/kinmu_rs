@@ -1,5 +1,6 @@
 //! 指定したパターンが存在するスタッフに対して発火するスコア
-//! TODO: HashMapやTrie木を用いた高速化
+//! 計算量はO(NM)
+//! TODO: RollingHash、FSMやTrie木を用いた高速化
 
 use super::super::types::{CondWrapper, Schedule, ScheduleConfig, Score, Shift};
 
