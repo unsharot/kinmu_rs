@@ -48,14 +48,16 @@ mod tests {
     use super::*;
 
     #[test]
-    fn general_pattern_test() {
-        let mut sc: ScheduleConfig = Default::default();
-        sc.staff.count = 1;
-        sc.day.count = 4;
+    fn test_simple() {
+        let schedule = vec![vec![Shift::H, Shift::H, Shift::A, Shift::Y]];
+
+        let mut schedule_config: ScheduleConfig = Default::default();
+        schedule_config.staff.count = schedule.len();
+        schedule_config.day.count = schedule[0].len();
 
         let score = eval(
-            &sc,
-            &vec![vec![Shift::H, Shift::H, Shift::A, Shift::Y]],
+            &schedule_config,
+            &schedule,
             &mut (
                 CondWrapper::new(Cond::Every),
                 vec![
@@ -65,19 +67,27 @@ mod tests {
                 1.0,
             ),
         );
-        assert_eq!(1.0, score);
 
-        sc.day.count = 37;
+        assert_eq!(1.0, score);
+    }
+
+    #[test]
+    fn test_complex() {
+        let schedule = {
+            use Shift::*;
+            &vec![vec![
+                N, N, K, K, A, N, N, N, N, K, K, N, A, A, N, K, K, K, N, N, A, A, A, K, K, N, N, N,
+                N, N, K, K, A, N, A, N, A,
+            ]]
+        };
+
+        let mut schedule_config: ScheduleConfig = Default::default();
+        schedule_config.staff.count = schedule.len();
+        schedule_config.day.count = schedule[0].len();
 
         let score = eval(
-            &sc,
-            {
-                use Shift::*;
-                &vec![vec![
-                    N, N, K, K, A, N, N, N, N, K, K, N, A, A, N, K, K, K, N, N, A, A, A, K, K, N,
-                    N, N, N, N, K, K, A, N, A, N, A,
-                ]]
-            },
+            &schedule_config,
+            &schedule,
             &mut (
                 CondWrapper::new(Cond::Every),
                 {
@@ -87,6 +97,7 @@ mod tests {
                 1.0,
             ),
         );
+
         assert_eq!(9.0, score);
     }
 }

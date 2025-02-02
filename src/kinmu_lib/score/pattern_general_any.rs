@@ -50,11 +50,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn general_pattern_any_with_cond() {
-        let mut sc: ScheduleConfig = Default::default();
-        sc.staff.count = 1;
-        sc.day.count = 37;
-        sc.day.buffer_count = 3;
+    fn test_with_cond() {
         let schedule = {
             use Shift::*;
             &vec![vec![
@@ -63,8 +59,13 @@ mod tests {
             ]]
         };
 
+        let mut schedule_config: ScheduleConfig = Default::default();
+        schedule_config.day.count = schedule[0].len();
+        schedule_config.day.buffer_count = 3;
+        schedule_config.staff.count = 1;
+
         let score = eval(
-            &sc,
+            &schedule_config,
             &schedule,
             &mut (
                 CondWrapper::new(Cond::DayExceptBuffer),
@@ -75,7 +76,7 @@ mod tests {
         assert_eq!(0.0, score);
 
         let score = eval(
-            &sc,
+            &schedule_config,
             &schedule,
             &mut (
                 CondWrapper::new(Cond::Every),

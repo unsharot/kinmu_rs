@@ -42,51 +42,76 @@ mod tests {
     use super::*;
 
     #[test]
-    fn dayc() {
+    fn test_pass() {
+        let schedule = {
+            use Shift::*;
+            vec![vec![I, A, K, N]]
+        };
+
         let mut schedule_config: ScheduleConfig = Default::default();
-        schedule_config.staff.count = 1;
+        schedule_config.day.count = schedule[0].len();
+        schedule_config.staff.count = schedule.len();
         schedule_config.staff.list.push(Staff {
             name: String::from(""),
             attributes: vec![1],
         });
-        schedule_config.day.count = 4;
         schedule_config
             .staff
             .attribute_map
             .names
-            .push(String::from("some_attribute"));
+            .push(String::from("n_count"));
         schedule_config
             .staff
             .attribute_map
             .name_to_index
-            .insert(String::from("some_attribute"), 0);
+            .insert(String::from("n_count"), 0);
 
         let score = eval(
             &schedule_config,
-            {
-                use Shift::*;
-                &vec![vec![I, A, K, N]]
-            },
+            &schedule,
             &mut (
                 CondWrapper::new(Cond::Every),
                 Shift::N,
-                String::from("some_attribute"),
+                String::from("n_count"),
                 1.0,
             ),
         );
 
         assert_eq!(0.0, score);
+    }
+
+    #[test]
+    fn test_hit() {
+        let schedule = {
+            use Shift::*;
+            vec![vec![I, A, N, N]]
+        };
+
+        let mut schedule_config: ScheduleConfig = Default::default();
+        schedule_config.day.count = schedule[0].len();
+        schedule_config.staff.count = schedule.len();
+        schedule_config.staff.list.push(Staff {
+            name: String::from(""),
+            attributes: vec![1],
+        });
+        schedule_config
+            .staff
+            .attribute_map
+            .names
+            .push(String::from("n_count"));
+        schedule_config
+            .staff
+            .attribute_map
+            .name_to_index
+            .insert(String::from("n_count"), 0);
 
         let score = eval(
             &schedule_config,
-            {
-                use Shift::*;
-                &vec![vec![I, A, N, N]]
-            },
+            &schedule,
             &mut (
                 CondWrapper::new(Cond::Every),
                 Shift::N,
-                String::from("some_attribute"),
+                String::from("n_count"),
                 1.0,
             ),
         );
