@@ -41,6 +41,7 @@ mod tests {
 
     use super::*;
 
+    /// ヒットするべきでないパターン
     #[test]
     fn test_pass() {
         let schedule = {
@@ -80,6 +81,7 @@ mod tests {
         assert_eq!(0.0, score);
     }
 
+    /// ヒットするパターン
     #[test]
     fn test_hit() {
         let schedule = {

@@ -49,8 +49,9 @@ mod tests {
 
     use super::*;
 
+    /// ヒットするべきでないパターン
     #[test]
-    fn test_with_cond() {
+    fn test_pass_with_cond() {
         let schedule = {
             use Shift::*;
             &vec![vec![
@@ -74,6 +75,23 @@ mod tests {
             ),
         );
         assert_eq!(0.0, score);
+    }
+
+    /// ヒットするパターン
+    #[test]
+    fn test_hit_with_cond() {
+        let schedule = {
+            use Shift::*;
+            &vec![vec![
+                N, K, K, K, O, I, A, K, H, O, K, H, N, I, A, K, H, I, A, K, O, N, I, A, K, N, O, N,
+                K, I, A, K, H, I, A, K, O,
+            ]]
+        };
+
+        let mut schedule_config: ScheduleConfig = Default::default();
+        schedule_config.day.count = schedule[0].len();
+        schedule_config.day.buffer_count = 3;
+        schedule_config.staff.count = 1;
 
         let score = eval(
             &schedule_config,

@@ -32,3 +32,94 @@ pub(super) fn eval(
     }
     ans
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::kinmu_lib::types::Cond;
+
+    use super::*;
+
+    /// 2度同じペアにならない場合、検出しない
+    #[test]
+    fn test_pass2() {
+        let schedule = {
+            use Shift::*;
+            vec![vec![I, A, K, I, A, K], vec![N, N, N, I, A, K]]
+        };
+
+        let mut schedule_config: ScheduleConfig = Default::default();
+        schedule_config.day.count = schedule[0].len();
+        schedule_config.staff.count = schedule.len();
+
+        let score = eval(
+            &schedule_config,
+            &schedule,
+            &mut (CondWrapper::new(Cond::Every), 2, Shift::I, 1.0),
+        );
+
+        assert_eq!(0.0, score);
+    }
+
+    /// 2度同じペアになる場合の検出
+    #[test]
+    fn test_hit2() {
+        let schedule = {
+            use Shift::*;
+            vec![vec![I, A, K, I, A, K], vec![I, N, N, I, A, K]]
+        };
+
+        let mut schedule_config: ScheduleConfig = Default::default();
+        schedule_config.day.count = schedule[0].len();
+        schedule_config.staff.count = schedule.len();
+
+        let score = eval(
+            &schedule_config,
+            &schedule,
+            &mut (CondWrapper::new(Cond::Every), 2, Shift::I, 1.0),
+        );
+
+        assert_eq!(1.0, score);
+    }
+
+    /// 3度同じペアにならない場合、検出しない
+    #[test]
+    fn test_pass3() {
+        let schedule = {
+            use Shift::*;
+            vec![vec![I, A, K, I, A, K], vec![I, N, N, I, A, K]]
+        };
+
+        let mut schedule_config: ScheduleConfig = Default::default();
+        schedule_config.day.count = schedule[0].len();
+        schedule_config.staff.count = schedule.len();
+
+        let score = eval(
+            &schedule_config,
+            &schedule,
+            &mut (CondWrapper::new(Cond::Every), 3, Shift::I, 1.0),
+        );
+
+        assert_eq!(0.0, score);
+    }
+
+    /// 3度同じペアになる場合の検出
+    #[test]
+    fn test_hit3() {
+        let schedule = {
+            use Shift::*;
+            vec![vec![I, I, K, I, A, K], vec![I, I, N, I, A, K]]
+        };
+
+        let mut schedule_config: ScheduleConfig = Default::default();
+        schedule_config.day.count = schedule[0].len();
+        schedule_config.staff.count = schedule.len();
+
+        let score = eval(
+            &schedule_config,
+            &schedule,
+            &mut (CondWrapper::new(Cond::Every), 3, Shift::I, 1.0),
+        );
+
+        assert_eq!(1.0, score);
+    }
+}

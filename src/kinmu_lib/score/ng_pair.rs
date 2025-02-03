@@ -24,3 +24,55 @@ pub(super) fn eval(
     }
     sum
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::kinmu_lib::types::Cond;
+
+    use super::*;
+
+    /// NGを正常に検出できるか
+    #[test]
+    fn test_basic() {
+        let schedule = {
+            use Shift::*;
+            vec![vec![I, A, K, I, A, K], vec![N, N, N, I, A, K]]
+        };
+
+        let mut schedule_config: ScheduleConfig = Default::default();
+        schedule_config.day.count = schedule[0].len();
+        schedule_config.staff.count = schedule.len();
+        schedule_config.staff.ng_list.push((0, 1));
+
+        let score = eval(
+            &schedule_config,
+            &schedule,
+            &mut (CondWrapper::new(Cond::Every), Shift::I, 1.0),
+        );
+
+        assert_eq!(1.0, score);
+    }
+
+    /// NGの設定に重複がある場合、重複してスコアが計算されるか
+    #[test]
+    fn test_duplicated() {
+        let schedule = {
+            use Shift::*;
+            vec![vec![I, A, K, I, A, K], vec![N, N, N, I, A, K]]
+        };
+
+        let mut schedule_config: ScheduleConfig = Default::default();
+        schedule_config.day.count = schedule[0].len();
+        schedule_config.staff.count = schedule.len();
+        schedule_config.staff.ng_list.push((0, 1));
+        schedule_config.staff.ng_list.push((0, 1));
+
+        let score = eval(
+            &schedule_config,
+            &schedule,
+            &mut (CondWrapper::new(Cond::Every), Shift::I, 1.0),
+        );
+
+        assert_eq!(2.0, score);
+    }
+}

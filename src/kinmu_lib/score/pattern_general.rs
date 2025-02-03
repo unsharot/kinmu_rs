@@ -47,6 +47,7 @@ mod tests {
 
     use super::*;
 
+    /// 単純な表におけるパターン検出
     #[test]
     fn test_simple() {
         let schedule = vec![vec![Shift::H, Shift::H, Shift::A, Shift::Y]];
@@ -71,6 +72,7 @@ mod tests {
         assert_eq!(1.0, score);
     }
 
+    /// 複雑な表における複数パターン検出
     #[test]
     fn test_complex() {
         let schedule = {

@@ -39,3 +39,73 @@ pub(super) fn eval(
     }
     sum
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::kinmu_lib::types::Cond;
+
+    use super::*;
+
+    /// ヒットするべきでないパターン
+    #[test]
+    fn test_pass() {
+        let schedule = {
+            use Shift::*;
+            vec![vec![O, O, K, H, A, K], vec![N, N, O, I, H, K]]
+        };
+
+        let mut schedule_config: ScheduleConfig = Default::default();
+        schedule_config.day.count = schedule[0].len();
+        schedule_config.staff.count = schedule.len();
+
+        let score = eval(
+            &schedule_config,
+            &schedule,
+            &mut (CondWrapper::new(Cond::Every), vec![Shift::O, Shift::H], 1.0),
+        );
+
+        assert_eq!(0.0, score);
+    }
+
+    /// OHパターンの検出
+    #[test]
+    fn test_hit() {
+        let schedule = {
+            use Shift::*;
+            vec![vec![O, O, K, H, A, K], vec![N, N, O, H, A, K]]
+        };
+
+        let mut schedule_config: ScheduleConfig = Default::default();
+        schedule_config.day.count = schedule[0].len();
+        schedule_config.staff.count = schedule.len();
+
+        let score = eval(
+            &schedule_config,
+            &schedule,
+            &mut (CondWrapper::new(Cond::Every), vec![Shift::O, Shift::H], 1.0),
+        );
+
+        assert_eq!(1.0, score);
+    }
+
+    /// 2回パターンが存在する場合は2回としてカウントする
+    #[test]
+    fn test_double() {
+        let schedule = {
+            use Shift::*;
+            vec![vec![O, O, K, H, A, K], vec![N, N, O, H, O, H]]
+        };
+
+        let mut schedule_config: ScheduleConfig = Default::default();
+        schedule_config.day.count = schedule[0].len();
+        schedule_config.staff.count = schedule.len();
+
+        let score = eval(
+            &schedule_config,
+            &schedule,
+            &mut (CondWrapper::new(Cond::Every), vec![Shift::O, Shift::H], 1.0),
+        );
+
+        assert_eq!(2.0, score);
+    }
+}
