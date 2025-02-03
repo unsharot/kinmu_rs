@@ -59,11 +59,11 @@ pub struct RawAnnealingTable {
 
 #[derive(Debug, serde::Deserialize)]
 pub struct RawResultTable {
-    pub score_functions: Vec<RawScoreFunction>,
+    pub score_functions: Vec<RawResultScoreFunction>,
 }
 
 #[derive(Debug, serde::Deserialize)]
-pub struct RawScoreFunction {
+pub struct RawResultScoreFunction {
     pub display_name: String,
     pub scores: Vec<String>,
     pub filter: Option<RawScoreFilter>,
