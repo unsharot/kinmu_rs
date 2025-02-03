@@ -22,7 +22,7 @@ pub(super) fn eval(
                 }
             }
         }
-        let mid = len / 2;
+        let mid = (len as Score) / 2.0 - 0.5;
 
         let mut a = 0.0;
         let mut i = 0;
@@ -66,7 +66,7 @@ mod tests {
             &mut (CondWrapper::new(Cond::Every), Shift::I, 1.0),
         );
 
-        assert_eq!(1.0, score);
+        assert_eq!(2.0, score);
     }
 
     /// 後ろを優先
@@ -87,6 +87,6 @@ mod tests {
             &mut (CondWrapper::new(Cond::Every), Shift::I, -1.0),
         );
 
-        assert_eq!(-1.0, score);
+        assert_eq!(-2.0, score);
     }
 }
