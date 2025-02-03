@@ -30,3 +30,62 @@ pub(super) fn eval(
     }
     sum
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::kinmu_lib::types::Cond;
+
+    use super::*;
+
+    /// YまたはKが2連続でないことを検知
+    #[test]
+    fn test_pass() {
+        let schedule = {
+            use Shift::*;
+            vec![vec![N, K, N, N]]
+        };
+
+        let mut schedule_config: ScheduleConfig = Default::default();
+        schedule_config.day.count = schedule[0].len();
+        schedule_config.staff.count = schedule.len();
+
+        let score = eval(
+            &schedule_config,
+            &schedule,
+            &mut (
+                CondWrapper::new(Cond::Every),
+                vec![Shift::K, Shift::Y],
+                2,
+                -1.0,
+            ),
+        );
+
+        assert_eq!(0.0, score);
+    }
+
+    /// YまたはKが2連続であることを検知
+    #[test]
+    fn test_hit() {
+        let schedule = {
+            use Shift::*;
+            vec![vec![N, K, Y, N]]
+        };
+
+        let mut schedule_config: ScheduleConfig = Default::default();
+        schedule_config.day.count = schedule[0].len();
+        schedule_config.staff.count = schedule.len();
+
+        let score = eval(
+            &schedule_config,
+            &schedule,
+            &mut (
+                CondWrapper::new(Cond::Every),
+                vec![Shift::K, Shift::Y],
+                2,
+                -1.0,
+            ),
+        );
+
+        assert_eq!(-1.0, score);
+    }
+}

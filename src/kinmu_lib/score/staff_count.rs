@@ -28,3 +28,73 @@ pub(super) fn eval(
     }
     sum
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::kinmu_lib::types::Cond;
+
+    use super::*;
+
+    /// Nが常に1なケース
+    #[test]
+    fn test_pass() {
+        let schedule = {
+            use Shift::*;
+            vec![vec![O, H, N, N], vec![N, N, O, O]]
+        };
+
+        let mut schedule_config: ScheduleConfig = Default::default();
+        schedule_config.day.count = schedule[0].len();
+        schedule_config.staff.count = schedule.len();
+
+        let score = eval(
+            &schedule_config,
+            &schedule,
+            &mut (CondWrapper::new(Cond::Every), Shift::N, 1, 1.0),
+        );
+
+        assert_eq!(0.0, score);
+    }
+
+    /// Nが一部0なケース
+    #[test]
+    fn test_hit_over() {
+        let schedule = {
+            use Shift::*;
+            vec![vec![O, H, N, N], vec![N, K, O, O]]
+        };
+
+        let mut schedule_config: ScheduleConfig = Default::default();
+        schedule_config.day.count = schedule[0].len();
+        schedule_config.staff.count = schedule.len();
+
+        let score = eval(
+            &schedule_config,
+            &schedule,
+            &mut (CondWrapper::new(Cond::Every), Shift::N, 1, 1.0),
+        );
+
+        assert_eq!(1.0, score);
+    }
+
+    /// Nが一部2なケース
+    #[test]
+    fn test_hit_lack() {
+        let schedule = {
+            use Shift::*;
+            vec![vec![O, N, N, N], vec![N, N, O, O]]
+        };
+
+        let mut schedule_config: ScheduleConfig = Default::default();
+        schedule_config.day.count = schedule[0].len();
+        schedule_config.staff.count = schedule.len();
+
+        let score = eval(
+            &schedule_config,
+            &schedule,
+            &mut (CondWrapper::new(Cond::Every), Shift::N, 1, 1.0),
+        );
+
+        assert_eq!(1.0, score);
+    }
+}

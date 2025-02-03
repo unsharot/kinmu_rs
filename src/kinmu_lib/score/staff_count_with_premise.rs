@@ -46,3 +46,104 @@ pub(super) fn eval(
     }
     sum
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::kinmu_lib::types::{Cond, Staff};
+
+    use super::*;
+
+    /// Iを一人で担当する人にその資格がある場合
+    #[test]
+    fn test_pass() {
+        let schedule = {
+            use Shift::*;
+            vec![vec![I, N, N, I], vec![N, N, O, I]]
+        };
+
+        let mut schedule_config: ScheduleConfig = Default::default();
+        schedule_config.day.count = schedule[0].len();
+        schedule_config.staff.count = schedule.len();
+        schedule_config.staff.list.push(Staff {
+            name: Default::default(),
+            attributes: vec![1],
+        });
+        schedule_config.staff.list.push(Staff {
+            name: Default::default(),
+            attributes: vec![0],
+        });
+        schedule_config
+            .staff
+            .attribute_map
+            .names
+            .push(String::from("I_alone_ok"));
+        schedule_config
+            .staff
+            .attribute_map
+            .name_to_index
+            .insert(String::from("I_alone_ok"), 0);
+
+        let score = eval(
+            &schedule_config,
+            &schedule,
+            &mut (
+                CondWrapper::new(Cond::Every),
+                Shift::I,
+                1,
+                CondWrapper::new(Cond::StaffWithAttribute((String::from("I_alone_ok"), 1))),
+                Shift::I,
+                1,
+                1.0,
+            ),
+        );
+
+        assert_eq!(0.0, score);
+    }
+
+    /// Iを一人で担当する人にその資格がない場合
+    #[test]
+    fn test_hit() {
+        let schedule = {
+            use Shift::*;
+            vec![vec![N, N, N, I], vec![I, N, O, I]]
+        };
+
+        let mut schedule_config: ScheduleConfig = Default::default();
+        schedule_config.day.count = schedule[0].len();
+        schedule_config.staff.count = schedule.len();
+        schedule_config.staff.list.push(Staff {
+            name: Default::default(),
+            attributes: vec![1],
+        });
+        schedule_config.staff.list.push(Staff {
+            name: Default::default(),
+            attributes: vec![0],
+        });
+        schedule_config
+            .staff
+            .attribute_map
+            .names
+            .push(String::from("I_alone_ok"));
+        schedule_config
+            .staff
+            .attribute_map
+            .name_to_index
+            .insert(String::from("I_alone_ok"), 0);
+
+        let score = eval(
+            &schedule_config,
+            &schedule,
+            &mut (
+                CondWrapper::new(Cond::Every),
+                Shift::I,
+                1,
+                CondWrapper::new(Cond::StaffWithAttribute((String::from("I_alone_ok"), 1))),
+                Shift::I,
+                1,
+                1.0,
+            ),
+        );
+
+        assert_eq!(1.0, score);
+    }
+}
