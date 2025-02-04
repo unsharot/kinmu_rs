@@ -545,50 +545,7 @@ seed = 6554
 
 #### score_functions
 焼きなましに用いるスコアとパラメータを指定します。
-記述方法は勤務表configのscore_functionsのscoresと同じです
-
-```toml
-score_functions = [
-   "PatternGeneral (Every (), [[I], [N,O,H,I,K,Y]], 1000)",
-   "PatternGeneral (Every (), [[A], [N,O,H,I,A]], 1000)",
-   "PatternFixed (Every (), [K,I], 100)",
-   "PatternFixed (Every (), [Y,I], 100)",
-   "PatternGeneral (Every (), [[K,Y],[N,O,H],[I]], 10)",
-   "PatternGeneral (Every (), [[N,O,H],[N,O,H],[I]], -300)",
-   "PatternFixed (Every (), [O,N], 100)",
-   "PatternFixed (Every (), [N,H], 1000)",
-   "PatternFixed (Every (), [O,H], 2000)",
-   "Streak (Every (), [N,O,H,I,A], 4, 200)",
-   "Streak (Every (), [N,O,H,I,A], 5, 1000)",
-   "Streak (Every (), [N,O,H,I,A], 6, 4000)",
-   "Streak (Every (), [N,O,H,I,A], 7, 10000)",
-   "NGPair (DayExceptBuffer (), I, 1000)",
-   "Streak (Every (), [K,Y], 2, -100)",
-   "Need2Holidays (Every (), [K,Y], 1000)",
-   "Need2Holidays (DayExceptBuffer (), [K,Y], 1000)",
-   "ShiftsBalance (DayExceptBuffer (), O, H, 3)",
-   "ShiftHalfBalance (DayExceptBuffer (), I, 10)",
-   "ShiftHalfBalance (DayExceptBuffer (), O, 3)",
-   "ShiftHalfBalance (DayExceptBuffer (), H, 3)",
-   "DayCountRegardStaffAttribute (DayExceptBuffer (), K, KDayCount, 10)",
-   "DayCountRegardStaffAttribute (DayExceptBuffer (), I, IDayCount, 10)",
-   "DayCountRegardStaffAttribute (DayExceptBuffer (), O, ODayCount, 100)",
-   "DayCountRegardStaffAttribute (DayExceptBuffer (), H, HDayCount, 100)",
-   "StaffCountRegardDayAttribute (DayExceptBuffer (), I, IStaffCount, 10)",
-   "StaffCount (And (DayExceptBuffer (), ParticularDayState B), N, 4, 5)",
-   "StaffCount (And (DayExceptBuffer (), ParticularDayState 2), N, 2, 5)",
-   "StaffCount (And (DayExceptBuffer (), ParticularDayState W), N, 2, 5)",
-   "StaffCount (And (DayExceptBuffer (), ParticularDayState H), N, 2, 5)",
-   "StaffCount (And (DayExceptBuffer (), ParticularDayState M), N, 2, 5)",
-   "StaffCount (DayExceptBuffer (), O, 1, 100)",
-   "StaffCount (DayExceptBuffer (), H, 1, 100)",
-   "StaffCountWithPremise (DayExceptBuffer (), I, 1, And (DayExceptBuffer (), StaffWithAttribute (ベテラン, 1)), I, 1, 70)",
-   "StaffCount (And (BeforeDayState B, DayExceptBuffer ()), I, 1, 30)",
-   "StaffCount (DayExceptBuffer (), U, 0, 100000)",
-   "NoSamePair (DayExceptBuffer (), 3, I, 1000)",
-   "NoSamePair (DayExceptBuffer (), 2, I, 500)",
-]
-```
+記述方法は勤務表configのresult.score_functionsと同じです。
 
 #### update_function
 焼きなましの更新に用いる更新関数を指定します。
