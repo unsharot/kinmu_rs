@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 use anyhow::Context;
 
-use crate::io::input::reader::types::{RawAttributeTable, RawScheduleConfig};
+use super::super::reader::types::{RawAttributeTable, RawScheduleConfig};
 use crate::kinmu_lib::types::{
     DayAttributeName, DayConfig, DayState, FillConfig, ResultConfig, Schedule, ScheduleConfig,
     ScheduleState, ScoreFilter, ScoreFunction, ScoreProp, Shift, ShiftState, Staff,

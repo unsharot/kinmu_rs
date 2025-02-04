@@ -1,6 +1,7 @@
 //! main_configを読み込むモジュール
 
-use crate::{io::input::reader::types::RawMainConfig, kinmu_lib::types::MainConfig};
+use super::super::reader::types::RawMainConfig;
+use crate::kinmu_lib::types::MainConfig;
 
 pub fn convert_main_config(config: RawMainConfig) -> anyhow::Result<MainConfig> {
     Ok(MainConfig {

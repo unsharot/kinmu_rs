@@ -1,6 +1,6 @@
 //! schedule_configから生成できる構造体を定義
 
-use crate::kinmu_lib::types::{
+use super::super::{
     DayAttributeName, DayState, Schedule, ScheduleState, Score, ScoreProp, Staff,
     StaffAttributeName, StaffAttributeNameIndexMap, NG,
 };

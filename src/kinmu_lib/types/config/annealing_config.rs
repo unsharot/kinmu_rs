@@ -1,6 +1,6 @@
 //! annealing_configを定義
 
-use crate::kinmu_lib::types::ScoreProp;
+use super::super::ScoreProp;
 
 /// 焼きなましの段階ごとの設定
 #[derive(Clone, Debug, Default)]

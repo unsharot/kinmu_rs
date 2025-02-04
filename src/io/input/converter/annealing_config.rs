@@ -1,6 +1,6 @@
 //! annealing_configを読み込むモジュール
 
-use crate::io::input::reader::types::RawAnnealingConfig;
+use super::super::reader::types::RawAnnealingConfig;
 use crate::kinmu_lib::types::{AnnealingConfig, ScoreProp};
 
 use super::util::parser::*;
