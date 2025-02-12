@@ -7,7 +7,6 @@ use rand::Rng;
 ///
 /// ```
 /// use rand::Rng;
-/// use annealing::annealing;
 ///
 /// fn updatef<R: Rng>(x: &f32, rng: &mut R) -> f32 {
 ///    x + rng.gen::<f32>() / 100.0
@@ -20,7 +19,7 @@ use rand::Rng;
 /// let best_score: f32;
 /// let best_model: f32;
 ///
-/// (best_score, best_model) = annealing::run(
+/// (best_score, best_model) = kinmu_annealing::run(
 ///     10000.0,
 ///     &0.0,
 ///     100000,
@@ -28,8 +27,8 @@ use rand::Rng;
 ///     evalf,
 ///     10.0,
 ///     0.0,
-///     annealing::basic_temp_func,
-///     annealing::basic_prob_func,
+///     kinmu_annealing::basic_temp_func,
+///     kinmu_annealing::basic_prob_func,
 ///     &mut rand::thread_rng(),
 /// );
 ///```
