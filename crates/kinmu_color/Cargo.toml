@@ -1,0 +1,7 @@
+[package]
+name = "kinmu_color"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+color-print = "0.3.7"

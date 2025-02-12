@@ -1,0 +1,9 @@
+[package]
+name = "kinmu_generator"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+kinmu_lib = { workspace = true }
+kinmu_annealing = { workspace = true }
+anyhow = { workspace = true }

@@ -1,7 +1,7 @@
-use ::kinmu::generator;
-use ::kinmu::io::input;
-use ::kinmu::io::output;
-use ::kinmu::utils::color;
+use ::kinmu_color;
+use ::kinmu_generator;
+use ::kinmu_input;
+use ::kinmu_output;
 
 use getopts::Options;
 use std::env;
@@ -45,7 +45,7 @@ fn main() -> io::Result<()> {
     let matches = match opts.parse(&args[1..]) {
         Ok(m) => m,
         Err(f) => {
-            color::write(&mut out, "[エラー]", color::Color::Red, use_color)?;
+            kinmu_color::write(&mut out, "[エラー]", kinmu_color::Color::Red, use_color)?;
             writeln!(out, " オプションが不正です")?;
             writeln!(out, "理由: {}", f)?;
             write_usage(&mut out, &program, opts)?;
@@ -61,7 +61,7 @@ fn main() -> io::Result<()> {
                 Box::new(f)
             }
             Err(e) => {
-                color::write(&mut out, "[エラー]", color::Color::Red, use_color)?;
+                kinmu_color::write(&mut out, "[エラー]", kinmu_color::Color::Red, use_color)?;
                 writeln!(out, " ファイルの読み込みに失敗しました")?;
                 writeln!(out, "理由: {}", e)?;
                 return Ok(());
@@ -101,12 +101,12 @@ fn main() -> io::Result<()> {
 }
 
 fn run<W: io::Write>(mut out: &mut W, main_file_path: &str, use_color: bool) -> anyhow::Result<()> {
-    let config = input::load_config(main_file_path)?;
+    let config = kinmu_input::load_config(main_file_path)?;
 
-    let answers = generator::run(&config)?;
+    let answers = kinmu_generator::run(&config)?;
 
     for ans in answers {
-        output::run(&mut out, ans, use_color)?;
+        kinmu_output::run(&mut out, ans, use_color)?;
     }
 
     Ok(())
