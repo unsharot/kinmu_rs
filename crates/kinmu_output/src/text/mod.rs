@@ -11,7 +11,7 @@ use std::io;
 
 pub(super) fn write_answer<W: io::Write>(
     out: &mut W,
-    ans: Answer,
+    ans: &Answer,
     use_color: bool,
 ) -> io::Result<()> {
     for (t, model) in ans.models.iter().enumerate() {

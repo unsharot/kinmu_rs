@@ -1,7 +1,7 @@
 use ::kinmu_color;
-use ::kinmu_generator;
-use ::kinmu_input;
-use ::kinmu_output;
+use ::kinmu_generator::GeneratorWithAnnealing;
+use ::kinmu_input::InputByFile;
+use ::kinmu_output::OutputText;
 
 use getopts::Options;
 use std::env;
@@ -92,22 +92,19 @@ fn main() -> io::Result<()> {
     };
 
     // 実行
-    match run(&mut out, main_file_path, use_color) {
+    match kinmu_core::run(
+        &mut InputByFile {
+            main_config_path: main_file_path,
+        },
+        &mut GeneratorWithAnnealing,
+        &mut OutputText {
+            out: &mut out,
+            use_color,
+        },
+    ) {
         Ok(_) => {}
         Err(e) => writeln!(out, "{:?}", e)?,
     };
-
-    Ok(())
-}
-
-fn run<W: io::Write>(mut out: &mut W, main_file_path: &str, use_color: bool) -> anyhow::Result<()> {
-    let config = kinmu_input::load_config(main_file_path)?;
-
-    let answers = kinmu_generator::run(&config)?;
-
-    for ans in answers {
-        kinmu_output::run(&mut out, ans, use_color)?;
-    }
 
     Ok(())
 }

@@ -1,6 +1,7 @@
 //! 生成を行うモジュール
 
 use ::kinmu_annealing;
+use ::kinmu_core::Generator;
 use ::kinmu_lib::types::{
     AnnealingConfig, Answer, FillConfig, MainConfig, Schedule, ScheduleConfig,
 };
@@ -9,8 +10,12 @@ use ::kinmu_lib::{fill, score, seed, update};
 use std::thread;
 use std::time::Instant;
 
-pub fn run(config: &MainConfig) -> anyhow::Result<Vec<Answer>> {
-    generate_schedules(config)
+pub struct GeneratorWithAnnealing;
+
+impl Generator<MainConfig, Answer> for GeneratorWithAnnealing {
+    fn run(&mut self, config: &MainConfig) -> anyhow::Result<Vec<Answer>> {
+        generate_schedules(config)
+    }
 }
 
 fn generate_schedules(config: &MainConfig) -> anyhow::Result<Vec<Answer>> {

@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 kinmu_lib = { workspace = true }
+kinmu_core = { workspace = true }
 anyhow = { workspace = true }
 serde = { version = "1.0.145", features = ["derive"] }
 toml = "0.8.19"

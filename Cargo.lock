@@ -90,6 +90,7 @@ dependencies = [
  "anyhow",
  "getopts",
  "kinmu_color",
+ "kinmu_core",
  "kinmu_generator",
  "kinmu_input",
  "kinmu_output",
@@ -111,11 +112,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "kinmu_core"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+]
+
+[[package]]
 name = "kinmu_generator"
 version = "0.1.0"
 dependencies = [
  "anyhow",
  "kinmu_annealing",
+ "kinmu_core",
  "kinmu_lib",
 ]
 
@@ -124,6 +133,7 @@ name = "kinmu_input"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "kinmu_core",
  "kinmu_lib",
  "serde",
  "toml",
@@ -143,6 +153,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "kinmu_color",
+ "kinmu_core",
  "kinmu_lib",
 ]
 
