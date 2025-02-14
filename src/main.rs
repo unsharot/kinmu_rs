@@ -86,21 +86,16 @@ fn main() -> io::Result<()> {
 
     // loadオプションの読み込み
     let load_option = matches.opt_str("l");
-    let main_file_path = match load_option {
+    let main_config_path = match load_option {
         Some(ref x) => x,
         None => DEFALUT_MAIN_CONFIG_PATH,
     };
 
     // 実行
     match kinmu_core::run(
-        &mut InputByFile {
-            main_config_path: main_file_path,
-        },
-        &mut GeneratorWithAnnealing,
-        &mut OutputText {
-            out: &mut out,
-            use_color,
-        },
+        &mut InputByFile::new(main_config_path),
+        &mut GeneratorWithAnnealing::new(),
+        &mut OutputText::new(&mut out, use_color),
     ) {
         Ok(_) => {}
         Err(e) => writeln!(out, "{:?}", e)?,

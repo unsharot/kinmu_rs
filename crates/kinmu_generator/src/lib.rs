@@ -10,7 +10,15 @@ use ::kinmu_lib::{fill, score, seed, update};
 use std::thread;
 use std::time::Instant;
 
+#[derive(Debug)]
 pub struct GeneratorWithAnnealing;
+
+#[allow(clippy::new_without_default)]
+impl GeneratorWithAnnealing {
+    pub fn new() -> Self {
+        GeneratorWithAnnealing
+    }
+}
 
 impl Generator<MainConfig, Answer> for GeneratorWithAnnealing {
     fn run(&mut self, config: &MainConfig) -> anyhow::Result<Vec<Answer>> {

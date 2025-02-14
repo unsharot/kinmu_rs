@@ -10,8 +10,15 @@ mod checker;
 mod converter;
 mod reader;
 
+#[derive(Debug)]
 pub struct InputByFile<'a> {
-    pub main_config_path: &'a str,
+    main_config_path: &'a str,
+}
+
+impl<'a> InputByFile<'a> {
+    pub fn new(main_config_path: &'a str) -> Self {
+        InputByFile { main_config_path }
+    }
 }
 
 impl Input<MainConfig> for InputByFile<'_> {

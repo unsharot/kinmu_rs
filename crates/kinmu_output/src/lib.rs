@@ -7,9 +7,16 @@ use ::kinmu_lib::types::Answer;
 
 use std::io;
 
+#[derive(Debug)]
 pub struct OutputText<'a, W: io::Write> {
-    pub out: &'a mut W,
-    pub use_color: bool,
+    out: &'a mut W,
+    use_color: bool,
+}
+
+impl<'a, W: io::Write> OutputText<'a, W> {
+    pub fn new(out: &'a mut W, use_color: bool) -> Self {
+        OutputText { out, use_color }
+    }
 }
 
 impl<W: io::Write> Output<Answer> for OutputText<'_, W> {
