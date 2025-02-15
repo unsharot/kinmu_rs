@@ -20,7 +20,7 @@ impl GeneratorWithAnnealing {
     }
 }
 
-impl Generator<MainConfig, Answer> for GeneratorWithAnnealing {
+impl Generator<MainConfig, Vec<Answer>> for GeneratorWithAnnealing {
     fn run(&mut self, config: &MainConfig) -> anyhow::Result<Vec<Answer>> {
         generate_schedules(config)
     }

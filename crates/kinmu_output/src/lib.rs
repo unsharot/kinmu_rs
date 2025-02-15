@@ -19,9 +19,12 @@ impl<'a, W: io::Write> OutputText<'a, W> {
     }
 }
 
-impl<W: io::Write> Output<Answer> for OutputText<'_, W> {
-    fn run(&mut self, answer: &Answer) -> anyhow::Result<()> {
-        text::write_answer(&mut self.out, answer, self.use_color)
-            .map_err(|e| anyhow::anyhow!(e.to_string()))
+impl<W: io::Write> Output<Vec<Answer>> for OutputText<'_, W> {
+    fn run(&mut self, answers: &Vec<Answer>) -> anyhow::Result<()> {
+        for answer in answers {
+            text::write_answer(&mut self.out, answer, self.use_color)
+                .map_err(|e| anyhow::anyhow!(e.to_string()))?;
+        }
+        Ok(())
     }
 }

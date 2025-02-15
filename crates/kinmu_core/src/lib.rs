@@ -3,7 +3,7 @@ pub trait Input<C> {
 }
 
 pub trait Generator<C, A> {
-    fn run(&mut self, config: &C) -> anyhow::Result<Vec<A>>;
+    fn run(&mut self, config: &C) -> anyhow::Result<A>;
 }
 
 pub trait Output<A> {
@@ -17,11 +17,9 @@ pub fn run<C, A, I: Input<C>, G: Generator<C, A>, O: Output<A>>(
 ) -> anyhow::Result<()> {
     let config = input.load_config()?;
 
-    let answers = generator.run(&config)?;
+    let answer = generator.run(&config)?;
 
-    for ans in answers {
-        output.run(&ans)?;
-    }
+    output.run(&answer)?;
 
     Ok(())
 }
