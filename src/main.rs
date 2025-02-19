@@ -8,7 +8,7 @@ use std::env;
 use std::fs::OpenOptions;
 use std::io;
 
-const DEFALUT_MAIN_CONFIG_PATH: &str = "example/main_config.toml";
+const DEFALUT_MAIN_CONFIG_PATH: &str = "example/simple_case/main_config.toml";
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 const REPOSITORY: &str = env!("CARGO_PKG_REPOSITORY");
 const LICENSE: &str = env!("CARGO_PKG_LICENSE");
