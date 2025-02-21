@@ -33,10 +33,10 @@ impl Cond {
             Cond::DayInRange((day_start, day_end)) => *day_start <= day && day <= *day_end,
             Cond::ParticularDayState(ds) => sc.day.days[day] == *ds,
             Cond::BeforeDayState(ds) => {
-                if day == 0 {
+                if day + 1 >= sc.day.count {
                     false
                 } else {
-                    sc.day.days[day - 1] == *ds
+                    sc.day.days[day + 1] == *ds
                 }
             }
             Cond::ParticularDay(d) => *d == day,
