@@ -1,0 +1,71 @@
+step_count = 200000
+
+# seed = 0
+
+score_functions = [
+
+{display_name = "ON", scores = [
+"PatternFixed (Every (), [O,N], 100)",
+]},
+
+{display_name = "NH", scores = [
+"PatternFixed (Every (), [N,H], 1000)",
+]},
+
+{display_name = "OH", scores = [
+"PatternFixed (Every (), [O,H], 2000)",
+]},
+
+{display_name = "遅早のバランス", scores = [
+"ShiftsBalance (DayExceptBuffer (), O, H, 3)",
+]},
+
+{display_name = "遅番の前後のバランス", scores = [
+"ShiftHalfBalance (DayExceptBuffer (), O, 3)",
+]},
+
+{display_name = "早番の前後のバランス", scores = [
+"ShiftHalfBalance (DayExceptBuffer (), H, 3)",
+]},
+
+{display_name = "フロのスタッフ数", scores = [
+"StaffCount (And (DayExceptBuffer (), ParticularDayState B), N, 3, 5)",
+]},
+
+{display_name = "フロ2のスタッフ数", scores = [
+"StaffCount (And (DayExceptBuffer (), ParticularDayState 2), N, 1, 10)",
+]},
+
+{display_name = "平日のスタッフ数", scores = [
+"StaffCount (And (DayExceptBuffer (), ParticularDayState W), N, 1, 10)",
+]},
+
+{display_name = "休日のスタッフ数", scores = [
+"StaffCount (And (DayExceptBuffer (), ParticularDayState H), N, 1, 10)",
+]},
+
+{display_name = "計測のスタッフ数", scores = [
+"StaffCount (And (DayExceptBuffer (), ParticularDayState M), N, 1, 10)",
+]},
+
+{display_name = "遅番のスタッフ数", scores = [
+"StaffCount (DayExceptBuffer (), O, 1, 100)",
+],filter={low_pass=0}},
+
+{display_name = "早番のスタッフ数", scores = [
+"StaffCount (DayExceptBuffer (), H, 1, 100)",
+],filter={low_pass=0}},
+
+{display_name = "遅番の日数", scores = [
+"DayCountRegardStaffAttribute (DayExceptBuffer (), O, ODayCount, 100)",
+],filter={low_pass=0}},
+
+{display_name = "早番の日数", scores = [
+"DayCountRegardStaffAttribute (DayExceptBuffer (), H, HDayCount, 100)",
+],filter={low_pass=0}},
+
+]
+
+update_function = "update4"
+
+temp = {max = 10000, min = 10}

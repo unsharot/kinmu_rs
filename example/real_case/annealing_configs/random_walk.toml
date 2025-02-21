@@ -1,0 +1,9 @@
+step_count = 10000
+
+# seed = 0
+
+score_functions = []
+
+update_function = "update5"
+
+temp = {max = 0, min = 0}
