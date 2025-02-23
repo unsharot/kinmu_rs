@@ -345,41 +345,41 @@ buffer_count = 3
 
 ```toml
 requested_schedule = [
-   "AKNUUUUUUUUUUIAKYUUUUUUUUIAKUUUUU",
-   "KHIAKUUUUUUUUUUUIAKYUUUUUUUUUUUUU",
-   "OIAKUUUUUUUUUUUUUUUUUUUIAKYUUUUUU",
-   "NOKKUUUUUUUUUUUUUUUUUUUUUUUUUUUUY",
-   "IAKUUUUUUUUUUUUUUYUUUUUUUKUUUUUUU",
-   "HYNUUUUUUUUUUUUUKUUUUYUUUUUUUUUUU",
-   "KNOUUUUUUUUUUUUUUUUUUUYUUUUUUUUUU",
-   "KNIAIAKKIAKUUUUUUUUUUUUUUUUUUUYUU",
-   "KNHUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU",
-   "IAKUUUUUUUUUUUIAKUUUUUUUUUUUUUUUU",
-   "UUUKKUUUUYKKUUUUUKKUUUUUKKUUUUUKK",
-   "UUUKKUUUUUKKUUUUUKKKUUUKKKUUUUUKK",
+"IAKUUUUUUUUUUUUUUUUUIAKKUUUUUUUUUU",
+"NIAKUUUUUUUUUUUUUUUUUUUUUUUUYUUUUU",
+"IAKUUUUUUUUUUUUUUUUYYUUUUUUUUUUUUU",
+"NIAKUUUUUUUUUIAKYUUUUUUUUUKUUUUUUU",
+"KNIAKUUUUUUUUUUUUUUUIAKKUUUUUUUUUU",
+"KNIAKUUUUUUUUUUUUUUUUUUUUUIAKUUUUU",
+"AKKUUUUUUUUUUUUUUKKUUUUUUUUUUUUUUU",
+"AKKUUUUUUUUUUIAKUUUUUUUUUUUUUUUUUU",
+"KNNUUUUUIAKUUUUUUUUUUUUUUUUUUUUUUU",
+"NKKUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU",
+"KKNUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU",
+"KKNUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU",
+"KKNUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU",
 ]
 ```
 
 ```toml
 requested_schedule = [
-   #W2WHHWFW2GHHWFW2WHHWFW2WHHWFW2WHH
-   #000123456789012345678901234567890
-   "   KKNNNNNKKNNNNNKKNNNNNKKNNNNNKK", #職員A
-   "NIAKKK    KKYK                   ", #職員B
-   "AKN KK                           ", #職員C
-   "NNIAK                        IAKY", #職員D
-   "KNN       KK                     ", #職員E
-   "KNN                              ", #職員F
-   "KNN                  YKK         ", #職員G
-   "IAK               KK             ", #職員H
-   "UUUKKYYYYYKYYYYYYKKYYYYYKYYYYYYKK", #職員I
-   "NKN      K                K      ", #職員J
-   "NIAK                             ", #職員K
-   "NNN             K   K     K      ", #職員L
-   "NON    KK       KK               ", #職員M
-   "ONK                              ", #職員N
-   "AKO        K             K       ", #職員O
-   "KNK                              ", #職員P
+#HHWBW2MHHWBW2WHHWBW2WHHWBW2WHHWBW2
+#8901234567890123456789012345678901
+"IAK                 IAKK          ", # 職員A
+"NIAK                        Y     ", # 職員B
+"IAK                YY             ", # 職員C
+"NIAK         IAKY         K       ", # 職員D
+"KNIAK               IAKK          ", # 職員E
+"KNIAK                     IAK     ", # 職員F
+"AKK              KK               ", # 職員G
+"AKK          IAK                  ", # 職員H
+"KNN     IAK                       ", # 職員I
+"NKK                               ", # 職員J
+"KKN                               ", # 職員K 土日祝休み
+"KKN                               ", # 職員L 土日祝休み 4連勤以上不可
+"KKN                               ", # 職員M 土日祝休み
+#HHWBW2MHHWBW2WHHWBW2WHHWBW2WHHWBW2
+#8901234567890123456789012345678901
 ]
 ```
 
