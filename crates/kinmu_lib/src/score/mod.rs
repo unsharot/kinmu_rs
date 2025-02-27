@@ -16,45 +16,85 @@ mod staff_count_regard_day_attribute;
 mod staff_count_with_premise;
 mod streak;
 
-use super::types::{Schedule, ScheduleConfig, Score, ScoreProp};
+use super::types::{Schedule, ScheduleConfig, ScoreProp};
 
-/// 複数のスコアを評価する
-#[allow(clippy::ptr_arg)]
-pub fn eval_scores(
-    sps: &mut Vec<ScoreProp>,
+use ::kinmu_model::Score;
+
+/// スコアを評価する
+pub fn eval_score_mut(
+    sp: &mut ScoreProp,
     schedule_config: &ScheduleConfig,
     schedule: &Schedule,
 ) -> Score {
-    sps.iter_mut()
-        .map(|sp: &mut ScoreProp| eval_score(sp, schedule_config, schedule))
-        .collect::<Vec<_>>()
-        .iter()
-        .sum()
-}
-
-/// スコアを評価する
-fn eval_score(sp: &mut ScoreProp, schedule_config: &ScheduleConfig, schedule: &Schedule) -> Score {
     match sp {
-        ScoreProp::PatternGeneral(p) => pattern_general::eval(schedule_config, schedule, p),
-        ScoreProp::PatternFixed(p) => pattern_fixed::eval(schedule_config, schedule, p),
-        ScoreProp::PatternGeneralAny(p) => pattern_general_any::eval(schedule_config, schedule, p),
-        ScoreProp::PatternFixedAny(p) => pattern_fixed_any::eval(schedule_config, schedule, p),
-        ScoreProp::Streak(p) => streak::eval(schedule_config, schedule, p),
-        ScoreProp::ShiftsBalance(p) => shifts_balance::eval(schedule_config, schedule, p),
-        ScoreProp::ShiftHalfBalance(p) => shift_half_balance::eval(schedule_config, schedule, p),
-        ScoreProp::ShiftDirPriority(p) => shift_dir_priority::eval(schedule_config, schedule, p),
+        ScoreProp::PatternGeneral(p) => pattern_general::eval_mut(schedule_config, schedule, p),
+        ScoreProp::PatternFixed(p) => pattern_fixed::eval_mut(schedule_config, schedule, p),
+        ScoreProp::PatternGeneralAny(p) => {
+            pattern_general_any::eval_mut(schedule_config, schedule, p)
+        }
+        ScoreProp::PatternFixedAny(p) => pattern_fixed_any::eval_mut(schedule_config, schedule, p),
+        ScoreProp::Streak(p) => streak::eval_mut(schedule_config, schedule, p),
+        ScoreProp::ShiftsBalance(p) => shifts_balance::eval_mut(schedule_config, schedule, p),
+        ScoreProp::ShiftHalfBalance(p) => {
+            shift_half_balance::eval_mut(schedule_config, schedule, p)
+        }
+        ScoreProp::ShiftDirPriority(p) => {
+            shift_dir_priority::eval_mut(schedule_config, schedule, p)
+        }
         ScoreProp::DayCountRegardStaffAttribute(p) => {
-            day_count_regard_staff_attribute::eval(schedule_config, schedule, p)
+            day_count_regard_staff_attribute::eval_mut(schedule_config, schedule, p)
         }
         ScoreProp::StaffCountRegardDayAttribute(p) => {
-            staff_count_regard_day_attribute::eval(schedule_config, schedule, p)
+            staff_count_regard_day_attribute::eval_mut(schedule_config, schedule, p)
         }
-        ScoreProp::StaffCount(p) => staff_count::eval(schedule_config, schedule, p),
-        ScoreProp::StaffCountAtLeast(p) => staff_count_at_least::eval(schedule_config, schedule, p),
+        ScoreProp::StaffCount(p) => staff_count::eval_mut(schedule_config, schedule, p),
+        ScoreProp::StaffCountAtLeast(p) => {
+            staff_count_at_least::eval_mut(schedule_config, schedule, p)
+        }
         ScoreProp::StaffCountWithPremise(p) => {
-            staff_count_with_premise::eval(schedule_config, schedule, p)
+            staff_count_with_premise::eval_mut(schedule_config, schedule, p)
         }
-        ScoreProp::NGPair(p) => ng_pair::eval(schedule_config, schedule, p),
-        ScoreProp::NoSamePair(p) => no_same_pair::eval(schedule_config, schedule, p),
+        ScoreProp::NGPair(p) => ng_pair::eval_mut(schedule_config, schedule, p),
+        ScoreProp::NoSamePair(p) => no_same_pair::eval_mut(schedule_config, schedule, p),
+    }
+}
+
+pub fn eval_score_immut(
+    sp: &ScoreProp,
+    schedule_config: &ScheduleConfig,
+    schedule: &Schedule,
+) -> Score {
+    match sp {
+        ScoreProp::PatternGeneral(p) => pattern_general::eval_immut(schedule_config, schedule, p),
+        ScoreProp::PatternFixed(p) => pattern_fixed::eval_immut(schedule_config, schedule, p),
+        ScoreProp::PatternGeneralAny(p) => {
+            pattern_general_any::eval_immut(schedule_config, schedule, p)
+        }
+        ScoreProp::PatternFixedAny(p) => {
+            pattern_fixed_any::eval_immut(schedule_config, schedule, p)
+        }
+        ScoreProp::Streak(p) => streak::eval_immut(schedule_config, schedule, p),
+        ScoreProp::ShiftsBalance(p) => shifts_balance::eval_immut(schedule_config, schedule, p),
+        ScoreProp::ShiftHalfBalance(p) => {
+            shift_half_balance::eval_immut(schedule_config, schedule, p)
+        }
+        ScoreProp::ShiftDirPriority(p) => {
+            shift_dir_priority::eval_immut(schedule_config, schedule, p)
+        }
+        ScoreProp::DayCountRegardStaffAttribute(p) => {
+            day_count_regard_staff_attribute::eval_immut(schedule_config, schedule, p)
+        }
+        ScoreProp::StaffCountRegardDayAttribute(p) => {
+            staff_count_regard_day_attribute::eval_immut(schedule_config, schedule, p)
+        }
+        ScoreProp::StaffCount(p) => staff_count::eval_immut(schedule_config, schedule, p),
+        ScoreProp::StaffCountAtLeast(p) => {
+            staff_count_at_least::eval_immut(schedule_config, schedule, p)
+        }
+        ScoreProp::StaffCountWithPremise(p) => {
+            staff_count_with_premise::eval_immut(schedule_config, schedule, p)
+        }
+        ScoreProp::NGPair(p) => ng_pair::eval_immut(schedule_config, schedule, p),
+        ScoreProp::NoSamePair(p) => no_same_pair::eval_immut(schedule_config, schedule, p),
     }
 }

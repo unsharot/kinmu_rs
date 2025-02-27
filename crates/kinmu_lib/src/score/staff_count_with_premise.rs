@@ -1,9 +1,45 @@
 //! 指定したシフトの人数を満たした日付に対して、指定したシフトが指定した値いない時に発火するスコア
 
-use super::super::types::{CondWrapper, Schedule, ScheduleConfig, Score, Shift};
+use super::super::types::{CondWrapper, Schedule, ScheduleConfig, Shift};
+
+use ::kinmu_model::Score;
+
+macro_rules! eval {
+    ($eval:ident, $schedule_config:expr, $schedule:expr, $cond_premise:expr, $shift_premise:expr, $count_premise:expr, $cond_main:expr, $shift_main:expr, $count_main:expr, $score:expr) => {{
+        let mut sum = 0.0;
+        for day in 0..$schedule_config.day.count {
+            let mut count = 0;
+            for staff in 0..$schedule_config.staff.count {
+                if $cond_premise.$eval(staff, day, $schedule_config)
+                    && $schedule[staff][day] == *$shift_premise
+                {
+                    count += 1;
+                }
+            }
+            if count == *$count_premise {
+                let mut is_valid = false;
+                let mut count2 = 0;
+                for staff in 0..$schedule_config.staff.count {
+                    if $cond_main.$eval(staff, day, $schedule_config) {
+                        is_valid = true;
+                        if $schedule[staff][day] == *$shift_main {
+                            count2 += 1;
+                        }
+                    }
+                }
+                if is_valid {
+                    let d = (count2 - *$count_main).abs() as Score;
+                    let a = d * *$score;
+                    sum += a * a;
+                }
+            }
+        }
+        sum
+    }};
+}
 
 #[allow(clippy::needless_range_loop)]
-pub(super) fn eval(
+pub(super) fn eval_mut(
     schedule_config: &ScheduleConfig,
     schedule: &Schedule,
     (cond_premise, shift_premise, count_premise, cond_main, shift_main, count_main, score): &mut (
@@ -16,40 +52,53 @@ pub(super) fn eval(
         Score,
     ),
 ) -> Score {
-    let mut sum = 0.0;
-    for day in 0..schedule_config.day.count {
-        let mut count = 0;
-        for staff in 0..schedule_config.staff.count {
-            if cond_premise.eval(staff, day, schedule_config)
-                && schedule[staff][day] == *shift_premise
-            {
-                count += 1;
-            }
-        }
-        if count == *count_premise {
-            let mut is_valid = false;
-            let mut count2 = 0;
-            for staff in 0..schedule_config.staff.count {
-                if cond_main.eval(staff, day, schedule_config) {
-                    is_valid = true;
-                    if schedule[staff][day] == *shift_main {
-                        count2 += 1;
-                    }
-                }
-            }
-            if is_valid {
-                let d = (count2 - *count_main).abs() as Score;
-                let a = d * *score;
-                sum += a * a;
-            }
-        }
-    }
-    sum
+    eval!(
+        eval_mut,
+        schedule_config,
+        schedule,
+        cond_premise,
+        shift_premise,
+        count_premise,
+        cond_main,
+        shift_main,
+        count_main,
+        score
+    )
+}
+
+#[allow(clippy::needless_range_loop)]
+pub(super) fn eval_immut(
+    schedule_config: &ScheduleConfig,
+    schedule: &Schedule,
+    (cond_premise, shift_premise, count_premise, cond_main, shift_main, count_main, score): &(
+        CondWrapper,
+        Shift,
+        i32,
+        CondWrapper,
+        Shift,
+        i32,
+        Score,
+    ),
+) -> Score {
+    eval!(
+        eval_immut,
+        schedule_config,
+        schedule,
+        cond_premise,
+        shift_premise,
+        count_premise,
+        cond_main,
+        shift_main,
+        count_main,
+        score
+    )
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::types::{Cond, Staff};
+    use crate::types::Cond;
+
+    use ::kinmu_model::Staff;
 
     use super::*;
 
@@ -83,7 +132,7 @@ mod tests {
             .name_to_index
             .insert(String::from("I_alone_ok"), 0);
 
-        let score = eval(
+        let score = eval_mut(
             &schedule_config,
             &schedule,
             &mut (
@@ -130,7 +179,7 @@ mod tests {
             .name_to_index
             .insert(String::from("I_alone_ok"), 0);
 
-        let score = eval(
+        let score = eval_mut(
             &schedule_config,
             &schedule,
             &mut (

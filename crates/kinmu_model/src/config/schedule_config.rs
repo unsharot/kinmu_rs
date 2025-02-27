@@ -1,8 +1,7 @@
 //! schedule_configから生成できる構造体を定義
 
 use super::super::{
-    DayAttributeName, DayState, Schedule, ScheduleState, Score, ScoreProp, Staff,
-    StaffAttributeName, StaffAttributeNameIndexMap, NG,
+    Schedule, ScheduleState, Score, Staff, StaffAttributeName, StaffAttributeNameIndexMap, NG,
 };
 
 use std::collections::HashMap;
@@ -16,14 +15,14 @@ pub struct FillConfig {
 }
 
 #[derive(Clone, Debug, Default)]
-pub struct ResultConfig {
-    pub score_functions: Vec<ScoreFunction>,
+pub struct ResultConfig<SP> {
+    pub score_functions: Vec<ScoreFunction<SP>>,
 }
 
 #[derive(Clone, Debug, Default)]
-pub struct ScoreFunction {
+pub struct ScoreFunction<SP> {
     pub display_name: String,
-    pub scores: Vec<ScoreProp>,
+    pub scores: Vec<SP>,
     pub filter: Option<ScoreFilter>,
 }
 
@@ -41,26 +40,28 @@ pub struct StaffConfig {
     pub count: usize,
 }
 
+pub type DayAttributeName = String;
+
 #[derive(Clone, Debug, Default)]
-pub struct DayConfig {
+pub struct DayConfig<S, SS, DS> {
     pub count: usize,
     pub buffer_count: usize,
-    pub days: Vec<DayState>,
-    pub requested_schedule: Schedule,
-    pub schedule_states: ScheduleState,
+    pub days: Vec<DS>,
+    pub requested_schedule: Schedule<S>,
+    pub schedule_states: ScheduleState<SS>,
     pub attributes: HashMap<DayAttributeName, Vec<i32>>,
 }
 
 #[derive(Clone, Debug, Default)]
-pub struct ScheduleConfig {
+pub struct ScheduleConfig<SP, S, SS, DS> {
     pub staff: StaffConfig,
-    pub day: DayConfig,
+    pub day: DayConfig<S, SS, DS>,
     pub fill: FillConfig,
-    pub annealing_configs: Vec<AnnealingConfig>,
-    pub result: ResultConfig,
+    pub annealing_configs: Vec<AnnealingConfig<SP>>,
+    pub result: ResultConfig<SP>,
 }
 
-impl ScheduleConfig {
+impl<SP, S, SS, DS> ScheduleConfig<SP, S, SS, DS> {
     pub fn get_attribute(&self, staff: usize, attribute: &StaffAttributeName) -> i32 {
         let att_index = self
             .staff

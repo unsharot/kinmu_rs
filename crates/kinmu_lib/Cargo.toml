@@ -4,5 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+kinmu_model = { workspace = true }
+kinmu_generator = { workspace = true }
+kinmu_input = { workspace = true }
 anyhow = { workspace = true }
 rand = { workspace = true }

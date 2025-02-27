@@ -1,8 +1,46 @@
 //! 焼きなましで使う更新関数のモジュール
 
-use super::types::{Schedule, ScheduleConfig, ScheduleState, Score, Shift, ShiftState};
+use super::types::{
+    DayState, Schedule, ScheduleConfig, ScheduleState, ScoreProp, Shift, ShiftState,
+};
+
+use ::kinmu_generator as gen;
+use ::kinmu_model::Score;
 
 use rand::Rng;
+
+#[derive(Debug, Clone)]
+pub struct Update;
+
+impl gen::Update<ScoreProp, Shift, ShiftState, DayState> for Update {
+    fn generate<'a, R: Rng>(
+        &self,
+        name: &str,
+        schedule_config: &'a kinmu_model::ScheduleConfig<ScoreProp, Shift, ShiftState, DayState>,
+    ) -> anyhow::Result<
+        Box<dyn FnMut(&kinmu_model::Schedule<Shift>, &mut R) -> kinmu_model::Schedule<Shift> + 'a>,
+    > {
+        let schedule_state = &schedule_config.day.schedule_states;
+        match name {
+            "update1" => Ok(Box::new(move |schedule, rng| {
+                update_randomly1(schedule_config, schedule_state, schedule, rng)
+            })),
+            "update2" => Ok(Box::new(move |schedule, rng| {
+                update_randomly2(schedule_config, schedule_state, schedule, rng)
+            })),
+            "update4" => Ok(Box::new(move |schedule, rng| {
+                update_randomly4(schedule_config, schedule_state, schedule, rng)
+            })),
+            "update5" => Ok(Box::new(move |schedule, rng| {
+                update_randomly5(schedule_config, schedule_state, schedule, rng)
+            })),
+            _ => Err(anyhow::anyhow!(
+                "Failed to generate update function {}",
+                name
+            )),
+        }
+    }
+}
 
 #[allow(clippy::type_complexity)]
 pub fn gen_update_func<'a, R: Rng>(

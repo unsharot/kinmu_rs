@@ -1,6 +1,9 @@
 use ::kinmu_color;
 use ::kinmu_generator::GeneratorWithAnnealing;
 use ::kinmu_input::InputByFile;
+use ::kinmu_lib::fill::Fill;
+use ::kinmu_lib::types::Shift;
+use ::kinmu_lib::update::Update;
 use ::kinmu_output::OutputText;
 
 use getopts::Options;
@@ -94,8 +97,16 @@ fn main() -> io::Result<()> {
     // 実行
     match kinmu_core::run(
         &mut InputByFile::new(main_config_path),
-        &mut GeneratorWithAnnealing::new(),
-        &mut OutputText::new(&mut out, use_color),
+        &mut GeneratorWithAnnealing::new(Fill, Update),
+        {
+            use Shift::*;
+            &mut OutputText::new(
+                &mut out,
+                use_color,
+                vec![H, O, I, N, K, Y],
+                vec![N, I, A, K, O, H],
+            )
+        },
     ) {
         Ok(_) => {}
         Err(e) => writeln!(out, "{:?}", e)?,

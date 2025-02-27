@@ -3,42 +3,73 @@
 //! 計算量はO(NM)
 //! TODO: RollingHash、FSMやTrie木を用いた高速化
 
-use super::super::types::{CondWrapper, Schedule, ScheduleConfig, Score, Shift};
+use super::super::types::{CondWrapper, Schedule, ScheduleConfig, Shift};
+
+use ::kinmu_model::Score;
+
+macro_rules! eval {
+    ($eval:ident, $schedule_config:expr, $schedule:expr, $cond:expr, $shift_pattern:expr, $score:expr) => {{
+        let mut sum = 0.0;
+        for staff in 0..$schedule_config.staff.count {
+            let mut a = 0.0;
+            for day in 0..$schedule_config.day.count {
+                let mut hit = true;
+                let mut is_valid = false;
+                for dd in 0..$shift_pattern.len() {
+                    if $schedule_config.day.count <= day + dd {
+                        hit = false;
+                        break;
+                    } else if $cond.$eval(staff, day + dd, $schedule_config) {
+                        is_valid = true;
+                        if !($shift_pattern[dd].contains(&$schedule[staff][day + dd])) {
+                            hit = false;
+                            break;
+                        }
+                    } else {
+                        hit = false;
+                        break;
+                    }
+                }
+                if hit && is_valid {
+                    a += *$score;
+                }
+            }
+            sum += a;
+        }
+        sum
+    }};
+}
 
 #[allow(clippy::needless_range_loop)]
-pub(super) fn eval(
+pub(super) fn eval_mut(
     schedule_config: &ScheduleConfig,
     schedule: &Schedule,
     (cond, shift_pattern, score): &mut (CondWrapper, Vec<Vec<Shift>>, Score),
 ) -> Score {
-    let mut sum = 0.0;
-    for staff in 0..schedule_config.staff.count {
-        let mut a = 0.0;
-        for day in 0..schedule_config.day.count {
-            let mut hit = true;
-            let mut is_valid = false;
-            for dd in 0..shift_pattern.len() {
-                if schedule_config.day.count <= day + dd {
-                    hit = false;
-                    break;
-                } else if cond.eval(staff, day + dd, schedule_config) {
-                    is_valid = true;
-                    if !(shift_pattern[dd].contains(&schedule[staff][day + dd])) {
-                        hit = false;
-                        break;
-                    }
-                } else {
-                    hit = false;
-                    break;
-                }
-            }
-            if hit && is_valid {
-                a += *score;
-            }
-        }
-        sum += a;
-    }
-    sum
+    eval!(
+        eval_mut,
+        schedule_config,
+        schedule,
+        cond,
+        shift_pattern,
+        score
+    )
+}
+
+#[allow(clippy::needless_range_loop)]
+pub(super) fn eval_immut(
+    schedule_config: &ScheduleConfig,
+    schedule: &Schedule,
+    (cond, shift_pattern, score): &(CondWrapper, Vec<Vec<Shift>>, Score),
+) -> Score {
+    eval!(
+        eval_immut,
+        schedule_config,
+        schedule,
+        cond,
+        shift_pattern,
+        score
+    )
 }
 
 #[cfg(test)]
@@ -56,7 +87,7 @@ mod tests {
         schedule_config.staff.count = schedule.len();
         schedule_config.day.count = schedule[0].len();
 
-        let score = eval(
+        let score = eval_mut(
             &schedule_config,
             &schedule,
             &mut (
@@ -87,7 +118,7 @@ mod tests {
         schedule_config.staff.count = schedule.len();
         schedule_config.day.count = schedule[0].len();
 
-        let score = eval(
+        let score = eval_mut(
             &schedule_config,
             &schedule,
             &mut (

@@ -4,7 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-kinmu_lib = { workspace = true }
+kinmu_model = { workspace = true }
 kinmu_annealing = { workspace = true }
 kinmu_core = { workspace = true }
 anyhow = { workspace = true }
+rand = { workspace = true }

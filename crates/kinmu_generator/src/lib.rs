@@ -1,46 +1,91 @@
 //! 生成を行うモジュール
 
+mod seed;
+
 use ::kinmu_annealing;
 use ::kinmu_core::Generator;
-use ::kinmu_lib::types::{
-    AnnealingConfig, Answer, FillConfig, MainConfig, Schedule, ScheduleConfig,
+use ::kinmu_model::ScorePropTrait;
+use ::kinmu_model::{
+    eval_scores_mut, AnnealingConfig, Answer, FillConfig, MainConfig, Schedule, ScheduleConfig,
 };
-use ::kinmu_lib::{fill, score, seed, update};
 
 use std::thread;
 use std::time::Instant;
 
+use rand::Rng;
+
 #[derive(Debug)]
-pub struct GeneratorWithAnnealing;
+pub struct GeneratorWithAnnealing<F, U> {
+    fill: F,
+    update: U,
+}
 
-#[allow(clippy::new_without_default)]
-impl GeneratorWithAnnealing {
-    pub fn new() -> Self {
-        GeneratorWithAnnealing
+impl<F, U> GeneratorWithAnnealing<F, U> {
+    pub fn new(fill: F, update: U) -> Self {
+        GeneratorWithAnnealing { fill, update }
     }
 }
 
-impl Generator<MainConfig, Vec<Answer>> for GeneratorWithAnnealing {
-    fn run(&mut self, config: &MainConfig) -> anyhow::Result<Vec<Answer>> {
-        generate_schedules(config)
+impl<SP, S, SS, DS, F, U> Generator<MainConfig<SP, S, SS, DS>, Vec<Answer<SP, S, SS, DS>>>
+    for GeneratorWithAnnealing<F, U>
+where
+    SP: Clone + std::marker::Send + 'static + ScorePropTrait<S, SS, DS>,
+    S: Clone + std::marker::Send + 'static,
+    SS: Clone + std::marker::Send + 'static,
+    DS: Clone + std::marker::Send + 'static,
+    F: Fill<SP, S, SS, DS> + Clone + std::marker::Send + 'static,
+    U: Update<SP, S, SS, DS> + Clone + std::marker::Send + 'static,
+{
+    fn run(
+        &mut self,
+        config: &MainConfig<SP, S, SS, DS>,
+    ) -> anyhow::Result<Vec<Answer<SP, S, SS, DS>>> {
+        generate_schedules(config, &self.fill, &self.update)
     }
 }
 
-fn generate_schedules(config: &MainConfig) -> anyhow::Result<Vec<Answer>> {
+fn generate_schedules<SP, S, SS, DS, F, U>(
+    config: &MainConfig<SP, S, SS, DS>,
+    fill: &F,
+    update: &U,
+) -> anyhow::Result<Vec<Answer<SP, S, SS, DS>>>
+where
+    SP: Clone + std::marker::Send + 'static + ScorePropTrait<S, SS, DS>,
+    S: Clone + std::marker::Send + 'static,
+    SS: Clone + std::marker::Send + 'static,
+    DS: Clone + std::marker::Send + 'static,
+    F: Fill<SP, S, SS, DS> + Clone + std::marker::Send + 'static,
+    U: Update<SP, S, SS, DS> + Clone + std::marker::Send + 'static,
+{
     let thread_count = config.thread_count.unwrap_or(1);
 
     let mut answers = Vec::new();
     for schedule_config in &config.schedule_configs {
-        answers.push(generate_schedule(schedule_config, thread_count)?);
+        answers.push(generate_schedule(
+            schedule_config,
+            thread_count,
+            fill,
+            update,
+        )?);
     }
 
     Ok(answers)
 }
 
-fn generate_schedule(
-    schedule_config: &ScheduleConfig,
+fn generate_schedule<SP, S, SS, DS, F, U>(
+    schedule_config: &ScheduleConfig<SP, S, SS, DS>,
     thread_count: u32,
-) -> anyhow::Result<Answer> {
+    fill: &F,
+    update: &U,
+) -> anyhow::Result<Answer<SP, S, SS, DS>>
+where
+    SP: Clone + std::marker::Send + 'static + ScorePropTrait<S, SS, DS>,
+    S: Clone + std::marker::Send + 'static,
+    SS: Clone + std::marker::Send + 'static,
+    DS: Clone + std::marker::Send + 'static,
+    F: Fill<SP, S, SS, DS> + Clone + std::marker::Send + 'static,
+    U: Update<SP, S, SS, DS> + Clone + std::marker::Send + 'static,
+{
     let start = Instant::now();
 
     let mut hs: Vec<thread::JoinHandle<anyhow::Result<_>>> = vec![];
@@ -48,16 +93,22 @@ fn generate_schedule(
         let schedule_config = schedule_config.clone();
         let annealing_configs = schedule_config.annealing_configs.clone();
         let fill_config = schedule_config.fill.clone();
+        let fill = fill.clone();
+        let update = update.clone();
         hs.push(thread::spawn(move || {
-            annealing(schedule_config, fill_config, annealing_configs)
+            annealing(
+                schedule_config,
+                fill_config,
+                annealing_configs,
+                fill,
+                update,
+            )
         }))
     }
 
     let mut models = Vec::new();
     for h in hs.into_iter() {
-        let model = h.join().unwrap()?.clone();
-
-        models.push(model);
+        models.push(h.join().unwrap()?);
     }
 
     Ok(Answer {
@@ -67,23 +118,35 @@ fn generate_schedule(
     })
 }
 
-fn annealing(
-    schedule_config: ScheduleConfig,
-    mut fill_config: FillConfig,
-    annealing_configs: Vec<AnnealingConfig>,
-) -> anyhow::Result<Schedule> {
-    let mut model = fill::run(&mut fill_config, &schedule_config)?;
+fn annealing<SP, S, SS, DS, F, U>(
+    schedule_config: ScheduleConfig<SP, S, SS, DS>,
+    fill_config: FillConfig,
+    annealing_configs: Vec<AnnealingConfig<SP>>,
+    fill: F,
+    update: U,
+) -> anyhow::Result<Schedule<S>>
+where
+    SP: ScorePropTrait<S, SS, DS>,
+    S: Clone,
+    F: Fill<SP, S, SS, DS>,
+    U: Update<SP, S, SS, DS>,
+{
+    let mut model = fill.run(
+        &fill_config.name,
+        &schedule_config,
+        &mut seed::gen_rng_from_seed(fill_config.seed),
+    )?;
 
     let mut score;
     for mut ac in annealing_configs {
         let mut rng = seed::gen_rng_from_seed(ac.seed);
-        score = score::eval_scores(&mut ac.score_props, &schedule_config, &model);
+        score = eval_scores_mut(&mut ac.score_props, &schedule_config, &model);
         (_, model) = kinmu_annealing::run(
             score,
             &model,
             ac.step,
-            update::gen_update_func(&ac.update_func, &schedule_config)?,
-            |m| score::eval_scores(&mut ac.score_props, &schedule_config, m),
+            update.generate(&ac.update_func, &schedule_config)?,
+            |m| eval_scores_mut(&mut ac.score_props, &schedule_config, m),
             ac.max_temp,
             ac.min_temp,
             kinmu_annealing::basic_temp_func,
@@ -93,4 +156,22 @@ fn annealing(
     }
 
     Ok(model)
+}
+
+pub trait Fill<SP, S, SS, DS> {
+    fn run<R: Rng>(
+        &self,
+        name: &str,
+        schedule_config: &ScheduleConfig<SP, S, SS, DS>,
+        rng: &mut R,
+    ) -> anyhow::Result<Schedule<S>>;
+}
+
+#[allow(clippy::type_complexity)]
+pub trait Update<SP, S, SS, DS> {
+    fn generate<'a, R: Rng>(
+        &self,
+        name: &str,
+        schedule_config: &'a ScheduleConfig<SP, S, SS, DS>,
+    ) -> anyhow::Result<Box<dyn FnMut(&Schedule<S>, &mut R) -> Schedule<S> + 'a>>;
 }

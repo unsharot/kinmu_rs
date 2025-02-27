@@ -4,11 +4,14 @@
 use anyhow::Context;
 
 use ::kinmu_core::Input;
-use ::kinmu_lib::types::MainConfig;
+use ::kinmu_model::MainConfig;
 
 mod checker;
 mod converter;
 mod reader;
+
+pub use checker::Check;
+pub use converter::{FromConfig, MapState};
 
 #[derive(Debug)]
 pub struct InputByFile<'a> {
@@ -21,8 +24,13 @@ impl<'a> InputByFile<'a> {
     }
 }
 
-impl Input<MainConfig> for InputByFile<'_> {
-    fn load_config(&mut self) -> anyhow::Result<MainConfig> {
+impl<SP, S, SS, DS> Input<MainConfig<SP, S, SS, DS>> for InputByFile<'_>
+where
+    SP: FromConfig + Clone + Check<S, SS, DS>,
+    S: FromConfig + MapState<SS>,
+    DS: FromConfig,
+{
+    fn load_config(&mut self) -> anyhow::Result<MainConfig<SP, S, SS, DS>> {
         let raw_main = reader::read_main_config(self.main_config_path).with_context(|| {
             format!(
                 "[エラー] メインconfigの読み込みに失敗しました\n対象ファイル: {}\nヒント: デフォルト以外のファイルを指定する場合、引数でパスを指定してください",
@@ -30,7 +38,8 @@ impl Input<MainConfig> for InputByFile<'_> {
             )
         })?;
         let schedule_config_paths = raw_main.schedule_config_paths.clone();
-        let mut converted_main: MainConfig = converter::convert_main_config(raw_main)?;
+        let mut converted_main: MainConfig<SP, S, SS, DS> =
+            converter::convert_main_config(raw_main)?;
 
         for path in schedule_config_paths {
             let raw_schedule = reader::read_schedule_config(&path).with_context(|| {

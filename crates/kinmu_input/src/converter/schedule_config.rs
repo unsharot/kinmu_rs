@@ -5,26 +5,27 @@ use std::collections::HashMap;
 use anyhow::Context;
 
 use super::super::reader::types::{RawAttributeTable, RawScheduleConfig};
-use ::kinmu_lib::types::{
-    DayAttributeName, DayConfig, DayState, FillConfig, ResultConfig, Schedule, ScheduleConfig,
-    ScheduleState, ScoreFilter, ScoreFunction, ScoreProp, Shift, ShiftState, Staff,
-    StaffAttributeNameIndexMap, StaffConfig,
+use ::kinmu_model::{
+    DayAttributeName, DayConfig, FillConfig, ResultConfig, Schedule, ScheduleConfig, ScheduleState,
+    ScoreFilter, ScoreFunction, Staff, StaffAttributeNameIndexMap, StaffConfig,
 };
 
 use super::util::parser::*;
 
 /// 勤務表で使う値を読み込む
-pub fn convert_schedule_config(config: RawScheduleConfig) -> anyhow::Result<ScheduleConfig> {
+pub fn convert_schedule_config<SP: FromConfig, S: FromConfig + MapState<SS>, SS, DS: FromConfig>(
+    config: RawScheduleConfig,
+) -> anyhow::Result<ScheduleConfig<SP, S, SS, DS>> {
     let schedule = config
         .day
         .requested_schedule
         .iter()
         .map(|s| {
-            <ScheduleRowWrapper>::from_config(s)
+            <ScheduleRowWrapper<S>>::from_config(s)
                 .map(|w| w.0)
                 .with_context(|| format!("Failed to parse schedule row \"{}\"", s))
         })
-        .collect::<anyhow::Result<Schedule>>()
+        .collect::<anyhow::Result<Schedule<S>>>()
         .context("Failed to parse day.requested_schedule")?;
 
     let staff_config = StaffConfig {
@@ -50,8 +51,9 @@ pub fn convert_schedule_config(config: RawScheduleConfig) -> anyhow::Result<Sche
     let day_config = DayConfig {
         count: config.day.day_count,
         buffer_count: config.day.buffer_count,
-        days: <Vec<DayState>>::from_config(&config.day.states)
-            .context("Failed to parse day.states")?,
+        days: <DayStateWrapper<DS>>::from_config(&config.day.states)
+            .context("Failed to parse day.states")?
+            .0,
         schedule_states: make_schedule_state(&schedule, config.day.buffer_count),
         requested_schedule: schedule,
         attributes: make_day_attributes(config.day.attributes),
@@ -72,8 +74,8 @@ pub fn convert_schedule_config(config: RawScheduleConfig) -> anyhow::Result<Sche
                     scores: sf
                         .scores
                         .iter()
-                        .map(|s| <ScoreProp>::from_config(s))
-                        .collect::<anyhow::Result<Vec<ScoreProp>>>()
+                        .map(|s| <SP>::from_config(s))
+                        .collect::<anyhow::Result<Vec<SP>>>()
                         .with_context(|| {
                             format!("Failed to parse score_function named {}", &sf.display_name)
                         })?,
@@ -84,11 +86,11 @@ pub fn convert_schedule_config(config: RawScheduleConfig) -> anyhow::Result<Sche
                     }),
                 })
             })
-            .collect::<anyhow::Result<Vec<ScoreFunction>>>()
+            .collect::<anyhow::Result<Vec<ScoreFunction<SP>>>>()
             .context("Failed to parse result.score_functions")?,
     };
 
-    let schedule_config: ScheduleConfig = ScheduleConfig {
+    let schedule_config: ScheduleConfig<SP, S, SS, DS> = ScheduleConfig {
         staff: staff_config,
         day: day_config,
         fill: fill_config,
@@ -118,20 +120,25 @@ fn make_staff_attribute_map(attributes: Vec<String>) -> StaffAttributeNameIndexM
     }
 }
 
-fn make_schedule_state(schedule: &Schedule, buffer: usize) -> ScheduleState {
-    let mut ans: ScheduleState = Vec::new();
+pub trait MapState<SS> {
+    const BUFFER_CASE: SS;
+    fn to_state(&self) -> SS;
+}
+
+fn make_schedule_state<S: MapState<SS>, SS>(
+    schedule: &Schedule<S>,
+    buffer: usize,
+) -> ScheduleState<SS> {
+    let mut ans: ScheduleState<SS> = Vec::new();
     for line in schedule {
         ans.push(
             line.iter()
                 .enumerate()
                 .map(|(i, shift)| {
                     if i < buffer {
-                        ShiftState::Absolute
+                        S::BUFFER_CASE
                     } else {
-                        match shift {
-                            Shift::U => ShiftState::Random,
-                            _ => ShiftState::Absolute,
-                        }
+                        shift.to_state()
                     }
                 })
                 .collect(),

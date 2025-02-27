@@ -5,18 +5,28 @@ fill1はUをランダムな枠に
 fill2はIとKの数合わせてうまいこと埋める
 */
 
-use super::seed;
-use super::types::{FillConfig, Schedule, ScheduleConfig, Shift, ShiftState};
+use super::types::{DayState, Schedule, ScheduleConfig, ScoreProp, Shift, ShiftState};
+
+use ::kinmu_generator as gen;
 
 use rand::Rng;
 
-pub fn run(fc: &mut FillConfig, schedule_config: &ScheduleConfig) -> anyhow::Result<Schedule> {
-    let mut rng = &mut seed::gen_rng_from_seed(fc.seed);
-    match fc.name.as_str() {
-        "no_fill" => Ok(no_fill(schedule_config, &mut rng)),
-        "fill1" => Ok(fill_randomly1(schedule_config, &mut rng)),
-        "fill2" => Ok(fill_randomly2(schedule_config, &mut rng)),
-        _ => Err(anyhow::anyhow!("Failed to parse fill function {}", fc.name)),
+#[derive(Debug, Clone)]
+pub struct Fill;
+
+impl gen::Fill<ScoreProp, Shift, ShiftState, DayState> for Fill {
+    fn run<R: Rng>(
+        &self,
+        name: &str,
+        schedule_config: &kinmu_model::ScheduleConfig<ScoreProp, Shift, ShiftState, DayState>,
+        mut rng: &mut R,
+    ) -> anyhow::Result<kinmu_model::Schedule<Shift>> {
+        match name {
+            "no_fill" => Ok(no_fill(schedule_config, &mut rng)),
+            "fill1" => Ok(fill_randomly1(schedule_config, &mut rng)),
+            "fill2" => Ok(fill_randomly2(schedule_config, &mut rng)),
+            _ => Err(anyhow::anyhow!("Failed to parse fill function {}", name)),
+        }
     }
 }
 

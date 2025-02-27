@@ -93,6 +93,7 @@ dependencies = [
  "kinmu_core",
  "kinmu_generator",
  "kinmu_input",
+ "kinmu_lib",
  "kinmu_output",
  "rand",
 ]
@@ -125,7 +126,8 @@ dependencies = [
  "anyhow",
  "kinmu_annealing",
  "kinmu_core",
- "kinmu_lib",
+ "kinmu_model",
+ "rand",
 ]
 
 [[package]]
@@ -134,7 +136,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "kinmu_core",
- "kinmu_lib",
+ "kinmu_model",
  "serde",
  "toml",
 ]
@@ -144,8 +146,15 @@ name = "kinmu_lib"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "kinmu_generator",
+ "kinmu_input",
+ "kinmu_model",
  "rand",
 ]
+
+[[package]]
+name = "kinmu_model"
+version = "0.1.0"
 
 [[package]]
 name = "kinmu_output"
@@ -154,7 +163,7 @@ dependencies = [
  "anyhow",
  "kinmu_color",
  "kinmu_core",
- "kinmu_lib",
+ "kinmu_model",
 ]
 
 [[package]]

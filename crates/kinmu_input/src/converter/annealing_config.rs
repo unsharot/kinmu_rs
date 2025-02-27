@@ -1,12 +1,12 @@
 //! annealing_configを読み込むモジュール
 
-use super::super::reader::types::RawAnnealingConfig;
-use ::kinmu_lib::types::{AnnealingConfig, ScoreProp};
-
-use super::util::parser::*;
+use super::{super::reader::types::RawAnnealingConfig, FromConfig};
+use ::kinmu_model::AnnealingConfig;
 
 /// 焼きなましの段階ごとの設定を読み込む
-pub fn convert_annealing_config(config: RawAnnealingConfig) -> anyhow::Result<AnnealingConfig> {
+pub fn convert_annealing_config<SP: FromConfig + Clone>(
+    config: RawAnnealingConfig,
+) -> anyhow::Result<AnnealingConfig<SP>> {
     let ac = AnnealingConfig {
         step: config.step_count,
         seed: config.seed,
@@ -16,10 +16,10 @@ pub fn convert_annealing_config(config: RawAnnealingConfig) -> anyhow::Result<An
             .map(|sf| {
                 sf.scores
                     .iter()
-                    .map(|s| ScoreProp::from_config(s))
-                    .collect::<anyhow::Result<Vec<ScoreProp>>>()
+                    .map(|s| SP::from_config(s))
+                    .collect::<anyhow::Result<Vec<SP>>>()
             })
-            .collect::<anyhow::Result<Vec<Vec<ScoreProp>>>>()?
+            .collect::<anyhow::Result<Vec<Vec<SP>>>>()?
             .concat(),
         update_func: config.update_function,
         max_temp: config.temp.max,

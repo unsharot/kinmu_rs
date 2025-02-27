@@ -1,28 +1,44 @@
 //! NGリストにあるペアがともに指定したシフトなら発火するスコア
 
-use super::super::types::{CondWrapper, Schedule, ScheduleConfig, Score, Shift};
+use super::super::types::{CondWrapper, Schedule, ScheduleConfig, Shift};
 
-pub(super) fn eval(
+use ::kinmu_model::Score;
+
+macro_rules! eval {
+    ($eval:ident, $schedule_config:expr, $schedule:expr, $cond:expr, $shift:expr, $score:expr) => {{
+        let mut sum = 0.0;
+        for day in 0..$schedule_config.day.count {
+            let mut a = 0.0;
+            for i in 0..$schedule_config.staff.ng_list.len() {
+                let (staff1, staff2) = $schedule_config.staff.ng_list[i];
+                if $cond.$eval(staff1, day, $schedule_config)
+                    && $cond.$eval(staff2, day, $schedule_config)
+                    && $schedule[staff1][day] == *$shift
+                    && $schedule[staff2][day] == *$shift
+                {
+                    a += *$score;
+                }
+            }
+            sum += a;
+        }
+        sum
+    }};
+}
+
+pub(super) fn eval_mut(
     schedule_config: &ScheduleConfig,
     schedule: &Schedule,
     (cond, shift, score): &mut (CondWrapper, Shift, Score),
 ) -> Score {
-    let mut sum = 0.0;
-    for day in 0..schedule_config.day.count {
-        let mut a = 0.0;
-        for i in 0..schedule_config.staff.ng_list.len() {
-            let (staff1, staff2) = schedule_config.staff.ng_list[i];
-            if cond.eval(staff1, day, schedule_config)
-                && cond.eval(staff2, day, schedule_config)
-                && schedule[staff1][day] == *shift
-                && schedule[staff2][day] == *shift
-            {
-                a += *score;
-            }
-        }
-        sum += a;
-    }
-    sum
+    eval!(eval_mut, schedule_config, schedule, cond, shift, score)
+}
+
+pub(super) fn eval_immut(
+    schedule_config: &ScheduleConfig,
+    schedule: &Schedule,
+    (cond, shift, score): &(CondWrapper, Shift, Score),
+) -> Score {
+    eval!(eval_immut, schedule_config, schedule, cond, shift, score)
 }
 
 #[cfg(test)]
@@ -44,7 +60,7 @@ mod tests {
         schedule_config.staff.count = schedule.len();
         schedule_config.staff.ng_list.push((0, 1));
 
-        let score = eval(
+        let score = eval_mut(
             &schedule_config,
             &schedule,
             &mut (CondWrapper::new(Cond::Every), Shift::I, 1.0),
@@ -67,7 +83,7 @@ mod tests {
         schedule_config.staff.ng_list.push((0, 1));
         schedule_config.staff.ng_list.push((0, 1));
 
-        let score = eval(
+        let score = eval_mut(
             &schedule_config,
             &schedule,
             &mut (CondWrapper::new(Cond::Every), Shift::I, 1.0),
