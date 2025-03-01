@@ -52,7 +52,7 @@ impl FromConfig for Shift {
     }
 }
 
-pub type Schedule = Vec<Vec<Shift>>;
+pub type Schedule = kinmu_model::Schedule<Shift>;
 
 #[derive(PartialEq, Clone, Debug, Default)]
 pub enum ShiftState {
@@ -61,7 +61,7 @@ pub enum ShiftState {
     Random,
 }
 
-pub type ScheduleState = Vec<Vec<ShiftState>>;
+pub type ScheduleState = kinmu_model::ScheduleState<ShiftState>;
 
 impl MapState<ShiftState> for Shift {
     const BUFFER_CASE: ShiftState = ShiftState::Absolute;

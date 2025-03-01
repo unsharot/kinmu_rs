@@ -3,10 +3,10 @@
 use super::super::score::{eval_score_immut, eval_score_mut};
 use super::cond::CondWrapper;
 use super::schedule::{DayState, Shift, ShiftState};
-use super::Cond;
+use super::{Cond, Schedule, ScheduleConfig};
 
 use ::kinmu_input::{Check, FromConfig};
-use ::kinmu_model::{DayAttributeName, ScheduleConfig, Score, ScorePropTrait, StaffAttributeName};
+use ::kinmu_model::{DayAttributeName, Score, ScorePropTrait, StaffAttributeName};
 
 use anyhow::Context as _;
 use std::fmt;
@@ -63,28 +63,17 @@ impl fmt::Display for ScoreProp {
 }
 
 impl ScorePropTrait<Shift, ShiftState, DayState> for ScoreProp {
-    fn eval_mut(
-        &mut self,
-        schedule_config: &kinmu_model::ScheduleConfig<Self, Shift, ShiftState, DayState>,
-        schedule: &kinmu_model::Schedule<Shift>,
-    ) -> Score {
+    fn eval_mut(&mut self, schedule_config: &ScheduleConfig, schedule: &Schedule) -> Score {
         eval_score_mut(self, schedule_config, schedule)
     }
 
-    fn eval_immut(
-        &self,
-        schedule_config: &kinmu_model::ScheduleConfig<Self, Shift, ShiftState, DayState>,
-        schedule: &kinmu_model::Schedule<Shift>,
-    ) -> Score {
+    fn eval_immut(&self, schedule_config: &ScheduleConfig, schedule: &Schedule) -> Score {
         eval_score_immut(self, schedule_config, schedule)
     }
 }
 
 impl Check<Shift, ShiftState, DayState> for ScoreProp {
-    fn check(
-        &self,
-        schedule_config: &kinmu_model::ScheduleConfig<Self, Shift, ShiftState, DayState>,
-    ) -> anyhow::Result<()> {
+    fn check(&self, schedule_config: &ScheduleConfig) -> anyhow::Result<()> {
         match self {
             ScoreProp::PatternGeneral((c, _, _)) => check_cond_wrapper(c, schedule_config),
             ScoreProp::PatternFixed((c, _, _)) => check_cond_wrapper(c, schedule_config),
@@ -117,20 +106,14 @@ impl Check<Shift, ShiftState, DayState> for ScoreProp {
 }
 
 /// CondWrapperの中のStaffAttributeNameやDayAttributeNameが有効か
-fn check_cond_wrapper(
-    c: &CondWrapper,
-    sc: &ScheduleConfig<ScoreProp, Shift, ShiftState, DayState>,
-) -> anyhow::Result<()> {
+fn check_cond_wrapper(c: &CondWrapper, sc: &ScheduleConfig) -> anyhow::Result<()> {
     check_cond(&c.cond, sc)
         .with_context(|| format!("CondWrapper {:?} の変換チェックに失敗しました", &c.cond))?;
     Ok(())
 }
 
 /// Condの中のStaffAttributeNameやDayAttributeNameが有効か
-fn check_cond(
-    c: &Cond,
-    sc: &ScheduleConfig<ScoreProp, Shift, ShiftState, DayState>,
-) -> anyhow::Result<()> {
+fn check_cond(c: &Cond, sc: &ScheduleConfig) -> anyhow::Result<()> {
     match c {
         Cond::Every => Ok(()),
         Cond::Or((c1, c2)) => check_cond(c1, sc).and(check_cond(c2, sc)),
@@ -154,7 +137,7 @@ fn check_cond(
 /// StaffAttributeNameが有効か
 fn check_staff_attribute_exists(
     sa: &StaffAttributeName,
-    sc: &ScheduleConfig<ScoreProp, Shift, ShiftState, DayState>,
+    sc: &ScheduleConfig,
 ) -> anyhow::Result<()> {
     if sc.staff.attribute_map.names.contains(sa) {
         Ok(())
@@ -167,10 +150,7 @@ fn check_staff_attribute_exists(
 }
 
 /// DayAttributeNameが有効か
-fn check_day_attribute_exists(
-    da: &DayAttributeName,
-    sc: &ScheduleConfig<ScoreProp, Shift, ShiftState, DayState>,
-) -> anyhow::Result<()> {
+fn check_day_attribute_exists(da: &DayAttributeName, sc: &ScheduleConfig) -> anyhow::Result<()> {
     if sc.day.attributes.contains_key(da) {
         Ok(())
     } else {

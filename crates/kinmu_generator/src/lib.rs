@@ -4,9 +4,9 @@ mod seed;
 
 use ::kinmu_annealing;
 use ::kinmu_core::Generator;
-use ::kinmu_model::ScorePropTrait;
 use ::kinmu_model::{
     eval_scores_mut, AnnealingConfig, Answer, FillConfig, MainConfig, Schedule, ScheduleConfig,
+    ScorePropTrait,
 };
 
 use std::thread;

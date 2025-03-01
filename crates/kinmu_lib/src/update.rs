@@ -16,10 +16,8 @@ impl gen::Update<ScoreProp, Shift, ShiftState, DayState> for Update {
     fn generate<'a, R: Rng>(
         &self,
         name: &str,
-        schedule_config: &'a kinmu_model::ScheduleConfig<ScoreProp, Shift, ShiftState, DayState>,
-    ) -> anyhow::Result<
-        Box<dyn FnMut(&kinmu_model::Schedule<Shift>, &mut R) -> kinmu_model::Schedule<Shift> + 'a>,
-    > {
+        schedule_config: &'a ScheduleConfig,
+    ) -> anyhow::Result<Box<dyn FnMut(&Schedule, &mut R) -> Schedule + 'a>> {
         let schedule_state = &schedule_config.day.schedule_states;
         match name {
             "update1" => Ok(Box::new(move |schedule, rng| {

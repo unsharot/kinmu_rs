@@ -8,6 +8,4 @@ pub use self::cond::*;
 pub use self::schedule::*;
 pub use self::score::*;
 
-pub type FilePath = String;
-
 pub type ScheduleConfig = kinmu_model::ScheduleConfig<ScoreProp, Shift, ShiftState, DayState>;

@@ -18,9 +18,9 @@ impl gen::Fill<ScoreProp, Shift, ShiftState, DayState> for Fill {
     fn run<R: Rng>(
         &self,
         name: &str,
-        schedule_config: &kinmu_model::ScheduleConfig<ScoreProp, Shift, ShiftState, DayState>,
+        schedule_config: &ScheduleConfig,
         mut rng: &mut R,
-    ) -> anyhow::Result<kinmu_model::Schedule<Shift>> {
+    ) -> anyhow::Result<Schedule> {
         match name {
             "no_fill" => Ok(no_fill(schedule_config, &mut rng)),
             "fill1" => Ok(fill_randomly1(schedule_config, &mut rng)),
