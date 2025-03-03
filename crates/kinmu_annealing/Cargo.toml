@@ -3,7 +3,9 @@ name = "kinmu_annealing"
 version = "0.1.0"
 authors = ["unsharot"]
 edition = "2021"
-description = "A crate to provide Simulated Annealing for kinmu."
+license = "MIT"
+description = "Provides simulated annealing for kinmu."
+repository = "https://github.com/unsharot/kinmu_rs"
 
 [dependencies]
 rand = { workspace = true }

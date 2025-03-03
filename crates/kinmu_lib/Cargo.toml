@@ -1,7 +1,11 @@
 [package]
 name = "kinmu_lib"
 version = "0.1.0"
+authors = ["unsharot"]
 edition = "2021"
+license = "MIT"
+description = "Provides specific scores and functions for kinmu."
+repository = "https://github.com/unsharot/kinmu_rs"
 
 [dependencies]
 kinmu_model = { workspace = true }

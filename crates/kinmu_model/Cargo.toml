@@ -1,6 +1,10 @@
 [package]
 name = "kinmu_model"
 version = "0.1.0"
+authors = ["unsharot"]
 edition = "2021"
+license = "MIT"
+description = "Provides generalized types for kinmu."
+repository = "https://github.com/unsharot/kinmu_rs"
 
 [dependencies]

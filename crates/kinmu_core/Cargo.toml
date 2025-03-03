@@ -1,7 +1,11 @@
 [package]
 name = "kinmu_core"
 version = "0.1.0"
+authors = ["unsharot"]
 edition = "2021"
+license = "MIT"
+description = "Provides main flow for kinmu."
+repository = "https://github.com/unsharot/kinmu_rs"
 
 [dependencies]
 anyhow = { workspace = true }
