@@ -1,7 +1,7 @@
 //! 指定したシフトが指定回数連続して存在するか判定するスコア
 //! 指定回数+1回連続は1回分としてカウントされる
 
-use super::super::types::{CondWrapper, Schedule, ScheduleConfig, Shift};
+use super::super::{CondWrapper, Schedule, ScheduleConfig, Shift};
 
 use ::kinmu_model::Score;
 
@@ -66,7 +66,7 @@ pub(super) fn eval_immut(
 
 #[cfg(test)]
 mod tests {
-    use crate::types::Cond;
+    use crate::Cond;
 
     use super::*;
 

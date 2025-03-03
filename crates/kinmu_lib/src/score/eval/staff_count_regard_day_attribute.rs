@@ -1,6 +1,6 @@
 //! 指定したシフトがDayAttributeで指定した数いない場合に発火するスコア
 
-use super::super::types::{CondWrapper, Schedule, ScheduleConfig, Shift};
+use super::super::{CondWrapper, Schedule, ScheduleConfig, Shift};
 
 use kinmu_model::{DayAttributeName, Score};
 
@@ -65,7 +65,7 @@ pub(super) fn eval_immut(
 
 #[cfg(test)]
 mod tests {
-    use crate::types::Cond;
+    use crate::Cond;
 
     use super::*;
 

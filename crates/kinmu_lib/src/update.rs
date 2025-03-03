@@ -1,6 +1,6 @@
 //! 焼きなましで使う更新関数のモジュール
 
-use super::types::{
+use super::{
     DayState, Schedule, ScheduleConfig, ScheduleState, ScoreProp, Shift, ShiftState,
 };
 

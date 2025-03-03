@@ -1,25 +1,29 @@
-//! 指定したシフトが指定した数いない場合に発火するスコア
+//! 指定した2つのシフト数がスタッフあたりでバランス良いか判定するスコア
 
-use super::super::types::{CondWrapper, Schedule, ScheduleConfig, Shift};
+use super::super::{CondWrapper, Schedule, ScheduleConfig, Shift};
 
 use ::kinmu_model::Score;
 
 macro_rules! eval {
-    ($eval:ident, $schedule_config:expr, $schedule:expr, $cond:expr, $shift:expr, $count:expr, $score:expr) => {{
+    ($eval:ident, $schedule_config:expr, $schedule:expr, $cond:expr, $shift1:expr, $shift2:expr, $score:expr) => {{
         let mut sum = 0.0;
-        for day in 0..$schedule_config.day.count {
+        for staff in 0..$schedule_config.staff.count {
             let mut is_valid = false;
-            let mut staff_count = 0;
-            for staff in 0..$schedule_config.staff.count {
+            let mut count1: i32 = 0;
+            let mut count2: i32 = 0;
+            for day in 0..$schedule_config.day.count {
                 if $cond.$eval(staff, day, $schedule_config) {
                     is_valid = true;
-                    if $schedule[staff][day] == *$shift {
-                        staff_count += 1;
+                    if $schedule[staff][day] == *$shift1 {
+                        count1 += 1;
+                    }
+                    if $schedule[staff][day] == *$shift2 {
+                        count2 += 1;
                     }
                 }
             }
             if is_valid {
-                let d = (staff_count - *$count).abs() as Score;
+                let d = (count1 - count2).abs() as Score;
                 let a = d * *$score;
                 sum += a * a;
             }
@@ -32,15 +36,15 @@ macro_rules! eval {
 pub(super) fn eval_mut(
     schedule_config: &ScheduleConfig,
     schedule: &Schedule,
-    (cond, shift, count, score): &mut (CondWrapper, Shift, i32, Score),
+    (cond, shift1, shift2, score): &mut (CondWrapper, Shift, Shift, Score),
 ) -> Score {
     eval!(
         eval_mut,
         schedule_config,
         schedule,
         cond,
-        shift,
-        count,
+        shift1,
+        shift2,
         score
     )
 }
@@ -49,31 +53,31 @@ pub(super) fn eval_mut(
 pub(super) fn eval_immut(
     schedule_config: &ScheduleConfig,
     schedule: &Schedule,
-    (cond, shift, count, score): &(CondWrapper, Shift, i32, Score),
+    (cond, shift1, shift2, score): &(CondWrapper, Shift, Shift, Score),
 ) -> Score {
     eval!(
         eval_immut,
         schedule_config,
         schedule,
         cond,
-        shift,
-        count,
+        shift1,
+        shift2,
         score
     )
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::types::Cond;
+    use crate::Cond;
 
     use super::*;
 
-    /// Nが常に1なケース
+    /// 2つのシフトの数が同じ場合
     #[test]
-    fn test_pass() {
+    fn test_eq() {
         let schedule = {
             use Shift::*;
-            vec![vec![O, H, N, N], vec![N, N, O, O]]
+            vec![vec![O, H, N, N]]
         };
 
         let mut schedule_config: ScheduleConfig = Default::default();
@@ -83,18 +87,18 @@ mod tests {
         let score = eval_mut(
             &schedule_config,
             &schedule,
-            &mut (CondWrapper::new(Cond::Every), Shift::N, 1, 1.0),
+            &mut (CondWrapper::new(Cond::Every), Shift::O, Shift::H, 1.0),
         );
 
         assert_eq!(0.0, score);
     }
 
-    /// Nが一部0なケース
+    /// 2つのシフトの数が違う場合
     #[test]
-    fn test_hit_over() {
+    fn test_neq() {
         let schedule = {
             use Shift::*;
-            vec![vec![O, H, N, N], vec![N, K, O, O]]
+            vec![vec![O, H, N, O]]
         };
 
         let mut schedule_config: ScheduleConfig = Default::default();
@@ -104,28 +108,7 @@ mod tests {
         let score = eval_mut(
             &schedule_config,
             &schedule,
-            &mut (CondWrapper::new(Cond::Every), Shift::N, 1, 1.0),
-        );
-
-        assert_eq!(1.0, score);
-    }
-
-    /// Nが一部2なケース
-    #[test]
-    fn test_hit_lack() {
-        let schedule = {
-            use Shift::*;
-            vec![vec![O, N, N, N], vec![N, N, O, O]]
-        };
-
-        let mut schedule_config: ScheduleConfig = Default::default();
-        schedule_config.day.count = schedule[0].len();
-        schedule_config.staff.count = schedule.len();
-
-        let score = eval_mut(
-            &schedule_config,
-            &schedule,
-            &mut (CondWrapper::new(Cond::Every), Shift::N, 1, 1.0),
+            &mut (CondWrapper::new(Cond::Every), Shift::O, Shift::H, 1.0),
         );
 
         assert_eq!(1.0, score);

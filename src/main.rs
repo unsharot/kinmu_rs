@@ -1,9 +1,7 @@
 use ::kinmu_color;
 use ::kinmu_generator::GeneratorWithAnnealing;
 use ::kinmu_input::InputByFile;
-use ::kinmu_lib::fill::Fill;
-use ::kinmu_lib::types::Shift;
-use ::kinmu_lib::update::Update;
+use ::kinmu_lib::{Fill, Shift, Update};
 use ::kinmu_output::OutputText;
 
 use getopts::Options;

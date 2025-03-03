@@ -1,7 +1,7 @@
 //! 指定したシフトが月の前後どちらにあるほうが良いか設定する
 //! Scoreのフィールドが正なら前を優先、負なら後ろを優先
 
-use super::super::types::{CondWrapper, Schedule, ScheduleConfig, Shift};
+use super::super::{CondWrapper, Schedule, ScheduleConfig, Shift};
 
 use ::kinmu_model::Score;
 
@@ -61,7 +61,7 @@ pub(super) fn eval_immut(
 
 #[cfg(test)]
 mod tests {
-    use crate::types::Cond;
+    use crate::Cond;
 
     use super::*;
 

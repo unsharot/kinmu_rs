@@ -5,7 +5,7 @@ fill1はUをランダムな枠に
 fill2はIとKの数合わせてうまいこと埋める
 */
 
-use super::types::{DayState, Schedule, ScheduleConfig, ScoreProp, Shift, ShiftState};
+use super::{DayState, Schedule, ScheduleConfig, ScoreProp, Shift, ShiftState};
 
 use ::kinmu_generator as gen;
 
