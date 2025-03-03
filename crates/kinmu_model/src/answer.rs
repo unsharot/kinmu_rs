@@ -1,5 +1,5 @@
 use super::config::ScheduleConfig;
-use super::types::Schedule;
+use super::Schedule;
 
 use std::time::Duration;
 

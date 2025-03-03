@@ -1,4 +1,4 @@
-use super::super::{Schedule, ScheduleConfig};
+use super::{Schedule, ScheduleConfig};
 
 pub type Score = f32;
 
