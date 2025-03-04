@@ -8,7 +8,7 @@ use ::kinmu_model::{AnnealingConfig, MainConfig, ScheduleConfig, ScoreFunction};
 /// チェックの関数
 pub fn run<SP, S, SS, DS>(config: &MainConfig<SP, S, SS, DS>) -> anyhow::Result<()>
 where
-    SP: Check<S, SS, DS>,
+    SP: Check<SP, S, SS, DS>,
 {
     for schedule_config in &config.schedule_configs {
         check_schedule_config(schedule_config)
@@ -26,7 +26,7 @@ fn check_schedule_config<SP, S, SS, DS>(
     schedule_config: &ScheduleConfig<SP, S, SS, DS>,
 ) -> anyhow::Result<()>
 where
-    SP: Check<S, SS, DS>,
+    SP: Check<SP, S, SS, DS>,
 {
     check_staff_attributes(schedule_config)
         .context("staff.attributesの変換チェックに失敗しました")?;
@@ -59,7 +59,7 @@ fn check_annealing_config<SP, S, SS, DS>(
     schedule_config: &ScheduleConfig<SP, S, SS, DS>,
 ) -> anyhow::Result<()>
 where
-    SP: Check<S, SS, DS>,
+    SP: Check<SP, S, SS, DS>,
 {
     annealing_config
         .score_props
@@ -263,7 +263,7 @@ fn check_score_functions<SP, S, SS, DS>(
     sc: &ScheduleConfig<SP, S, SS, DS>,
 ) -> anyhow::Result<()>
 where
-    SP: Check<S, SS, DS>,
+    SP: Check<SP, S, SS, DS>,
 {
     for sf in score_functions {
         sf.scores.iter().try_for_each(|x| {
@@ -278,6 +278,6 @@ where
     Ok(())
 }
 
-pub trait Check<S, SS, DS>: Sized {
-    fn check(&self, schedule_config: &ScheduleConfig<Self, S, SS, DS>) -> anyhow::Result<()>;
+pub trait Check<SP, S, SS, DS>: Sized {
+    fn check(&self, schedule_config: &ScheduleConfig<SP, S, SS, DS>) -> anyhow::Result<()>;
 }

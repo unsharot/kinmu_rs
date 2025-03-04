@@ -4,9 +4,10 @@ mod eval;
 
 use self::eval::{eval_score_immut, eval_score_mut};
 
-use super::cond::CondWrapper;
-use super::schedule::{DayState, Shift, ShiftState};
-use super::{Cond, Schedule, ScheduleConfig};
+use super::{
+    CondWrapper, DayAttributeNameWrapper, DayState, Schedule, ScheduleConfig, Shift, ShiftState,
+    StaffAttributeNameWrapper,
+};
 
 use ::kinmu_input::{Check, FromConfig};
 use ::kinmu_model::{DayAttributeName, Score, ScorePropTrait, StaffAttributeName};
@@ -75,92 +76,34 @@ impl ScorePropTrait<Shift, ShiftState, DayState> for ScoreProp {
     }
 }
 
-impl Check<Shift, ShiftState, DayState> for ScoreProp {
+impl Check<ScoreProp, Shift, ShiftState, DayState> for ScoreProp {
     fn check(&self, schedule_config: &ScheduleConfig) -> anyhow::Result<()> {
         match self {
-            ScoreProp::PatternGeneral((c, _, _)) => check_cond_wrapper(c, schedule_config),
-            ScoreProp::PatternFixed((c, _, _)) => check_cond_wrapper(c, schedule_config),
-            ScoreProp::PatternGeneralAny((c, _, _)) => check_cond_wrapper(c, schedule_config),
-            ScoreProp::PatternFixedAny((c, _, _)) => check_cond_wrapper(c, schedule_config),
-            ScoreProp::Streak((c, _, _, _)) => check_cond_wrapper(c, schedule_config),
-            ScoreProp::ShiftsBalance((c, _, _, _)) => check_cond_wrapper(c, schedule_config),
-            ScoreProp::ShiftHalfBalance((c, _, _)) => check_cond_wrapper(c, schedule_config),
-            ScoreProp::ShiftDirPriority((c, _, _)) => check_cond_wrapper(c, schedule_config),
-            ScoreProp::DayCountRegardStaffAttribute((c, _, sa, _)) => {
-                check_cond_wrapper(c, schedule_config)
-                    .and(check_staff_attribute_exists(sa, schedule_config))
-            }
-            ScoreProp::StaffCountRegardDayAttribute((c, _, da, _)) => {
-                check_cond_wrapper(c, schedule_config)
-                    .and(check_day_attribute_exists(da, schedule_config))
-            }
-            ScoreProp::StaffCount((c, _, _, _)) => check_cond_wrapper(c, schedule_config),
-            ScoreProp::StaffCountAtLeast((c, _, _, _)) => check_cond_wrapper(c, schedule_config),
+            ScoreProp::PatternGeneral((c, _, _)) => c.check(schedule_config),
+            ScoreProp::PatternFixed((c, _, _)) => c.check(schedule_config),
+            ScoreProp::PatternGeneralAny((c, _, _)) => c.check(schedule_config),
+            ScoreProp::PatternFixedAny((c, _, _)) => c.check(schedule_config),
+            ScoreProp::Streak((c, _, _, _)) => c.check(schedule_config),
+            ScoreProp::ShiftsBalance((c, _, _, _)) => c.check(schedule_config),
+            ScoreProp::ShiftHalfBalance((c, _, _)) => c.check(schedule_config),
+            ScoreProp::ShiftDirPriority((c, _, _)) => c.check(schedule_config),
+            ScoreProp::DayCountRegardStaffAttribute((c, _, sa, _)) => c
+                .check(schedule_config)
+                .and(StaffAttributeNameWrapper(sa).check(schedule_config)),
+            ScoreProp::StaffCountRegardDayAttribute((c, _, da, _)) => c
+                .check(schedule_config)
+                .and(DayAttributeNameWrapper(da).check(schedule_config)),
+            ScoreProp::StaffCount((c, _, _, _)) => c.check(schedule_config),
+            ScoreProp::StaffCountAtLeast((c, _, _, _)) => c.check(schedule_config),
             ScoreProp::StaffCountWithPremise((c1, _, _, c2, _, _, _)) => {
-                check_cond_wrapper(c1, schedule_config).and(check_cond_wrapper(c2, schedule_config))
+                c1.check(schedule_config).and(c2.check(schedule_config))
             }
-            ScoreProp::NGPair((c, _, _)) => check_cond_wrapper(c, schedule_config),
-            ScoreProp::NoSamePair((c, _, _, _)) => check_cond_wrapper(c, schedule_config),
+            ScoreProp::NGPair((c, _, _)) => c.check(schedule_config),
+            ScoreProp::NoSamePair((c, _, _, _)) => c.check(schedule_config),
         }
         .with_context(|| format!("スコア {:?} の変換チェックに失敗しました", self))?;
 
         Ok(())
-    }
-}
-
-/// CondWrapperの中のStaffAttributeNameやDayAttributeNameが有効か
-fn check_cond_wrapper(c: &CondWrapper, sc: &ScheduleConfig) -> anyhow::Result<()> {
-    check_cond(&c.cond, sc)
-        .with_context(|| format!("CondWrapper {:?} の変換チェックに失敗しました", &c.cond))?;
-    Ok(())
-}
-
-/// Condの中のStaffAttributeNameやDayAttributeNameが有効か
-fn check_cond(c: &Cond, sc: &ScheduleConfig) -> anyhow::Result<()> {
-    match c {
-        Cond::Every => Ok(()),
-        Cond::Or((c1, c2)) => check_cond(c1, sc).and(check_cond(c2, sc)),
-        Cond::And((c1, c2)) => check_cond(c1, sc).and(check_cond(c2, sc)),
-        Cond::Not(c) => check_cond(c, sc),
-
-        Cond::DayExceptBuffer => Ok(()),
-        Cond::DayInRange(_) => Ok(()),
-        Cond::ParticularDayState(_) => Ok(()),
-        Cond::BeforeDayState(_) => Ok(()),
-        Cond::ParticularDay(_) => Ok(()),
-
-        Cond::StaffInRange(_) => Ok(()),
-        Cond::StaffWithAttribute((sa, _)) => check_staff_attribute_exists(sa, sc),
-        Cond::ParticularStaff(_) => Ok(()),
-    }
-    .with_context(|| format!("Cond {:?} の変換チェックに失敗しました", c))?;
-    Ok(())
-}
-
-/// StaffAttributeNameが有効か
-fn check_staff_attribute_exists(
-    sa: &StaffAttributeName,
-    sc: &ScheduleConfig,
-) -> anyhow::Result<()> {
-    if sc.staff.attribute_map.names.contains(sa) {
-        Ok(())
-    } else {
-        Err(anyhow::anyhow!(
-            "{} はstaff.attributesに登録されていません",
-            sa
-        ))
-    }
-}
-
-/// DayAttributeNameが有効か
-fn check_day_attribute_exists(da: &DayAttributeName, sc: &ScheduleConfig) -> anyhow::Result<()> {
-    if sc.day.attributes.contains_key(da) {
-        Ok(())
-    } else {
-        Err(anyhow::anyhow!(
-            "{} はday.attributesに登録されていません",
-            da
-        ))
     }
 }
 

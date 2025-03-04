@@ -1,8 +1,6 @@
 //! 焼きなましで使う更新関数のモジュール
 
-use super::{
-    DayState, Schedule, ScheduleConfig, ScheduleState, ScoreProp, Shift, ShiftState,
-};
+use super::{DayState, Schedule, ScheduleConfig, ScheduleState, ScoreProp, Shift, ShiftState};
 
 use ::kinmu_generator as gen;
 use ::kinmu_model::Score;

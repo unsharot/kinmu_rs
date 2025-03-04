@@ -26,7 +26,7 @@ impl<'a> InputByFile<'a> {
 
 impl<SP, S, SS, DS> Input<MainConfig<SP, S, SS, DS>> for InputByFile<'_>
 where
-    SP: FromConfig + Clone + Check<S, SS, DS>,
+    SP: FromConfig + Clone + Check<SP, S, SS, DS>,
     S: FromConfig + MapState<SS>,
     DS: FromConfig,
 {

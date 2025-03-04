@@ -1,10 +1,11 @@
 //! 条件に関わる型の定義
 
-use super::{DayState, ScheduleConfig};
+use super::{DayState, ScheduleConfig, ScoreProp, Shift, ShiftState, StaffAttributeNameWrapper};
 
-use ::kinmu_input::FromConfig;
+use ::kinmu_input::{Check, FromConfig};
 use ::kinmu_model::StaffAttributeName;
 
+use anyhow::Context as _;
 use std::fmt;
 
 #[derive(Debug, PartialEq, Clone, Default)]
@@ -146,5 +147,39 @@ impl FromConfig for CondWrapper {
     fn from_config(s: &str) -> anyhow::Result<Self> {
         let cond = Cond::from_config(s)?;
         Ok(CondWrapper::new(cond))
+    }
+}
+
+impl Check<ScoreProp, Shift, ShiftState, DayState> for Cond {
+    fn check(&self, schedule_config: &ScheduleConfig) -> anyhow::Result<()> {
+        match self {
+            Cond::Every => Ok(()),
+            Cond::Or((c1, c2)) => c1.check(schedule_config).and(c2.check(schedule_config)),
+            Cond::And((c1, c2)) => c1.check(schedule_config).and(c2.check(schedule_config)),
+            Cond::Not(c) => c.check(schedule_config),
+
+            Cond::DayExceptBuffer => Ok(()),
+            Cond::DayInRange(_) => Ok(()),
+            Cond::ParticularDayState(_) => Ok(()),
+            Cond::BeforeDayState(_) => Ok(()),
+            Cond::ParticularDay(_) => Ok(()),
+
+            Cond::StaffInRange(_) => Ok(()),
+            Cond::StaffWithAttribute((sa, _)) => {
+                StaffAttributeNameWrapper(sa).check(schedule_config)
+            }
+            Cond::ParticularStaff(_) => Ok(()),
+        }
+        .with_context(|| format!("Cond {:?} の変換チェックに失敗しました", self))?;
+        Ok(())
+    }
+}
+
+impl Check<ScoreProp, Shift, ShiftState, DayState> for CondWrapper {
+    fn check(&self, schedule_config: &ScheduleConfig) -> anyhow::Result<()> {
+        self.cond.check(schedule_config).with_context(|| {
+            format!("CondWrapper {:?} の変換チェックに失敗しました", &self.cond)
+        })?;
+        Ok(())
     }
 }
