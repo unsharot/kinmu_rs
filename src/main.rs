@@ -9,9 +9,13 @@ use std::env;
 use std::fs::OpenOptions;
 use std::io;
 
+/// 引数で指定しない場合に読み込むmain_configのパス
 const DEFALUT_MAIN_CONFIG_PATH: &str = "example/simple_case/main_config.toml";
+/// kinmuのバージョン
 const VERSION: &str = env!("CARGO_PKG_VERSION");
+/// kinmuのリポジトリ
 const REPOSITORY: &str = env!("CARGO_PKG_REPOSITORY");
+/// kinmuのライセンス
 const LICENSE: &str = env!("CARGO_PKG_LICENSE");
 
 fn write_usage<W: io::Write>(out: &mut W, program: &str, opts: Options) -> io::Result<()> {

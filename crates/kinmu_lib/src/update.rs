@@ -7,9 +7,12 @@ use ::kinmu_model::Score;
 
 use rand::Rng;
 
+/// 生成器で用いる更新関数のための型
+/// GeneratorWithAnnealingのUpdateを実装
 #[derive(Debug, Clone)]
 pub struct Update;
 
+/// Updateの実装
 impl gen::Update<ScoreProp, Shift, ShiftState, DayState> for Update {
     fn generate<'a, R: Rng>(
         &self,

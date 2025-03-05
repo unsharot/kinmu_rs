@@ -20,7 +20,7 @@ use super::{Schedule, ScheduleConfig, ScoreProp};
 
 use ::kinmu_model::Score;
 
-/// スコアを評価する
+/// スコアをmutで評価する
 pub fn eval_score_mut(
     sp: &mut ScoreProp,
     schedule_config: &ScheduleConfig,
@@ -59,6 +59,7 @@ pub fn eval_score_mut(
     }
 }
 
+/// スコアをimmutで評価する
 pub fn eval_score_immut(
     sp: &ScoreProp,
     schedule_config: &ScheduleConfig,

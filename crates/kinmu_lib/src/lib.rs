@@ -1,3 +1,5 @@
+//! 生成に使う具体的な型の実装
+
 mod cond;
 mod config;
 mod fill;

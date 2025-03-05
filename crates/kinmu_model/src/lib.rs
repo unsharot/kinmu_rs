@@ -1,3 +1,6 @@
+//! Config, Answer, ScorePropTrait, Staff, Schedule, ScheduleStateを定義する
+//! 実際のScoreProp, Shift, ShiftState, DayStateには依存せず、パラメータとして残す
+
 mod answer;
 mod config;
 mod schedule;

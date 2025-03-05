@@ -1,4 +1,4 @@
-//! 条件に関わる型の定義
+//! Cond型の定義と実装
 
 use super::{DayState, ScheduleConfig, ScoreProp, Shift, ShiftState, StaffAttributeNameWrapper};
 
@@ -8,6 +8,7 @@ use ::kinmu_model::StaffAttributeName;
 use anyhow::Context as _;
 use std::fmt;
 
+/// ScorePropに用いる条件を管理する型
 #[derive(Debug, PartialEq, Clone, Default)]
 pub enum Cond {
     #[default]

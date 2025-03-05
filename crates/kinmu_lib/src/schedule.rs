@@ -4,6 +4,7 @@ use ::kinmu_input::{FromConfig, MapState};
 
 use std::fmt;
 
+/// シフトの型
 #[derive(Debug, Clone, PartialEq, Copy, Default)]
 pub enum Shift {
     #[default]
@@ -52,8 +53,10 @@ impl FromConfig for Shift {
     }
 }
 
+/// Shiftを用いる具体的なSchedule
 pub type Schedule = kinmu_model::Schedule<Shift>;
 
+/// シフトが固定かどうかを管理する型
 #[derive(PartialEq, Clone, Debug, Default)]
 pub enum ShiftState {
     #[default]
@@ -61,6 +64,7 @@ pub enum ShiftState {
     Random,
 }
 
+/// ShiftStateを用いる具体的なScheduleState
 pub type ScheduleState = kinmu_model::ScheduleState<ShiftState>;
 
 impl MapState<ShiftState> for Shift {
@@ -73,6 +77,7 @@ impl MapState<ShiftState> for Shift {
     }
 }
 
+/// 曜日を管理する型
 #[derive(Debug, PartialEq, Clone, Default)]
 pub enum DayState {
     #[default]

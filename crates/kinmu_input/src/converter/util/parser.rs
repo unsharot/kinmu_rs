@@ -1,8 +1,10 @@
-//! ScoreProp, Shift, Daysを文字列から変換するためのモジュール
+//! FromConfigとその基本的な型への実装
 
 use anyhow::Context as _;
 
+/// configに由来する文字列からの変換を行うトレイト
 pub trait FromConfig: Sized {
+    /// configに由来する文字列からSelfへの変換
     fn from_config(s: &str) -> anyhow::Result<Self>;
 }
 
@@ -165,6 +167,7 @@ impl FromConfig for f32 {
     }
 }
 
+/// DayStateにFromConfigを実装するためのWrapper
 pub struct DayStateWrapper<DS>(pub Vec<DS>);
 
 impl<DS: FromConfig> FromConfig for DayStateWrapper<DS> {
@@ -177,6 +180,7 @@ impl<DS: FromConfig> FromConfig for DayStateWrapper<DS> {
     }
 }
 
+/// requested_scheduleに由来するVec<Shift>にFromConfigを実装するためのWrapper
 pub struct ScheduleRowWrapper<S: FromConfig>(pub Vec<S>);
 
 impl<S: FromConfig> FromConfig for ScheduleRowWrapper<S> {

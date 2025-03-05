@@ -1,4 +1,4 @@
-//! 内部で使用するconfigを読み込むモジュール
+//! 生のtoml形式のconfig型を内部で使用するMainConfig型に変換するモジュール
 
 mod util;
 

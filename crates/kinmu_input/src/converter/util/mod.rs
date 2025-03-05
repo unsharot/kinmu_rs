@@ -1,3 +1,3 @@
-//! converterで共通利用するモジュールをまとめたもの
+//! converterで共通利用するモジュールをまとめたモジュール
 
 pub mod parser;

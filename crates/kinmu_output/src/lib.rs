@@ -1,4 +1,5 @@
-//! 結果をユーザーに出力するモジュール
+//! テキスト出力機能を提供
+//! ファイル出力と標準出力は引数で切り替え
 
 use ::kinmu_color;
 use ::kinmu_core::Output;
@@ -7,6 +8,11 @@ use ::kinmu_model::{eval_scores_immut, Answer, Schedule, ScheduleConfig, ScorePr
 use std::fmt;
 use std::io;
 
+/// テキスト出力の出力器
+/// outは出力先
+/// use_colorは出力に色を使うかで、ファイル出力の場合false、標準出力の場合trueが良い
+/// row_stats_shiftsは行の統計を表示するシフト
+/// column_stats_shiftsは列の統計を表示するシフト
 #[derive(Debug)]
 pub struct OutputText<'a, W: io::Write, S> {
     out: &'a mut W,
@@ -16,6 +22,11 @@ pub struct OutputText<'a, W: io::Write, S> {
 }
 
 impl<'a, W: io::Write, S> OutputText<'a, W, S> {
+    /// コンストラクタ
+    /// outは出力先
+    /// use_colorは出力に色を使うかで、ファイル出力の場合false、標準出力の場合trueが良い
+    /// row_stats_shiftsは行の統計を表示するシフト
+    /// column_stats_shiftsは列の統計を表示するシフト
     pub fn new(
         out: &'a mut W,
         use_color: bool,
@@ -31,6 +42,9 @@ impl<'a, W: io::Write, S> OutputText<'a, W, S> {
     }
 }
 
+/// 出力器の実装
+/// 出力のため、一部の型にfmt::Displayを要求
+/// また、処理上の都合でCloneも要求
 impl<W, SP, S, SS, DS> Output<Vec<Answer<SP, S, SS, DS>>> for OutputText<'_, W, S>
 where
     W: io::Write,
@@ -52,6 +66,8 @@ where
     W: io::Write,
     S: fmt::Display + PartialEq,
 {
+    /// self.outにAnswerを出力
+    /// ただし、戻り値はio::Result<()>であることに注意
     fn write_answer<SP, SS, DS>(&mut self, ans: &Answer<SP, S, SS, DS>) -> io::Result<()>
     where
         S: Clone,
@@ -67,6 +83,7 @@ where
         Ok(())
     }
 
+    /// 1つの表を統計情報やスコア含めて出力
     fn write_model<SP, SS, DS>(
         &mut self,
         schedule_config: &ScheduleConfig<SP, S, SS, DS>,
@@ -141,7 +158,7 @@ where
             // Shiftの行を出力
             self.write_shift_row(schedule_config, schedule, r)?;
 
-            // 統計情報
+            // 行の統計情報
             for s in 0..self.row_stats_shifts.len() {
                 self.write_shift_count_row(s, schedule_config, schedule, r)?;
             }
@@ -157,7 +174,7 @@ where
         // 曜日を表示
         self.write_days(schedule_config)?;
 
-        // 日ごとの統計を表示
+        // 列の統計を表示
         for s in 0..self.column_stats_shifts.len() {
             self.write_shift_count_columns(s, schedule_config, schedule)?;
         }
@@ -165,7 +182,7 @@ where
         Ok(())
     }
 
-    /// Shiftの行を出力
+    /// 表のrで指定した行を出力
     fn write_shift_row<SP, SS, DS>(
         &mut self,
         schedule_config: &ScheduleConfig<SP, S, SS, DS>,
@@ -185,7 +202,8 @@ where
         Ok(())
     }
 
-    /// 指定したシフトの数を出力
+    /// 行のShiftの統計を出力
+    /// row_stats_shiftsのindexで指定したシフトの数をr行目について出力
     fn write_shift_count_row<SP, SS, DS>(
         &mut self,
         index: usize,
@@ -229,7 +247,8 @@ where
         Ok(())
     }
 
-    /// 指定したシフトの列の和を表示
+    /// column_stats_shiftsのindexで指定した列の和を表示
+    /// row_stats_shiftsのindexで指定したシフトの数を各列について出力
     #[allow(clippy::needless_range_loop)]
     fn write_shift_count_columns<SP, SS, DS>(
         &mut self,

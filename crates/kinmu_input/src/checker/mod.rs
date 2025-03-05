@@ -1,11 +1,11 @@
-//! 読み込んだconfigが正常か判定するモジュール
+//! 読み込み、変換したconfigが正常か判定する関数とそのトレイトを提供するモジュール
 
 use anyhow::Context as _;
 use std::cmp::Ordering;
 
 use ::kinmu_model::{AnnealingConfig, MainConfig, ScheduleConfig, ScoreFunction};
 
-/// チェックの関数
+/// 読み込み、変換したconfigが正常か判定する
 pub fn run<SP, S, SS, DS>(config: &MainConfig<SP, S, SS, DS>) -> anyhow::Result<()>
 where
     SP: Check<SP, S, SS, DS>,
@@ -21,7 +21,7 @@ where
     Ok(())
 }
 
-/// 勤務表configのチェック
+/// schedule_configのチェック
 fn check_schedule_config<SP, S, SS, DS>(
     schedule_config: &ScheduleConfig<SP, S, SS, DS>,
 ) -> anyhow::Result<()>
@@ -53,7 +53,7 @@ where
     Ok(())
 }
 
-/// 焼きなましconfigのチェック
+/// annealing_configのチェック
 fn check_annealing_config<SP, S, SS, DS>(
     annealing_config: &AnnealingConfig<SP>,
     schedule_config: &ScheduleConfig<SP, S, SS, DS>,
@@ -70,7 +70,7 @@ where
     Ok(())
 }
 
-/// staffのattributesが十分か
+/// staffのattributesが十分な数あるか
 fn check_staff_attributes<SP, S, SS, DS>(
     schedule_config: &ScheduleConfig<SP, S, SS, DS>,
 ) -> anyhow::Result<()> {
@@ -278,6 +278,9 @@ where
     Ok(())
 }
 
+/// configから変換された型が正常か判定するトレイト
 pub trait Check<SP, S, SS, DS>: Sized {
+    /// schedule_configから、selfが正常か判定
+    /// 正常でない場合、anyhow::Result<()>をcontextをつけてErrで返す
     fn check(&self, schedule_config: &ScheduleConfig<SP, S, SS, DS>) -> anyhow::Result<()>;
 }

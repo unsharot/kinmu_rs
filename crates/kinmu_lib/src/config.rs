@@ -3,8 +3,10 @@ use super::{DayState, ScoreProp, Shift, ShiftState};
 use ::kinmu_input::Check;
 use ::kinmu_model::{DayAttributeName, StaffAttributeName};
 
+/// 具体的なScheduleConfig
 pub type ScheduleConfig = kinmu_model::ScheduleConfig<ScoreProp, Shift, ShiftState, DayState>;
 
+/// StaffAttributeNameにCheckを実装するためのWrapper
 pub(super) struct StaffAttributeNameWrapper<'a>(pub &'a StaffAttributeName);
 
 impl Check<ScoreProp, Shift, ShiftState, DayState> for StaffAttributeNameWrapper<'_> {
@@ -20,6 +22,7 @@ impl Check<ScoreProp, Shift, ShiftState, DayState> for StaffAttributeNameWrapper
     }
 }
 
+/// DayAttributeNameにCheckを実装するためのWrapper
 pub(super) struct DayAttributeNameWrapper<'a>(pub &'a DayAttributeName);
 
 impl Check<ScoreProp, Shift, ShiftState, DayState> for DayAttributeNameWrapper<'_> {

@@ -1,5 +1,6 @@
-//! toml形式のconfigを読み込むためのモジュール
-//! パスを受け取り、configを返す
+//! toml形式のconfigファイルを読み込む入力器を提供
+//! パスを受け取り、MainConfigを返す
+//! また、ここで要求するtraitを定義
 
 use anyhow::Context;
 
@@ -10,20 +11,29 @@ mod checker;
 mod converter;
 mod reader;
 
+// トレイトを外部に公開
 pub use checker::Check;
 pub use converter::{FromConfig, MapState};
 
+/// toml形式のconfigファイルを読み込む入力器
+/// main_configのパスを保持
 #[derive(Debug)]
 pub struct InputByFile<'a> {
     main_config_path: &'a str,
 }
 
 impl<'a> InputByFile<'a> {
+    /// コンストラクタ
+    /// main_configのパスを要求
     pub fn new(main_config_path: &'a str) -> Self {
         InputByFile { main_config_path }
     }
 }
 
+/// 入力器の実装
+/// ScorePropにあたるSPにはCloneとCheckを要求
+/// ShiftにあたるSにはMapStateを要求
+/// SP, S, DayStateにあたるDSにはそれぞれFromConfigを要求
 impl<SP, S, SS, DS> Input<MainConfig<SP, S, SS, DS>> for InputByFile<'_>
 where
     SP: FromConfig + Clone + Check<SP, S, SS, DS>,

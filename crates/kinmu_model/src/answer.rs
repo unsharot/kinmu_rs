@@ -3,6 +3,7 @@ use super::Schedule;
 
 use std::time::Duration;
 
+/// Generatorで出力され、Outputに渡される結果の型
 #[derive(Debug, Clone)]
 pub struct Answer<SP, S, SS, DS> {
     pub models: Vec<Schedule<S>>,

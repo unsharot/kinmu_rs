@@ -1,4 +1,5 @@
-//! 生成を行うモジュール
+//! 焼きなまし法を用いた生成器を提供
+//! また、ここで要求するtraitを定義
 
 mod seed;
 
@@ -14,6 +15,8 @@ use std::time::Instant;
 
 use rand::Rng;
 
+/// 焼きなまし法を用いた生成器
+/// 初めに表を埋めるための型Fと更新のための型Uを保持
 #[derive(Debug)]
 pub struct GeneratorWithAnnealing<F, U> {
     fill: F,
@@ -21,11 +24,16 @@ pub struct GeneratorWithAnnealing<F, U> {
 }
 
 impl<F, U> GeneratorWithAnnealing<F, U> {
+    /// コンストラクタ
+    /// 初めに表を埋めるための型Fと更新のための型Uを要求
     pub fn new(fill: F, update: U) -> Self {
         GeneratorWithAnnealing { fill, update }
     }
 }
 
+/// 生成器の実装
+/// F, UにはFill, Updateを要求
+/// また、スレッドを分けるため各型にClone + std::marker::Send + 'staticを要求
 impl<SP, S, SS, DS, F, U> Generator<MainConfig<SP, S, SS, DS>, Vec<Answer<SP, S, SS, DS>>>
     for GeneratorWithAnnealing<F, U>
 where
@@ -44,6 +52,7 @@ where
     }
 }
 
+/// 勤務表をMainConfigで指定した回数ループして生成
 fn generate_schedules<SP, S, SS, DS, F, U>(
     config: &MainConfig<SP, S, SS, DS>,
     fill: &F,
@@ -72,6 +81,7 @@ where
     Ok(answers)
 }
 
+/// 勤務表をマルチスレッドで複数生成
 fn generate_schedule<SP, S, SS, DS, F, U>(
     schedule_config: &ScheduleConfig<SP, S, SS, DS>,
     thread_count: u32,
@@ -118,6 +128,7 @@ where
     })
 }
 
+/// 焼きなましを実行する
 fn annealing<SP, S, SS, DS, F, U>(
     schedule_config: ScheduleConfig<SP, S, SS, DS>,
     fill_config: FillConfig,
@@ -158,7 +169,9 @@ where
     Ok(model)
 }
 
+/// GeneratorWithAnnealingで用いるFillの共通のふるまい
 pub trait Fill<SP, S, SS, DS> {
+    /// 名前とScheduleConfig, Rngから埋めた表を出力
     fn run<R: Rng>(
         &self,
         name: &str,
@@ -167,8 +180,10 @@ pub trait Fill<SP, S, SS, DS> {
     ) -> anyhow::Result<Schedule<S>>;
 }
 
+/// GeneratorWithAnnealingで用いるUpdateの共通のふるまい
 #[allow(clippy::type_complexity)]
 pub trait Update<SP, S, SS, DS> {
+    /// 名前とScheduleConfigからクロージャーを生成
     fn generate<'a, R: Rng>(
         &self,
         name: &str,

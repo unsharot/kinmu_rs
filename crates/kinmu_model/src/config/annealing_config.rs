@@ -1,6 +1,4 @@
-//! annealing_configを定義
-
-/// 焼きなましの段階ごとの設定
+/// 焼きなましの段階ごとのConfig
 #[derive(Clone, Debug, Default)]
 pub struct AnnealingConfig<SP> {
     pub step: u32,            // 焼きなましのステップ数

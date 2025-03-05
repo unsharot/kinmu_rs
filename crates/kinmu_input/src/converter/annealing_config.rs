@@ -1,9 +1,9 @@
-//! annealing_configを読み込むモジュール
+//! annealing_configを変換する関数を提供するモジュール
 
 use super::{super::reader::types::RawAnnealingConfig, FromConfig};
 use ::kinmu_model::AnnealingConfig;
 
-/// 焼きなましの段階ごとの設定を読み込む
+/// RawAnnealingConfigをAnnealingConfigに変換する
 pub fn convert_annealing_config<SP: FromConfig + Clone>(
     config: RawAnnealingConfig,
 ) -> anyhow::Result<AnnealingConfig<SP>> {

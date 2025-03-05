@@ -15,6 +15,7 @@ use ::kinmu_model::{DayAttributeName, Score, ScorePropTrait, StaffAttributeName}
 use anyhow::Context as _;
 use std::fmt;
 
+/// 具体的なスコア
 #[derive(Debug, PartialEq, Clone)]
 pub enum ScoreProp {
     PatternGeneral((CondWrapper, Vec<Vec<Shift>>, Score)),
@@ -116,6 +117,7 @@ impl FromConfig for ScoreProp {
     }
 }
 
+/// FromConfigの実装のためのヘルパー関数
 #[inline(always)]
 fn helper_sp(w1: &str, w2: &str) -> anyhow::Result<ScoreProp> {
     match (w1, w2) {
@@ -227,6 +229,7 @@ fn format_str_vec_to_words(s: &str) -> anyhow::Result<Vec<&str>> {
     Ok(words)
 }
 
+/// Vec<Shift>にFromConfigを実装するためのWrapper
 struct VecShiftWrapper(pub Vec<Shift>);
 
 impl FromConfig for VecShiftWrapper {
@@ -240,6 +243,7 @@ impl FromConfig for VecShiftWrapper {
     }
 }
 
+/// Vec<Vec<Shift>>にFromConfigを実装するためのWrapper
 struct VecVecShiftWrapper(pub Vec<Vec<Shift>>);
 
 impl FromConfig for VecVecShiftWrapper {

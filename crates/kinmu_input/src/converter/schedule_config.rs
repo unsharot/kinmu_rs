@@ -1,4 +1,4 @@
-//! schedule_configを読み込むモジュール
+//! schedule_configを変換する関数を提供するモジュール
 
 use std::collections::HashMap;
 
@@ -12,7 +12,8 @@ use ::kinmu_model::{
 
 use super::util::parser::*;
 
-/// 勤務表で使う値を読み込む
+/// RawScheduleConfigをScheduleConfigに変換する
+/// annealing_configsフィールドは空なので、あとから設定しなおす
 pub fn convert_schedule_config<SP: FromConfig, S: FromConfig + MapState<SS>, SS, DS: FromConfig>(
     config: RawScheduleConfig,
 ) -> anyhow::Result<ScheduleConfig<SP, S, SS, DS>> {
@@ -120,11 +121,17 @@ fn make_staff_attribute_map(attributes: Vec<String>) -> StaffAttributeNameIndexM
     }
 }
 
+/// Shiftに実装するためのトレイト
+/// 入力された場所を変化させてよいかを記録するShiftStateをrequested_scheduleから生成する際に用いる
 pub trait MapState<SS> {
+    /// バッファの範囲に対して適応するデフォルトのShiftStateを指定
     const BUFFER_CASE: SS;
+    /// SSに変換する
     fn to_state(&self) -> SS;
 }
 
+/// ScheduleStateを与えられた表から生成する
+/// シフトとして用いるSにはMapStateを要求
 fn make_schedule_state<S: MapState<SS>, SS>(
     schedule: &Schedule<S>,
     buffer: usize,

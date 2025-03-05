@@ -11,9 +11,12 @@ use ::kinmu_generator as gen;
 
 use rand::Rng;
 
+/// 生成器で用いるFill関数のための型
+/// GeneratorWithAnnealingのFillを実装
 #[derive(Debug, Clone)]
 pub struct Fill;
 
+/// Fillの実装
 impl gen::Fill<ScoreProp, Shift, ShiftState, DayState> for Fill {
     fn run<R: Rng>(
         &self,
