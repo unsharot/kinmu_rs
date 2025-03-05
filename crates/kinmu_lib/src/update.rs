@@ -41,40 +41,6 @@ impl gen::Update<ScoreProp, Shift, ShiftState, DayState> for Update {
     }
 }
 
-#[allow(clippy::type_complexity)]
-pub fn gen_update_func<'a, R: Rng>(
-    text: &str,
-    schedule_config: &'a ScheduleConfig,
-) -> anyhow::Result<Box<dyn FnMut(&Schedule, &mut R) -> Schedule + 'a>> {
-    let schedule_state = &schedule_config.day.schedule_states;
-    match text {
-        "update1" => Ok(Box::new(move |schedule, rng| {
-            update_randomly1(schedule_config, schedule_state, schedule, rng)
-        })),
-        "update2" => Ok(Box::new(move |schedule, rng| {
-            update_randomly2(schedule_config, schedule_state, schedule, rng)
-        })),
-        "update4" => Ok(Box::new(move |schedule, rng| {
-            update_randomly4(schedule_config, schedule_state, schedule, rng)
-        })),
-        "update5" => Ok(Box::new(move |schedule, rng| {
-            update_randomly5(schedule_config, schedule_state, schedule, rng)
-        })),
-        _ => Err(anyhow::anyhow!(
-            "Failed to generate update function {}",
-            text
-        )),
-    }
-}
-
-/*
-元の表を更新するか、新たなものを構成するかは議論の余地あり
-元の表を更新する場合、採用されなかった場合に備えて変更箇所のログを返す
-変更をログをもとに戻す関数を与える必要がある
-
-現状クローンして新たな表を返している
-*/
-
 /// ランダムな1つの枠をランダムな枠に変える
 /// Absoluteの場合繰り返す
 fn update_randomly1<R: Rng>(
