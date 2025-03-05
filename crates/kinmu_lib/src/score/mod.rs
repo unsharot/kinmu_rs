@@ -256,3 +256,48 @@ impl FromConfig for VecVecShiftWrapper {
         Ok(VecVecShiftWrapper(ans))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use super::super::Cond;
+
+    #[test]
+    fn vec_shift_test() {
+        let v1 = <VecShiftWrapper>::from_config("[N, I, K]").unwrap();
+
+        assert_eq!(v1.0, vec![Shift::N, Shift::I, Shift::K]);
+    }
+
+    #[test]
+    fn vec_vec_shift_test() {
+        let v2 = <VecVecShiftWrapper>::from_config("[[N, I, K], [O, H, A]]").unwrap();
+
+        assert_eq!(
+            v2.0,
+            vec![
+                vec![Shift::N, Shift::I, Shift::K],
+                vec![Shift::O, Shift::H, Shift::A]
+            ]
+        );
+    }
+
+    #[test]
+    fn score_prop_test() {
+        let s = "PatternGeneral (Every (), [[N,O,H], [O,H], [K, Y]], 123)";
+        println!("{:?}", ScoreProp::from_config(s).unwrap());
+        assert_eq!(
+            ScoreProp::PatternGeneral((
+                CondWrapper::new(Cond::Every),
+                vec![
+                    vec![Shift::N, Shift::O, Shift::H],
+                    vec![Shift::O, Shift::H],
+                    vec![Shift::K, Shift::Y]
+                ],
+                123.0
+            )),
+            ScoreProp::from_config(s).unwrap()
+        );
+    }
+}

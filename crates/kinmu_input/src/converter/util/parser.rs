@@ -193,84 +193,46 @@ impl<S: FromConfig> FromConfig for ScheduleRowWrapper<S> {
     }
 }
 
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-//     #[test]
-//     fn vec_shift_test() {
-//         let v1: Vec<Shift> = <Vec<Shift>>::from_config("[N, I, K]").unwrap();
+    #[test]
+    fn parse_tuple_test() {
+        assert_eq!(
+            <(isize, isize)>::from_config("(1,2")
+                .unwrap_err()
+                .to_string(),
+            String::from("found '(', but ')' not found")
+        );
+        assert_eq!(
+            <(isize, isize)>::from_config("(1)")
+                .unwrap_err()
+                .to_string(),
+            String::from("Needs 2 fields, but not enough.")
+        );
+        assert_eq!(
+            <(isize, isize)>::from_config("(1, 2, 3)")
+                .unwrap_err()
+                .to_string(),
+            String::from("Needs 2 fields, but too much given.")
+        );
+        assert_eq!(<(isize, isize)>::from_config("(1,2)").unwrap(), (1, 2));
+        assert_eq!(<(isize, isize)>::from_config("1,2").unwrap(), (1, 2));
+        assert_eq!(<(isize, isize)>::from_config(" 1, 2 ").unwrap(), (1, 2));
+    }
 
-//         assert_eq!(v1, vec![Shift::N, Shift::I, Shift::K]);
-//     }
-
-//     #[test]
-//     fn vec_vec_shift_test() {
-//         let v2 = <Vec<Vec<Shift>>>::from_config("[[N, I, K], [O, H, A]]").unwrap();
-
-//         assert_eq!(
-//             v2,
-//             vec![
-//                 vec![Shift::N, Shift::I, Shift::K],
-//                 vec![Shift::O, Shift::H, Shift::A]
-//             ]
-//         );
-//     }
-
-//     #[test]
-//     fn score_prop_test() {
-//         let s = "PatternGeneral (Every (), [[N,O,H], [O,H], [K, Y]], 123)";
-//         println!("{:?}", ScoreProp::from_config(s).unwrap());
-//         assert_eq!(
-//             ScoreProp::PatternGeneral((
-//                 CondWrapper::new(Cond::Every),
-//                 vec![
-//                     vec![Shift::N, Shift::O, Shift::H],
-//                     vec![Shift::O, Shift::H],
-//                     vec![Shift::K, Shift::Y]
-//                 ],
-//                 123.0
-//             )),
-//             ScoreProp::from_config(s).unwrap()
-//         );
-//     }
-
-//     #[test]
-//     fn parse_tuple_test() {
-//         assert_eq!(
-//             <(isize, isize)>::from_config("(1,2")
-//                 .unwrap_err()
-//                 .to_string(),
-//             String::from("found '(', but ')' not found")
-//         );
-//         assert_eq!(
-//             <(isize, isize)>::from_config("(1)")
-//                 .unwrap_err()
-//                 .to_string(),
-//             String::from("Needs 2 fields, but not enough.")
-//         );
-//         assert_eq!(
-//             <(isize, isize)>::from_config("(1, 2, 3)")
-//                 .unwrap_err()
-//                 .to_string(),
-//             String::from("Needs 2 fields, but too much given.")
-//         );
-//         assert_eq!(<(isize, isize)>::from_config("(1,2)").unwrap(), (1, 2));
-//         assert_eq!(<(isize, isize)>::from_config("1,2").unwrap(), (1, 2));
-//         assert_eq!(<(isize, isize)>::from_config(" 1, 2 ").unwrap(), (1, 2));
-//     }
-
-//     #[test]
-//     fn parse_japanese() {
-//         let s = "StaffCountRegardDayAttribute (DayExceptBuffer (), I, 夜勤, 1000)";
-//         assert_eq!(
-//             ScoreProp::from_config(s).unwrap(),
-//             ScoreProp::StaffCountRegardDayAttribute((
-//                 CondWrapper::from_config("DayExceptBuffer ()").unwrap(),
-//                 Shift::I,
-//                 String::from("夜勤"),
-//                 1000.0
-//             ))
-//         );
-//     }
-// }
+    #[test]
+    fn parse_japanese() {
+        let s = "(DayExceptBuffer (), I, 夜勤, 1000)";
+        assert_eq!(
+            <(String, String, String, i32)>::from_config(s).unwrap(),
+            (
+                String::from("DayExceptBuffer ()"),
+                String::from("I"),
+                String::from("夜勤"),
+                1000
+            )
+        );
+    }
+}
