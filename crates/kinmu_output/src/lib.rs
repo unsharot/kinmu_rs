@@ -48,7 +48,7 @@ impl<'a, W: io::Write, S> OutputText<'a, W, S> {
 impl<W, SP, S, SS, DS> Output<Vec<Answer<SP, S, SS, DS>>> for OutputText<'_, W, S>
 where
     W: io::Write,
-    SP: ScorePropTrait<S, SS, DS> + Clone,
+    SP: ScorePropTrait<SP, S, SS, DS> + Clone,
     S: fmt::Display + PartialEq + Clone,
     DS: fmt::Display,
 {
@@ -71,7 +71,7 @@ where
     fn write_answer<SP, SS, DS>(&mut self, ans: &Answer<SP, S, SS, DS>) -> io::Result<()>
     where
         S: Clone,
-        SP: ScorePropTrait<S, SS, DS> + Clone,
+        SP: ScorePropTrait<SP, S, SS, DS> + Clone,
         DS: fmt::Display,
     {
         for (t, model) in ans.models.iter().enumerate() {
@@ -91,7 +91,7 @@ where
     ) -> io::Result<()>
     where
         S: Clone,
-        SP: ScorePropTrait<S, SS, DS> + Clone,
+        SP: ScorePropTrait<SP, S, SS, DS> + Clone,
         DS: fmt::Display,
     {
         let score = eval_scores_immut(
