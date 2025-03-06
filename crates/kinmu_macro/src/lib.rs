@@ -1,0 +1,57 @@
+use proc_macro::TokenStream;
+use quote::quote;
+use syn::{parse_macro_input, parse_quote, DeriveInput, Generics};
+
+#[proc_macro_derive(ScorePropTrait, attributes(score_prop_trait))]
+pub fn derive_score_prop(item: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(item as DeriveInput);
+
+    let mut generics: Generics = Default::default();
+    for a in input.attrs {
+        if a.path().is_ident("score_prop_trait") {
+            generics = match a.parse_args() {
+                Ok(v) => v,
+                Err(e) => {
+                    return syn::Error::new_spanned(a.path().get_ident(), e).to_compile_error().into();
+                }
+            };
+        }
+    }
+
+    let data_enum = match &input.data {
+        syn::Data::Enum(v) => v,
+        _ => {
+            return syn::Error::new_spanned(&input.ident, "Must be enum type")
+                .to_compile_error()
+                .into();
+        }
+    };
+
+    let mut variants= Vec::new();
+    for v in &data_enum.variants {
+        variants.push(v.ident.clone());
+    }
+
+    let trait_path: syn::Path = parse_quote!(kinmu_model::ScorePropTrait);
+    let ty = input.ident;
+    let (impl_g, ty_g, where_clause) = input.generics.split_for_impl();
+
+    let gen = quote! {
+        #[automatically_derived]
+        impl #impl_g #trait_path #generics for #ty #ty_g #where_clause {
+            fn eval_mut(&mut self, schedule_config: &ScheduleConfig, schedule: &Schedule) -> Score {
+                match self {
+                    #(Self::#variants(x) => #trait_path::eval_mut(self, schedule_config, schedule),)*
+                }
+            }
+
+            fn eval_immut(&self, schedule_config: &ScheduleConfig, schedule: &Schedule) -> Score {
+                match self {
+                    #(Self::#variants(x) => #trait_path::eval_immut(self, schedule_config, schedule),)*
+                }
+            }
+        }
+    };
+
+    gen.into()
+}

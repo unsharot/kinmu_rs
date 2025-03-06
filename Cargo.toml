@@ -19,6 +19,7 @@ kinmu_annealing = { path = "crates/kinmu_annealing" }
 kinmu_lib = { path = "crates/kinmu_lib" }
 kinmu_core = { path = "crates/kinmu_core" }
 kinmu_model = { path = "crates/kinmu_model" }
+kinmu_macro = { path = "crates/kinmu_macro" }
 anyhow = "1.0.95"
 rand = "0.8.5"
 

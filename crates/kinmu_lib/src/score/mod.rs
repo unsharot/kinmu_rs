@@ -301,3 +301,36 @@ mod tests {
         );
     }
 }
+
+use kinmu_macro::ScorePropTrait;
+
+struct Foo;
+
+impl ScorePropTrait<Shift, ShiftState, DayState> for Foo {
+    fn eval_mut(&mut self, _: &ScheduleConfig, _: &Schedule) -> f32 {
+        2.0
+    }
+
+    fn eval_immut(&self, _: &ScheduleConfig, _: &Schedule) -> f32 {
+        2.0
+    }
+}
+
+struct Bar;
+
+impl ScorePropTrait<Shift, ShiftState, DayState> for Bar {
+    fn eval_mut(&mut self, _: &ScheduleConfig, _: &Schedule) -> f32 {
+        1.0
+    }
+
+    fn eval_immut(&self, _: &ScheduleConfig, _: &Schedule) -> f32 {
+        1.0
+    }
+}
+
+#[derive(ScorePropTrait)]
+#[score_prop_trait(<Shift, ShiftState, DayState>)]
+enum SP {
+    Foo(Foo),
+    Bar(Bar),
+}
