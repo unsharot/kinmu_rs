@@ -67,7 +67,7 @@ impl fmt::Display for ScoreProp {
     }
 }
 
-impl ScorePropTrait<ScoreProp, Shift, ShiftState, DayState> for ScoreProp {
+impl ScorePropTrait<Shift, ShiftState, DayState> for ScoreProp {
     fn eval_mut(
         &mut self,
         staff_config: &StaffConfig,
@@ -312,35 +312,35 @@ mod tests {
     }
 }
 
-// use kinmu_macro::ScorePropTrait;
+use kinmu_macro::ScorePropTrait;
 
-// struct Foo;
+struct Foo;
 
-// impl ScorePropTrait<SPtest, Shift, ShiftState, DayState> for Foo {
-//     fn eval_mut(&mut self, _: &StaffConfig, _: &DayConfig, _: &Schedule) -> f32 {
-//         2.0
-//     }
+impl ScorePropTrait<Shift, ShiftState, DayState> for Foo {
+    fn eval_mut(&mut self, _: &StaffConfig, _: &DayConfig, _: &Schedule) -> f32 {
+        2.0
+    }
 
-//     fn eval_immut(&self, _: &StaffConfig, _: &DayConfig, _: &Schedule) -> f32 {
-//         2.0
-//     }
-// }
+    fn eval_immut(&self, _: &StaffConfig, _: &DayConfig, _: &Schedule) -> f32 {
+        2.0
+    }
+}
 
-// struct Bar;
+struct Bar;
 
-// impl ScorePropTrait<SPtest, Shift, ShiftState, DayState> for Bar {
-//     fn eval_mut(&mut self, _: &StaffConfig, _: &DayConfig, _: &Schedule) -> f32 {
-//         1.0
-//     }
+impl ScorePropTrait<Shift, ShiftState, DayState> for Bar {
+    fn eval_mut(&mut self, _: &StaffConfig, _: &DayConfig, _: &Schedule) -> f32 {
+        1.0
+    }
 
-//     fn eval_immut(&self, _: &StaffConfig, _: &DayConfig, _: &Schedule) -> f32 {
-//         1.0
-//     }
-// }
+    fn eval_immut(&self, _: &StaffConfig, _: &DayConfig, _: &Schedule) -> f32 {
+        1.0
+    }
+}
 
-// #[derive(ScorePropTrait)]
-// #[score_prop_trait(<Shift, ShiftState, DayState>)]
-// enum SPtest {
-//     Foo(Foo),
-//     Bar(Bar),
-// }
+#[derive(ScorePropTrait)]
+#[score_prop_trait(<Shift, ShiftState, DayState>)]
+enum SPtest {
+    Foo(Foo),
+    Bar(Bar),
+}

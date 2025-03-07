@@ -58,12 +58,12 @@ pub fn derive_score_prop(item: TokenStream) -> TokenStream {
     let ty = input.ident;
     let (impl_g, ty_g, where_clause) = input.generics.split_for_impl();
 
-    dbg!(&input.generics);
+    // dbg!(&input.generics);
 
-    let sp = generics.args.get(0).unwrap();
-    let shift = generics.args.get(1).unwrap();
-    let shift_state = generics.args.get(2).unwrap();
-    let day_state = generics.args.get(3).unwrap();
+    // let sp = generics.args.get(0).unwrap();
+    let shift = generics.args.get(0).unwrap();
+    let shift_state = generics.args.get(1).unwrap();
+    let day_state = generics.args.get(2).unwrap();
 
     // let sp = "ScoreProp";
     // let shift = "Shift";
@@ -73,21 +73,21 @@ pub fn derive_score_prop(item: TokenStream) -> TokenStream {
     let gen = quote! {
         #[automatically_derived]
         impl #impl_g #trait_path #generics for #ty #ty_g #where_clause {
-            fn eval_mut(&mut self, schedule_config: &kinmu_model::ScheduleConfig<#sp, #shift, #shift_state, #day_state>, schedule: &kinmu_model::Schedule<#shift>) -> kinmu_model::Score {
+            fn eval_mut(&mut self, staff_config: &kinmu_model::StaffConfig, day_config: &kinmu_model::DayConfig<#shift, #shift_state, #day_state>, schedule: &kinmu_model::Schedule<#shift>) -> kinmu_model::Score {
                 match self {
-                    #(Self::#variants(x) => #trait_path::eval_mut(self, schedule_config.staff, schedule_config.day schedule),)*
+                    #(Self::#variants(x) => #trait_path::eval_mut(self, staff_config, day_config, schedule),)*
                 }
             }
 
-            fn eval_immut(&self, schedule_config: &kinmu_model::ScheduleConfig<#sp, #shift, #shift_state, #day_state>, schedule: &kinmu_model::Schedule<#shift>) -> Score {
+            fn eval_immut(&self, staff_config: &kinmu_model::StaffConfig, day_config: &kinmu_model::DayConfig<#shift, #shift_state, #day_state>, schedule: &kinmu_model::Schedule<#shift>) -> Score {
                 match self {
-                    #(Self::#variants(x) => #trait_path::eval_immut(self, schedule_config.staff, schedule_config.day, schedule),)*
+                    #(Self::#variants(x) => #trait_path::eval_immut(self, staff_config, day_config, schedule),)*
                 }
             }
         }
     };
 
-    dbg!(&gen);
+    // dbg!(&gen);
 
     gen.into()
 }

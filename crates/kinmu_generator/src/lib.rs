@@ -37,7 +37,7 @@ impl<F, U> GeneratorWithAnnealing<F, U> {
 impl<SP, S, SS, DS, F, U> Generator<MainConfig<SP, S, SS, DS>, Vec<Answer<SP, S, SS, DS>>>
     for GeneratorWithAnnealing<F, U>
 where
-    SP: Clone + std::marker::Send + 'static + ScorePropTrait<SP, S, SS, DS>,
+    SP: Clone + std::marker::Send + 'static + ScorePropTrait<S, SS, DS>,
     S: Clone + std::marker::Send + 'static,
     SS: Clone + std::marker::Send + 'static,
     DS: Clone + std::marker::Send + 'static,
@@ -59,7 +59,7 @@ fn generate_schedules<SP, S, SS, DS, F, U>(
     update: &U,
 ) -> anyhow::Result<Vec<Answer<SP, S, SS, DS>>>
 where
-    SP: Clone + std::marker::Send + 'static + ScorePropTrait<SP, S, SS, DS>,
+    SP: Clone + std::marker::Send + 'static + ScorePropTrait<S, SS, DS>,
     S: Clone + std::marker::Send + 'static,
     SS: Clone + std::marker::Send + 'static,
     DS: Clone + std::marker::Send + 'static,
@@ -89,7 +89,7 @@ fn generate_schedule<SP, S, SS, DS, F, U>(
     update: &U,
 ) -> anyhow::Result<Answer<SP, S, SS, DS>>
 where
-    SP: Clone + std::marker::Send + 'static + ScorePropTrait<SP, S, SS, DS>,
+    SP: Clone + std::marker::Send + 'static + ScorePropTrait<S, SS, DS>,
     S: Clone + std::marker::Send + 'static,
     SS: Clone + std::marker::Send + 'static,
     DS: Clone + std::marker::Send + 'static,
@@ -137,7 +137,7 @@ fn annealing<SP, S, SS, DS, F, U>(
     update: U,
 ) -> anyhow::Result<Schedule<S>>
 where
-    SP: ScorePropTrait<SP, S, SS, DS>,
+    SP: ScorePropTrait<S, SS, DS>,
     S: Clone,
     F: Fill<SP, S, SS, DS>,
     U: Update<SP, S, SS, DS>,
