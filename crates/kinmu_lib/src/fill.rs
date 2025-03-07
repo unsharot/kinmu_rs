@@ -166,7 +166,9 @@ fn fill_randomly2<R: Rng>(schedule_config: &ScheduleConfig, rng: &mut R) -> Sche
 
         // Iの差分を計算
         let i_dif = count_waku_row!(Shift::I, schedule_config, schedule, r)
-            - schedule_config.get_attribute(r, &"IDayCount".to_string());
+            - schedule_config
+                .staff
+                .get_attribute(r, &"IDayCount".to_string());
 
         // 余分なIをランダムに消す
         for _ in 0..i_dif {
@@ -177,7 +179,9 @@ fn fill_randomly2<R: Rng>(schedule_config: &ScheduleConfig, rng: &mut R) -> Sche
         remove_improper_a(schedule_config, &mut schedule, r);
 
         // Kの差分を計算
-        let k_dif = schedule_config.get_attribute(r, &"KDayCount".to_string())
+        let k_dif = schedule_config
+            .staff
+            .get_attribute(r, &"KDayCount".to_string())
             - count_waku_row!(Shift::K, schedule_config, schedule, r);
 
         if k_dif > 0 {

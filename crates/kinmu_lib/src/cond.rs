@@ -1,9 +1,11 @@
 //! Cond型の定義と実装
 
-use super::{DayState, ScheduleConfig, ScoreProp, Shift, ShiftState, StaffAttributeNameWrapper};
+use super::{
+    DayConfig, DayState, ScheduleConfig, ScoreProp, Shift, ShiftState, StaffAttributeNameWrapper,
+};
 
 use ::kinmu_input::{Check, FromConfig};
-use ::kinmu_model::StaffAttributeName;
+use ::kinmu_model::{StaffAttributeName, StaffConfig};
 
 use anyhow::Context as _;
 use std::fmt;
@@ -29,20 +31,24 @@ pub enum Cond {
 }
 
 impl Cond {
-    pub fn eval(&self, staff: usize, day: usize, sc: &ScheduleConfig) -> bool {
+    pub fn eval(&self, staff: usize, day: usize, sc: &StaffConfig, dc: &DayConfig) -> bool {
         match self {
             Cond::Every => true,
-            Cond::Or((cond1, cond2)) => cond1.eval(staff, day, sc) || cond2.eval(staff, day, sc),
-            Cond::And((cond1, cond2)) => cond1.eval(staff, day, sc) && cond2.eval(staff, day, sc),
-            Cond::Not(cond) => !cond.eval(staff, day, sc),
-            Cond::DayExceptBuffer => sc.day.buffer_count <= day,
+            Cond::Or((cond1, cond2)) => {
+                cond1.eval(staff, day, sc, dc) || cond2.eval(staff, day, sc, dc)
+            }
+            Cond::And((cond1, cond2)) => {
+                cond1.eval(staff, day, sc, dc) && cond2.eval(staff, day, sc, dc)
+            }
+            Cond::Not(cond) => !cond.eval(staff, day, sc, dc),
+            Cond::DayExceptBuffer => dc.buffer_count <= day,
             Cond::DayInRange((day_start, day_end)) => *day_start <= day && day <= *day_end,
-            Cond::ParticularDayState(ds) => sc.day.days[day] == *ds,
+            Cond::ParticularDayState(ds) => dc.days[day] == *ds,
             Cond::BeforeDayState(ds) => {
-                if day + 1 >= sc.day.count {
+                if day + 1 >= dc.count {
                     false
                 } else {
-                    sc.day.days[day + 1] == *ds
+                    dc.days[day + 1] == *ds
                 }
             }
             Cond::ParticularDay(d) => *d == day,
@@ -74,14 +80,14 @@ impl CondWrapper {
 
     /// メモ化したCondの評価
     /// ScheduleConfigが焼きなましの過程で変化しない制限の上で
-    pub fn eval_mut(&mut self, staff: usize, day: usize, sc: &ScheduleConfig) -> bool {
+    pub fn eval_mut(&mut self, staff: usize, day: usize, sc: &StaffConfig, dc: &DayConfig) -> bool {
         if self.memo.is_empty() {
-            self.memo = vec![vec![None; sc.day.count]; sc.staff.count];
+            self.memo = vec![vec![None; dc.count]; sc.count];
         }
         match self.memo[staff][day] {
             Some(ans) => ans,
             None => {
-                let ans = self.cond.eval(staff, day, sc);
+                let ans = self.cond.eval(staff, day, sc, dc);
                 self.memo[staff][day] = Some(ans);
                 ans
             }
@@ -90,19 +96,19 @@ impl CondWrapper {
 
     /// メモに記入しないCondの評価
     /// ただし、メモが記入されている場合は利用する
-    pub fn eval_immut(&self, staff: usize, day: usize, sc: &ScheduleConfig) -> bool {
+    pub fn eval_immut(&self, staff: usize, day: usize, sc: &StaffConfig, dc: &DayConfig) -> bool {
         if self.memo.is_empty() {
-            return self.cond.eval(staff, day, sc);
+            return self.cond.eval(staff, day, sc, dc);
         }
         match self.memo[staff][day] {
             Some(ans) => ans,
-            None => self.cond.eval(staff, day, sc),
+            None => self.cond.eval(staff, day, sc, dc),
         }
     }
 
     /// メモを参照しないCondの評価
-    pub fn eval_anyway(&self, staff: usize, day: usize, sc: &ScheduleConfig) -> bool {
-        self.cond.eval(staff, day, sc)
+    pub fn eval_anyway(&self, staff: usize, day: usize, sc: &StaffConfig, dc: &DayConfig) -> bool {
+        self.cond.eval(staff, day, sc, dc)
     }
 }
 

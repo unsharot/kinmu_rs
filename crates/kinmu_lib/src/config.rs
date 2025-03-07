@@ -6,6 +6,8 @@ use ::kinmu_model::{DayAttributeName, StaffAttributeName};
 /// 具体的なScheduleConfig
 pub type ScheduleConfig = kinmu_model::ScheduleConfig<ScoreProp, Shift, ShiftState, DayState>;
 
+pub type DayConfig = kinmu_model::DayConfig<Shift, ShiftState, DayState>;
+
 /// StaffAttributeNameにCheckを実装するためのWrapper
 pub(super) struct StaffAttributeNameWrapper<'a>(pub &'a StaffAttributeName);
 

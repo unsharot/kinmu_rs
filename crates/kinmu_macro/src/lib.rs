@@ -75,13 +75,13 @@ pub fn derive_score_prop(item: TokenStream) -> TokenStream {
         impl #impl_g #trait_path #generics for #ty #ty_g #where_clause {
             fn eval_mut(&mut self, schedule_config: &kinmu_model::ScheduleConfig<#sp, #shift, #shift_state, #day_state>, schedule: &kinmu_model::Schedule<#shift>) -> kinmu_model::Score {
                 match self {
-                    #(Self::#variants(x) => #trait_path::eval_mut(self, schedule_config, schedule),)*
+                    #(Self::#variants(x) => #trait_path::eval_mut(self, schedule_config.staff, schedule_config.day schedule),)*
                 }
             }
 
             fn eval_immut(&self, schedule_config: &kinmu_model::ScheduleConfig<#sp, #shift, #shift_state, #day_state>, schedule: &kinmu_model::Schedule<#shift>) -> Score {
                 match self {
-                    #(Self::#variants(x) => #trait_path::eval_immut(self, schedule_config, schedule),)*
+                    #(Self::#variants(x) => #trait_path::eval_immut(self, schedule_config.staff, schedule_config.day, schedule),)*
                 }
             }
         }

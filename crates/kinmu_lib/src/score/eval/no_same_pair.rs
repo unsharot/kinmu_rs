@@ -1,18 +1,20 @@
 //! 指定回数以上同じペアなら発火するスコア
 
-use super::super::{CondWrapper, Schedule, ScheduleConfig, Shift};
+use super::super::{CondWrapper, DayConfig, Schedule, Shift, StaffConfig};
 
 use ::kinmu_model::Score;
 
 use std::collections::HashMap;
 
 macro_rules! eval {
-    ($eval:ident, $schedule_config:expr, $schedule:expr, $cond:expr, $pair_limit:expr, $shift:expr, $score:expr) => {{
+    ($eval:ident, $staff_config:expr, $day_config:expr, $schedule:expr, $cond:expr, $pair_limit:expr, $shift:expr, $score:expr) => {{
         let mut pair_map: HashMap<Vec<usize>, i32> = HashMap::new();
-        for day in 0..$schedule_config.day.count {
+        for day in 0..$day_config.count {
             let mut i_list: Vec<usize> = Vec::new();
-            for staff in 0..$schedule_config.staff.count {
-                if $cond.$eval(staff, day, $schedule_config) && $schedule[staff][day] == *$shift {
+            for staff in 0..$staff_config.count {
+                if $cond.$eval(staff, day, $staff_config, $day_config)
+                    && $schedule[staff][day] == *$shift
+                {
                     i_list.push(staff);
                 }
             }
@@ -34,13 +36,15 @@ macro_rules! eval {
 
 #[allow(clippy::needless_range_loop)]
 pub(super) fn eval_mut(
-    schedule_config: &ScheduleConfig,
+    staff_config: &StaffConfig,
+    day_config: &DayConfig,
     schedule: &Schedule,
     (cond, pair_limit, shift, score): &mut (CondWrapper, i32, Shift, Score),
 ) -> Score {
     eval!(
         eval_mut,
-        schedule_config,
+        staff_config,
+        day_config,
         schedule,
         cond,
         pair_limit,
@@ -51,13 +55,15 @@ pub(super) fn eval_mut(
 
 #[allow(clippy::needless_range_loop)]
 pub(super) fn eval_immut(
-    schedule_config: &ScheduleConfig,
+    staff_config: &StaffConfig,
+    day_config: &DayConfig,
     schedule: &Schedule,
     (cond, pair_limit, shift, score): &(CondWrapper, i32, Shift, Score),
 ) -> Score {
     eval!(
         eval_immut,
-        schedule_config,
+        staff_config,
+        day_config,
         schedule,
         cond,
         pair_limit,
@@ -70,6 +76,7 @@ pub(super) fn eval_immut(
 mod tests {
     use crate::Cond;
 
+    use super::super::super::ScheduleConfig;
     use super::*;
 
     /// 2度同じペアにならない場合、検出しない
@@ -85,7 +92,8 @@ mod tests {
         schedule_config.staff.count = schedule.len();
 
         let score = eval_mut(
-            &schedule_config,
+            &schedule_config.staff,
+            &schedule_config.day,
             &schedule,
             &mut (CondWrapper::new(Cond::Every), 2, Shift::I, 1.0),
         );
@@ -106,7 +114,8 @@ mod tests {
         schedule_config.staff.count = schedule.len();
 
         let score = eval_mut(
-            &schedule_config,
+            &schedule_config.staff,
+            &schedule_config.day,
             &schedule,
             &mut (CondWrapper::new(Cond::Every), 2, Shift::I, 1.0),
         );
@@ -127,7 +136,8 @@ mod tests {
         schedule_config.staff.count = schedule.len();
 
         let score = eval_mut(
-            &schedule_config,
+            &schedule_config.staff,
+            &schedule_config.day,
             &schedule,
             &mut (CondWrapper::new(Cond::Every), 3, Shift::I, 1.0),
         );
@@ -148,7 +158,8 @@ mod tests {
         schedule_config.staff.count = schedule.len();
 
         let score = eval_mut(
-            &schedule_config,
+            &schedule_config.staff,
+            &schedule_config.day,
             &schedule,
             &mut (CondWrapper::new(Cond::Every), 3, Shift::I, 1.0),
         );

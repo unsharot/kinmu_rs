@@ -3,23 +3,23 @@
 //! 計算量はO(NM)
 //! TODO: RollingHash、FSMやTrie木を用いた高速化
 
-use super::super::{CondWrapper, Schedule, ScheduleConfig, Shift};
+use super::super::{CondWrapper, DayConfig, Schedule, Shift, StaffConfig};
 
 use ::kinmu_model::Score;
 
 macro_rules! eval {
-    ($eval:ident, $schedule_config:expr, $schedule:expr, $cond:expr, $shift_pattern:expr, $score:expr) => {{
+    ($eval:ident, $staff_config:expr, $day_config:expr, $schedule:expr, $cond:expr, $shift_pattern:expr, $score:expr) => {{
         let mut sum = 0.0;
-        for staff in 0..$schedule_config.staff.count {
+        for staff in 0..$staff_config.count {
             let mut any = false;
-            for day in 0..$schedule_config.day.count {
+            for day in 0..$day_config.count {
                 let mut hit = true;
                 let mut is_valid = false;
                 for dd in 0..$shift_pattern.len() {
-                    if $schedule_config.day.count <= day + dd {
+                    if $day_config.count <= day + dd {
                         hit = false;
                         break;
-                    } else if $cond.$eval(staff, day + dd, $schedule_config) {
+                    } else if $cond.$eval(staff, day + dd, $staff_config, $day_config) {
                         is_valid = true;
                         if $shift_pattern[dd] != $schedule[staff][day + dd] {
                             hit = false;
@@ -45,13 +45,15 @@ macro_rules! eval {
 
 #[allow(clippy::needless_range_loop)]
 pub(super) fn eval_mut(
-    schedule_config: &ScheduleConfig,
+    staff_config: &StaffConfig,
+    day_config: &DayConfig,
     schedule: &Schedule,
     (cond, shift_pattern, score): &mut (CondWrapper, Vec<Shift>, Score),
 ) -> Score {
     eval!(
         eval_mut,
-        schedule_config,
+        staff_config,
+        day_config,
         schedule,
         cond,
         shift_pattern,
@@ -61,13 +63,15 @@ pub(super) fn eval_mut(
 
 #[allow(clippy::needless_range_loop)]
 pub(super) fn eval_immut(
-    schedule_config: &ScheduleConfig,
+    staff_config: &StaffConfig,
+    day_config: &DayConfig,
     schedule: &Schedule,
     (cond, shift_pattern, score): &(CondWrapper, Vec<Shift>, Score),
 ) -> Score {
     eval!(
         eval_immut,
-        schedule_config,
+        staff_config,
+        day_config,
         schedule,
         cond,
         shift_pattern,
@@ -79,6 +83,7 @@ pub(super) fn eval_immut(
 mod tests {
     use crate::Cond;
 
+    use super::super::super::ScheduleConfig;
     use super::*;
 
     /// ヒットするべきでないパターン
@@ -94,7 +99,8 @@ mod tests {
         schedule_config.staff.count = schedule.len();
 
         let score = eval_mut(
-            &schedule_config,
+            &schedule_config.staff,
+            &schedule_config.day,
             &schedule,
             &mut (CondWrapper::new(Cond::Every), vec![Shift::O, Shift::H], 1.0),
         );
@@ -115,7 +121,8 @@ mod tests {
         schedule_config.staff.count = schedule.len();
 
         let score = eval_mut(
-            &schedule_config,
+            &schedule_config.staff,
+            &schedule_config.day,
             &schedule,
             &mut (CondWrapper::new(Cond::Every), vec![Shift::O, Shift::H], 1.0),
         );
@@ -136,7 +143,8 @@ mod tests {
         schedule_config.staff.count = schedule.len();
 
         let score = eval_mut(
-            &schedule_config,
+            &schedule_config.staff,
+            &schedule_config.day,
             &schedule,
             &mut (CondWrapper::new(Cond::Every), vec![Shift::O, Shift::H], 1.0),
         );

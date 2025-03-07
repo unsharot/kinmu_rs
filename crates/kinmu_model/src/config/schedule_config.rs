@@ -67,15 +67,10 @@ pub struct ScheduleConfig<SP, S, SS, DS> {
     pub result: ResultConfig<SP>,
 }
 
-impl<SP, S, SS, DS> ScheduleConfig<SP, S, SS, DS> {
+impl StaffConfig {
     /// 指定したスタッフの指定したattributeを取得する
     pub fn get_attribute(&self, staff: usize, attribute: &StaffAttributeName) -> i32 {
-        let att_index = self
-            .staff
-            .attribute_map
-            .name_to_index
-            .get(attribute)
-            .unwrap();
-        self.staff.list[staff].attributes[*att_index]
+        let att_index = self.attribute_map.name_to_index.get(attribute).unwrap();
+        self.list[staff].attributes[*att_index]
     }
 }
