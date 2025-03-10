@@ -1,17 +1,17 @@
 //! 指定したシフトをStaffAttributeで指定した数入らなかった場合に発火するスコア
 
-use super::super::{CondWrapper, Schedule, ScheduleConfig, Shift};
+use super::super::{CondWrapper, DayConfig, Schedule, Shift};
 
-use ::kinmu_model::{Score, StaffAttributeName};
+use ::kinmu_model::{Score, StaffAttributeName, StaffConfig};
 
 macro_rules! eval {
-    ($eval:ident, $schedule_config:expr, $schedule:expr, $cond:expr, $shift:expr, $attribute:expr, $score:expr) => {{
+    ($eval:ident, $staff_config:expr, $day_config:expr, $schedule:expr, $cond:expr, $shift:expr, $attribute:expr, $score:expr) => {{
         let mut sum = 0.0;
-        for staff in 0..$schedule_config.staff.count {
+        for staff in 0..$staff_config.count {
             let mut is_valid = false;
             let mut count = 0;
-            for day in 0..$schedule_config.day.count {
-                if $cond.$eval(staff, day, $schedule_config) {
+            for day in 0..$day_config.count {
+                if $cond.$eval(staff, day, $staff_config, $day_config) {
                     is_valid = true;
                     if $schedule[staff][day] == *$shift {
                         count += 1;
@@ -19,7 +19,7 @@ macro_rules! eval {
                 }
             }
             if is_valid {
-                let count_needed = $schedule_config.get_attribute(staff, $attribute);
+                let count_needed = $staff_config.get_attribute(staff, $attribute);
                 if count_needed != -1 {
                     // 値が-1の場合、任意の数を許すためスコアを増やさない
                     let d = (count - count_needed).abs() as Score;
@@ -34,13 +34,15 @@ macro_rules! eval {
 
 #[allow(clippy::needless_range_loop)]
 pub(super) fn eval_mut(
-    schedule_config: &ScheduleConfig,
+    staff_config: &StaffConfig,
+    day_config: &DayConfig,
     schedule: &Schedule,
     (cond, shift, attribute, score): &mut (CondWrapper, Shift, StaffAttributeName, Score),
 ) -> Score {
     eval!(
         eval_mut,
-        schedule_config,
+        staff_config,
+        day_config,
         schedule,
         cond,
         shift,
@@ -51,13 +53,15 @@ pub(super) fn eval_mut(
 
 #[allow(clippy::needless_range_loop)]
 pub(super) fn eval_immut(
-    schedule_config: &ScheduleConfig,
+    staff_config: &StaffConfig,
+    day_config: &DayConfig,
     schedule: &Schedule,
     (cond, shift, attribute, score): &(CondWrapper, Shift, StaffAttributeName, Score),
 ) -> Score {
     eval!(
         eval_immut,
-        schedule_config,
+        staff_config,
+        day_config,
         schedule,
         cond,
         shift,
@@ -72,6 +76,7 @@ mod tests {
 
     use ::kinmu_model::Staff;
 
+    use super::super::super::ScheduleConfig;
     use super::*;
 
     /// ヒットするべきでないパターン
@@ -101,7 +106,8 @@ mod tests {
             .insert(String::from("n_count"), 0);
 
         let score = eval_mut(
-            &schedule_config,
+            &schedule_config.staff,
+            &schedule_config.day,
             &schedule,
             &mut (
                 CondWrapper::new(Cond::Every),
@@ -141,7 +147,8 @@ mod tests {
             .insert(String::from("n_count"), 0);
 
         let score = eval_mut(
-            &schedule_config,
+            &schedule_config.staff,
+            &schedule_config.day,
             &schedule,
             &mut (
                 CondWrapper::new(Cond::Every),

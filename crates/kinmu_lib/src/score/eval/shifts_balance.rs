@@ -1,18 +1,18 @@
 //! 指定した2つのシフト数がスタッフあたりでバランス良いか判定するスコア
 
-use super::super::{CondWrapper, Schedule, ScheduleConfig, Shift};
+use super::super::{CondWrapper, DayConfig, Schedule, Shift, StaffConfig};
 
 use ::kinmu_model::Score;
 
 macro_rules! eval {
-    ($eval:ident, $schedule_config:expr, $schedule:expr, $cond:expr, $shift1:expr, $shift2:expr, $score:expr) => {{
+    ($eval:ident, $staff_config:expr, $day_config:expr, $schedule:expr, $cond:expr, $shift1:expr, $shift2:expr, $score:expr) => {{
         let mut sum = 0.0;
-        for staff in 0..$schedule_config.staff.count {
+        for staff in 0..$staff_config.count {
             let mut is_valid = false;
             let mut count1: i32 = 0;
             let mut count2: i32 = 0;
-            for day in 0..$schedule_config.day.count {
-                if $cond.$eval(staff, day, $schedule_config) {
+            for day in 0..$day_config.count {
+                if $cond.$eval(staff, day, $staff_config, $day_config) {
                     is_valid = true;
                     if $schedule[staff][day] == *$shift1 {
                         count1 += 1;
@@ -34,13 +34,15 @@ macro_rules! eval {
 
 #[allow(clippy::needless_range_loop)]
 pub(super) fn eval_mut(
-    schedule_config: &ScheduleConfig,
+    staff_config: &StaffConfig,
+    day_config: &DayConfig,
     schedule: &Schedule,
     (cond, shift1, shift2, score): &mut (CondWrapper, Shift, Shift, Score),
 ) -> Score {
     eval!(
         eval_mut,
-        schedule_config,
+        staff_config,
+        day_config,
         schedule,
         cond,
         shift1,
@@ -51,13 +53,15 @@ pub(super) fn eval_mut(
 
 #[allow(clippy::needless_range_loop)]
 pub(super) fn eval_immut(
-    schedule_config: &ScheduleConfig,
+    staff_config: &StaffConfig,
+    day_config: &DayConfig,
     schedule: &Schedule,
     (cond, shift1, shift2, score): &(CondWrapper, Shift, Shift, Score),
 ) -> Score {
     eval!(
         eval_immut,
-        schedule_config,
+        staff_config,
+        day_config,
         schedule,
         cond,
         shift1,
@@ -70,6 +74,7 @@ pub(super) fn eval_immut(
 mod tests {
     use crate::Cond;
 
+    use super::super::super::ScheduleConfig;
     use super::*;
 
     /// 2つのシフトの数が同じ場合
@@ -85,7 +90,8 @@ mod tests {
         schedule_config.staff.count = schedule.len();
 
         let score = eval_mut(
-            &schedule_config,
+            &schedule_config.staff,
+            &schedule_config.day,
             &schedule,
             &mut (CondWrapper::new(Cond::Every), Shift::O, Shift::H, 1.0),
         );
@@ -106,7 +112,8 @@ mod tests {
         schedule_config.staff.count = schedule.len();
 
         let score = eval_mut(
-            &schedule_config,
+            &schedule_config.staff,
+            &schedule_config.day,
             &schedule,
             &mut (CondWrapper::new(Cond::Every), Shift::O, Shift::H, 1.0),
         );

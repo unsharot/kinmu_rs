@@ -1,16 +1,16 @@
 //! 指定したシフトの人数を満たした日付に対して、指定したシフトが指定した値いない時に発火するスコア
 
-use super::super::{CondWrapper, Schedule, ScheduleConfig, Shift};
+use super::super::{CondWrapper, DayConfig, Schedule, Shift, StaffConfig};
 
 use ::kinmu_model::Score;
 
 macro_rules! eval {
-    ($eval:ident, $schedule_config:expr, $schedule:expr, $cond_premise:expr, $shift_premise:expr, $count_premise:expr, $cond_main:expr, $shift_main:expr, $count_main:expr, $score:expr) => {{
+    ($eval:ident, $staff_config:expr, $day_config:expr, $schedule:expr, $cond_premise:expr, $shift_premise:expr, $count_premise:expr, $cond_main:expr, $shift_main:expr, $count_main:expr, $score:expr) => {{
         let mut sum = 0.0;
-        for day in 0..$schedule_config.day.count {
+        for day in 0..$day_config.count {
             let mut count = 0;
-            for staff in 0..$schedule_config.staff.count {
-                if $cond_premise.$eval(staff, day, $schedule_config)
+            for staff in 0..$staff_config.count {
+                if $cond_premise.$eval(staff, day, $staff_config, $day_config)
                     && $schedule[staff][day] == *$shift_premise
                 {
                     count += 1;
@@ -19,8 +19,8 @@ macro_rules! eval {
             if count == *$count_premise {
                 let mut is_valid = false;
                 let mut count2 = 0;
-                for staff in 0..$schedule_config.staff.count {
-                    if $cond_main.$eval(staff, day, $schedule_config) {
+                for staff in 0..$staff_config.count {
+                    if $cond_main.$eval(staff, day, $staff_config, $day_config) {
                         is_valid = true;
                         if $schedule[staff][day] == *$shift_main {
                             count2 += 1;
@@ -40,7 +40,8 @@ macro_rules! eval {
 
 #[allow(clippy::needless_range_loop)]
 pub(super) fn eval_mut(
-    schedule_config: &ScheduleConfig,
+    staff_config: &StaffConfig,
+    day_config: &DayConfig,
     schedule: &Schedule,
     (cond_premise, shift_premise, count_premise, cond_main, shift_main, count_main, score): &mut (
         CondWrapper,
@@ -54,7 +55,8 @@ pub(super) fn eval_mut(
 ) -> Score {
     eval!(
         eval_mut,
-        schedule_config,
+        staff_config,
+        day_config,
         schedule,
         cond_premise,
         shift_premise,
@@ -68,7 +70,8 @@ pub(super) fn eval_mut(
 
 #[allow(clippy::needless_range_loop)]
 pub(super) fn eval_immut(
-    schedule_config: &ScheduleConfig,
+    staff_config: &StaffConfig,
+    day_config: &DayConfig,
     schedule: &Schedule,
     (cond_premise, shift_premise, count_premise, cond_main, shift_main, count_main, score): &(
         CondWrapper,
@@ -82,7 +85,8 @@ pub(super) fn eval_immut(
 ) -> Score {
     eval!(
         eval_immut,
-        schedule_config,
+        staff_config,
+        day_config,
         schedule,
         cond_premise,
         shift_premise,
@@ -100,6 +104,7 @@ mod tests {
 
     use ::kinmu_model::Staff;
 
+    use super::super::super::ScheduleConfig;
     use super::*;
 
     /// Iを一人で担当する人にその資格がある場合
@@ -133,7 +138,8 @@ mod tests {
             .insert(String::from("I_alone_ok"), 0);
 
         let score = eval_mut(
-            &schedule_config,
+            &schedule_config.staff,
+            &schedule_config.day,
             &schedule,
             &mut (
                 CondWrapper::new(Cond::Every),
@@ -180,7 +186,8 @@ mod tests {
             .insert(String::from("I_alone_ok"), 0);
 
         let score = eval_mut(
-            &schedule_config,
+            &schedule_config.staff,
+            &schedule_config.day,
             &schedule,
             &mut (
                 CondWrapper::new(Cond::Every),

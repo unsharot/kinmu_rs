@@ -101,7 +101,8 @@ where
                 .iter()
                 .flat_map(|x| x.scores.clone())
                 .collect::<Vec<SP>>(),
-            schedule_config,
+            &schedule_config.staff,
+            &schedule_config.day,
             model,
         );
 
@@ -111,7 +112,12 @@ where
         writeln!(self.out)?;
 
         for sf in &schedule_config.result.score_functions {
-            let s = eval_scores_immut(&sf.scores, schedule_config, model);
+            let s = eval_scores_immut(
+                &sf.scores,
+                &schedule_config.staff,
+                &schedule_config.day,
+                model,
+            );
             let mut ok = true;
             if let Some(f) = &sf.filter {
                 if let Some(h) = f.high_pass {

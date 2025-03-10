@@ -5,12 +5,12 @@ mod eval;
 use self::eval::{eval_score_immut, eval_score_mut};
 
 use super::{
-    CondWrapper, DayAttributeNameWrapper, DayState, Schedule, ScheduleConfig, Shift, ShiftState,
-    StaffAttributeNameWrapper,
+    CondWrapper, DayAttributeNameWrapper, DayConfig, DayState, Schedule, ScheduleConfig, Shift,
+    ShiftState, StaffAttributeNameWrapper,
 };
 
 use ::kinmu_input::{Check, FromConfig};
-use ::kinmu_model::{DayAttributeName, Score, ScorePropTrait, StaffAttributeName};
+use ::kinmu_model::{DayAttributeName, Score, ScorePropTrait, StaffAttributeName, StaffConfig};
 
 use anyhow::Context as _;
 use std::fmt;
@@ -68,12 +68,22 @@ impl fmt::Display for ScoreProp {
 }
 
 impl ScorePropTrait<Shift, ShiftState, DayState> for ScoreProp {
-    fn eval_mut(&mut self, schedule_config: &ScheduleConfig, schedule: &Schedule) -> Score {
-        eval_score_mut(self, schedule_config, schedule)
+    fn eval_mut(
+        &mut self,
+        staff_config: &StaffConfig,
+        day_config: &DayConfig,
+        schedule: &Schedule,
+    ) -> Score {
+        eval_score_mut(self, staff_config, day_config, schedule)
     }
 
-    fn eval_immut(&self, schedule_config: &ScheduleConfig, schedule: &Schedule) -> Score {
-        eval_score_immut(self, schedule_config, schedule)
+    fn eval_immut(
+        &self,
+        staff_config: &StaffConfig,
+        day_config: &DayConfig,
+        schedule: &Schedule,
+    ) -> Score {
+        eval_score_immut(self, staff_config, day_config, schedule)
     }
 }
 

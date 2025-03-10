@@ -151,13 +151,25 @@ where
     let mut score;
     for mut ac in annealing_configs {
         let mut rng = seed::gen_rng_from_seed(ac.seed);
-        score = eval_scores_mut(&mut ac.score_props, &schedule_config, &model);
+        score = eval_scores_mut(
+            &mut ac.score_props,
+            &schedule_config.staff,
+            &schedule_config.day,
+            &model,
+        );
         (_, model) = kinmu_annealing::run(
             score,
             &model,
             ac.step,
             update.generate(&ac.update_func, &schedule_config)?,
-            |m| eval_scores_mut(&mut ac.score_props, &schedule_config, m),
+            |m| {
+                eval_scores_mut(
+                    &mut ac.score_props,
+                    &schedule_config.staff,
+                    &schedule_config.day,
+                    m,
+                )
+            },
             ac.max_temp,
             ac.min_temp,
             kinmu_annealing::basic_temp_func,
