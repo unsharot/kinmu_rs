@@ -17,7 +17,6 @@ use self::eval::staff_count_at_least::StaffCountAtLeast;
 use self::eval::staff_count_regard_day_attribute::StaffCountRegardDayAttribute;
 use self::eval::staff_count_with_premise::StaffCountWithPremise;
 use self::eval::streak::Streak;
-use self::eval::{eval_score_immut, eval_score_mut};
 
 use super::{
     CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, Shift, ShiftState,
@@ -25,13 +24,15 @@ use super::{
 };
 
 use ::kinmu_input::{Check, FromConfig};
-use ::kinmu_model::{DayAttributeName, Score, ScorePropTrait, StaffAttributeName, StaffConfig};
+use ::kinmu_model::{DayAttributeName, Score, StaffAttributeName, StaffConfig};
+use kinmu_macro::ScorePropTrait;
 
 use anyhow::Context as _;
 use std::fmt;
 
 /// 具体的なスコア
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, ScorePropTrait)]
+#[score_prop_trait(<Shift, ShiftState, DayState>)]
 pub enum ScoreProp {
     PatternGeneral(PatternGeneral),
     PatternFixed(PatternFixed),
@@ -79,26 +80,6 @@ impl fmt::Display for ScoreProp {
             ScoreProp::NGPair(p) => write!(f, "NGPair {:?}", p),
             ScoreProp::NoSamePair(p) => write!(f, "NoSamePair {:?}", p),
         }
-    }
-}
-
-impl ScorePropTrait<Shift, ShiftState, DayState> for ScoreProp {
-    fn eval_mut(
-        &mut self,
-        staff_config: &StaffConfig,
-        day_config: &DayConfig,
-        schedule: &Schedule,
-    ) -> Score {
-        eval_score_mut(self, staff_config, day_config, schedule)
-    }
-
-    fn eval_immut(
-        &self,
-        staff_config: &StaffConfig,
-        day_config: &DayConfig,
-        schedule: &Schedule,
-    ) -> Score {
-        eval_score_immut(self, staff_config, day_config, schedule)
     }
 }
 
