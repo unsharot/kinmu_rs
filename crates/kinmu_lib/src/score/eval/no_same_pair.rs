@@ -1,19 +1,23 @@
 //! 指定回数以上同じペアなら発火するスコア
 
-use super::super::{CondWrapper, DayConfig, Schedule, Shift, StaffConfig};
+use super::super::{
+    CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, ScoreProp, Shift, ShiftState,
+    StaffConfig,
+};
 
-use ::kinmu_model::Score;
+use kinmu_input::Check;
+use kinmu_model::{Score, ScorePropTrait};
 
 use std::collections::HashMap;
 
 macro_rules! eval {
-    ($eval:ident, $staff_config:expr, $day_config:expr, $schedule:expr, $cond:expr, $pair_limit:expr, $shift:expr, $score:expr) => {{
+    ($eval:ident, $self:expr, $staff_config:expr, $day_config:expr, $schedule:expr) => {{
         let mut pair_map: HashMap<Vec<usize>, i32> = HashMap::new();
         for day in 0..$day_config.count {
             let mut i_list: Vec<usize> = Vec::new();
             for staff in 0..$staff_config.count {
-                if $cond.$eval(staff, day, $staff_config, $day_config)
-                    && $schedule[staff][day] == *$shift
+                if $self.cond.$eval(staff, day, $staff_config, $day_config)
+                    && $schedule[staff][day] == $self.shift
                 {
                     i_list.push(staff);
                 }
@@ -25,51 +29,58 @@ macro_rules! eval {
         }
         let mut ans = 0.0;
         for count in pair_map.values() {
-            let a = *count - *$pair_limit + 1;
+            let a = *count - $self.pair_limit + 1;
             if a > 0 {
-                ans += (a as Score) * *$score
+                ans += (a as Score) * $self.score
             }
         }
         ans
     }};
 }
 
-#[allow(clippy::needless_range_loop)]
-pub(super) fn eval_mut(
-    staff_config: &StaffConfig,
-    day_config: &DayConfig,
-    schedule: &Schedule,
-    (cond, pair_limit, shift, score): &mut (CondWrapper, i32, Shift, Score),
-) -> Score {
-    eval!(
-        eval_mut,
-        staff_config,
-        day_config,
-        schedule,
-        cond,
-        pair_limit,
-        shift,
-        score
-    )
+#[derive(Debug, PartialEq, Clone)]
+pub struct NoSamePair {
+    pub cond: CondWrapper,
+    pub pair_limit: i32,
+    pub shift: Shift,
+    pub score: Score,
 }
 
-#[allow(clippy::needless_range_loop)]
-pub(super) fn eval_immut(
-    staff_config: &StaffConfig,
-    day_config: &DayConfig,
-    schedule: &Schedule,
-    (cond, pair_limit, shift, score): &(CondWrapper, i32, Shift, Score),
-) -> Score {
-    eval!(
-        eval_immut,
-        staff_config,
-        day_config,
-        schedule,
-        cond,
-        pair_limit,
-        shift,
-        score
-    )
+impl NoSamePair {
+    pub fn new((cond, pair_limit, shift, score): (CondWrapper, i32, Shift, Score)) -> Self {
+        Self {
+            cond,
+            pair_limit,
+            shift,
+            score,
+        }
+    }
+}
+
+impl ScorePropTrait<Shift, ShiftState, DayState> for NoSamePair {
+    fn eval_mut(
+        &mut self,
+        staff_config: &StaffConfig,
+        day_config: &DayConfig,
+        schedule: &Schedule,
+    ) -> Score {
+        eval!(eval_mut, self, staff_config, day_config, schedule)
+    }
+
+    fn eval_immut(
+        &self,
+        staff_config: &StaffConfig,
+        day_config: &DayConfig,
+        schedule: &Schedule,
+    ) -> Score {
+        eval!(eval_immut, self, staff_config, day_config, schedule)
+    }
+}
+
+impl Check<ScoreProp, Shift, ShiftState, DayState> for NoSamePair {
+    fn check(&self, schedule_config: &ScheduleConfig) -> anyhow::Result<()> {
+        self.cond.check(schedule_config)
+    }
 }
 
 #[cfg(test)]
@@ -91,12 +102,9 @@ mod tests {
         schedule_config.day.count = schedule[0].len();
         schedule_config.staff.count = schedule.len();
 
-        let score = eval_mut(
-            &schedule_config.staff,
-            &schedule_config.day,
-            &schedule,
-            &mut (CondWrapper::new(Cond::Every), 2, Shift::I, 1.0),
-        );
+        let mut sp = NoSamePair::new((CondWrapper::new(Cond::Every), 2, Shift::I, 1.0));
+
+        let score = sp.eval_mut(&schedule_config.staff, &schedule_config.day, &schedule);
 
         assert_eq!(0.0, score);
     }
@@ -113,12 +121,9 @@ mod tests {
         schedule_config.day.count = schedule[0].len();
         schedule_config.staff.count = schedule.len();
 
-        let score = eval_mut(
-            &schedule_config.staff,
-            &schedule_config.day,
-            &schedule,
-            &mut (CondWrapper::new(Cond::Every), 2, Shift::I, 1.0),
-        );
+        let mut sp = NoSamePair::new((CondWrapper::new(Cond::Every), 2, Shift::I, 1.0));
+
+        let score = sp.eval_mut(&schedule_config.staff, &schedule_config.day, &schedule);
 
         assert_eq!(1.0, score);
     }
@@ -135,12 +140,9 @@ mod tests {
         schedule_config.day.count = schedule[0].len();
         schedule_config.staff.count = schedule.len();
 
-        let score = eval_mut(
-            &schedule_config.staff,
-            &schedule_config.day,
-            &schedule,
-            &mut (CondWrapper::new(Cond::Every), 3, Shift::I, 1.0),
-        );
+        let mut sp = NoSamePair::new((CondWrapper::new(Cond::Every), 3, Shift::I, 1.0));
+
+        let score = sp.eval_mut(&schedule_config.staff, &schedule_config.day, &schedule);
 
         assert_eq!(0.0, score);
     }
@@ -157,12 +159,9 @@ mod tests {
         schedule_config.day.count = schedule[0].len();
         schedule_config.staff.count = schedule.len();
 
-        let score = eval_mut(
-            &schedule_config.staff,
-            &schedule_config.day,
-            &schedule,
-            &mut (CondWrapper::new(Cond::Every), 3, Shift::I, 1.0),
-        );
+        let mut sp = NoSamePair::new((CondWrapper::new(Cond::Every), 3, Shift::I, 1.0));
+
+        let score = sp.eval_mut(&schedule_config.staff, &schedule_config.day, &schedule);
 
         assert_eq!(1.0, score);
     }

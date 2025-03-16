@@ -1,29 +1,33 @@
 //! 指定したシフトをStaffAttributeで指定した数入らなかった場合に発火するスコア
 
-use super::super::{CondWrapper, DayConfig, Schedule, Shift};
+use super::super::{
+    CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, ScoreProp, Shift, ShiftState,
+    StaffAttributeNameWrapper,
+};
 
-use ::kinmu_model::{Score, StaffAttributeName, StaffConfig};
+use kinmu_input::Check;
+use kinmu_model::{Score, ScorePropTrait, StaffAttributeName, StaffConfig};
 
 macro_rules! eval {
-    ($eval:ident, $staff_config:expr, $day_config:expr, $schedule:expr, $cond:expr, $shift:expr, $attribute:expr, $score:expr) => {{
+    ($eval:ident, $self:expr, $staff_config:expr, $day_config:expr, $schedule:expr) => {{
         let mut sum = 0.0;
         for staff in 0..$staff_config.count {
             let mut is_valid = false;
             let mut count = 0;
             for day in 0..$day_config.count {
-                if $cond.$eval(staff, day, $staff_config, $day_config) {
+                if $self.cond.$eval(staff, day, $staff_config, $day_config) {
                     is_valid = true;
-                    if $schedule[staff][day] == *$shift {
+                    if $schedule[staff][day] == $self.shift {
                         count += 1;
                     }
                 }
             }
             if is_valid {
-                let count_needed = $staff_config.get_attribute(staff, $attribute);
+                let count_needed = $staff_config.get_attribute(staff, &$self.attribute);
                 if count_needed != -1 {
                     // 値が-1の場合、任意の数を許すためスコアを増やさない
                     let d = (count - count_needed).abs() as Score;
-                    let a = d * *$score;
+                    let a = d * $self.score;
                     sum += a * a;
                 }
             }
@@ -32,49 +36,60 @@ macro_rules! eval {
     }};
 }
 
-#[allow(clippy::needless_range_loop)]
-pub(super) fn eval_mut(
-    staff_config: &StaffConfig,
-    day_config: &DayConfig,
-    schedule: &Schedule,
-    (cond, shift, attribute, score): &mut (CondWrapper, Shift, StaffAttributeName, Score),
-) -> Score {
-    eval!(
-        eval_mut,
-        staff_config,
-        day_config,
-        schedule,
-        cond,
-        shift,
-        attribute,
-        score
-    )
+#[derive(Debug, PartialEq, Clone)]
+pub struct DayCountRegardStaffAttribute {
+    pub cond: CondWrapper,
+    pub shift: Shift,
+    pub attribute: StaffAttributeName,
+    pub score: Score,
 }
 
-#[allow(clippy::needless_range_loop)]
-pub(super) fn eval_immut(
-    staff_config: &StaffConfig,
-    day_config: &DayConfig,
-    schedule: &Schedule,
-    (cond, shift, attribute, score): &(CondWrapper, Shift, StaffAttributeName, Score),
-) -> Score {
-    eval!(
-        eval_immut,
-        staff_config,
-        day_config,
-        schedule,
-        cond,
-        shift,
-        attribute,
-        score
-    )
+impl DayCountRegardStaffAttribute {
+    pub fn new(
+        (cond, shift, attribute, score): (CondWrapper, Shift, StaffAttributeName, Score),
+    ) -> Self {
+        Self {
+            cond,
+            shift,
+            attribute,
+            score,
+        }
+    }
+}
+
+impl ScorePropTrait<Shift, ShiftState, DayState> for DayCountRegardStaffAttribute {
+    fn eval_mut(
+        &mut self,
+        staff_config: &StaffConfig,
+        day_config: &DayConfig,
+        schedule: &Schedule,
+    ) -> Score {
+        eval!(eval_mut, self, staff_config, day_config, schedule)
+    }
+
+    fn eval_immut(
+        &self,
+        staff_config: &StaffConfig,
+        day_config: &DayConfig,
+        schedule: &Schedule,
+    ) -> Score {
+        eval!(eval_immut, self, staff_config, day_config, schedule)
+    }
+}
+
+impl Check<ScoreProp, Shift, ShiftState, DayState> for DayCountRegardStaffAttribute {
+    fn check(&self, schedule_config: &ScheduleConfig) -> anyhow::Result<()> {
+        self.cond
+            .check(schedule_config)
+            .and(StaffAttributeNameWrapper(&self.attribute).check(schedule_config))
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use crate::Cond;
 
-    use ::kinmu_model::Staff;
+    use kinmu_model::Staff;
 
     use super::super::super::ScheduleConfig;
     use super::*;
@@ -105,17 +120,14 @@ mod tests {
             .name_to_index
             .insert(String::from("n_count"), 0);
 
-        let score = eval_mut(
-            &schedule_config.staff,
-            &schedule_config.day,
-            &schedule,
-            &mut (
-                CondWrapper::new(Cond::Every),
-                Shift::N,
-                String::from("n_count"),
-                1.0,
-            ),
-        );
+        let mut sp = DayCountRegardStaffAttribute::new((
+            CondWrapper::new(Cond::Every),
+            Shift::N,
+            String::from("n_count"),
+            1.0,
+        ));
+
+        let score = sp.eval_mut(&schedule_config.staff, &schedule_config.day, &schedule);
 
         assert_eq!(0.0, score);
     }
@@ -146,17 +158,14 @@ mod tests {
             .name_to_index
             .insert(String::from("n_count"), 0);
 
-        let score = eval_mut(
-            &schedule_config.staff,
-            &schedule_config.day,
-            &schedule,
-            &mut (
-                CondWrapper::new(Cond::Every),
-                Shift::N,
-                String::from("n_count"),
-                1.0,
-            ),
-        );
+        let mut sp = DayCountRegardStaffAttribute::new((
+            CondWrapper::new(Cond::Every),
+            Shift::N,
+            String::from("n_count"),
+            1.0,
+        ));
+
+        let score = sp.eval_mut(&schedule_config.staff, &schedule_config.day, &schedule);
 
         assert_eq!(1.0, score);
     }

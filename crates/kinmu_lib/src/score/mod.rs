@@ -2,11 +2,26 @@
 
 mod eval;
 
+use self::eval::day_count_regard_staff_attribute::DayCountRegardStaffAttribute;
+use self::eval::ng_pair::NGPair;
+use self::eval::no_same_pair::NoSamePair;
+use self::eval::pattern_fixed::PatternFixed;
+use self::eval::pattern_fixed_any::PatternFixedAny;
+use self::eval::pattern_general::PatternGeneral;
+use self::eval::pattern_general_any::PatternGeneralAny;
+use self::eval::shift_dir_priority::ShiftDirPriority;
+use self::eval::shift_half_balance::ShiftHalfBalance;
+use self::eval::shifts_balance::ShiftsBalance;
+use self::eval::staff_count::StaffCount;
+use self::eval::staff_count_at_least::StaffCountAtLeast;
+use self::eval::staff_count_regard_day_attribute::StaffCountRegardDayAttribute;
+use self::eval::staff_count_with_premise::StaffCountWithPremise;
+use self::eval::streak::Streak;
 use self::eval::{eval_score_immut, eval_score_mut};
 
 use super::{
-    CondWrapper, DayAttributeNameWrapper, DayConfig, DayState, Schedule, ScheduleConfig, Shift,
-    ShiftState, StaffAttributeNameWrapper,
+    CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, Shift, ShiftState,
+    StaffAttributeNameWrapper,
 };
 
 use ::kinmu_input::{Check, FromConfig};
@@ -18,26 +33,26 @@ use std::fmt;
 /// 具体的なスコア
 #[derive(Debug, PartialEq, Clone)]
 pub enum ScoreProp {
-    PatternGeneral((CondWrapper, Vec<Vec<Shift>>, Score)),
-    PatternFixed((CondWrapper, Vec<Shift>, Score)),
-    PatternGeneralAny((CondWrapper, Vec<Vec<Shift>>, Score)),
-    PatternFixedAny((CondWrapper, Vec<Shift>, Score)),
-    Streak((CondWrapper, Vec<Shift>, i32, Score)),
-    ShiftsBalance((CondWrapper, Shift, Shift, Score)),
-    ShiftHalfBalance((CondWrapper, Shift, Score)),
-    ShiftDirPriority((CondWrapper, Shift, Score)),
-    DayCountRegardStaffAttribute((CondWrapper, Shift, StaffAttributeName, Score)),
-    StaffCountRegardDayAttribute((CondWrapper, Shift, DayAttributeName, Score)),
-    StaffCount((CondWrapper, Shift, i32, Score)),
-    StaffCountAtLeast((CondWrapper, Shift, i32, Score)),
-    StaffCountWithPremise((CondWrapper, Shift, i32, CondWrapper, Shift, i32, Score)),
-    NGPair((CondWrapper, Shift, Score)),
-    NoSamePair((CondWrapper, i32, Shift, Score)),
+    PatternGeneral(PatternGeneral),
+    PatternFixed(PatternFixed),
+    PatternGeneralAny(PatternGeneralAny),
+    PatternFixedAny(PatternFixedAny),
+    Streak(Streak),
+    ShiftsBalance(ShiftsBalance),
+    ShiftHalfBalance(ShiftHalfBalance),
+    ShiftDirPriority(ShiftDirPriority),
+    DayCountRegardStaffAttribute(DayCountRegardStaffAttribute),
+    StaffCountRegardDayAttribute(StaffCountRegardDayAttribute),
+    StaffCount(StaffCount),
+    StaffCountAtLeast(StaffCountAtLeast),
+    StaffCountWithPremise(StaffCountWithPremise),
+    NGPair(NGPair),
+    NoSamePair(NoSamePair),
 }
 
 impl Default for ScoreProp {
     fn default() -> Self {
-        ScoreProp::PatternGeneral((Default::default(), Default::default(), Default::default()))
+        ScoreProp::PatternGeneral(Default::default())
     }
 }
 
@@ -90,27 +105,21 @@ impl ScorePropTrait<Shift, ShiftState, DayState> for ScoreProp {
 impl Check<ScoreProp, Shift, ShiftState, DayState> for ScoreProp {
     fn check(&self, schedule_config: &ScheduleConfig) -> anyhow::Result<()> {
         match self {
-            ScoreProp::PatternGeneral((c, _, _)) => c.check(schedule_config),
-            ScoreProp::PatternFixed((c, _, _)) => c.check(schedule_config),
-            ScoreProp::PatternGeneralAny((c, _, _)) => c.check(schedule_config),
-            ScoreProp::PatternFixedAny((c, _, _)) => c.check(schedule_config),
-            ScoreProp::Streak((c, _, _, _)) => c.check(schedule_config),
-            ScoreProp::ShiftsBalance((c, _, _, _)) => c.check(schedule_config),
-            ScoreProp::ShiftHalfBalance((c, _, _)) => c.check(schedule_config),
-            ScoreProp::ShiftDirPriority((c, _, _)) => c.check(schedule_config),
-            ScoreProp::DayCountRegardStaffAttribute((c, _, sa, _)) => c
-                .check(schedule_config)
-                .and(StaffAttributeNameWrapper(sa).check(schedule_config)),
-            ScoreProp::StaffCountRegardDayAttribute((c, _, da, _)) => c
-                .check(schedule_config)
-                .and(DayAttributeNameWrapper(da).check(schedule_config)),
-            ScoreProp::StaffCount((c, _, _, _)) => c.check(schedule_config),
-            ScoreProp::StaffCountAtLeast((c, _, _, _)) => c.check(schedule_config),
-            ScoreProp::StaffCountWithPremise((c1, _, _, c2, _, _, _)) => {
-                c1.check(schedule_config).and(c2.check(schedule_config))
-            }
-            ScoreProp::NGPair((c, _, _)) => c.check(schedule_config),
-            ScoreProp::NoSamePair((c, _, _, _)) => c.check(schedule_config),
+            ScoreProp::PatternGeneral(p) => p.check(schedule_config),
+            ScoreProp::PatternFixed(p) => p.check(schedule_config),
+            ScoreProp::PatternGeneralAny(p) => p.check(schedule_config),
+            ScoreProp::PatternFixedAny(p) => p.check(schedule_config),
+            ScoreProp::Streak(p) => p.check(schedule_config),
+            ScoreProp::ShiftsBalance(p) => p.check(schedule_config),
+            ScoreProp::ShiftHalfBalance(p) => p.check(schedule_config),
+            ScoreProp::ShiftDirPriority(p) => p.check(schedule_config),
+            ScoreProp::DayCountRegardStaffAttribute(p) => p.check(schedule_config),
+            ScoreProp::StaffCountRegardDayAttribute(p) => p.check(schedule_config),
+            ScoreProp::StaffCount(p) => p.check(schedule_config),
+            ScoreProp::StaffCountAtLeast(p) => p.check(schedule_config),
+            ScoreProp::StaffCountWithPremise(p) => p.check(schedule_config),
+            ScoreProp::NGPair(p) => p.check(schedule_config),
+            ScoreProp::NoSamePair(p) => p.check(schedule_config),
         }
         .with_context(|| format!("スコア {:?} の変換チェックに失敗しました", self))?;
 
@@ -134,72 +143,79 @@ fn helper_sp(w1: &str, w2: &str) -> anyhow::Result<ScoreProp> {
         ("PatternGeneral", p) => Ok(ScoreProp::PatternGeneral({
             let (cw, VecVecShiftWrapper(vvs), s) =
                 <(CondWrapper, VecVecShiftWrapper, Score)>::from_config(p)?;
-            (cw, vvs, s)
+            PatternGeneral::new((cw, vvs, s))
         })),
         ("PatternFixed", p) => Ok(ScoreProp::PatternFixed({
             let (cw, VecShiftWrapper(vs), s) =
                 <(CondWrapper, VecShiftWrapper, Score)>::from_config(p)?;
-            (cw, vs, s)
+            PatternFixed::new((cw, vs, s))
         })),
         ("PatternGeneralAny", p) => Ok(ScoreProp::PatternGeneralAny({
             let (cw, VecVecShiftWrapper(vvs), s) =
                 <(CondWrapper, VecVecShiftWrapper, Score)>::from_config(p)?;
-            (cw, vvs, s)
+            PatternGeneralAny::new((cw, vvs, s))
         })),
         ("PatternFixedAny", p) => Ok(ScoreProp::PatternFixedAny({
             let (cw, VecShiftWrapper(vs), s) =
                 <(CondWrapper, VecShiftWrapper, Score)>::from_config(p)?;
-            (cw, vs, s)
+            PatternFixedAny::new((cw, vs, s))
         })),
         ("Streak", p) => Ok(ScoreProp::Streak({
             let (cw, VecShiftWrapper(vs), i, s) =
                 <(CondWrapper, VecShiftWrapper, i32, Score)>::from_config(p)?;
-            (cw, vs, i, s)
+            Streak::new((cw, vs, i, s))
         })),
-        ("ShiftsBalance", p) => Ok(ScoreProp::ShiftsBalance(<(
+        ("ShiftsBalance", p) => Ok(ScoreProp::ShiftsBalance(ShiftsBalance::new(<(
             CondWrapper,
             Shift,
             Shift,
             Score,
-        )>::from_config(p)?)),
-        ("ShiftHalfBalance", p) => Ok(ScoreProp::ShiftHalfBalance(
+        )>::from_config(
+            p
+        )?))),
+        ("ShiftHalfBalance", p) => Ok(ScoreProp::ShiftHalfBalance(ShiftHalfBalance::new(
             <(CondWrapper, Shift, Score)>::from_config(p)?,
-        )),
-        ("ShiftDirPriority", p) => Ok(ScoreProp::ShiftDirPriority(
+        ))),
+        ("ShiftDirPriority", p) => Ok(ScoreProp::ShiftDirPriority(ShiftDirPriority::new(
             <(CondWrapper, Shift, Score)>::from_config(p)?,
-        )),
+        ))),
         ("DayCountRegardStaffAttribute", p) => Ok(ScoreProp::DayCountRegardStaffAttribute(
-            <(CondWrapper, Shift, StaffAttributeName, Score)>::from_config(p)?,
+            DayCountRegardStaffAttribute::new(
+                <(CondWrapper, Shift, StaffAttributeName, Score)>::from_config(p)?,
+            ),
         )),
         ("StaffCountRegardDayAttribute", p) => Ok(ScoreProp::StaffCountRegardDayAttribute(
-            <(CondWrapper, Shift, DayAttributeName, Score)>::from_config(p)?,
+            StaffCountRegardDayAttribute::new(
+                <(CondWrapper, Shift, DayAttributeName, Score)>::from_config(p)?,
+            ),
         )),
-        ("StaffCount", p) => Ok(ScoreProp::StaffCount(
-            <(CondWrapper, Shift, i32, Score)>::from_config(p)?,
-        )),
-        ("StaffCountAtLeast", p) => Ok(ScoreProp::StaffCountAtLeast(<(
-            CondWrapper,
-            Shift,
-            i32,
-            Score,
-        )>::from_config(p)?)),
-        ("StaffCountWithPremise", p) => Ok(ScoreProp::StaffCountWithPremise(<(
-            CondWrapper,
-            Shift,
-            i32,
+        ("StaffCount", p) => Ok(ScoreProp::StaffCount(StaffCount::new(<(
             CondWrapper,
             Shift,
             i32,
             Score,
         )>::from_config(
             p
-        )?)),
-        ("NGPair", p) => Ok(ScoreProp::NGPair(
+        )?))),
+        ("StaffCountAtLeast", p) => Ok(ScoreProp::StaffCountAtLeast(StaffCountAtLeast::new(
+            <(CondWrapper, Shift, i32, Score)>::from_config(p)?,
+        ))),
+        ("StaffCountWithPremise", p) => Ok(ScoreProp::StaffCountWithPremise(
+            StaffCountWithPremise::new(
+                <(CondWrapper, Shift, i32, CondWrapper, Shift, i32, Score)>::from_config(p)?,
+            ),
+        )),
+        ("NGPair", p) => Ok(ScoreProp::NGPair(NGPair::new(
             <(CondWrapper, Shift, Score)>::from_config(p)?,
-        )),
-        ("NoSamePair", p) => Ok(ScoreProp::NoSamePair(
-            <(CondWrapper, i32, Shift, Score)>::from_config(p)?,
-        )),
+        ))),
+        ("NoSamePair", p) => Ok(ScoreProp::NoSamePair(NoSamePair::new(<(
+            CondWrapper,
+            i32,
+            Shift,
+            Score,
+        )>::from_config(
+            p
+        )?))),
         (s, _) => Err(anyhow::anyhow!("Unexpected ScoreProp {}", s)),
     }
 }
@@ -298,7 +314,7 @@ mod tests {
         let s = "PatternGeneral (Every (), [[N,O,H], [O,H], [K, Y]], 123)";
         println!("{:?}", ScoreProp::from_config(s).unwrap());
         assert_eq!(
-            ScoreProp::PatternGeneral((
+            ScoreProp::PatternGeneral(PatternGeneral::new((
                 CondWrapper::new(Cond::Every),
                 vec![
                     vec![Shift::N, Shift::O, Shift::H],
@@ -306,7 +322,7 @@ mod tests {
                     vec![Shift::K, Shift::Y]
                 ],
                 123.0
-            )),
+            ))),
             ScoreProp::from_config(s).unwrap()
         );
     }
