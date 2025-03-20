@@ -4,8 +4,8 @@
 
 use anyhow::Context;
 
-use ::kinmu_core::Input;
-use ::kinmu_model::MainConfig;
+use kinmu_core::Input;
+use kinmu_model::MainConfig;
 
 mod checker;
 mod converter;

@@ -4,8 +4,8 @@ use super::{
     DayConfig, DayState, ScheduleConfig, ScoreProp, Shift, ShiftState, StaffAttributeNameWrapper,
 };
 
-use ::kinmu_input::{Check, FromConfig};
-use ::kinmu_model::{StaffAttributeName, StaffConfig};
+use kinmu_input::{Check, FromConfig};
+use kinmu_model::{StaffAttributeName, StaffConfig};
 
 use anyhow::Context as _;
 use std::fmt;

@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use anyhow::Context;
 
 use super::super::reader::types::{RawAttributeTable, RawScheduleConfig};
-use ::kinmu_model::{
+use kinmu_model::{
     DayAttributeName, DayConfig, FillConfig, ResultConfig, Schedule, ScheduleConfig, ScheduleState,
     ScoreFilter, ScoreFunction, Staff, StaffAttributeNameIndexMap, StaffConfig,
 };

@@ -1,6 +1,6 @@
 //! 勤務表に関わる型の宣言
 
-use ::kinmu_input::{FromConfig, MapState};
+use kinmu_input::{FromConfig, MapState};
 
 use std::fmt;
 

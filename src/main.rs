@@ -1,8 +1,7 @@
-use ::kinmu_color;
-use ::kinmu_generator::GeneratorWithAnnealing;
-use ::kinmu_input::InputByFile;
-use ::kinmu_lib::{Fill, Shift, Update};
-use ::kinmu_output::OutputText;
+use kinmu_generator::GeneratorWithAnnealing;
+use kinmu_input::InputByFile;
+use kinmu_lib::{Fill, Shift, Update};
+use kinmu_output::OutputText;
 
 use getopts::Options;
 use std::env;

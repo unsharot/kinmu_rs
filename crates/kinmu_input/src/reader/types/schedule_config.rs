@@ -1,6 +1,6 @@
 //! schedule_configを読み込むための構造体
 
-use ::kinmu_model::Score;
+use kinmu_model::Score;
 
 #[derive(Debug, serde::Deserialize)]
 pub struct RawScheduleConfig {

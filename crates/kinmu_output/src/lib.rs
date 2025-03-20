@@ -1,9 +1,8 @@
 //! テキスト出力機能を提供
 //! ファイル出力と標準出力は引数で切り替え
 
-use ::kinmu_color;
-use ::kinmu_core::Output;
-use ::kinmu_model::{eval_scores_immut, Answer, Schedule, ScheduleConfig, ScorePropTrait};
+use kinmu_core::Output;
+use kinmu_model::{eval_scores_immut, Answer, Schedule, ScheduleConfig, ScorePropTrait};
 
 use std::fmt;
 use std::io;

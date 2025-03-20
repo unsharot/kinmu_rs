@@ -37,9 +37,9 @@ use super::{
     StaffAttributeNameWrapper,
 };
 
-use ::kinmu_input::{Check, FromConfig};
-use ::kinmu_model::{DayAttributeName, Score, StaffAttributeName, StaffConfig};
+use kinmu_input::{Check, FromConfig};
 use kinmu_macro::ScorePropTrait;
+use kinmu_model::{DayAttributeName, Score, StaffAttributeName, StaffConfig};
 
 use anyhow::Context as _;
 use std::fmt;

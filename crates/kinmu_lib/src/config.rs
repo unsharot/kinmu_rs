@@ -1,7 +1,7 @@
 use super::{DayState, ScoreProp, Shift, ShiftState};
 
-use ::kinmu_input::Check;
-use ::kinmu_model::{DayAttributeName, StaffAttributeName};
+use kinmu_input::Check;
+use kinmu_model::{DayAttributeName, StaffAttributeName};
 
 /// 具体的なScheduleConfig
 pub type ScheduleConfig = kinmu_model::ScheduleConfig<ScoreProp, Shift, ShiftState, DayState>;

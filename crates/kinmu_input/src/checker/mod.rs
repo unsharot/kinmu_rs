@@ -3,7 +3,7 @@
 use anyhow::Context as _;
 use std::cmp::Ordering;
 
-use ::kinmu_model::{AnnealingConfig, MainConfig, ScheduleConfig, ScoreFunction};
+use kinmu_model::{AnnealingConfig, MainConfig, ScheduleConfig, ScoreFunction};
 
 /// 読み込み、変換したconfigが正常か判定する
 pub fn run<SP, S, SS, DS>(config: &MainConfig<SP, S, SS, DS>) -> anyhow::Result<()>

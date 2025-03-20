@@ -114,7 +114,7 @@ impl Check<ScoreProp, Shift, ShiftState, DayState> for StaffCountWithPremise {
 mod tests {
     use crate::Cond;
 
-    use ::kinmu_model::Staff;
+    use kinmu_model::Staff;
 
     use super::super::super::ScheduleConfig;
     use super::*;
