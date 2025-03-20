@@ -1,6 +1,6 @@
-//! 指定したシフトが指定した数より少ない場合に発火するスコア
+//! 指定したシフトが月の前後でバランスよく配置されているかを判定するスコア
 
-use super::super::{
+use super::{
     CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, ScoreProp, Shift, ShiftState,
     StaffConfig,
 };
@@ -11,19 +11,38 @@ use kinmu_model::{Score, ScorePropTrait};
 macro_rules! eval {
     ($eval:ident, $self:expr, $staff_config:expr, $day_config:expr, $schedule:expr) => {{
         let mut sum = 0.0;
-        for day in 0..$day_config.count {
+        for staff in 0..$staff_config.count {
             let mut is_valid = false;
-            let mut staff_count = 0;
-            for staff in 0..$staff_config.count {
+            // 条件を満たすdayの中から中間を探す
+            let mut len = 0;
+            for day in 0..$day_config.count {
                 if $self.cond.$eval(staff, day, $staff_config, $day_config) {
                     is_valid = true;
                     if $schedule[staff][day] == $self.shift {
-                        staff_count += 1;
+                        len += 1;
+                    }
+                }
+            }
+            let mid = len / 2;
+
+            let mut cf: i32 = 0;
+            let mut cl: i32 = 0;
+            let mut i = 0;
+            for day in 0..$day_config.count {
+                if $self.cond.$eval(staff, day, $staff_config, $day_config) {
+                    is_valid = true;
+                    if $schedule[staff][day] == $self.shift {
+                        i += 1;
+                        if i <= mid {
+                            cf += 1;
+                        } else {
+                            cl += 1;
+                        }
                     }
                 }
             }
             if is_valid {
-                let d = std::cmp::min(staff_count - $self.count, 0) as Score;
+                let d = (cf - cl).abs() as Score;
                 let a = d * $self.score;
                 sum += a * a;
             }
@@ -33,25 +52,19 @@ macro_rules! eval {
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct StaffCountAtLeast {
+pub struct ShiftHalfBalance {
     pub cond: CondWrapper,
     pub shift: Shift,
-    pub count: i32,
     pub score: Score,
 }
 
-impl StaffCountAtLeast {
-    pub fn new((cond, shift, count, score): (CondWrapper, Shift, i32, Score)) -> Self {
-        Self {
-            cond,
-            shift,
-            count,
-            score,
-        }
+impl ShiftHalfBalance {
+    pub fn new((cond, shift, score): (CondWrapper, Shift, Score)) -> Self {
+        Self { cond, shift, score }
     }
 }
 
-impl ScorePropTrait<Shift, ShiftState, DayState> for StaffCountAtLeast {
+impl ScorePropTrait<Shift, ShiftState, DayState> for ShiftHalfBalance {
     fn eval_mut(
         &mut self,
         staff_config: &StaffConfig,
@@ -71,7 +84,7 @@ impl ScorePropTrait<Shift, ShiftState, DayState> for StaffCountAtLeast {
     }
 }
 
-impl Check<ScoreProp, Shift, ShiftState, DayState> for StaffCountAtLeast {
+impl Check<ScoreProp, Shift, ShiftState, DayState> for ShiftHalfBalance {
     fn check(&self, schedule_config: &ScheduleConfig) -> anyhow::Result<()> {
         self.cond.check(schedule_config)
     }
@@ -84,38 +97,38 @@ mod tests {
     use super::super::super::ScheduleConfig;
     use super::*;
 
-    /// Nが最低1つあるケース
+    /// 前後で同じ場合
     #[test]
-    fn test_pass() {
+    fn test_eq() {
         let schedule = {
             use Shift::*;
-            vec![vec![O, H, N, N], vec![N, N, O, O]]
+            vec![vec![I, A, K, I, A, K]]
         };
 
         let mut schedule_config: ScheduleConfig = Default::default();
         schedule_config.day.count = schedule[0].len();
         schedule_config.staff.count = schedule.len();
 
-        let mut sp = StaffCountAtLeast::new((CondWrapper::new(Cond::Every), Shift::N, 1, 1.0));
+        let mut sp = ShiftHalfBalance::new((CondWrapper::new(Cond::Every), Shift::I, 1.0));
 
         let score = sp.eval_mut(&schedule_config.staff, &schedule_config.day, &schedule);
 
         assert_eq!(0.0, score);
     }
 
-    /// Nが最低1つないケース
+    /// 前後で違う場合
     #[test]
-    fn test_hit() {
+    fn test_neq() {
         let schedule = {
             use Shift::*;
-            vec![vec![O, H, N, N], vec![N, K, O, O]]
+            vec![vec![I, A, K, N, N, K]]
         };
 
         let mut schedule_config: ScheduleConfig = Default::default();
         schedule_config.day.count = schedule[0].len();
         schedule_config.staff.count = schedule.len();
 
-        let mut sp = StaffCountAtLeast::new((CondWrapper::new(Cond::Every), Shift::N, 1, 1.0));
+        let mut sp = ShiftHalfBalance::new((CondWrapper::new(Cond::Every), Shift::I, 1.0));
 
         let score = sp.eval_mut(&schedule_config.staff, &schedule_config.day, &schedule);
 

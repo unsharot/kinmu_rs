@@ -1,6 +1,6 @@
 //! 指定した2つのシフト数がスタッフあたりでバランス良いか判定するスコア
 
-use super::super::{
+use super::{
     CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, ScoreProp, Shift, ShiftState,
     StaffConfig,
 };

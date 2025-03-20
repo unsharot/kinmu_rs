@@ -1,62 +1,61 @@
-//! 指定したシフトがDayAttributeで指定した数いない場合に発火するスコア
+//! 指定したシフトが指定回数連続して存在するか判定するスコア
+//! 指定回数+1回連続は1回分としてカウントされる
 
-use crate::DayAttributeNameWrapper;
-
-use super::super::{
+use super::{
     CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, ScoreProp, Shift, ShiftState,
     StaffConfig,
 };
 
 use kinmu_input::Check;
-use kinmu_model::{DayAttributeName, Score, ScorePropTrait};
+use kinmu_model::{Score, ScorePropTrait};
 
 macro_rules! eval {
     ($eval:ident, $self:expr, $staff_config:expr, $day_config:expr, $schedule:expr) => {{
         let mut sum = 0.0;
-        for day in 0..$day_config.count {
-            let mut is_valid = false;
-            let mut count = 0;
-            for staff in 0..$staff_config.count {
+        for staff in 0..$staff_config.count {
+            let mut a = 0.0;
+            let mut accum = 0;
+            for day in 0..$day_config.count {
                 if $self.cond.$eval(staff, day, $staff_config, $day_config) {
-                    is_valid = true;
-                    if $schedule[staff][day] == $self.shift {
-                        count += 1;
+                    if $self.target_shifts.contains(&$schedule[staff][day]) {
+                        accum += 1;
+                    } else {
+                        accum = 0;
+                    }
+                    if accum >= $self.streak_count {
+                        a += $self.score;
+                        accum = 0;
                     }
                 }
             }
-            if is_valid {
-                let count_needed = $day_config.attributes.get(&$self.attribute).unwrap()[day];
-                let d = (count - count_needed).abs() as Score;
-                let a = d * $self.score;
-                sum += a * a;
-            }
+            sum += a;
         }
         sum
     }};
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct StaffCountRegardDayAttribute {
+pub struct Streak {
     pub cond: CondWrapper,
-    pub shift: Shift,
-    pub attribute: DayAttributeName,
+    pub target_shifts: Vec<Shift>,
+    pub streak_count: i32,
     pub score: Score,
 }
 
-impl StaffCountRegardDayAttribute {
+impl Streak {
     pub fn new(
-        (cond, shift, attribute, score): (CondWrapper, Shift, DayAttributeName, Score),
+        (cond, target_shifts, streak_count, score): (CondWrapper, Vec<Shift>, i32, Score),
     ) -> Self {
         Self {
             cond,
-            shift,
-            attribute,
+            target_shifts,
+            streak_count,
             score,
         }
     }
 }
 
-impl ScorePropTrait<Shift, ShiftState, DayState> for StaffCountRegardDayAttribute {
+impl ScorePropTrait<Shift, ShiftState, DayState> for Streak {
     fn eval_mut(
         &mut self,
         staff_config: &StaffConfig,
@@ -76,11 +75,9 @@ impl ScorePropTrait<Shift, ShiftState, DayState> for StaffCountRegardDayAttribut
     }
 }
 
-impl Check<ScoreProp, Shift, ShiftState, DayState> for StaffCountRegardDayAttribute {
+impl Check<ScoreProp, Shift, ShiftState, DayState> for Streak {
     fn check(&self, schedule_config: &ScheduleConfig) -> anyhow::Result<()> {
-        self.cond
-            .check(schedule_config)
-            .and(DayAttributeNameWrapper(&self.attribute).check(schedule_config))
+        self.cond.check(schedule_config)
     }
 }
 
@@ -91,27 +88,23 @@ mod tests {
     use super::super::super::ScheduleConfig;
     use super::*;
 
-    /// Nが指定した数あるケース
+    /// YまたはKが2連続でないことを検知
     #[test]
     fn test_pass() {
         let schedule = {
             use Shift::*;
-            vec![vec![O, N, N, N], vec![N, N, O, O]]
+            vec![vec![N, K, N, N]]
         };
 
         let mut schedule_config: ScheduleConfig = Default::default();
         schedule_config.day.count = schedule[0].len();
         schedule_config.staff.count = schedule.len();
-        schedule_config
-            .day
-            .attributes
-            .insert(String::from("n_staff_count"), vec![1, 2, 1, 1]);
 
-        let mut sp = StaffCountRegardDayAttribute::new((
+        let mut sp = Streak::new((
             CondWrapper::new(Cond::Every),
-            Shift::N,
-            String::from("n_staff_count"),
-            1.0,
+            vec![Shift::K, Shift::Y],
+            2,
+            -1.0,
         ));
 
         let score = sp.eval_mut(&schedule_config.staff, &schedule_config.day, &schedule);
@@ -119,31 +112,27 @@ mod tests {
         assert_eq!(0.0, score);
     }
 
-    /// Nが指定した数ないケース
+    /// YまたはKが2連続であることを検知
     #[test]
     fn test_hit() {
         let schedule = {
             use Shift::*;
-            vec![vec![O, N, N, N], vec![N, K, O, O]]
+            vec![vec![N, K, Y, N]]
         };
 
         let mut schedule_config: ScheduleConfig = Default::default();
         schedule_config.day.count = schedule[0].len();
         schedule_config.staff.count = schedule.len();
-        schedule_config
-            .day
-            .attributes
-            .insert(String::from("n_staff_count"), vec![1, 2, 1, 1]);
 
-        let mut sp = StaffCountRegardDayAttribute::new((
+        let mut sp = Streak::new((
             CondWrapper::new(Cond::Every),
-            Shift::N,
-            String::from("n_staff_count"),
-            1.0,
+            vec![Shift::K, Shift::Y],
+            2,
+            -1.0,
         ));
 
         let score = sp.eval_mut(&schedule_config.staff, &schedule_config.day, &schedule);
 
-        assert_eq!(1.0, score);
+        assert_eq!(-1.0, score);
     }
 }

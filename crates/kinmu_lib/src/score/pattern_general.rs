@@ -3,7 +3,7 @@
 //! 計算量はO(NM)
 //! TODO: RollingHash、FSMやTrie木を用いた高速化
 
-use super::super::{
+use super::{
     CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, ScoreProp, Shift, ShiftState,
     StaffConfig,
 };

@@ -1,6 +1,6 @@
 //! 指定したシフトをStaffAttributeで指定した数入らなかった場合に発火するスコア
 
-use super::super::{
+use super::{
     CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, ScoreProp, Shift, ShiftState,
     StaffAttributeNameWrapper,
 };

@@ -1,22 +1,36 @@
 //! スコアに関わる型の宣言
 
-mod eval;
+mod day_count_regard_staff_attribute;
+mod ng_pair;
+mod no_same_pair;
+mod pattern_fixed;
+mod pattern_fixed_any;
+mod pattern_general;
+mod pattern_general_any;
+mod shift_dir_priority;
+mod shift_half_balance;
+mod shifts_balance;
+mod staff_count;
+mod staff_count_at_least;
+mod staff_count_regard_day_attribute;
+mod staff_count_with_premise;
+mod streak;
 
-use self::eval::day_count_regard_staff_attribute::DayCountRegardStaffAttribute;
-use self::eval::ng_pair::NGPair;
-use self::eval::no_same_pair::NoSamePair;
-use self::eval::pattern_fixed::PatternFixed;
-use self::eval::pattern_fixed_any::PatternFixedAny;
-use self::eval::pattern_general::PatternGeneral;
-use self::eval::pattern_general_any::PatternGeneralAny;
-use self::eval::shift_dir_priority::ShiftDirPriority;
-use self::eval::shift_half_balance::ShiftHalfBalance;
-use self::eval::shifts_balance::ShiftsBalance;
-use self::eval::staff_count::StaffCount;
-use self::eval::staff_count_at_least::StaffCountAtLeast;
-use self::eval::staff_count_regard_day_attribute::StaffCountRegardDayAttribute;
-use self::eval::staff_count_with_premise::StaffCountWithPremise;
-use self::eval::streak::Streak;
+use self::day_count_regard_staff_attribute::DayCountRegardStaffAttribute;
+use self::ng_pair::NGPair;
+use self::no_same_pair::NoSamePair;
+use self::pattern_fixed::PatternFixed;
+use self::pattern_fixed_any::PatternFixedAny;
+use self::pattern_general::PatternGeneral;
+use self::pattern_general_any::PatternGeneralAny;
+use self::shift_dir_priority::ShiftDirPriority;
+use self::shift_half_balance::ShiftHalfBalance;
+use self::shifts_balance::ShiftsBalance;
+use self::staff_count::StaffCount;
+use self::staff_count_at_least::StaffCountAtLeast;
+use self::staff_count_regard_day_attribute::StaffCountRegardDayAttribute;
+use self::staff_count_with_premise::StaffCountWithPremise;
+use self::streak::Streak;
 
 use super::{
     CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, Shift, ShiftState,

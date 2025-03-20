@@ -1,6 +1,6 @@
 //! 指定回数以上同じペアなら発火するスコア
 
-use super::super::{
+use super::{
     CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, ScoreProp, Shift, ShiftState,
     StaffConfig,
 };

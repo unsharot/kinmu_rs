@@ -1,7 +1,6 @@
-//! 指定したシフトが指定回数連続して存在するか判定するスコア
-//! 指定回数+1回連続は1回分としてカウントされる
+//! NGリストにあるペアがともに指定したシフトなら発火するスコア
 
-use super::super::{
+use super::{
     CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, ScoreProp, Shift, ShiftState,
     StaffConfig,
 };
@@ -12,20 +11,16 @@ use kinmu_model::{Score, ScorePropTrait};
 macro_rules! eval {
     ($eval:ident, $self:expr, $staff_config:expr, $day_config:expr, $schedule:expr) => {{
         let mut sum = 0.0;
-        for staff in 0..$staff_config.count {
+        for day in 0..$day_config.count {
             let mut a = 0.0;
-            let mut accum = 0;
-            for day in 0..$day_config.count {
-                if $self.cond.$eval(staff, day, $staff_config, $day_config) {
-                    if $self.target_shifts.contains(&$schedule[staff][day]) {
-                        accum += 1;
-                    } else {
-                        accum = 0;
-                    }
-                    if accum >= $self.streak_count {
-                        a += $self.score;
-                        accum = 0;
-                    }
+            for i in 0..$staff_config.ng_list.len() {
+                let (staff1, staff2) = $staff_config.ng_list[i];
+                if $self.cond.$eval(staff1, day, $staff_config, $day_config)
+                    && $self.cond.$eval(staff2, day, $staff_config, $day_config)
+                    && $schedule[staff1][day] == $self.shift
+                    && $schedule[staff2][day] == $self.shift
+                {
+                    a += $self.score;
                 }
             }
             sum += a;
@@ -35,27 +30,19 @@ macro_rules! eval {
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct Streak {
+pub struct NGPair {
     pub cond: CondWrapper,
-    pub target_shifts: Vec<Shift>,
-    pub streak_count: i32,
+    pub shift: Shift,
     pub score: Score,
 }
 
-impl Streak {
-    pub fn new(
-        (cond, target_shifts, streak_count, score): (CondWrapper, Vec<Shift>, i32, Score),
-    ) -> Self {
-        Self {
-            cond,
-            target_shifts,
-            streak_count,
-            score,
-        }
+impl NGPair {
+    pub fn new((cond, shift, score): (CondWrapper, Shift, Score)) -> Self {
+        Self { cond, shift, score }
     }
 }
 
-impl ScorePropTrait<Shift, ShiftState, DayState> for Streak {
+impl ScorePropTrait<Shift, ShiftState, DayState> for NGPair {
     fn eval_mut(
         &mut self,
         staff_config: &StaffConfig,
@@ -75,7 +62,7 @@ impl ScorePropTrait<Shift, ShiftState, DayState> for Streak {
     }
 }
 
-impl Check<ScoreProp, Shift, ShiftState, DayState> for Streak {
+impl Check<ScoreProp, Shift, ShiftState, DayState> for NGPair {
     fn check(&self, schedule_config: &ScheduleConfig) -> anyhow::Result<()> {
         self.cond.check(schedule_config)
     }
@@ -88,51 +75,44 @@ mod tests {
     use super::super::super::ScheduleConfig;
     use super::*;
 
-    /// YまたはKが2連続でないことを検知
+    /// NGを正常に検出できるか
     #[test]
-    fn test_pass() {
+    fn test_basic() {
         let schedule = {
             use Shift::*;
-            vec![vec![N, K, N, N]]
+            vec![vec![I, A, K, I, A, K], vec![N, N, N, I, A, K]]
         };
 
         let mut schedule_config: ScheduleConfig = Default::default();
         schedule_config.day.count = schedule[0].len();
         schedule_config.staff.count = schedule.len();
+        schedule_config.staff.ng_list.push((0, 1));
 
-        let mut sp = Streak::new((
-            CondWrapper::new(Cond::Every),
-            vec![Shift::K, Shift::Y],
-            2,
-            -1.0,
-        ));
+        let mut sp = NGPair::new((CondWrapper::new(Cond::Every), Shift::I, 1.0));
 
         let score = sp.eval_mut(&schedule_config.staff, &schedule_config.day, &schedule);
 
-        assert_eq!(0.0, score);
+        assert_eq!(1.0, score);
     }
 
-    /// YまたはKが2連続であることを検知
+    /// NGの設定に重複がある場合、重複してスコアが計算されるか
     #[test]
-    fn test_hit() {
+    fn test_duplicated() {
         let schedule = {
             use Shift::*;
-            vec![vec![N, K, Y, N]]
+            vec![vec![I, A, K, I, A, K], vec![N, N, N, I, A, K]]
         };
 
         let mut schedule_config: ScheduleConfig = Default::default();
         schedule_config.day.count = schedule[0].len();
         schedule_config.staff.count = schedule.len();
+        schedule_config.staff.ng_list.push((0, 1));
+        schedule_config.staff.ng_list.push((0, 1));
 
-        let mut sp = Streak::new((
-            CondWrapper::new(Cond::Every),
-            vec![Shift::K, Shift::Y],
-            2,
-            -1.0,
-        ));
+        let mut sp = NGPair::new((CondWrapper::new(Cond::Every), Shift::I, 1.0));
 
         let score = sp.eval_mut(&schedule_config.staff, &schedule_config.day, &schedule);
 
-        assert_eq!(-1.0, score);
+        assert_eq!(2.0, score);
     }
 }

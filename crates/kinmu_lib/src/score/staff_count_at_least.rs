@@ -1,7 +1,6 @@
-//! 指定したシフトが月の前後どちらにあるほうが良いか設定する
-//! Scoreのフィールドが正なら前を優先、負なら後ろを優先
+//! 指定したシフトが指定した数より少ない場合に発火するスコア
 
-use super::super::{
+use super::{
     CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, ScoreProp, Shift, ShiftState,
     StaffConfig,
 };
@@ -12,33 +11,21 @@ use kinmu_model::{Score, ScorePropTrait};
 macro_rules! eval {
     ($eval:ident, $self:expr, $staff_config:expr, $day_config:expr, $schedule:expr) => {{
         let mut sum = 0.0;
-        for staff in 0..$staff_config.count {
+        for day in 0..$day_config.count {
             let mut is_valid = false;
-            // 条件を満たすdayの中から中間を探す
-            let mut len = 0;
-            for day in 0..$day_config.count {
+            let mut staff_count = 0;
+            for staff in 0..$staff_config.count {
                 if $self.cond.$eval(staff, day, $staff_config, $day_config) {
                     is_valid = true;
                     if $schedule[staff][day] == $self.shift {
-                        len += 1;
-                    }
-                }
-            }
-            let mid = (len as Score) / 2.0 - 0.5;
-
-            let mut a = 0.0;
-            let mut i = 0;
-            for day in 0..$day_config.count {
-                if $self.cond.$eval(staff, day, $staff_config, $day_config) {
-                    is_valid = true;
-                    if $schedule[staff][day] == $self.shift {
-                        i += 1;
-                        a += $self.score * ((i as Score) - (mid as Score));
+                        staff_count += 1;
                     }
                 }
             }
             if is_valid {
-                sum += a;
+                let d = std::cmp::min(staff_count - $self.count, 0) as Score;
+                let a = d * $self.score;
+                sum += a * a;
             }
         }
         sum
@@ -46,19 +33,25 @@ macro_rules! eval {
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct ShiftDirPriority {
+pub struct StaffCountAtLeast {
     pub cond: CondWrapper,
     pub shift: Shift,
+    pub count: i32,
     pub score: Score,
 }
 
-impl ShiftDirPriority {
-    pub fn new((cond, shift, score): (CondWrapper, Shift, Score)) -> Self {
-        Self { cond, shift, score }
+impl StaffCountAtLeast {
+    pub fn new((cond, shift, count, score): (CondWrapper, Shift, i32, Score)) -> Self {
+        Self {
+            cond,
+            shift,
+            count,
+            score,
+        }
     }
 }
 
-impl ScorePropTrait<Shift, ShiftState, DayState> for ShiftDirPriority {
+impl ScorePropTrait<Shift, ShiftState, DayState> for StaffCountAtLeast {
     fn eval_mut(
         &mut self,
         staff_config: &StaffConfig,
@@ -78,7 +71,7 @@ impl ScorePropTrait<Shift, ShiftState, DayState> for ShiftDirPriority {
     }
 }
 
-impl Check<ScoreProp, Shift, ShiftState, DayState> for ShiftDirPriority {
+impl Check<ScoreProp, Shift, ShiftState, DayState> for StaffCountAtLeast {
     fn check(&self, schedule_config: &ScheduleConfig) -> anyhow::Result<()> {
         self.cond.check(schedule_config)
     }
@@ -91,41 +84,41 @@ mod tests {
     use super::super::super::ScheduleConfig;
     use super::*;
 
-    /// 前を優先
+    /// Nが最低1つあるケース
     #[test]
-    fn test_front() {
+    fn test_pass() {
         let schedule = {
             use Shift::*;
-            vec![vec![I, A, K, I, A, K]]
+            vec![vec![O, H, N, N], vec![N, N, O, O]]
         };
 
         let mut schedule_config: ScheduleConfig = Default::default();
         schedule_config.day.count = schedule[0].len();
         schedule_config.staff.count = schedule.len();
 
-        let mut sp = ShiftDirPriority::new((CondWrapper::new(Cond::Every), Shift::I, 1.0));
+        let mut sp = StaffCountAtLeast::new((CondWrapper::new(Cond::Every), Shift::N, 1, 1.0));
 
         let score = sp.eval_mut(&schedule_config.staff, &schedule_config.day, &schedule);
 
-        assert_eq!(2.0, score);
+        assert_eq!(0.0, score);
     }
 
-    /// 後ろを優先
+    /// Nが最低1つないケース
     #[test]
-    fn test_back() {
+    fn test_hit() {
         let schedule = {
             use Shift::*;
-            vec![vec![I, A, K, I, A, K]]
+            vec![vec![O, H, N, N], vec![N, K, O, O]]
         };
 
         let mut schedule_config: ScheduleConfig = Default::default();
         schedule_config.day.count = schedule[0].len();
         schedule_config.staff.count = schedule.len();
 
-        let mut sp = ShiftDirPriority::new((CondWrapper::new(Cond::Every), Shift::I, -1.0));
+        let mut sp = StaffCountAtLeast::new((CondWrapper::new(Cond::Every), Shift::N, 1, 1.0));
 
         let score = sp.eval_mut(&schedule_config.staff, &schedule_config.day, &schedule);
 
-        assert_eq!(-2.0, score);
+        assert_eq!(1.0, score);
     }
 }

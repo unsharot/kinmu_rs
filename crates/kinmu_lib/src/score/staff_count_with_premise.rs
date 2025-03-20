@@ -1,6 +1,6 @@
 //! 指定したシフトの人数を満たした日付に対して、指定したシフトが指定した値いない時に発火するスコア
 
-use super::super::{
+use super::{
     CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, ScoreProp, Shift, ShiftState,
     StaffConfig,
 };

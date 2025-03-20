@@ -1,8 +1,9 @@
 //! 指定したパターンが存在するスタッフに対して発火するスコア
+//! ただし、パターンは固定
 //! 計算量はO(NM)
 //! TODO: RollingHash、FSMやTrie木を用いた高速化
 
-use super::super::{
+use super::{
     CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, ScoreProp, Shift, ShiftState,
     StaffConfig,
 };
@@ -27,7 +28,7 @@ macro_rules! eval {
                         .$eval(staff, day + dd, $staff_config, $day_config)
                     {
                         is_valid = true;
-                        if !($self.shift_pattern[dd].contains(&$schedule[staff][day + dd])) {
+                        if $self.shift_pattern[dd] != $schedule[staff][day + dd] {
                             hit = false;
                             break;
                         }
@@ -50,14 +51,14 @@ macro_rules! eval {
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct PatternGeneralAny {
+pub struct PatternFixedAny {
     pub cond: CondWrapper,
-    pub shift_pattern: Vec<Vec<Shift>>,
+    pub shift_pattern: Vec<Shift>,
     pub score: Score,
 }
 
-impl PatternGeneralAny {
-    pub fn new((cond, shift_pattern, score): (CondWrapper, Vec<Vec<Shift>>, Score)) -> Self {
+impl PatternFixedAny {
+    pub fn new((cond, shift_pattern, score): (CondWrapper, Vec<Shift>, Score)) -> Self {
         Self {
             cond,
             shift_pattern,
@@ -66,7 +67,7 @@ impl PatternGeneralAny {
     }
 }
 
-impl ScorePropTrait<Shift, ShiftState, DayState> for PatternGeneralAny {
+impl ScorePropTrait<Shift, ShiftState, DayState> for PatternFixedAny {
     fn eval_mut(
         &mut self,
         staff_config: &StaffConfig,
@@ -86,7 +87,7 @@ impl ScorePropTrait<Shift, ShiftState, DayState> for PatternGeneralAny {
     }
 }
 
-impl Check<ScoreProp, Shift, ShiftState, DayState> for PatternGeneralAny {
+impl Check<ScoreProp, Shift, ShiftState, DayState> for PatternFixedAny {
     fn check(&self, schedule_config: &ScheduleConfig) -> anyhow::Result<()> {
         self.cond.check(schedule_config)
     }
@@ -101,53 +102,61 @@ mod tests {
 
     /// ヒットするべきでないパターン
     #[test]
-    fn test_pass_with_cond() {
+    fn test_pass() {
         let schedule = {
             use Shift::*;
-            &vec![vec![
-                N, K, K, K, O, I, A, K, H, O, K, H, N, I, A, K, H, I, A, K, O, N, I, A, K, N, O, N,
-                K, I, A, K, H, I, A, K, O,
-            ]]
+            vec![vec![O, O, K, H, A, K], vec![N, N, O, I, H, K]]
         };
 
         let mut schedule_config: ScheduleConfig = Default::default();
         schedule_config.day.count = schedule[0].len();
-        schedule_config.day.buffer_count = 3;
-        schedule_config.staff.count = 1;
+        schedule_config.staff.count = schedule.len();
 
-        let mut sp = PatternGeneralAny::new((
-            CondWrapper::new(Cond::DayExceptBuffer),
-            vec![vec![Shift::K, Shift::Y], vec![Shift::K, Shift::Y]],
-            -1000.0,
-        ));
+        let mut sp =
+            PatternFixedAny::new((CondWrapper::new(Cond::Every), vec![Shift::O, Shift::H], 1.0));
 
         let score = sp.eval_mut(&schedule_config.staff, &schedule_config.day, &schedule);
+
         assert_eq!(0.0, score);
     }
 
-    /// ヒットするパターン
+    /// OHパターンの検出
     #[test]
-    fn test_hit_with_cond() {
+    fn test_hit() {
         let schedule = {
             use Shift::*;
-            &vec![vec![
-                N, K, K, K, O, I, A, K, H, O, K, H, N, I, A, K, H, I, A, K, O, N, I, A, K, N, O, N,
-                K, I, A, K, H, I, A, K, O,
-            ]]
+            vec![vec![O, O, K, H, A, K], vec![N, N, O, H, A, K]]
         };
 
         let mut schedule_config: ScheduleConfig = Default::default();
         schedule_config.day.count = schedule[0].len();
-        schedule_config.day.buffer_count = 3;
-        schedule_config.staff.count = 1;
+        schedule_config.staff.count = schedule.len();
 
-        let mut sp = PatternGeneralAny::new((
-            CondWrapper::new(Cond::Every),
-            vec![vec![Shift::K, Shift::Y], vec![Shift::K, Shift::Y]],
-            -1000.0,
-        ));
+        let mut sp =
+            PatternFixedAny::new((CondWrapper::new(Cond::Every), vec![Shift::O, Shift::H], 1.0));
 
         let score = sp.eval_mut(&schedule_config.staff, &schedule_config.day, &schedule);
-        assert_eq!(-1000.0, score);
+
+        assert_eq!(1.0, score);
+    }
+
+    /// 2回パターンが存在する場合も1回としてカウントする
+    #[test]
+    fn test_double() {
+        let schedule = {
+            use Shift::*;
+            vec![vec![O, O, K, H, A, K], vec![N, N, O, H, O, H]]
+        };
+
+        let mut schedule_config: ScheduleConfig = Default::default();
+        schedule_config.day.count = schedule[0].len();
+        schedule_config.staff.count = schedule.len();
+
+        let mut sp =
+            PatternFixedAny::new((CondWrapper::new(Cond::Every), vec![Shift::O, Shift::H], 1.0));
+
+        let score = sp.eval_mut(&schedule_config.staff, &schedule_config.day, &schedule);
+
+        assert_eq!(1.0, score);
     }
 }
