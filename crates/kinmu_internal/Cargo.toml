@@ -14,5 +14,5 @@ kinmu_output = { workspace = true }
 kinmu_lib = { workspace = true }
 kinmu_core = { workspace = true }
 kinmu_model = { workspace = true }
-kinmu_macro = { workspace = true }
+kinmu_macros = { workspace = true }
 kinmu_color = { workspace = true }

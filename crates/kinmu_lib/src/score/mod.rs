@@ -38,7 +38,7 @@ use super::{
 };
 
 use kinmu_input::{Check, FromConfig};
-use kinmu_macro::ScorePropTrait;
+use kinmu_macros::ScorePropTrait;
 use kinmu_model::{DayAttributeName, Score, StaffAttributeName, StaffConfig};
 
 use anyhow::Context as _;

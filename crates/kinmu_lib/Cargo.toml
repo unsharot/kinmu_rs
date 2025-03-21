@@ -11,6 +11,6 @@ repository = "https://github.com/unsharot/kinmu_rs"
 kinmu_model = { workspace = true }
 kinmu_generator = { workspace = true }
 kinmu_input = { workspace = true }
-kinmu_macro = { workspace = true }
+kinmu_macros = { workspace = true }
 anyhow = { workspace = true }
 rand = { workspace = true }

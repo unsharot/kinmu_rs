@@ -145,7 +145,7 @@ dependencies = [
  "kinmu_generator",
  "kinmu_input",
  "kinmu_lib",
- "kinmu_macro",
+ "kinmu_macros",
  "kinmu_model",
  "kinmu_output",
 ]
@@ -157,13 +157,13 @@ dependencies = [
  "anyhow",
  "kinmu_generator",
  "kinmu_input",
- "kinmu_macro",
+ "kinmu_macros",
  "kinmu_model",
  "rand",
 ]
 
 [[package]]
-name = "kinmu_macro"
+name = "kinmu_macros"
 version = "0.1.0"
 dependencies = [
  "kinmu_model",
