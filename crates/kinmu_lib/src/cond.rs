@@ -4,7 +4,7 @@ use super::{
     DayConfig, DayState, ScheduleConfig, ScoreProp, Shift, ShiftState, StaffAttributeNameWrapper,
 };
 
-use kinmu_input::{Check, FromConfig};
+use kinmu_input_by_file::{Check, FromConfig};
 use kinmu_model::{StaffAttributeName, StaffConfig};
 
 use anyhow::Context as _;

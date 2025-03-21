@@ -12,7 +12,7 @@ members = ["crates/*"]
 
 [workspace.dependencies]
 kinmu_generator_with_annealing = { path = "crates/kinmu_generator_with_annealing" }
-kinmu_input = { path = "crates/kinmu_input" }
+kinmu_input_by_file = { path = "crates/kinmu_input_by_file" }
 kinmu_output = { path = "crates/kinmu_output" }
 kinmu_color = { path = "crates/kinmu_color" }
 kinmu_annealing = { path = "crates/kinmu_annealing" }

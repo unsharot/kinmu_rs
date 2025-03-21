@@ -1,6 +1,6 @@
 use super::{DayState, ScoreProp, Shift, ShiftState};
 
-use kinmu_input::Check;
+use kinmu_input_by_file::Check;
 use kinmu_model::{DayAttributeName, StaffAttributeName};
 
 /// 具体的なScheduleConfig

@@ -37,7 +37,7 @@ use super::{
     StaffAttributeNameWrapper,
 };
 
-use kinmu_input::{Check, FromConfig};
+use kinmu_input_by_file::{Check, FromConfig};
 use kinmu_macros::ScorePropTrait;
 use kinmu_model::{DayAttributeName, Score, StaffAttributeName, StaffConfig};
 

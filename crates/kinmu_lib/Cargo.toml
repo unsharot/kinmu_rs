@@ -10,7 +10,7 @@ repository = "https://github.com/unsharot/kinmu_rs"
 [dependencies]
 kinmu_model = { workspace = true }
 kinmu_generator_with_annealing = { workspace = true }
-kinmu_input = { workspace = true }
+kinmu_input_by_file = { workspace = true }
 kinmu_macros = { workspace = true }
 anyhow = { workspace = true }
 rand = { workspace = true }

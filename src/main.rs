@@ -1,5 +1,5 @@
 use kinmu::generator_with_annealing::GeneratorWithAnnealing;
-use kinmu::input::InputByFile;
+use kinmu::input_by_file::InputByFile;
 use kinmu::lib::{Fill, Shift, Update};
 use kinmu::output::OutputText;
 

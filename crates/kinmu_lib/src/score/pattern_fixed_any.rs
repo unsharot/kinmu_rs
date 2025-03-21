@@ -8,7 +8,7 @@ use super::{
     StaffConfig,
 };
 
-use kinmu_input::Check;
+use kinmu_input_by_file::Check;
 use kinmu_model::{Score, ScorePropTrait};
 
 macro_rules! eval {

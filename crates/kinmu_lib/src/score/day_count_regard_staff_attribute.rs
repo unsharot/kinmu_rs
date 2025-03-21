@@ -5,7 +5,7 @@ use super::{
     StaffAttributeNameWrapper,
 };
 
-use kinmu_input::Check;
+use kinmu_input_by_file::Check;
 use kinmu_model::{Score, ScorePropTrait, StaffAttributeName, StaffConfig};
 
 macro_rules! eval {
