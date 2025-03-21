@@ -7,7 +7,7 @@ fill2はIとKの数合わせてうまいこと埋める
 
 use super::{DayState, Schedule, ScheduleConfig, ScoreProp, Shift, ShiftState};
 
-use kinmu_generator as gen;
+use kinmu_generator_with_annealing as gen;
 
 use rand::Rng;
 

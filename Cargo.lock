@@ -115,7 +115,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "kinmu_generator"
+name = "kinmu_generator_with_annealing"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -142,7 +142,7 @@ version = "0.1.0"
 dependencies = [
  "kinmu_color",
  "kinmu_core",
- "kinmu_generator",
+ "kinmu_generator_with_annealing",
  "kinmu_input",
  "kinmu_lib",
  "kinmu_macros",
@@ -155,7 +155,7 @@ name = "kinmu_lib"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "kinmu_generator",
+ "kinmu_generator_with_annealing",
  "kinmu_input",
  "kinmu_macros",
  "kinmu_model",

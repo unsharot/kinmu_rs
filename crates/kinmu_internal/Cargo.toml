@@ -8,7 +8,7 @@ description = "Provides internal subcrates for kinmu."
 repository = "https://github.com/unsharot/kinmu_rs"
 
 [dependencies]
-kinmu_generator = { workspace = true }
+kinmu_generator_with_annealing = { workspace = true }
 kinmu_input = { workspace = true }
 kinmu_output = { workspace = true }
 kinmu_lib = { workspace = true }

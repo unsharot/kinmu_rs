@@ -11,7 +11,7 @@ repository = "https://github.com/unsharot/kinmu_rs"
 members = ["crates/*"]
 
 [workspace.dependencies]
-kinmu_generator = { path = "crates/kinmu_generator" }
+kinmu_generator_with_annealing = { path = "crates/kinmu_generator_with_annealing" }
 kinmu_input = { path = "crates/kinmu_input" }
 kinmu_output = { path = "crates/kinmu_output" }
 kinmu_color = { path = "crates/kinmu_color" }

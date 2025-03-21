@@ -1,4 +1,4 @@
-use kinmu::generator::GeneratorWithAnnealing;
+use kinmu::generator_with_annealing::GeneratorWithAnnealing;
 use kinmu::input::InputByFile;
 use kinmu::lib::{Fill, Shift, Update};
 use kinmu::output::OutputText;

@@ -2,7 +2,7 @@
 
 use super::{DayState, Schedule, ScheduleConfig, ScheduleState, ScoreProp, Shift, ShiftState};
 
-use kinmu_generator as gen;
+use kinmu_generator_with_annealing as gen;
 use kinmu_model::Score;
 
 use rand::Rng;
