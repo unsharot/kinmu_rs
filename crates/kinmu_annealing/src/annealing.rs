@@ -31,7 +31,7 @@ use rand::Rng;
 ///     kinmu_annealing::basic_prob_func,
 ///     &mut rand::thread_rng(),
 /// );
-///```
+/// ```
 #[allow(clippy::too_many_arguments)]
 pub fn run<M, S, U, E, T, P, R>(
     initial_score: S,
