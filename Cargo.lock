@@ -89,12 +89,7 @@ version = "2.3.0"
 dependencies = [
  "anyhow",
  "getopts",
- "kinmu_color",
- "kinmu_core",
- "kinmu_generator",
- "kinmu_input",
- "kinmu_lib",
- "kinmu_output",
+ "kinmu_internal",
  "rand",
 ]
 
@@ -139,6 +134,20 @@ dependencies = [
  "kinmu_model",
  "serde",
  "toml",
+]
+
+[[package]]
+name = "kinmu_internal"
+version = "0.1.0"
+dependencies = [
+ "kinmu_color",
+ "kinmu_core",
+ "kinmu_generator",
+ "kinmu_input",
+ "kinmu_lib",
+ "kinmu_macro",
+ "kinmu_model",
+ "kinmu_output",
 ]
 
 [[package]]

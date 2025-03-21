@@ -1,7 +1,7 @@
-use kinmu_generator::GeneratorWithAnnealing;
-use kinmu_input::InputByFile;
-use kinmu_lib::{Fill, Shift, Update};
-use kinmu_output::OutputText;
+use kinmu::generator::GeneratorWithAnnealing;
+use kinmu::input::InputByFile;
+use kinmu::lib::{Fill, Shift, Update};
+use kinmu::output::OutputText;
 
 use getopts::Options;
 use std::env;
@@ -49,7 +49,7 @@ fn main() -> io::Result<()> {
     let matches = match opts.parse(&args[1..]) {
         Ok(m) => m,
         Err(f) => {
-            kinmu_color::write(&mut out, "[エラー]", kinmu_color::Color::Red, use_color)?;
+            kinmu::color::write(&mut out, "[エラー]", kinmu::color::Color::Red, use_color)?;
             writeln!(out, " オプションが不正です")?;
             writeln!(out, "理由: {}", f)?;
             write_usage(&mut out, &program, opts)?;
@@ -65,7 +65,7 @@ fn main() -> io::Result<()> {
                 Box::new(f)
             }
             Err(e) => {
-                kinmu_color::write(&mut out, "[エラー]", kinmu_color::Color::Red, use_color)?;
+                kinmu::color::write(&mut out, "[エラー]", kinmu::color::Color::Red, use_color)?;
                 writeln!(out, " ファイルの読み込みに失敗しました")?;
                 writeln!(out, "理由: {}", e)?;
                 return Ok(());
@@ -96,7 +96,7 @@ fn main() -> io::Result<()> {
     };
 
     // 実行
-    match kinmu_core::run(
+    match kinmu::core::run(
         &mut InputByFile::new(main_config_path),
         &mut GeneratorWithAnnealing::new(Fill, Update),
         {

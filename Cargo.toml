@@ -20,17 +20,13 @@ kinmu_lib = { path = "crates/kinmu_lib" }
 kinmu_core = { path = "crates/kinmu_core" }
 kinmu_model = { path = "crates/kinmu_model" }
 kinmu_macro = { path = "crates/kinmu_macro" }
+kinmu_internal = { path = "crates/kinmu_internal" }
 anyhow = "1.0.95"
 rand = "0.8.5"
 
 
 [dependencies]
-kinmu_generator = { workspace = true }
-kinmu_input = { workspace = true }
-kinmu_output = { workspace = true }
-kinmu_color = { workspace = true }
-kinmu_lib = { workspace = true }
-kinmu_core = { workspace = true }
+kinmu_internal = { workspace = true }
 anyhow = { workspace = true }
 rand = { workspace = true }
 getopts = "0.2.21"
