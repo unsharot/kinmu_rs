@@ -1,7 +1,7 @@
 use kinmu::generator_with_annealing::GeneratorWithAnnealing;
 use kinmu::input_by_file::InputByFile;
 use kinmu::lib::{Fill, Shift, Update};
-use kinmu::output::OutputText;
+use kinmu::output_text::OutputText;
 
 use getopts::Options;
 use std::env;
