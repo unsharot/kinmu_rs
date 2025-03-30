@@ -1,6 +1,7 @@
 //! スコアに関わる型の宣言
 
 mod day_count_regard_staff_attribute;
+mod distance;
 mod ng_pair;
 mod no_same_pair;
 mod pattern_fixed;
@@ -17,6 +18,7 @@ mod staff_count_with_premise;
 mod streak;
 
 use self::day_count_regard_staff_attribute::DayCountRegardStaffAttribute;
+use self::distance::ShiftDistance;
 use self::ng_pair::NGPair;
 use self::no_same_pair::NoSamePair;
 use self::pattern_fixed::PatternFixed;
@@ -56,6 +58,7 @@ pub enum ScoreProp {
     ShiftsBalance(ShiftsBalance),
     ShiftHalfBalance(ShiftHalfBalance),
     ShiftDirPriority(ShiftDirPriority),
+    ShiftDistance(ShiftDistance),
     DayCountRegardStaffAttribute(DayCountRegardStaffAttribute),
     StaffCountRegardDayAttribute(StaffCountRegardDayAttribute),
     StaffCount(StaffCount),
@@ -82,6 +85,9 @@ impl fmt::Display for ScoreProp {
             ScoreProp::ShiftsBalance(p) => write!(f, "ShiftsBalance {:?}", p),
             ScoreProp::ShiftHalfBalance(p) => write!(f, "ShiftHalfBalance {:?}", p),
             ScoreProp::ShiftDirPriority(p) => write!(f, "ShiftDirPriority {:?}", p),
+            ScoreProp::ShiftDistance(p) => {
+                write!(f, "ShiftDistance {:?}", p)
+            }
             ScoreProp::DayCountRegardStaffAttribute(p) => {
                 write!(f, "DayCountRegardStaffAttribute {:?}", p)
             }
@@ -108,6 +114,7 @@ impl Check<ScoreProp, Shift, ShiftState, DayState> for ScoreProp {
             ScoreProp::ShiftsBalance(p) => p.check(schedule_config),
             ScoreProp::ShiftHalfBalance(p) => p.check(schedule_config),
             ScoreProp::ShiftDirPriority(p) => p.check(schedule_config),
+            ScoreProp::ShiftDistance(p) => p.check(schedule_config),
             ScoreProp::DayCountRegardStaffAttribute(p) => p.check(schedule_config),
             ScoreProp::StaffCountRegardDayAttribute(p) => p.check(schedule_config),
             ScoreProp::StaffCount(p) => p.check(schedule_config),
@@ -174,6 +181,13 @@ fn helper_sp(w1: &str, w2: &str) -> anyhow::Result<ScoreProp> {
         ("ShiftDirPriority", p) => Ok(ScoreProp::ShiftDirPriority(ShiftDirPriority::new(
             <(CondWrapper, Shift, Score)>::from_config(p)?,
         ))),
+        ("ShiftDistance", p) => Ok(ScoreProp::ShiftDistance(ShiftDistance::new(<(
+            CondWrapper,
+            Shift,
+            Score,
+        )>::from_config(
+            p
+        )?))),
         ("DayCountRegardStaffAttribute", p) => Ok(ScoreProp::DayCountRegardStaffAttribute(
             DayCountRegardStaffAttribute::new(
                 <(CondWrapper, Shift, StaffAttributeName, Score)>::from_config(p)?,
