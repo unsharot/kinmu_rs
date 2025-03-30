@@ -276,6 +276,7 @@ filterは任意で、任意の有理数パラメータlow_passとhigh_passを持
 | ShiftsBalance                | (Cond, Shift, Shift, Score)                 | 指定した2つのシフトのバランスが悪い場合のペナルティを指定                                               |
 | ShiftHalfBalance             | (Cond, Shift, Score)                        | 指定したシフトが指定範囲の前半と後半でバランスが取れていない場合のペナルティを指定                      |
 | ShiftDirPriority             | (Cond, Shift, Score)                        | 指定したシフトが指定範囲の前後どちらにあるほうが良いか指定 指定スコアが正なら前を優先、負なら後ろを優先 |
+| ShiftDistance                | (Cond, Shift, Score)                        | 指定したシフトどうしの距離が離れていることによるペナルティを指定                                        |
 | DayCountRegardStaffAttribute | (Cond, Shift, StaffAttributeName, Score)    | 職員ごとの指定したパラメータと指定したシフトの数の差によるペナルティを指定                              |
 | StaffCountRegardDayAttribute | (Cond, Shift, DayAttributeName, Score)      | 日付ごとの指定したパラメータと指定したシフトの数の差によるペナルティを指定                              |
 | StaffCount                   | (Cond, Shift, i32, Score)                   | 指定した値と指定したシフトの人数の差によるペナルティを指定                                              |
