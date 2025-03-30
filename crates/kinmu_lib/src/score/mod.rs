@@ -1,7 +1,6 @@
 //! スコアに関わる型の宣言
 
 mod day_count_regard_staff_attribute;
-mod distance;
 mod ng_pair;
 mod no_same_pair;
 mod pattern_fixed;
@@ -9,6 +8,7 @@ mod pattern_fixed_any;
 mod pattern_general;
 mod pattern_general_any;
 mod shift_dir_priority;
+mod shift_distance;
 mod shift_half_balance;
 mod shifts_balance;
 mod staff_count;
@@ -18,7 +18,6 @@ mod staff_count_with_premise;
 mod streak;
 
 use self::day_count_regard_staff_attribute::DayCountRegardStaffAttribute;
-use self::distance::ShiftDistance;
 use self::ng_pair::NGPair;
 use self::no_same_pair::NoSamePair;
 use self::pattern_fixed::PatternFixed;
@@ -26,6 +25,7 @@ use self::pattern_fixed_any::PatternFixedAny;
 use self::pattern_general::PatternGeneral;
 use self::pattern_general_any::PatternGeneralAny;
 use self::shift_dir_priority::ShiftDirPriority;
+use self::shift_distance::ShiftDistance;
 use self::shift_half_balance::ShiftHalfBalance;
 use self::shifts_balance::ShiftsBalance;
 use self::staff_count::StaffCount;
