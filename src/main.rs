@@ -1,6 +1,6 @@
 use kinmu::generator_with_annealing::GeneratorWithAnnealing;
 use kinmu::input_by_file::InputByFile;
-use kinmu::lib::{Shift, StdFill, Update};
+use kinmu::lib::{Shift, StdFill, StdUpdate};
 use kinmu::output_text::OutputText;
 
 use getopts::Options;
@@ -98,7 +98,7 @@ fn main() -> io::Result<()> {
     // 実行
     match kinmu::core::run(
         &mut InputByFile::new(main_config_path),
-        &mut GeneratorWithAnnealing::new(StdFill, Update),
+        &mut GeneratorWithAnnealing::new(StdFill, StdUpdate),
         {
             use Shift::*;
             &mut OutputText::new(

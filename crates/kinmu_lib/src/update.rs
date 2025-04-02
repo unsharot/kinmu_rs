@@ -2,7 +2,7 @@
 
 use super::{DayState, Schedule, ScheduleConfig, ScheduleState, ScoreProp, Shift, ShiftState};
 
-use kinmu_generator_with_annealing as gen;
+use kinmu_generator_with_annealing::Update;
 use kinmu_model::Score;
 
 use rand::Rng;
@@ -10,10 +10,10 @@ use rand::Rng;
 /// 生成器で用いる更新関数のための型
 /// GeneratorWithAnnealingのUpdateを実装
 #[derive(Debug, Clone)]
-pub struct Update;
+pub struct StdUpdate;
 
 /// Updateの実装
-impl gen::Update<ScoreProp, Shift, ShiftState, DayState> for Update {
+impl Update<ScoreProp, Shift, ShiftState, DayState> for StdUpdate {
     fn generate<'a, R: Rng>(
         &self,
         name: &str,
