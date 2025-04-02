@@ -200,7 +200,7 @@ traitを利用し、頻繁に変わる可能性のあるモジュールほど下
 | core                                                 | Input, Generator, Output |                                                 |
 | model                                                | ScorePropTrait           | MainConfig, Answer                              |
 | input_by_file, generator_with_annealing, output_text |                          | InputByFile, GeneratorWithAnnealing, OutputText |
-| lib                                                  |                          | ScoreProp, Shift                                |
+| lib                                                  |                          | StdScoreProp, Shift                                |
 
 
 モジュール同士の依存関係は下図のようになっています。
@@ -226,16 +226,16 @@ graph TD;
 独自の入力、生成、出力方法を使用したい場合はkinmu::core::Input, Generator, Outputをそれぞれ実装してください。
 
 職場に特有の考慮事項があり、既存のスコアで評価不可能な場合、ScorePropTraitを実装する新たなenum型を定義してください。
-既存のScorePropと併用したい場合、kinmu::macros::ScorePropTraitのderiveマクロを用いてenumを拡張できます。
+既存のStdScorePropと併用したい場合、kinmu::macros::ScorePropTraitのderiveマクロを用いてenumを拡張できます。
 
 ```rust
-use kinmu::lib::ScoreProp;
+use kinmu::lib::StdScoreProp;
 use kinmu::macros::ScorePropTrait;
 use crate::your_module::YourSP;
 
 #[derive(ScorePropTrait)]
 enum NewScoreProp {
-   Std(ScoreProp),
+   Std(StdScoreProp),
    // YourSPはScorePropTraitを実装している必要があります。
    New(YourSP),
 }
