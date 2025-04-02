@@ -1,7 +1,7 @@
 //! 指定回数以上同じペアなら発火するスコア
 
 use super::{
-    CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, ScoreProp, Shift, ShiftState,
+    CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, StdScoreProp, Shift, ShiftState,
     StaffConfig,
 };
 
@@ -77,7 +77,7 @@ impl ScorePropTrait<Shift, ShiftState, DayState> for NoSamePair {
     }
 }
 
-impl Check<ScoreProp, Shift, ShiftState, DayState> for NoSamePair {
+impl Check<StdScoreProp, Shift, ShiftState, DayState> for NoSamePair {
     fn check(&self, schedule_config: &ScheduleConfig) -> anyhow::Result<()> {
         self.cond.check(schedule_config)
     }

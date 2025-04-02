@@ -4,7 +4,7 @@
 //! TODO: RollingHash、FSMやTrie木を用いた高速化
 
 use super::{
-    CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, ScoreProp, Shift, ShiftState,
+    CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, StdScoreProp, Shift, ShiftState,
     StaffConfig,
 };
 
@@ -87,7 +87,7 @@ impl ScorePropTrait<Shift, ShiftState, DayState> for PatternFixedAny {
     }
 }
 
-impl Check<ScoreProp, Shift, ShiftState, DayState> for PatternFixedAny {
+impl Check<StdScoreProp, Shift, ShiftState, DayState> for PatternFixedAny {
     fn check(&self, schedule_config: &ScheduleConfig) -> anyhow::Result<()> {
         self.cond.check(schedule_config)
     }

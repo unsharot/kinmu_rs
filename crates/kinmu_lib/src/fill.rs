@@ -5,7 +5,7 @@ fill1はUをランダムな枠に
 fill2はIとKの数合わせてうまいこと埋める
 */
 
-use super::{DayState, Schedule, ScheduleConfig, ScoreProp, Shift, ShiftState};
+use super::{DayState, Schedule, ScheduleConfig, StdScoreProp, Shift, ShiftState};
 
 use kinmu_generator_with_annealing::Fill;
 
@@ -17,7 +17,7 @@ use rand::Rng;
 pub struct StdFill;
 
 /// Fillの実装
-impl Fill<ScoreProp, Shift, ShiftState, DayState> for StdFill {
+impl Fill<StdScoreProp, Shift, ShiftState, DayState> for StdFill {
     fn run<R: Rng>(
         &self,
         name: &str,

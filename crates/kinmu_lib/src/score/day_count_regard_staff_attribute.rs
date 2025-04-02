@@ -1,8 +1,8 @@
 //! 指定したシフトをStaffAttributeで指定した数入らなかった場合に発火するスコア
 
 use super::{
-    CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, ScoreProp, Shift, ShiftState,
-    StaffAttributeNameWrapper,
+    CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, Shift, ShiftState,
+    StaffAttributeNameWrapper, StdScoreProp,
 };
 
 use kinmu_input_by_file::Check;
@@ -77,7 +77,7 @@ impl ScorePropTrait<Shift, ShiftState, DayState> for DayCountRegardStaffAttribut
     }
 }
 
-impl Check<ScoreProp, Shift, ShiftState, DayState> for DayCountRegardStaffAttribute {
+impl Check<StdScoreProp, Shift, ShiftState, DayState> for DayCountRegardStaffAttribute {
     fn check(&self, schedule_config: &ScheduleConfig) -> anyhow::Result<()> {
         self.cond
             .check(schedule_config)

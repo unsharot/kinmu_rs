@@ -1,7 +1,7 @@
 //! 指定したシフトが月の前後でバランスよく配置されているかを判定するスコア
 
 use super::{
-    CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, ScoreProp, Shift, ShiftState,
+    CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, StdScoreProp, Shift, ShiftState,
     StaffConfig,
 };
 
@@ -84,7 +84,7 @@ impl ScorePropTrait<Shift, ShiftState, DayState> for ShiftHalfBalance {
     }
 }
 
-impl Check<ScoreProp, Shift, ShiftState, DayState> for ShiftHalfBalance {
+impl Check<StdScoreProp, Shift, ShiftState, DayState> for ShiftHalfBalance {
     fn check(&self, schedule_config: &ScheduleConfig) -> anyhow::Result<()> {
         self.cond.check(schedule_config)
     }

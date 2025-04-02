@@ -1,7 +1,7 @@
 //! 指定したシフトの人数を満たした日付に対して、指定したシフトが指定した値いない時に発火するスコア
 
 use super::{
-    CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, ScoreProp, Shift, ShiftState,
+    CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, StdScoreProp, Shift, ShiftState,
     StaffConfig,
 };
 
@@ -102,7 +102,7 @@ impl ScorePropTrait<Shift, ShiftState, DayState> for StaffCountWithPremise {
     }
 }
 
-impl Check<ScoreProp, Shift, ShiftState, DayState> for StaffCountWithPremise {
+impl Check<StdScoreProp, Shift, ShiftState, DayState> for StaffCountWithPremise {
     fn check(&self, schedule_config: &ScheduleConfig) -> anyhow::Result<()> {
         self.cond_premise
             .check(schedule_config)

@@ -2,7 +2,7 @@
 //! Scoreのフィールドが正なら前を優先、負なら後ろを優先
 
 use super::{
-    CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, ScoreProp, Shift, ShiftState,
+    CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, StdScoreProp, Shift, ShiftState,
     StaffConfig,
 };
 
@@ -78,7 +78,7 @@ impl ScorePropTrait<Shift, ShiftState, DayState> for ShiftDirPriority {
     }
 }
 
-impl Check<ScoreProp, Shift, ShiftState, DayState> for ShiftDirPriority {
+impl Check<StdScoreProp, Shift, ShiftState, DayState> for ShiftDirPriority {
     fn check(&self, schedule_config: &ScheduleConfig) -> anyhow::Result<()> {
         self.cond.check(schedule_config)
     }

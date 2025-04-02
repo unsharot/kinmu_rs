@@ -1,6 +1,6 @@
 //! 焼きなましで使う更新関数のモジュール
 
-use super::{DayState, Schedule, ScheduleConfig, ScheduleState, ScoreProp, Shift, ShiftState};
+use super::{DayState, Schedule, ScheduleConfig, ScheduleState, StdScoreProp, Shift, ShiftState};
 
 use kinmu_generator_with_annealing::Update;
 use kinmu_model::Score;
@@ -13,7 +13,7 @@ use rand::Rng;
 pub struct StdUpdate;
 
 /// Updateの実装
-impl Update<ScoreProp, Shift, ShiftState, DayState> for StdUpdate {
+impl Update<StdScoreProp, Shift, ShiftState, DayState> for StdUpdate {
     fn generate<'a, R: Rng>(
         &self,
         name: &str,

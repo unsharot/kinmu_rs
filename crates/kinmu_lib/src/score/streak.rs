@@ -2,7 +2,7 @@
 //! 指定回数+1回連続は1回分としてカウントされる
 
 use super::{
-    CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, ScoreProp, Shift, ShiftState,
+    CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, StdScoreProp, Shift, ShiftState,
     StaffConfig,
 };
 
@@ -75,7 +75,7 @@ impl ScorePropTrait<Shift, ShiftState, DayState> for Streak {
     }
 }
 
-impl Check<ScoreProp, Shift, ShiftState, DayState> for Streak {
+impl Check<StdScoreProp, Shift, ShiftState, DayState> for Streak {
     fn check(&self, schedule_config: &ScheduleConfig) -> anyhow::Result<()> {
         self.cond.check(schedule_config)
     }

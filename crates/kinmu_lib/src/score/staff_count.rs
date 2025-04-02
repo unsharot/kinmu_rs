@@ -1,7 +1,7 @@
 //! 指定したシフトが指定した数いない場合に発火するスコア
 
 use super::{
-    CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, ScoreProp, Shift, ShiftState,
+    CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, StdScoreProp, Shift, ShiftState,
     StaffConfig,
 };
 
@@ -71,7 +71,7 @@ impl ScorePropTrait<Shift, ShiftState, DayState> for StaffCount {
     }
 }
 
-impl Check<ScoreProp, Shift, ShiftState, DayState> for StaffCount {
+impl Check<StdScoreProp, Shift, ShiftState, DayState> for StaffCount {
     fn check(&self, schedule_config: &ScheduleConfig) -> anyhow::Result<()> {
         self.cond.check(schedule_config)
     }

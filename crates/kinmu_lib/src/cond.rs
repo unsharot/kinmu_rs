@@ -1,7 +1,7 @@
 //! Cond型の定義と実装
 
 use super::{
-    DayConfig, DayState, ScheduleConfig, ScoreProp, Shift, ShiftState, StaffAttributeNameWrapper,
+    DayConfig, DayState, ScheduleConfig, StdScoreProp, Shift, ShiftState, StaffAttributeNameWrapper,
 };
 
 use kinmu_input_by_file::{Check, FromConfig};
@@ -157,7 +157,7 @@ impl FromConfig for CondWrapper {
     }
 }
 
-impl Check<ScoreProp, Shift, ShiftState, DayState> for Cond {
+impl Check<StdScoreProp, Shift, ShiftState, DayState> for Cond {
     fn check(&self, schedule_config: &ScheduleConfig) -> anyhow::Result<()> {
         match self {
             Cond::Every => Ok(()),
@@ -182,7 +182,7 @@ impl Check<ScoreProp, Shift, ShiftState, DayState> for Cond {
     }
 }
 
-impl Check<ScoreProp, Shift, ShiftState, DayState> for CondWrapper {
+impl Check<StdScoreProp, Shift, ShiftState, DayState> for CondWrapper {
     fn check(&self, schedule_config: &ScheduleConfig) -> anyhow::Result<()> {
         self.cond.check(schedule_config).with_context(|| {
             format!("CondWrapper {:?} の変換チェックに失敗しました", &self.cond)

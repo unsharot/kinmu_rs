@@ -1,10 +1,10 @@
-use super::{DayState, ScoreProp, Shift, ShiftState};
+use super::{DayState, StdScoreProp, Shift, ShiftState};
 
 use kinmu_input_by_file::Check;
 use kinmu_model::{DayAttributeName, StaffAttributeName};
 
 /// 具体的なScheduleConfig
-pub type ScheduleConfig = kinmu_model::ScheduleConfig<ScoreProp, Shift, ShiftState, DayState>;
+pub type ScheduleConfig = kinmu_model::ScheduleConfig<StdScoreProp, Shift, ShiftState, DayState>;
 
 /// 具体的なDayConfig
 pub type DayConfig = kinmu_model::DayConfig<Shift, ShiftState, DayState>;
@@ -12,7 +12,7 @@ pub type DayConfig = kinmu_model::DayConfig<Shift, ShiftState, DayState>;
 /// StaffAttributeNameにCheckを実装するためのWrapper
 pub(super) struct StaffAttributeNameWrapper<'a>(pub &'a StaffAttributeName);
 
-impl Check<ScoreProp, Shift, ShiftState, DayState> for StaffAttributeNameWrapper<'_> {
+impl Check<StdScoreProp, Shift, ShiftState, DayState> for StaffAttributeNameWrapper<'_> {
     fn check(&self, schedule_config: &ScheduleConfig) -> anyhow::Result<()> {
         if schedule_config.staff.attribute_map.names.contains(self.0) {
             Ok(())
@@ -28,7 +28,7 @@ impl Check<ScoreProp, Shift, ShiftState, DayState> for StaffAttributeNameWrapper
 /// DayAttributeNameにCheckを実装するためのWrapper
 pub(super) struct DayAttributeNameWrapper<'a>(pub &'a DayAttributeName);
 
-impl Check<ScoreProp, Shift, ShiftState, DayState> for DayAttributeNameWrapper<'_> {
+impl Check<StdScoreProp, Shift, ShiftState, DayState> for DayAttributeNameWrapper<'_> {
     fn check(&self, schedule_config: &ScheduleConfig) -> anyhow::Result<()> {
         if schedule_config.day.attributes.contains_key(self.0) {
             Ok(())
