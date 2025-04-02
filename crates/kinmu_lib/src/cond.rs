@@ -1,7 +1,7 @@
 //! Cond型の定義と実装
 
 use super::{
-    DayConfig, DayState, ScheduleConfig, StdScoreProp, Shift, ShiftState, StaffAttributeNameWrapper,
+    DayConfig, DayState, ScheduleConfig, Shift, ShiftState, StaffAttributeNameWrapper, StdScoreProp,
 };
 
 use kinmu_input_by_file::{Check, FromConfig};

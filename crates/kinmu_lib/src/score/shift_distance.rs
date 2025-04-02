@@ -1,11 +1,11 @@
 //! 指定したシフトをStaffAttributeで指定した数入らなかった場合に発火するスコア
 
 use super::{
-    CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, StdScoreProp, Shift, ShiftState,
+    CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, Shift, ShiftState, StdScoreProp,
 };
 
 use kinmu_input_by_file::Check;
-use kinmu_model::{Score, ScorePropTrait, StaffConfig};
+use kinmu_model::{Score, ScoreProp, StaffConfig};
 
 macro_rules! eval {
     ($eval:ident, $self:expr, $staff_config:expr, $day_config:expr, $schedule:expr) => {{
@@ -47,7 +47,7 @@ impl ShiftDistance {
     }
 }
 
-impl ScorePropTrait<Shift, ShiftState, DayState> for ShiftDistance {
+impl ScoreProp<Shift, ShiftState, DayState> for ShiftDistance {
     fn eval_mut(
         &mut self,
         staff_config: &StaffConfig,

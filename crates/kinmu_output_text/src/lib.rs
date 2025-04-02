@@ -2,7 +2,7 @@
 //! ファイル出力と標準出力は引数で切り替え
 
 use kinmu_core::Output;
-use kinmu_model::{eval_scores_immut, Answer, Schedule, ScheduleConfig, ScorePropTrait};
+use kinmu_model::{eval_scores_immut, Answer, Schedule, ScheduleConfig, ScoreProp};
 
 use std::fmt;
 use std::io;
@@ -47,7 +47,7 @@ impl<'a, W: io::Write, S> OutputText<'a, W, S> {
 impl<W, SP, S, SS, DS> Output<Vec<Answer<SP, S, SS, DS>>> for OutputText<'_, W, S>
 where
     W: io::Write,
-    SP: ScorePropTrait<S, SS, DS> + Clone,
+    SP: ScoreProp<S, SS, DS> + Clone,
     S: fmt::Display + PartialEq + Clone,
     DS: fmt::Display,
 {
@@ -70,7 +70,7 @@ where
     fn write_answer<SP, SS, DS>(&mut self, ans: &Answer<SP, S, SS, DS>) -> io::Result<()>
     where
         S: Clone,
-        SP: ScorePropTrait<S, SS, DS> + Clone,
+        SP: ScoreProp<S, SS, DS> + Clone,
         DS: fmt::Display,
     {
         for (t, model) in ans.models.iter().enumerate() {
@@ -90,7 +90,7 @@ where
     ) -> io::Result<()>
     where
         S: Clone,
-        SP: ScorePropTrait<S, SS, DS> + Clone,
+        SP: ScoreProp<S, SS, DS> + Clone,
         DS: fmt::Display,
     {
         let score = eval_scores_immut(

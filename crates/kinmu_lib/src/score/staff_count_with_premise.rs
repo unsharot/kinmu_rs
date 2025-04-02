@@ -1,12 +1,12 @@
 //! 指定したシフトの人数を満たした日付に対して、指定したシフトが指定した値いない時に発火するスコア
 
 use super::{
-    CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, StdScoreProp, Shift, ShiftState,
-    StaffConfig,
+    CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, Shift, ShiftState, StaffConfig,
+    StdScoreProp,
 };
 
 use kinmu_input_by_file::Check;
-use kinmu_model::{Score, ScorePropTrait};
+use kinmu_model::{Score, ScoreProp};
 
 macro_rules! eval {
     ($eval:ident, $self:expr, $staff_config:expr, $day_config:expr, $schedule:expr) => {{
@@ -82,7 +82,7 @@ impl StaffCountWithPremise {
     }
 }
 
-impl ScorePropTrait<Shift, ShiftState, DayState> for StaffCountWithPremise {
+impl ScoreProp<Shift, ShiftState, DayState> for StaffCountWithPremise {
     fn eval_mut(
         &mut self,
         staff_config: &StaffConfig,

@@ -6,7 +6,7 @@ use super::{
 };
 
 use kinmu_input_by_file::Check;
-use kinmu_model::{Score, ScorePropTrait, StaffAttributeName, StaffConfig};
+use kinmu_model::{Score, ScoreProp, StaffAttributeName, StaffConfig};
 
 macro_rules! eval {
     ($eval:ident, $self:expr, $staff_config:expr, $day_config:expr, $schedule:expr) => {{
@@ -57,7 +57,7 @@ impl DayCountRegardStaffAttribute {
     }
 }
 
-impl ScorePropTrait<Shift, ShiftState, DayState> for DayCountRegardStaffAttribute {
+impl ScoreProp<Shift, ShiftState, DayState> for DayCountRegardStaffAttribute {
     fn eval_mut(
         &mut self,
         staff_config: &StaffConfig,

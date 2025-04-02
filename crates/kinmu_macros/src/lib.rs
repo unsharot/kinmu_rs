@@ -6,7 +6,7 @@ use syn::{parse_macro_input, parse_quote, AngleBracketedGenericArguments, Derive
 
 fn get_generic_attribute(input: &DeriveInput) -> syn::Result<AngleBracketedGenericArguments> {
     for a in &input.attrs {
-        if a.path().is_ident("score_prop_trait") {
+        if a.path().is_ident("score_prop") {
             return match a.parse_args::<AngleBracketedGenericArguments>() {
                 Ok(v) => {
                     if v.args.len() != 3 {
@@ -24,12 +24,12 @@ fn get_generic_attribute(input: &DeriveInput) -> syn::Result<AngleBracketedGener
     }
     Err(syn::Error::new_spanned(
         &input.ident,
-        "must have score_prop_trait attribute",
+        "must have score_prop attribute",
     ))
 }
 
 /// ScorePropをenumで拡張するためのderiveマクロ
-#[proc_macro_derive(ScorePropTrait, attributes(score_prop_trait))]
+#[proc_macro_derive(ScoreProp, attributes(score_prop))]
 pub fn derive_score_prop(item: TokenStream) -> TokenStream {
     let input = parse_macro_input!(item as DeriveInput);
 
@@ -52,7 +52,7 @@ pub fn derive_score_prop(item: TokenStream) -> TokenStream {
         Err(e) => return e.to_compile_error().into(),
     };
 
-    let trait_path: syn::Path = parse_quote!(kinmu_model::ScorePropTrait);
+    let trait_path: syn::Path = parse_quote!(kinmu_model::ScoreProp);
     let ty = input.ident;
     let (impl_g, ty_g, where_clause) = input.generics.split_for_impl();
 

@@ -1,12 +1,12 @@
 //! 指定回数以上同じペアなら発火するスコア
 
 use super::{
-    CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, StdScoreProp, Shift, ShiftState,
-    StaffConfig,
+    CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, Shift, ShiftState, StaffConfig,
+    StdScoreProp,
 };
 
 use kinmu_input_by_file::Check;
-use kinmu_model::{Score, ScorePropTrait};
+use kinmu_model::{Score, ScoreProp};
 
 use std::collections::HashMap;
 
@@ -57,7 +57,7 @@ impl NoSamePair {
     }
 }
 
-impl ScorePropTrait<Shift, ShiftState, DayState> for NoSamePair {
+impl ScoreProp<Shift, ShiftState, DayState> for NoSamePair {
     fn eval_mut(
         &mut self,
         staff_config: &StaffConfig,

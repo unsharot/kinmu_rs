@@ -3,12 +3,12 @@
 //! TODO: RollingHash、FSMやTrie木を用いた高速化
 
 use super::{
-    CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, StdScoreProp, Shift, ShiftState,
-    StaffConfig,
+    CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, Shift, ShiftState, StaffConfig,
+    StdScoreProp,
 };
 
 use kinmu_input_by_file::Check;
-use kinmu_model::{Score, ScorePropTrait};
+use kinmu_model::{Score, ScoreProp};
 
 macro_rules! eval {
     ($eval:ident, $self:expr, $staff_config:expr, $day_config:expr, $schedule:expr) => {{
@@ -66,7 +66,7 @@ impl PatternGeneralAny {
     }
 }
 
-impl ScorePropTrait<Shift, ShiftState, DayState> for PatternGeneralAny {
+impl ScoreProp<Shift, ShiftState, DayState> for PatternGeneralAny {
     fn eval_mut(
         &mut self,
         staff_config: &StaffConfig,

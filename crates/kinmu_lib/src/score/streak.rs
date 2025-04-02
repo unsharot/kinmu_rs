@@ -2,12 +2,12 @@
 //! 指定回数+1回連続は1回分としてカウントされる
 
 use super::{
-    CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, StdScoreProp, Shift, ShiftState,
-    StaffConfig,
+    CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, Shift, ShiftState, StaffConfig,
+    StdScoreProp,
 };
 
 use kinmu_input_by_file::Check;
-use kinmu_model::{Score, ScorePropTrait};
+use kinmu_model::{Score, ScoreProp};
 
 macro_rules! eval {
     ($eval:ident, $self:expr, $staff_config:expr, $day_config:expr, $schedule:expr) => {{
@@ -55,7 +55,7 @@ impl Streak {
     }
 }
 
-impl ScorePropTrait<Shift, ShiftState, DayState> for Streak {
+impl ScoreProp<Shift, ShiftState, DayState> for Streak {
     fn eval_mut(
         &mut self,
         staff_config: &StaffConfig,

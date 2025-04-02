@@ -198,9 +198,9 @@ traitを利用し、頻繁に変わる可能性のあるモジュールほど下
 | module                                               | trait                    | instance                                        |
 | ---------------------------------------------------- | ------------------------ | ----------------------------------------------- |
 | core                                                 | Input, Generator, Output |                                                 |
-| model                                                | ScorePropTrait           | MainConfig, Answer                              |
+| model                                                | ScoreProp                | MainConfig, Answer                              |
 | input_by_file, generator_with_annealing, output_text |                          | InputByFile, GeneratorWithAnnealing, OutputText |
-| lib                                                  |                          | StdScoreProp, Shift                                |
+| lib                                                  |                          | StdScoreProp, Shift                             |
 
 
 モジュール同士の依存関係は下図のようになっています。
@@ -214,7 +214,7 @@ graph TD;
    core -- run --> main;
    input_by_file -- FromConfig, Check --> lib;
    generator_with_annealing -- Fill, Update --> lib;
-   model -- ScorePropTrait --> lib;
+   model -- ScoreProp --> lib;
    model -- MainConfig --> input_by_file;
    model -- MainConfig, Answer --> generator_with_annealing;
    model -- Answer --> output_text;
@@ -225,18 +225,20 @@ graph TD;
 
 独自の入力、生成、出力方法を使用したい場合はkinmu::core::Input, Generator, Outputをそれぞれ実装してください。
 
-職場に特有の考慮事項があり、既存のスコアで評価不可能な場合、ScorePropTraitを実装する新たなenum型を定義してください。
-既存のStdScorePropと併用したい場合、kinmu::macros::ScorePropTraitのderiveマクロを用いてenumを拡張できます。
+職場に特有の考慮事項があり、既存のスコアで評価不可能な場合、ScorePropを実装する新たなenum型を定義してください。
+既存のStdScorePropと併用したい場合、kinmu::macros::ScorePropのderiveマクロを用いてenumを拡張できます。
 
 ```rust
 use kinmu::lib::StdScoreProp;
-use kinmu::macros::ScorePropTrait;
+use kinmu::macros::ScoreProp;
 use crate::your_module::YourSP;
 
-#[derive(ScorePropTrait)]
+#[derive(ScoreProp)]
+// ScorePropに用いる型引数を指定します。
+#[score_prop(<Shift, ShiftState, DayState>)]
 enum NewScoreProp {
    Std(StdScoreProp),
-   // YourSPはScorePropTraitを実装している必要があります。
+   // YourSPはScorePropを実装している必要があります。
    New(YourSP),
 }
 ```

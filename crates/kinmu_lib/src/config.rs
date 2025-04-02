@@ -1,4 +1,4 @@
-use super::{DayState, StdScoreProp, Shift, ShiftState};
+use super::{DayState, Shift, ShiftState, StdScoreProp};
 
 use kinmu_input_by_file::Check;
 use kinmu_model::{DayAttributeName, StaffAttributeName};

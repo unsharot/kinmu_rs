@@ -3,12 +3,12 @@
 use crate::DayAttributeNameWrapper;
 
 use super::{
-    CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, StdScoreProp, Shift, ShiftState,
-    StaffConfig,
+    CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, Shift, ShiftState, StaffConfig,
+    StdScoreProp,
 };
 
 use kinmu_input_by_file::Check;
-use kinmu_model::{DayAttributeName, Score, ScorePropTrait};
+use kinmu_model::{DayAttributeName, Score, ScoreProp};
 
 macro_rules! eval {
     ($eval:ident, $self:expr, $staff_config:expr, $day_config:expr, $schedule:expr) => {{
@@ -56,7 +56,7 @@ impl StaffCountRegardDayAttribute {
     }
 }
 
-impl ScorePropTrait<Shift, ShiftState, DayState> for StaffCountRegardDayAttribute {
+impl ScoreProp<Shift, ShiftState, DayState> for StaffCountRegardDayAttribute {
     fn eval_mut(
         &mut self,
         staff_config: &StaffConfig,

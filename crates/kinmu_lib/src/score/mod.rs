@@ -40,15 +40,15 @@ use super::{
 };
 
 use kinmu_input_by_file::{Check, FromConfig};
-use kinmu_macros::ScorePropTrait;
+use kinmu_macros::ScoreProp;
 use kinmu_model::{DayAttributeName, Score, StaffAttributeName, StaffConfig};
 
 use anyhow::Context as _;
 use std::fmt;
 
 /// 具体的なスコア
-#[derive(Debug, PartialEq, Clone, ScorePropTrait)]
-#[score_prop_trait(<Shift, ShiftState, DayState>)]
+#[derive(Debug, PartialEq, Clone, ScoreProp)]
+#[score_prop(<Shift, ShiftState, DayState>)]
 pub enum StdScoreProp {
     PatternGeneral(PatternGeneral),
     PatternFixed(PatternFixed),

@@ -4,7 +4,7 @@ use super::{DayConfig, Schedule, StaffConfig};
 pub type Score = f32;
 
 /// ScorePropの共通のふるまいを定める
-pub trait ScorePropTrait<S, SS, DS>: Sized {
+pub trait ScoreProp<S, SS, DS>: Sized {
     /// mutで評価する
     fn eval_mut(
         &mut self,
@@ -24,7 +24,7 @@ pub trait ScorePropTrait<S, SS, DS>: Sized {
 
 /// mutでScorePropのVecを全て評価して和をとる
 #[allow(clippy::ptr_arg)]
-pub fn eval_scores_mut<SP: ScorePropTrait<S, SS, DS>, S, SS, DS>(
+pub fn eval_scores_mut<SP: ScoreProp<S, SS, DS>, S, SS, DS>(
     sps: &mut Vec<SP>,
     staff_config: &StaffConfig,
     day_config: &DayConfig<S, SS, DS>,
@@ -39,7 +39,7 @@ pub fn eval_scores_mut<SP: ScorePropTrait<S, SS, DS>, S, SS, DS>(
 
 /// immutでScorePropのVecを全て評価して和をとる
 #[allow(clippy::ptr_arg)]
-pub fn eval_scores_immut<SP: ScorePropTrait<S, SS, DS>, S, SS, DS>(
+pub fn eval_scores_immut<SP: ScoreProp<S, SS, DS>, S, SS, DS>(
     sps: &Vec<SP>,
     staff_config: &StaffConfig,
     day_config: &DayConfig<S, SS, DS>,
