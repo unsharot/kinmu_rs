@@ -7,17 +7,17 @@ fill2はIとKの数合わせてうまいこと埋める
 
 use super::{DayState, Schedule, ScheduleConfig, ScoreProp, Shift, ShiftState};
 
-use kinmu_generator_with_annealing as gen;
+use kinmu_generator_with_annealing::Fill;
 
 use rand::Rng;
 
 /// 生成器で用いるFill関数のための型
 /// GeneratorWithAnnealingのFillを実装
 #[derive(Debug, Clone)]
-pub struct Fill;
+pub struct StdFill;
 
 /// Fillの実装
-impl gen::Fill<ScoreProp, Shift, ShiftState, DayState> for Fill {
+impl Fill<ScoreProp, Shift, ShiftState, DayState> for StdFill {
     fn run<R: Rng>(
         &self,
         name: &str,

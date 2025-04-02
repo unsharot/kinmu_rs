@@ -207,7 +207,7 @@ traitを利用し、頻繁に変わる可能性のあるモジュールほど下
 
 ```mermaid
 graph TD;
-   lib -- Fill, Update --> main;
+   lib -- StdFill, Update --> main;
    input_by_file -- InputByFile --> main;
    generator_with_annealing -- GeneratorWithAnnealing --> main;
    output_text -- OutputText --> main;
