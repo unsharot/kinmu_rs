@@ -174,29 +174,88 @@ where
     }
 }
 
-/// DayStateにFromConfigを実装するためのWrapper
-pub struct DayStateWrapper<DS>(pub Vec<DS>);
+/// FromConfigを文字ごとに変換してVecを作るためのWrapper
+pub struct CharVecWrapper<T>(pub Vec<T>);
 
-impl<DS: FromConfig> FromConfig for DayStateWrapper<DS> {
-    fn from_config(s: &str) -> anyhow::Result<Self> {
-        let mut ans: Vec<DS> = Vec::new();
-        for c in s.chars() {
-            ans.push(<DS>::from_config(&c.to_string())?);
-        }
-        Ok(DayStateWrapper(ans))
-    }
-}
-
-/// requested_scheduleに由来するVec<Shift>にFromConfigを実装するためのWrapper
-pub struct ScheduleRowWrapper<S: FromConfig>(pub Vec<S>);
-
-impl<S: FromConfig> FromConfig for ScheduleRowWrapper<S> {
+impl<T> FromConfig for CharVecWrapper<T>
+where
+    T: FromConfig,
+{
     fn from_config(s: &str) -> anyhow::Result<Self> {
         let mut ans = Vec::new();
         for c in s.chars() {
-            ans.push(<S>::from_config(&c.to_string())?);
+            ans.push(T::from_config(&c.to_string())?);
         }
-        Ok(ScheduleRowWrapper(ans))
+        Ok(CharVecWrapper(ans))
+    }
+}
+
+/// Vecを読み込む
+/// 多重入れ子構造になったVecにも対応
+fn format_str_vec_to_words(s: &str) -> anyhow::Result<Vec<&str>> {
+    let trimmed_s = s.trim();
+    if !trimmed_s.starts_with('[') {
+        return Err(anyhow::anyhow!("\'[\' not found"));
+    }
+    if !trimmed_s.ends_with(']') {
+        return Err(anyhow::anyhow!("\']\' not found"));
+    }
+    let bare_s = &trimmed_s[1..(trimmed_s.len() - 1)];
+    let mut words = Vec::new();
+    let mut bracket_flag = false;
+    let mut start_idx = 0;
+    let mut end_idx = 0;
+    for c in bare_s.chars() {
+        if !bracket_flag && c == ',' {
+            words.push(bare_s[start_idx..end_idx].trim());
+            start_idx = end_idx + c.len_utf8();
+        }
+        if c == '[' {
+            bracket_flag = true;
+        }
+        if c == ']' {
+            bracket_flag = false;
+        }
+        end_idx += c.len_utf8();
+    }
+    if !bare_s[start_idx..end_idx].trim().is_empty() {
+        words.push(bare_s[start_idx..end_idx].trim());
+    }
+
+    Ok(words)
+}
+
+/// FromConfigをVecに対して使うためのWrapper
+pub struct VecWrapper<T>(pub Vec<T>);
+
+impl<T> FromConfig for VecWrapper<T>
+where
+    T: FromConfig,
+{
+    fn from_config(s: &str) -> anyhow::Result<Self> {
+        let words = format_str_vec_to_words(s)?;
+        let mut ans = Vec::new();
+        for w in words {
+            ans.push(T::from_config(w)?);
+        }
+        Ok(VecWrapper(ans))
+    }
+}
+
+/// FromConfigを2重のVecに対して使うためのWrapper
+pub struct VecVecWrapper<T>(pub Vec<Vec<T>>);
+
+impl<T> FromConfig for VecVecWrapper<T>
+where
+    T: FromConfig,
+{
+    fn from_config(s: &str) -> anyhow::Result<Self> {
+        let words = format_str_vec_to_words(s)?;
+        let mut ans = Vec::new();
+        for w in words {
+            ans.push(VecWrapper::from_config(w)?.0);
+        }
+        Ok(VecVecWrapper(ans))
     }
 }
 
@@ -241,5 +300,26 @@ mod tests {
                 1000
             )
         );
+    }
+
+    #[test]
+    fn vec_wrapper_test() {
+        let v1 = <VecWrapper<i32>>::from_config("[0, 1, 2]").unwrap();
+
+        assert_eq!(v1.0, vec![0, 1, 2]);
+    }
+
+    #[test]
+    fn vec_vec_wrapper_test() {
+        let v2 = <VecVecWrapper<i32>>::from_config("[[0, 1, 2], [3, 4, 5]]").unwrap();
+
+        assert_eq!(v2.0, vec![vec![0, 1, 2], vec![3, 4, 5]]);
+    }
+
+    #[test]
+    fn char_vec_wrapper_test() {
+        let v2 = <CharVecWrapper<i32>>::from_config("123456").unwrap();
+
+        assert_eq!(v2.0, vec![1, 2, 3, 4, 5, 6]);
     }
 }

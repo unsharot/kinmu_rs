@@ -39,7 +39,7 @@ use super::{
     StaffAttributeNameWrapper,
 };
 
-use kinmu_input_by_file::{Check, FromConfig};
+use kinmu_input_by_file::{Check, FromConfig, VecVecWrapper, VecWrapper};
 use kinmu_macros::ScoreProp;
 use kinmu_model::{DayAttributeName, Score, StaffAttributeName, StaffConfig};
 
@@ -143,28 +143,28 @@ impl FromConfig for StdScoreProp {
 fn helper_sp(w1: &str, w2: &str) -> anyhow::Result<StdScoreProp> {
     match (w1, w2) {
         ("PatternGeneral", p) => Ok(StdScoreProp::PatternGeneral({
-            let (cw, VecVecShiftWrapper(vvs), s) =
-                <(CondWrapper, VecVecShiftWrapper, Score)>::from_config(p)?;
+            let (cw, VecVecWrapper::<Shift>(vvs), s) =
+                <(CondWrapper, VecVecWrapper<Shift>, Score)>::from_config(p)?;
             PatternGeneral::new((cw, vvs, s))
         })),
         ("PatternFixed", p) => Ok(StdScoreProp::PatternFixed({
-            let (cw, VecShiftWrapper(vs), s) =
-                <(CondWrapper, VecShiftWrapper, Score)>::from_config(p)?;
+            let (cw, VecWrapper::<Shift>(vs), s) =
+                <(CondWrapper, VecWrapper<Shift>, Score)>::from_config(p)?;
             PatternFixed::new((cw, vs, s))
         })),
         ("PatternGeneralAny", p) => Ok(StdScoreProp::PatternGeneralAny({
-            let (cw, VecVecShiftWrapper(vvs), s) =
-                <(CondWrapper, VecVecShiftWrapper, Score)>::from_config(p)?;
+            let (cw, VecVecWrapper::<Shift>(vvs), s) =
+                <(CondWrapper, VecVecWrapper<Shift>, Score)>::from_config(p)?;
             PatternGeneralAny::new((cw, vvs, s))
         })),
         ("PatternFixedAny", p) => Ok(StdScoreProp::PatternFixedAny({
-            let (cw, VecShiftWrapper(vs), s) =
-                <(CondWrapper, VecShiftWrapper, Score)>::from_config(p)?;
+            let (cw, VecWrapper::<Shift>(vs), s) =
+                <(CondWrapper, VecWrapper<Shift>, Score)>::from_config(p)?;
             PatternFixedAny::new((cw, vs, s))
         })),
         ("Streak", p) => Ok(StdScoreProp::Streak({
-            let (cw, VecShiftWrapper(vs), i, s) =
-                <(CondWrapper, VecShiftWrapper, i32, Score)>::from_config(p)?;
+            let (cw, VecWrapper::<Shift>(vs), i, s) =
+                <(CondWrapper, VecWrapper<Shift>, i32, Score)>::from_config(p)?;
             Streak::new((cw, vs, i, s))
         })),
         ("ShiftsBalance", p) => Ok(StdScoreProp::ShiftsBalance(ShiftsBalance::new(
@@ -224,69 +224,6 @@ fn helper_sp(w1: &str, w2: &str) -> anyhow::Result<StdScoreProp> {
     }
 }
 
-/// Vecを読み込む
-/// 2重入れ子構造になったVecにも対応
-fn format_str_vec_to_words(s: &str) -> anyhow::Result<Vec<&str>> {
-    let trimmed_s = s.trim();
-    if !trimmed_s.starts_with('[') {
-        return Err(anyhow::anyhow!("\'[\' not found"));
-    }
-    if !trimmed_s.ends_with(']') {
-        return Err(anyhow::anyhow!("\']\' not found"));
-    }
-    let bare_s = &trimmed_s[1..(trimmed_s.len() - 1)];
-    let mut words = Vec::new();
-    let mut bracket_flag = false;
-    let mut start_idx = 0;
-    let mut end_idx = 0;
-    for c in bare_s.chars() {
-        if !bracket_flag && c == ',' {
-            words.push(bare_s[start_idx..end_idx].trim());
-            start_idx = end_idx + c.len_utf8();
-        }
-        if c == '[' {
-            bracket_flag = true;
-        }
-        if c == ']' {
-            bracket_flag = false;
-        }
-        end_idx += c.len_utf8();
-    }
-    if !bare_s[start_idx..end_idx].trim().is_empty() {
-        words.push(bare_s[start_idx..end_idx].trim());
-    }
-
-    Ok(words)
-}
-
-/// Vec<Shift>にFromConfigを実装するためのWrapper
-struct VecShiftWrapper(pub Vec<Shift>);
-
-impl FromConfig for VecShiftWrapper {
-    fn from_config(s: &str) -> anyhow::Result<Self> {
-        let words = format_str_vec_to_words(s)?;
-        let mut ans = Vec::new();
-        for w in words {
-            ans.push(<Shift>::from_config(w)?);
-        }
-        Ok(VecShiftWrapper(ans))
-    }
-}
-
-/// Vec<Vec<Shift>>にFromConfigを実装するためのWrapper
-struct VecVecShiftWrapper(pub Vec<Vec<Shift>>);
-
-impl FromConfig for VecVecShiftWrapper {
-    fn from_config(s: &str) -> anyhow::Result<Self> {
-        let words = format_str_vec_to_words(s)?;
-        let mut ans = Vec::new();
-        for w in words {
-            ans.push(VecShiftWrapper::from_config(w)?.0);
-        }
-        Ok(VecVecShiftWrapper(ans))
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -295,14 +232,14 @@ mod tests {
 
     #[test]
     fn vec_shift_test() {
-        let v1 = <VecShiftWrapper>::from_config("[N, I, K]").unwrap();
+        let v1 = <VecWrapper<Shift>>::from_config("[N, I, K]").unwrap();
 
         assert_eq!(v1.0, vec![Shift::N, Shift::I, Shift::K]);
     }
 
     #[test]
     fn vec_vec_shift_test() {
-        let v2 = <VecVecShiftWrapper>::from_config("[[N, I, K], [O, H, A]]").unwrap();
+        let v2 = <VecVecWrapper<Shift>>::from_config("[[N, I, K], [O, H, A]]").unwrap();
 
         assert_eq!(
             v2.0,

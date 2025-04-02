@@ -13,7 +13,7 @@ mod reader;
 
 // トレイトを外部に公開
 pub use checker::Check;
-pub use converter::{FromConfig, MapState};
+pub use converter::*;
 
 /// toml形式のconfigファイルを読み込む入力器
 /// main_configのパスを保持

@@ -22,7 +22,7 @@ pub fn convert_schedule_config<SP: FromConfig, S: FromConfig + MapState<SS>, SS,
         .requested_schedule
         .iter()
         .map(|s| {
-            <ScheduleRowWrapper<S>>::from_config(s)
+            <CharVecWrapper<S>>::from_config(s)
                 .map(|w| w.0)
                 .with_context(|| format!("Failed to parse schedule row \"{}\"", s))
         })
@@ -52,7 +52,7 @@ pub fn convert_schedule_config<SP: FromConfig, S: FromConfig + MapState<SS>, SS,
     let day_config = DayConfig {
         count: config.day.day_count,
         buffer_count: config.day.buffer_count,
-        days: <DayStateWrapper<DS>>::from_config(&config.day.states)
+        days: <CharVecWrapper<DS>>::from_config(&config.day.states)
             .context("Failed to parse day.states")?
             .0,
         schedule_states: make_schedule_state(&schedule, config.day.buffer_count),
