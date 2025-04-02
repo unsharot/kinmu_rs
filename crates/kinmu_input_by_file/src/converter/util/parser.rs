@@ -8,6 +8,37 @@ pub trait FromConfig: Sized {
     fn from_config(s: &str) -> anyhow::Result<Self>;
 }
 
+macro_rules! impls_for_primitives {
+    ($target:ty) => {
+        impl FromConfig for $target {
+            fn from_config(s: &str) -> anyhow::Result<Self> {
+                Ok(s.parse::<$target>()?)
+            }
+        }
+    };
+}
+
+impls_for_primitives!(i8);
+impls_for_primitives!(i16);
+impls_for_primitives!(i32);
+impls_for_primitives!(i64);
+impls_for_primitives!(i128);
+impls_for_primitives!(isize);
+
+impls_for_primitives!(u8);
+impls_for_primitives!(u16);
+impls_for_primitives!(u32);
+impls_for_primitives!(u64);
+impls_for_primitives!(u128);
+impls_for_primitives!(usize);
+
+impls_for_primitives!(f32);
+impls_for_primitives!(f64);
+
+impls_for_primitives!(char);
+
+impls_for_primitives!(bool);
+
 impl FromConfig for String {
     fn from_config(s: &str) -> anyhow::Result<Self> {
         Ok(s.to_string())
@@ -140,30 +171,6 @@ where
         let z = Z::from_config(words[6])
             .with_context(|| format!("Failed to parse 7th field of {}", s))?;
         Ok((t, u, v, w, x, y, z))
-    }
-}
-
-impl FromConfig for usize {
-    fn from_config(s: &str) -> anyhow::Result<Self> {
-        Ok(s.parse::<usize>()?)
-    }
-}
-
-impl FromConfig for isize {
-    fn from_config(s: &str) -> anyhow::Result<Self> {
-        Ok(s.parse::<isize>()?)
-    }
-}
-
-impl FromConfig for i32 {
-    fn from_config(s: &str) -> anyhow::Result<Self> {
-        Ok(s.parse::<i32>()?)
-    }
-}
-
-impl FromConfig for f32 {
-    fn from_config(s: &str) -> anyhow::Result<Self> {
-        Ok(s.parse::<f32>()?)
     }
 }
 
