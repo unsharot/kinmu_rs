@@ -24,12 +24,9 @@ macro_rules! eval {
             }
             if is_valid {
                 let count_needed = $staff_config.get_attribute(staff, &$self.attribute);
-                if count_needed != -1 {
-                    // 値が-1の場合、任意の数を許すためスコアを増やさない
-                    let d = (count - count_needed).abs() as Score;
-                    let a = d * $self.score;
-                    sum += a * a;
-                }
+                let d = (count - count_needed).abs() as Score;
+                let a = d * $self.score;
+                sum += a * a;
             }
         }
         sum
