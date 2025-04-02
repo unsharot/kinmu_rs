@@ -82,6 +82,21 @@ fn format_str_tuple_to_words(s: &str) -> anyhow::Result<Vec<&str>> {
     Ok(words)
 }
 
+impl<T> FromConfig for (T,)
+where
+    T: FromConfig,
+{
+    #[allow(clippy::len_zero)]
+    fn from_config(s: &str) -> anyhow::Result<Self> {
+        let words = format_str_tuple_to_words(s)?;
+        anyhow::ensure!(words.len() >= 1, "Needs 1 field, but not enough.");
+        anyhow::ensure!(1 >= words.len(), "Needs 1 field, but too much given.");
+        let t = T::from_config(words[0])
+            .with_context(|| format!("Failed to parse 1st field of {}", s))?;
+        Ok((t,))
+    }
+}
+
 impl<T, U> FromConfig for (T, U)
 where
     T: FromConfig,
@@ -139,6 +154,61 @@ where
         let w = W::from_config(words[3])
             .with_context(|| format!("Failed to parse 4th field of {}", s))?;
         Ok((t, u, v, w))
+    }
+}
+
+impl<T, U, V, W, X> FromConfig for (T, U, V, W, X)
+where
+    T: FromConfig,
+    U: FromConfig,
+    V: FromConfig,
+    W: FromConfig,
+    X: FromConfig,
+{
+    fn from_config(s: &str) -> anyhow::Result<Self> {
+        let words = format_str_tuple_to_words(s)?;
+        anyhow::ensure!(words.len() >= 5, "Needs 5 fields, but not enough.");
+        anyhow::ensure!(5 >= words.len(), "Needs 5 fields, but too much given.");
+        let t = T::from_config(words[0])
+            .with_context(|| format!("Failed to parse 1st field of {}", s))?;
+        let u = U::from_config(words[1])
+            .with_context(|| format!("Failed to parse 2nd field of {}", s))?;
+        let v = V::from_config(words[2])
+            .with_context(|| format!("Failed to parse 3rd field of {}", s))?;
+        let w = W::from_config(words[3])
+            .with_context(|| format!("Failed to parse 4th field of {}", s))?;
+        let x = X::from_config(words[4])
+            .with_context(|| format!("Failed to parse 5th field of {}", s))?;
+        Ok((t, u, v, w, x))
+    }
+}
+
+impl<T, U, V, W, X, Y> FromConfig for (T, U, V, W, X, Y)
+where
+    T: FromConfig,
+    U: FromConfig,
+    V: FromConfig,
+    W: FromConfig,
+    X: FromConfig,
+    Y: FromConfig,
+{
+    fn from_config(s: &str) -> anyhow::Result<Self> {
+        let words = format_str_tuple_to_words(s)?;
+        anyhow::ensure!(words.len() >= 6, "Needs 6 fields, but not enough.");
+        anyhow::ensure!(6 >= words.len(), "Needs 6 fields, but too much given.");
+        let t = T::from_config(words[0])
+            .with_context(|| format!("Failed to parse 1st field of {}", s))?;
+        let u = U::from_config(words[1])
+            .with_context(|| format!("Failed to parse 2nd field of {}", s))?;
+        let v = V::from_config(words[2])
+            .with_context(|| format!("Failed to parse 3rd field of {}", s))?;
+        let w = W::from_config(words[3])
+            .with_context(|| format!("Failed to parse 4th field of {}", s))?;
+        let x = X::from_config(words[4])
+            .with_context(|| format!("Failed to parse 5th field of {}", s))?;
+        let y = Y::from_config(words[5])
+            .with_context(|| format!("Failed to parse 6th field of {}", s))?;
+        Ok((t, u, v, w, x, y))
     }
 }
 
