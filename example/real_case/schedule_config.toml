@@ -10,20 +10,20 @@ attributes = [
 ]
 
 list = [
-#        名前                      A1  A2  K    I    O    H    番号
-{name = "職員A",     attributes = [1,  1,  8,   6,  -1,  -1]}, #0
-{name = "職員B",     attributes = [1,  1,  8,   6,  -1,  -1]}, #1
-{name = "職員C",     attributes = [1,  1,  8,   6,  -1,  -1]}, #2
-{name = "職員D",     attributes = [1,  1,  8,   6,  -1,  -1]}, #3
-{name = "職員E",     attributes = [1,  1,  9,   6,  -1,  -1]}, #4
-{name = "職員F",     attributes = [1,  1,  9,   6,  -1,  -1]}, #5
-{name = "職員G",     attributes = [1,  1,  9,   5,  -1,  -1]}, #6
-{name = "職員H",     attributes = [0,  1,  9,   4,  -1,  -1]}, #7
-{name = "職員I",     attributes = [0,  1,  9,   3,   2,   2]}, #8
-{name = "職員J",     attributes = [0,  0,  8,   0,   0,   0]}, #9
-{name = "職員K",     attributes = [0,  0,  10,  0,   0,   0]}, #10
-{name = "職員L",     attributes = [0,  0,  15,  0,   0,   0]}, #11
-{name = "職員M",     attributes = [0,  0,  20,  0,   0,   0]}, #12
+#              A1  A2  K    I    O    H           名前     番号
+{attributes = [1,  1,  8,   6,  -1,  -1], name = "職員A"}, #0
+{attributes = [1,  1,  8,   6,  -1,  -1], name = "職員B"}, #1
+{attributes = [1,  1,  8,   6,  -1,  -1], name = "職員C"}, #2
+{attributes = [1,  1,  8,   6,  -1,  -1], name = "職員D"}, #3
+{attributes = [1,  1,  9,   6,  -1,  -1], name = "職員E"}, #4
+{attributes = [1,  1,  9,   6,  -1,  -1], name = "職員F"}, #5
+{attributes = [1,  1,  9,   5,  -1,  -1], name = "職員G"}, #6
+{attributes = [0,  1,  9,   4,  -1,  -1], name = "職員H"}, #7
+{attributes = [0,  1,  9,   3,   2,   2], name = "職員I"}, #8
+{attributes = [0,  0,  8,   0,   0,   0], name = "職員J"}, #9
+{attributes = [0,  0,  10,  0,   0,   0], name = "職員K"}, #10
+{attributes = [0,  0,  15,  0,   0,   0], name = "職員L"}, #11
+{attributes = [0,  0,  20,  0,   0,   0], name = "職員M"}, #12
 ]
 
 # O,Hは-1なら任意
