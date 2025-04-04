@@ -156,11 +156,20 @@ where
         write!(self.out, "<th scope=\"col\">人/日付</th>")?;
 
         for c in 0..schedule_config.day.count {
-            write!(
-                self.out,
-                "<th scope=\"col\"><div>{}</div><div>{}</div></th>",
-                schedule_config.day.days[c], c
-            )?;
+            if c < schedule_config.day.buffer_count {
+                write!(
+                    self.out,
+                    "<th scope=\"col\"><div>{}</div><div>{}</div><br/></th>",
+                    0, schedule_config.day.days[c]
+                )?;
+            } else {
+                write!(
+                    self.out,
+                    "<th scope=\"col\"><div>{}</div><div>{}</div><br/></th>",
+                    c - schedule_config.day.buffer_count + 1,
+                    schedule_config.day.days[c]
+                )?;
+            }
         }
 
         write!(self.out, "<th scope=\"col\" class=\"padding\"></th>")?;
@@ -202,7 +211,10 @@ where
 
         write!(self.out, "</tbody>")?;
 
-        write!(self.out, "<thead><tr><td class=\"padding\"></td></tr></thead>")?;
+        write!(
+            self.out,
+            "<thead><tr><td class=\"padding\"></td></tr></thead>"
+        )?;
 
         write!(self.out, "<tfoot>")?;
 
@@ -326,29 +338,17 @@ where
 <style>
 table {{
     border-collapse: collapse;
-    border: 2px solid rgb(140 140 140);
+    border: 2px solid black;
     font-family: sans-serif;
     font-size: 0.8rem;
     letter-spacing: 1px;
-}}
-
-thead,
-tfoot {{
-    background-color: rgb(228 240 245);
+    text-align: center;
 }}
 
 th,
 td {{
-    border: 1px solid rgb(160 160 160);
+    border: 1px solid black;
     padding: 8px 10px;
-}}
-
-td {{
-    text-align: center;
-}}
-
-tbody > tr:nth-of-type(even) {{
-    background-color: rgb(237 238 242);
 }}
 
 .padding {{
