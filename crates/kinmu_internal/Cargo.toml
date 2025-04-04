@@ -11,6 +11,7 @@ repository = "https://github.com/unsharot/kinmu_rs"
 kinmu_generator_with_annealing = { workspace = true }
 kinmu_input_by_file = { workspace = true }
 kinmu_output_text = { workspace = true }
+kinmu_output_html = { workspace = true }
 kinmu_lib = { workspace = true }
 kinmu_core = { workspace = true }
 kinmu_model = { workspace = true }

@@ -5,4 +5,5 @@ pub use kinmu_input_by_file as input_by_file;
 pub use kinmu_lib as lib;
 pub use kinmu_macros as macros;
 pub use kinmu_model as model;
+pub use kinmu_output_html as output_html;
 pub use kinmu_output_text as output_text;

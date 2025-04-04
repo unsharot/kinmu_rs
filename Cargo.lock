@@ -147,6 +147,7 @@ dependencies = [
  "kinmu_lib",
  "kinmu_macros",
  "kinmu_model",
+ "kinmu_output_html",
  "kinmu_output_text",
 ]
 
@@ -175,6 +176,15 @@ dependencies = [
 [[package]]
 name = "kinmu_model"
 version = "0.1.0"
+
+[[package]]
+name = "kinmu_output_html"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "kinmu_core",
+ "kinmu_model",
+]
 
 [[package]]
 name = "kinmu_output_text"

@@ -14,6 +14,7 @@ members = ["crates/*"]
 kinmu_generator_with_annealing = { path = "crates/kinmu_generator_with_annealing" }
 kinmu_input_by_file = { path = "crates/kinmu_input_by_file" }
 kinmu_output_text = { path = "crates/kinmu_output_text" }
+kinmu_output_html = { path = "crates/kinmu_output_html" }
 kinmu_color = { path = "crates/kinmu_color" }
 kinmu_annealing = { path = "crates/kinmu_annealing" }
 kinmu_lib = { path = "crates/kinmu_lib" }
