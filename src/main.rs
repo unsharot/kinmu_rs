@@ -4,6 +4,7 @@ use kinmu::input_by_file::InputByFile;
 use kinmu::lib::{Shift, StdFill, StdUpdate};
 use kinmu::model::{Answer, ScoreProp};
 use kinmu::output_html::OutputHTML;
+use kinmu::output_html::ToJapanese;
 use kinmu::output_text::OutputText;
 
 use core::fmt;
@@ -154,7 +155,7 @@ impl<'a, W: io::Write, S> OutputTextOrHTML<'a, W, S> {
 
 impl<W: io::Write, SP, S, SS, DS> Output<Vec<Answer<SP, S, SS, DS>>> for OutputTextOrHTML<'_, W, S>
 where
-    S: fmt::Display + PartialEq + Clone,
+    S: ToJapanese + fmt::Display + PartialEq + Clone,
     SP: ScoreProp<S, SS, DS> + Clone,
     DS: Display,
 {

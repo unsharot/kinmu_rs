@@ -160,6 +160,7 @@ dependencies = [
  "kinmu_input_by_file",
  "kinmu_macros",
  "kinmu_model",
+ "kinmu_output_html",
  "rand",
 ]
 

@@ -1,6 +1,7 @@
 //! 勤務表に関わる型の宣言
 
 use kinmu_input_by_file::{FromConfig, MapState};
+use kinmu_output_html::ToJapanese;
 
 use std::fmt;
 
@@ -31,6 +32,22 @@ impl fmt::Display for Shift {
             Shift::Y => write!(f, "Y"),
             Shift::D => write!(f, "D"),
             Shift::U => write!(f, "U"),
+        }
+    }
+}
+
+impl ToJapanese for Shift {
+    fn to_japanese(&self) -> String {
+        match self {
+            Shift::N => String::from("日"),
+            Shift::K => String::from("公"),
+            Shift::I => String::from("／"),
+            Shift::A => String::from("＼"),
+            Shift::O => String::from("オ"),
+            Shift::H => String::from("早"),
+            Shift::Y => String::from("有"),
+            Shift::D => String::from("D"),
+            Shift::U => String::from("U"),
         }
     }
 }

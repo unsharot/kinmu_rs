@@ -39,7 +39,7 @@ impl<W, SP, S, SS, DS> Output<Vec<Answer<SP, S, SS, DS>>> for OutputHTML<'_, W, 
 where
     W: io::Write,
     SP: ScoreProp<S, SS, DS> + Clone,
-    S: fmt::Display + PartialEq + Clone,
+    S: ToJapanese + PartialEq + Clone,
     DS: fmt::Display,
 {
     fn run(&mut self, answers: &Vec<Answer<SP, S, SS, DS>>) -> anyhow::Result<()> {
@@ -55,7 +55,7 @@ where
 impl<W, S> OutputHTML<'_, W, S>
 where
     W: io::Write,
-    S: fmt::Display + PartialEq,
+    S: ToJapanese + PartialEq,
 {
     /// self.outにAnswerを出力
     /// ただし、戻り値はio::Result<()>であることに注意
@@ -178,7 +178,7 @@ where
             write!(
                 self.out,
                 "<th scope=\"col\">{}</th>",
-                self.row_stats_shifts[s]
+                self.row_stats_shifts[s].to_japanese()
             )?;
         }
 
@@ -243,7 +243,7 @@ where
         DS: fmt::Display,
     {
         for c in 0..schedule_config.day.count {
-            write!(self.out, "<td>{}</td>", schedule[r][c])?;
+            write!(self.out, "<td>{}</td>", schedule[r][c].to_japanese())?;
         }
 
         Ok(())
@@ -314,7 +314,7 @@ where
         write!(
             self.out,
             "<th scope=\"row\">{}</th>",
-            self.column_stats_shifts[index]
+            self.column_stats_shifts[index].to_japanese()
         )?;
         for c in 0..schedule_config.day.count {
             let mut sum = 0;
@@ -359,4 +359,9 @@ td {{
         )?;
         Ok(())
     }
+}
+
+// HTML出力のためのToString
+pub trait ToJapanese {
+    fn to_japanese(&self) -> String;
 }
