@@ -4,7 +4,6 @@
 use kinmu_core::Output;
 use kinmu_model::{eval_scores_immut, Answer, Schedule, ScheduleConfig, ScoreProp};
 
-use std::fmt;
 use std::io;
 
 /// テキスト出力の出力器
@@ -40,7 +39,7 @@ where
     W: io::Write,
     SP: ScoreProp<S, SS, DS> + Clone,
     S: ToJapanese + PartialEq + Clone,
-    DS: fmt::Display,
+    DS: ToJapanese,
 {
     fn run(&mut self, answers: &Vec<Answer<SP, S, SS, DS>>) -> anyhow::Result<()> {
         for ans in answers {
@@ -63,7 +62,7 @@ where
     where
         S: Clone,
         SP: ScoreProp<S, SS, DS> + Clone,
-        DS: fmt::Display,
+        DS: ToJapanese,
     {
         for (t, model) in ans.models.iter().enumerate() {
             writeln!(self.out, "<div>thread: {}</div>", t + 1)?;
@@ -84,7 +83,7 @@ where
     where
         S: Clone,
         SP: ScoreProp<S, SS, DS> + Clone,
-        DS: fmt::Display,
+        DS: ToJapanese,
     {
         let score = eval_scores_immut(
             &schedule_config
@@ -148,7 +147,7 @@ where
     ) -> io::Result<()>
     where
         S: Clone,
-        DS: fmt::Display,
+        DS: ToJapanese,
     {
         write!(self.out, "<table>")?;
 
@@ -160,14 +159,15 @@ where
                 write!(
                     self.out,
                     "<th scope=\"col\"><div>{}</div><div>{}</div><br/></th>",
-                    0, schedule_config.day.days[c]
+                    0,
+                    schedule_config.day.days[c].to_japanese()
                 )?;
             } else {
                 write!(
                     self.out,
                     "<th scope=\"col\"><div>{}</div><div>{}</div><br/></th>",
                     c - schedule_config.day.buffer_count + 1,
-                    schedule_config.day.days[c]
+                    schedule_config.day.days[c].to_japanese()
                 )?;
             }
         }
@@ -240,7 +240,7 @@ where
         r: usize,
     ) -> io::Result<()>
     where
-        DS: fmt::Display,
+        DS: ToJapanese,
     {
         for c in 0..schedule_config.day.count {
             write!(self.out, "<td>{}</td>", schedule[r][c].to_japanese())?;
@@ -259,7 +259,7 @@ where
         r: usize,
     ) -> io::Result<()>
     where
-        DS: fmt::Display,
+        DS: ToJapanese,
     {
         let mut sum = 0;
         for c in schedule_config.day.buffer_count..schedule_config.day.count {
@@ -279,7 +279,7 @@ where
         schedule_config: &ScheduleConfig<SP, S, SS, DS>,
     ) -> io::Result<()>
     where
-        DS: fmt::Display,
+        DS: ToJapanese,
     {
         write!(self.out, "<tr>")?;
         write!(self.out, "<th scope=\"col\">シフト/日付</th>")?;
@@ -288,7 +288,8 @@ where
             write!(
                 self.out,
                 "<th scope=\"col\"><div>{}</div><div>{}</div></th>",
-                schedule_config.day.days[c], c
+                schedule_config.day.days[c].to_japanese(),
+                c
             )?;
         }
 
@@ -307,7 +308,7 @@ where
         schedule: &Schedule<S>,
     ) -> io::Result<()>
     where
-        DS: fmt::Display,
+        DS: ToJapanese,
     {
         write!(self.out, "<tr>")?;
 

@@ -129,3 +129,15 @@ impl FromConfig for DayState {
         }
     }
 }
+
+impl ToJapanese for DayState {
+    fn to_japanese(&self) -> String {
+        match self {
+            DayState::Weekday => String::from("平日"),
+            DayState::Holiday => String::from("土日"),
+            DayState::Bath => String::from("フロ"),
+            DayState::Bath2 => String::from("フロ2"),
+            DayState::Measure => String::from("体重"),
+        }
+    }
+}

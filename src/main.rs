@@ -10,7 +10,6 @@ use kinmu::output_text::OutputText;
 use core::fmt;
 use getopts::Options;
 use std::env;
-use std::fmt::Display;
 use std::fs::OpenOptions;
 use std::io;
 
@@ -157,7 +156,7 @@ impl<W: io::Write, SP, S, SS, DS> Output<Vec<Answer<SP, S, SS, DS>>> for OutputT
 where
     S: ToJapanese + fmt::Display + PartialEq + Clone,
     SP: ScoreProp<S, SS, DS> + Clone,
-    DS: Display,
+    DS: ToJapanese + fmt::Display,
 {
     fn run(&mut self, answer: &Vec<Answer<SP, S, SS, DS>>) -> anyhow::Result<()> {
         match self {
