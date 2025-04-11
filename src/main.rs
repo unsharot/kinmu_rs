@@ -1,13 +1,9 @@
-use kinmu::core::Output;
 use kinmu::generator_with_annealing::GeneratorWithAnnealing;
 use kinmu::input_by_file::InputByFile;
 use kinmu::lib::{Shift, StdFill, StdUpdate};
-use kinmu::model::{Answer, ScoreProp};
-use kinmu::output_html::OutputHTML;
-use kinmu::output_html::ToJapanese;
-use kinmu::output_text::OutputText;
 
-use core::fmt;
+use kinmu::OutputTextOrHTML;
+
 use getopts::Options;
 use std::env;
 use std::fs::OpenOptions;
@@ -124,44 +120,4 @@ fn main() -> io::Result<()> {
     };
 
     Ok(())
-}
-
-enum OutputTextOrHTML<'a, W: io::Write, S> {
-    OutputText(OutputText<'a, W, S>),
-    OutputHTML(OutputHTML<'a, W, S>),
-}
-
-impl<'a, W: io::Write, S> OutputTextOrHTML<'a, W, S> {
-    pub fn new(
-        use_html: bool,
-        out: &'a mut W,
-        use_color: bool,
-        row_stats_shifts: Vec<S>,
-        column_stats_shifts: Vec<S>,
-    ) -> Self {
-        if use_html {
-            Self::OutputHTML(OutputHTML::new(out, row_stats_shifts, column_stats_shifts))
-        } else {
-            Self::OutputText(OutputText::new(
-                out,
-                use_color,
-                row_stats_shifts,
-                column_stats_shifts,
-            ))
-        }
-    }
-}
-
-impl<W: io::Write, SP, S, SS, DS> Output<Vec<Answer<SP, S, SS, DS>>> for OutputTextOrHTML<'_, W, S>
-where
-    S: ToJapanese + fmt::Display + PartialEq + Clone,
-    SP: ScoreProp<S, SS, DS> + Clone,
-    DS: ToJapanese + fmt::Display,
-{
-    fn run(&mut self, answer: &Vec<Answer<SP, S, SS, DS>>) -> anyhow::Result<()> {
-        match self {
-            Self::OutputText(o) => o.run(answer),
-            Self::OutputHTML(o) => o.run(answer),
-        }
-    }
 }
