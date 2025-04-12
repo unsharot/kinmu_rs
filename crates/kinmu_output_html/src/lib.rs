@@ -155,21 +155,16 @@ where
         write!(self.out, "<th scope=\"col\">人/日付</th>")?;
 
         for c in 0..schedule_config.day.count {
-            if c < schedule_config.day.buffer_count {
-                write!(
-                    self.out,
-                    "<th scope=\"col\"><div>{}</div><div>{}</div><br/></th>",
-                    0,
-                    schedule_config.day.days[c].to_japanese()
-                )?;
-            } else {
-                write!(
-                    self.out,
-                    "<th scope=\"col\"><div>{}</div><div>{}</div><br/></th>",
-                    c - schedule_config.day.buffer_count + 1,
-                    schedule_config.day.days[c].to_japanese()
-                )?;
-            }
+            write!(
+                self.out,
+                "<th scope=\"col\"><div>{}</div><div>{}</div><br/></th>",
+                if c < schedule_config.day.buffer_count {
+                    0
+                } else {
+                    c - schedule_config.day.buffer_count + 1
+                },
+                schedule_config.day.days[c].to_japanese()
+            )?;
         }
 
         write!(self.out, "<th scope=\"col\" class=\"padding\"></th>")?;
@@ -289,7 +284,11 @@ where
                 self.out,
                 "<th scope=\"col\"><div>{}</div><div>{}</div></th>",
                 schedule_config.day.days[c].to_japanese(),
-                c
+                if c < schedule_config.day.buffer_count {
+                    0
+                } else {
+                    c - schedule_config.day.buffer_count + 1
+                }
             )?;
         }
 
