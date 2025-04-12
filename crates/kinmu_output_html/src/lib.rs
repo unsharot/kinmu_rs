@@ -341,14 +341,15 @@ table {{
     border: 2px solid black;
     font-family: sans-serif;
     font-size: 0.8rem;
-    letter-spacing: 1px;
+    letter-spacing: 0px;
     text-align: center;
+    font-weight: bold;
 }}
 
 th,
 td {{
     border: 1px solid black;
-    padding: 8px 10px;
+    padding: 1px 1px;
 }}
 
 .padding {{
