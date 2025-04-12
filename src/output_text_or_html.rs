@@ -6,12 +6,12 @@ use super::output_text::OutputText;
 
 use std::io;
 
-pub enum OutputTextOrHTML<'a, W: io::Write, S> {
+pub enum OutputTextOrHTML<'a, W, S> {
     OutputText(OutputText<'a, W, S>),
     OutputHTML(OutputHTML<'a, W, S>),
 }
 
-impl<'a, W: io::Write, S> OutputTextOrHTML<'a, W, S> {
+impl<'a, W, S> OutputTextOrHTML<'a, W, S> {
     pub fn new(
         use_html: bool,
         out: &'a mut W,

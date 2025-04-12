@@ -11,14 +11,14 @@ use std::io;
 /// row_stats_shiftsは行の統計を表示するシフト
 /// column_stats_shiftsは列の統計を表示するシフト
 #[derive(Debug)]
-pub struct OutputHTML<'a, W: io::Write, S> {
+pub struct OutputHTML<'a, W, S> {
     out: &'a mut W,
     print_buffer: bool,
     row_stats_shifts: Vec<S>,
     column_stats_shifts: Vec<S>,
 }
 
-impl<'a, W: io::Write, S> OutputHTML<'a, W, S> {
+impl<'a, W, S> OutputHTML<'a, W, S> {
     /// コンストラクタ
     /// outは出力先
     /// row_stats_shiftsは行の統計を表示するシフト
