@@ -13,6 +13,7 @@ use std::io;
 #[derive(Debug)]
 pub struct OutputHTML<'a, W: io::Write, S> {
     out: &'a mut W,
+    print_buffer: bool,
     row_stats_shifts: Vec<S>,
     column_stats_shifts: Vec<S>,
 }
@@ -22,9 +23,15 @@ impl<'a, W: io::Write, S> OutputHTML<'a, W, S> {
     /// outは出力先
     /// row_stats_shiftsは行の統計を表示するシフト
     /// column_stats_shiftsは列の統計を表示するシフト
-    pub fn new(out: &'a mut W, row_stats_shifts: Vec<S>, column_stats_shifts: Vec<S>) -> Self {
+    pub fn new(
+        out: &'a mut W,
+        print_buffer: bool,
+        row_stats_shifts: Vec<S>,
+        column_stats_shifts: Vec<S>,
+    ) -> Self {
         OutputHTML {
             out,
+            print_buffer,
             row_stats_shifts,
             column_stats_shifts,
         }
@@ -154,7 +161,12 @@ where
         write!(self.out, "<thead><tr>")?;
         write!(self.out, "<th scope=\"col\">人/日付</th>")?;
 
-        for c in 0..schedule_config.day.count {
+        for c in if self.print_buffer {
+            0
+        } else {
+            schedule_config.day.buffer_count
+        }..schedule_config.day.count
+        {
             write!(
                 self.out,
                 "<th scope=\"col\"><div>{}</div><div>{}</div><br/></th>",
@@ -237,7 +249,12 @@ where
     where
         DS: ToJapanese,
     {
-        for c in 0..schedule_config.day.count {
+        for c in if self.print_buffer {
+            0
+        } else {
+            schedule_config.day.buffer_count
+        }..schedule_config.day.count
+        {
             write!(self.out, "<td>{}</td>", schedule[r][c].to_japanese())?;
         }
 
@@ -279,7 +296,12 @@ where
         write!(self.out, "<tr>")?;
         write!(self.out, "<th scope=\"col\">シフト/日付</th>")?;
 
-        for c in 0..schedule_config.day.count {
+        for c in if self.print_buffer {
+            0
+        } else {
+            schedule_config.day.buffer_count
+        }..schedule_config.day.count
+        {
             write!(
                 self.out,
                 "<th scope=\"col\"><div>{}</div><div>{}</div></th>",
@@ -316,7 +338,12 @@ where
             "<th scope=\"row\">{}</th>",
             self.column_stats_shifts[index].to_japanese()
         )?;
-        for c in 0..schedule_config.day.count {
+        for c in if self.print_buffer {
+            0
+        } else {
+            schedule_config.day.buffer_count
+        }..schedule_config.day.count
+        {
             let mut sum = 0;
             for r in 0..schedule_config.staff.count {
                 if schedule[r][c] == self.column_stats_shifts[index] {

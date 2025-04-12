@@ -16,11 +16,17 @@ impl<'a, W: io::Write, S> OutputTextOrHTML<'a, W, S> {
         use_html: bool,
         out: &'a mut W,
         use_color: bool,
+        print_buffer: bool,
         row_stats_shifts: Vec<S>,
         column_stats_shifts: Vec<S>,
     ) -> Self {
         if use_html {
-            Self::OutputHTML(OutputHTML::new(out, row_stats_shifts, column_stats_shifts))
+            Self::OutputHTML(OutputHTML::new(
+                out,
+                print_buffer,
+                row_stats_shifts,
+                column_stats_shifts,
+            ))
         } else {
             Self::OutputText(OutputText::new(
                 out,
