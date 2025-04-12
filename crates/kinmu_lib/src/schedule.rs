@@ -44,7 +44,7 @@ impl ToJapanese for Shift {
             Shift::I => String::from("／"),
             Shift::A => String::from("＼"),
             Shift::O => String::from("オ"),
-            Shift::H => String::from("早"),
+            Shift::H => String::from("ハ"),
             Shift::Y => String::from("有"),
             Shift::D => String::from("D"),
             Shift::U => String::from("U"),
