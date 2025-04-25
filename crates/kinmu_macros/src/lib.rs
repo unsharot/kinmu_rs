@@ -4,6 +4,7 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn::{parse_macro_input, parse_quote, AngleBracketedGenericArguments, DeriveInput};
 
+/// score_propのattributeを取得してgenericsを返す
 fn get_generic_attribute(input: &DeriveInput) -> syn::Result<AngleBracketedGenericArguments> {
     for a in &input.attrs {
         if a.path().is_ident("score_prop") {
@@ -33,6 +34,7 @@ fn get_generic_attribute(input: &DeriveInput) -> syn::Result<AngleBracketedGener
 pub fn derive_score_prop(item: TokenStream) -> TokenStream {
     let input = parse_macro_input!(item as DeriveInput);
 
+    // enumか判定
     let data_enum = match &input.data {
         syn::Data::Enum(v) => v,
         _ => {
@@ -42,24 +44,33 @@ pub fn derive_score_prop(item: TokenStream) -> TokenStream {
         }
     };
 
+    // enumの列挙子を取得
     let mut variants = Vec::new();
     for v in &data_enum.variants {
         variants.push(v.ident.clone());
     }
 
+    // ScorePropのジェネリクスをattributeから取得
     let generics = match get_generic_attribute(&input) {
         Ok(v) => v,
         Err(e) => return e.to_compile_error().into(),
     };
 
-    let trait_path: syn::Path = parse_quote!(kinmu_model::ScoreProp);
-    let ty = input.ident;
-    let (impl_g, ty_g, where_clause) = input.generics.split_for_impl();
-
+    // ジェネリクスの型引数を個別に取得
     let shift = generics.args.get(0).unwrap();
     let shift_state = generics.args.get(1).unwrap();
     let day_state = generics.args.get(2).unwrap();
 
+    // ScorePropのパス
+    let trait_path: syn::Path = parse_quote!(kinmu_model::ScoreProp);
+
+    // ScorePropのderive先の識別子
+    let ty = input.ident;
+
+    // 埋め込み対象のジェネリクスの要素を分割
+    let (impl_g, ty_g, where_clause) = input.generics.split_for_impl();
+
+    // implのコードを生成
     let gen = quote! {
         #[automatically_derived]
         impl #impl_g #trait_path #generics for #ty #ty_g #where_clause {
@@ -77,5 +88,6 @@ pub fn derive_score_prop(item: TokenStream) -> TokenStream {
         }
     };
 
+    // proc_macro2::TokenStreamをproc_marco::TokenStreamにしてリターン
     gen.into()
 }
