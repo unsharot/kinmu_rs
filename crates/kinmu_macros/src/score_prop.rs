@@ -44,7 +44,7 @@ pub fn derive_score_prop(input: DeriveInput) -> syn::Result<proc_macro2::TokenSt
                 }
             }
 
-            fn eval_immut(&self, staff_config: &kinmu_model::StaffConfig, day_config: &kinmu_model::DayConfig<#shift, #shift_state, #day_state>, schedule: &kinmu_model::Schedule<#shift>) -> Score {
+            fn eval_immut(&self, staff_config: &kinmu_model::StaffConfig, day_config: &kinmu_model::DayConfig<#shift, #shift_state, #day_state>, schedule: &kinmu_model::Schedule<#shift>) -> kinmu_model::Score {
                 match self {
                     #(Self::#variants(x) => #trait_path::eval_immut(x, staff_config, day_config, schedule),)*
                 }
