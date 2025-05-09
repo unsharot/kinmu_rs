@@ -1,6 +1,6 @@
 [package]
 name = "kinmu"
-version = "2.3.1"
+version = "2.3.2"
 authors = ["unsharot"]
 edition = "2021"
 license = "MIT"
