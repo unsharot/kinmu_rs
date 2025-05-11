@@ -1,4 +1,4 @@
-//! 指定したシフトをStaffAttributeで指定した数入らなかった場合に発火するスコア
+//! 指定したシフトどうしの距離が遠い場合に高いペナルティを与えるスコア
 
 use super::{
     CondWrapper, DayConfig, DayState, Schedule, ScheduleConfig, Shift, ShiftState, StdScoreProp,
