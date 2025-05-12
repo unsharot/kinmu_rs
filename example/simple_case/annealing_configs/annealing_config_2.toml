@@ -20,4 +20,4 @@ score_functions = [
 update_function = "update1"
 
 # 焼きなましの温度を指定
-temp = {max = 0, min = 0}
+temp = {max = 10000, min = 0}
