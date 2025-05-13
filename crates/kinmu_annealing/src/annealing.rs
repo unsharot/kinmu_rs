@@ -70,11 +70,15 @@ where
 
         temp = temp_func(temp_max, temp_min, step_count, loop_value);
 
+        // スコアが改善または確率でモデルを更新
         if rng.gen::<f32>() < prob_func(current_score, next_score, temp) {
             current_model = next_model.clone();
             current_score = next_score;
         }
-        if next_score < best_score {
+
+        // 最良モデルの更新
+        // ここは < だとランダムウォークできないため <= にしてある
+        if next_score <= best_score {
             best_model = next_model;
             best_score = next_score;
         }
