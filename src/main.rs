@@ -109,8 +109,8 @@ fn main() -> io::Result<()> {
             &mut OutputTextOrHTML::new(
                 output_html,
                 &mut out,
-                false,
                 use_color,
+                false,
                 vec![H, O, I, N, K, Y],
                 vec![N, I, A, K, O, H],
             )
