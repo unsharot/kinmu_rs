@@ -83,6 +83,10 @@ exeファイルを実行する際、デフォルトでメインconfigとして`e
 ./kinmu.exe
 ```
 
+そのまま実行すると、ターミナルに下の画像のように出力されます。
+
+![](example/simple_case/output_stdout.png)
+
 また、`-o`あるいは`--output`オプションから出力先パスを指定できます。
 指定した場合、標準出力の代わりに指定ファイルに結果がテキスト出力されます。
 Windowsの場合、出力先の指定にパイプラインを用いると文字化けやカラーコードが残る場合があるため、こちらの機能をご利用ください。
@@ -101,6 +105,11 @@ HTMLの出力では、tableを用いて出力されます。結果を印刷し�
 # 出力されたファイルはブラウザで開いてください。
 ./kinmu.exe --html -o output.html
 ```
+
+`./kinmu.exe -l .\example\real_case\main_config.toml --html -o .\example\real_case\result.html`
+を実行し、生成されたファイルを開くと下の画像のように表示されます。
+
+![](example/real_case/output_html.png)
 
 ### ソースコードをダウンロードする場合
 
