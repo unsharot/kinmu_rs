@@ -320,6 +320,7 @@ Condの詳細は以下の通り
 | ParticularDayState | DayState                  | 指定の曜日なら有効                                                 |
 | BeforeDayState     | DayState                  | 指定の曜日の前日なら有効                                           |
 | ParticularDay      | usize                     | 指定の日付のみ有効                                                 |
+| DayList            | [usize]                   | 日付がリストに含まれるなら有効                                     |
 | StaffInRange       | (usize, usize)            | 指定した範囲のスタッフなら有効                                     |
 | StaffWithAttribute | (StaffAttributeName, i32) | 指定した職員ごとのパラメータが指定した整数であるスタッフなら有効   |
 | ParticularStaff    | usize                     | 指定した番号のスタッフなら有効                                     |
