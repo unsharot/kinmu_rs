@@ -15,9 +15,9 @@ use std::fmt;
 pub enum Cond {
     #[default]
     Every,
+    Not(Box<Cond>),
     Or((Box<Cond>, Box<Cond>)),
     And((Box<Cond>, Box<Cond>)),
-    Not(Box<Cond>),
 
     DayExceptBuffer,
     DayInRange((usize, usize)),
@@ -34,13 +34,13 @@ impl Cond {
     pub fn eval(&self, staff: usize, day: usize, sc: &StaffConfig, dc: &DayConfig) -> bool {
         match self {
             Cond::Every => true,
+            Cond::Not(cond) => !cond.eval(staff, day, sc, dc),
             Cond::Or((cond1, cond2)) => {
                 cond1.eval(staff, day, sc, dc) || cond2.eval(staff, day, sc, dc)
             }
             Cond::And((cond1, cond2)) => {
                 cond1.eval(staff, day, sc, dc) && cond2.eval(staff, day, sc, dc)
             }
-            Cond::Not(cond) => !cond.eval(staff, day, sc, dc),
             Cond::DayExceptBuffer => dc.buffer_count <= day,
             Cond::DayInRange((day_start, day_end)) => *day_start <= day && day <= *day_end,
             Cond::ParticularDayState(ds) => dc.days[day] == *ds,
@@ -125,9 +125,9 @@ impl FromConfig for Cond {
         anyhow::ensure!(2 >= words.len(), "Needs 2 fields, but too much given.");
         match (words[0], words[1]) {
             ("Every", _) => Ok(Cond::Every),
+            ("Not", p) => Ok(Cond::Not(Box::new(<Cond>::from_config(p)?))),
             ("Or", p) => Ok(Cond::Or(<(Box<Cond>, Box<Cond>)>::from_config(p)?)),
             ("And", p) => Ok(Cond::And(<(Box<Cond>, Box<Cond>)>::from_config(p)?)),
-            ("Not", p) => Ok(Cond::Not(Box::new(<Cond>::from_config(p)?))),
             ("DayExceptBuffer", _) => Ok(Cond::DayExceptBuffer),
             ("DayInRange", p) => Ok(Cond::DayInRange(<(usize, usize)>::from_config(p)?)),
             ("ParticularDayState", p) => Ok(Cond::ParticularDayState(<DayState>::from_config(p)?)),
@@ -161,9 +161,9 @@ impl Check<StdScoreProp, Shift, ShiftState, DayState> for Cond {
     fn check(&self, schedule_config: &ScheduleConfig) -> anyhow::Result<()> {
         match self {
             Cond::Every => Ok(()),
+            Cond::Not(c) => c.check(schedule_config),
             Cond::Or((c1, c2)) => c1.check(schedule_config).and(c2.check(schedule_config)),
             Cond::And((c1, c2)) => c1.check(schedule_config).and(c2.check(schedule_config)),
-            Cond::Not(c) => c.check(schedule_config),
 
             Cond::DayExceptBuffer => Ok(()),
             Cond::DayInRange(_) => Ok(()),
