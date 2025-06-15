@@ -4,7 +4,7 @@ use super::{
     DayConfig, DayState, ScheduleConfig, Shift, ShiftState, StaffAttributeNameWrapper, StdScoreProp,
 };
 
-use kinmu_input_by_file::{Check, FromConfig};
+use kinmu_input_by_file::{Check, FromConfig, VecWrapper};
 use kinmu_model::{StaffAttributeName, StaffConfig};
 
 use anyhow::Context as _;
@@ -13,18 +13,22 @@ use std::fmt;
 /// ScorePropに用いる条件を管理する型
 #[derive(Debug, PartialEq, Clone, Default)]
 pub enum Cond {
+    // 基本条件
     #[default]
     Every,
     Not(Box<Cond>),
     Or((Box<Cond>, Box<Cond>)),
     And((Box<Cond>, Box<Cond>)),
 
+    // 日付についての条件
     DayExceptBuffer,
     DayInRange((usize, usize)),
     ParticularDayState(DayState),
     BeforeDayState(DayState),
     ParticularDay(usize),
+    DayList(Vec<usize>),
 
+    // スタッフについての条件
     StaffInRange((usize, usize)),
     StaffWithAttribute((StaffAttributeName, i32)),
     ParticularStaff(usize),
@@ -52,6 +56,7 @@ impl Cond {
                 }
             }
             Cond::ParticularDay(d) => *d == day,
+            Cond::DayList(ds) => ds.iter().any(|d| *d == day),
             Cond::StaffInRange((staff_start, staff_end)) => {
                 *staff_start <= staff && staff <= *staff_end
             }
@@ -133,6 +138,7 @@ impl FromConfig for Cond {
             ("ParticularDayState", p) => Ok(Cond::ParticularDayState(<DayState>::from_config(p)?)),
             ("BeforeDayState", p) => Ok(Cond::BeforeDayState(<DayState>::from_config(p)?)),
             ("ParticularDay", p) => Ok(Cond::ParticularDay(<usize>::from_config(p)?)),
+            ("DayList", p) => Ok(Cond::DayList(<VecWrapper<usize>>::from_config(p)?.0)),
             ("StaffInRange", p) => Ok(Cond::StaffInRange(<(usize, usize)>::from_config(p)?)),
             ("StaffWithAttribute", p) => Ok(Cond::StaffWithAttribute(
                 <(StaffAttributeName, i32)>::from_config(p)?,
@@ -170,6 +176,7 @@ impl Check<StdScoreProp, Shift, ShiftState, DayState> for Cond {
             Cond::ParticularDayState(_) => Ok(()),
             Cond::BeforeDayState(_) => Ok(()),
             Cond::ParticularDay(_) => Ok(()),
+            Cond::DayList(_) => Ok(()),
 
             Cond::StaffInRange(_) => Ok(()),
             Cond::StaffWithAttribute((sa, _)) => {
