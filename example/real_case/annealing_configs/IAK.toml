@@ -106,6 +106,11 @@ score_functions = [
 "Streak (Staff 11, [N], 4, 1000)",
 ],filter={low_pass=0}},
 
+# 実際の日付は 3,5,8,12
+{display_name = "職員Gが指定された日で夜勤しない", scores = [
+"StaffCount (And (Staff 6, DayInList [5,7,10,14]), I, 0, 10000)",
+],filter={low_pass=0}},
+
 ]
 
 update_function = "update5"
