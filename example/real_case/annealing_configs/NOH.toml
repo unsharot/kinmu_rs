@@ -5,63 +5,63 @@ step_count = 200000
 score_functions = [
 
 {display_name = "ON", scores = [
-"PatternFixed (Every (), [O,N], 100)",
+"PatternFixed (True (), [O,N], 100)",
 ]},
 
 {display_name = "NH", scores = [
-"PatternFixed (Every (), [N,H], 1000)",
+"PatternFixed (True (), [N,H], 1000)",
 ]},
 
 {display_name = "OH", scores = [
-"PatternFixed (Every (), [O,H], 2000)",
+"PatternFixed (True (), [O,H], 2000)",
 ]},
 
 {display_name = "遅早のバランス", scores = [
-"ShiftsBalance (DayExceptBuffer (), O, H, 3)",
+"ShiftsBalance (NoBuffer (), O, H, 3)",
 ]},
 
 {display_name = "遅番の前後のバランス", scores = [
-"ShiftHalfBalance (DayExceptBuffer (), O, 3)",
+"ShiftHalfBalance (NoBuffer (), O, 3)",
 ]},
 
 {display_name = "早番の前後のバランス", scores = [
-"ShiftHalfBalance (DayExceptBuffer (), H, 3)",
+"ShiftHalfBalance (NoBuffer (), H, 3)",
 ]},
 
 {display_name = "フロのスタッフ数", scores = [
-"StaffCount (And (DayExceptBuffer (), ParticularDayState B), N, 3, 5)",
+"StaffCount (And (NoBuffer (), DayState B), N, 3, 5)",
 ]},
 
 {display_name = "フロ2のスタッフ数", scores = [
-"StaffCount (And (DayExceptBuffer (), ParticularDayState 2), N, 1, 10)",
+"StaffCount (And (NoBuffer (), DayState 2), N, 1, 10)",
 ]},
 
 {display_name = "平日のスタッフ数", scores = [
-"StaffCount (And (DayExceptBuffer (), ParticularDayState W), N, 1, 10)",
+"StaffCount (And (NoBuffer (), DayState W), N, 1, 10)",
 ]},
 
 {display_name = "休日のスタッフ数", scores = [
-"StaffCount (And (DayExceptBuffer (), ParticularDayState H), N, 1, 10)",
+"StaffCount (And (NoBuffer (), DayState H), N, 1, 10)",
 ]},
 
 {display_name = "計測のスタッフ数", scores = [
-"StaffCount (And (DayExceptBuffer (), ParticularDayState M), N, 1, 10)",
+"StaffCount (And (NoBuffer (), DayState M), N, 1, 10)",
 ]},
 
 {display_name = "遅番のスタッフ数", scores = [
-"StaffCount (DayExceptBuffer (), O, 1, 100)",
+"StaffCount (NoBuffer (), O, 1, 100)",
 ],filter={low_pass=0}},
 
 {display_name = "早番のスタッフ数", scores = [
-"StaffCount (DayExceptBuffer (), H, 1, 100)",
+"StaffCount (NoBuffer (), H, 1, 100)",
 ],filter={low_pass=0}},
 
 {display_name = "遅番の日数", scores = [
-"DayCountRegardStaffAttribute (And (Not StaffWithAttribute (ODayCount, -1), DayExceptBuffer ()), O, ODayCount, 100)",
+"DayCountRegardStaffAttribute (And (Not StaffWithAttribute (ODayCount, -1), NoBuffer ()), O, ODayCount, 100)",
 ],filter={low_pass=0}},
 
 {display_name = "早番の日数", scores = [
-"DayCountRegardStaffAttribute (And (Not StaffWithAttribute (HDayCount, -1), DayExceptBuffer ()), H, HDayCount, 100)",
+"DayCountRegardStaffAttribute (And (Not StaffWithAttribute (HDayCount, -1), NoBuffer ()), H, HDayCount, 100)",
 ],filter={low_pass=0}},
 
 ]

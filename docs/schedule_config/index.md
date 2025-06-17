@@ -296,46 +296,46 @@ filterは任意で、任意の有理数パラメータlow_passとhigh_passを持
 
 型の詳細は以下の通り
 
-| 型名      | 説明                             | 例                                             |
-| :-------- | :------------------------------- | :--------------------------------------------- |
-| Cond      | スコアを適用する勤務表の枠の条件 | And (DayExceptBuffer (), ParticularDayState B) |
-| Shift     | シフト N,K,I,A,O,H,Y,D,U         | N                                              |
-| [Shift]   | シフトのリスト                   | [N, O, H]                                      |
-| [[Shift]] | シフトのリストのリスト           | [[N], [K, Y]]                                  |
-| Score     | スコア 実数                      | -100.3                                         |
-| i32       | 整数                             | -3                                             |
-| usize     | 非負整数                         | 4                                              |
-| DayState  | 曜日 W,H,B,2,M                   | B                                              |
+| 型名      | 説明                             | 例                            |
+| :-------- | :------------------------------- | :---------------------------- |
+| Cond      | スコアを適用する勤務表の枠の条件 | And (NoBuffer (), DayState B) |
+| Shift     | シフト N,K,I,A,O,H,Y,D,U         | N                             |
+| [Shift]   | シフトのリスト                   | [N, O, H]                     |
+| [[Shift]] | シフトのリストのリスト           | [[N], [K, Y]]                 |
+| Score     | スコア 実数                      | -100.3                        |
+| i32       | 整数                             | -3                            |
+| usize     | 非負整数                         | 4                             |
+| DayState  | 曜日 W,H,B,2,M                   | B                             |
 
 Condの詳細は以下の通り
 
 | 種類               | 引数の型                  | 説明                                                               |
 | :----------------- | :------------------------ | :----------------------------------------------------------------- |
-| Every              | ()                        | すべての枠を有効とする                                             |
+| True               | ()                        | すべての枠を有効とする                                             |
 | Not                | Cond                      | 指定した条件を満たしていなければ有効とする                         |
 | Or                 | (Cond, Cond)              | 指定した2つのCondのどちらかを満たしていれば有効とする              |
 | And                | (Cond, Cond)              | 指定した2つのCondの両方を満たしていれば有効とする                  |
-| DayExceptBuffer    | ()                        | バッファーでないなら有効                                           |
+| NoBuffer           | ()                        | バッファーでないなら有効                                           |
 | DayInRange         | (usize, usize)            | 指定した範囲の日付でないなら有効 日数はバッファーから0,1,2..と続く |
-| ParticularDayState | DayState                  | 指定の曜日なら有効                                                 |
+| DayState           | DayState                  | 指定の曜日なら有効                                                 |
 | BeforeDayState     | DayState                  | 指定の曜日の前日なら有効                                           |
-| ParticularDay      | usize                     | 指定の日付のみ有効                                                 |
-| DayList            | [usize]                   | 日付がリストに含まれるなら有効                                     |
+| Day                | usize                     | 指定の日付のみ有効                                                 |
+| DayInList          | [usize]                   | 日付がリストに含まれるなら有効                                     |
 | StaffInRange       | (usize, usize)            | 指定した範囲のスタッフなら有効                                     |
 | StaffWithAttribute | (StaffAttributeName, i32) | 指定した職員ごとのパラメータが指定した整数であるスタッフなら有効   |
-| ParticularStaff    | usize                     | 指定した番号のスタッフなら有効                                     |
+| Staff              | usize                     | 指定した番号のスタッフなら有効                                     |
 
 ```toml
 score_functions = [
    {display_name = "夜勤の禁止パターン", scores = [
-      "PatternGeneral (Every (), [[I], [N,O,H,I,K,Y]], 1000)",
-      "PatternGeneral (Every (), [[A], [N,O,H,I,A]], 1000)"
+      "PatternGeneral (True (), [[I], [N,O,H,I,K,Y]], 1000)",
+      "PatternGeneral (True (), [[A], [N,O,H,I,A]], 1000)"
    ], filter = {low_pass = 1000}},
    {display_name = "望ましいパターン", scores = [
-      "PatternFixed (Every (), [K,I], 100)",
-      "PatternFixed (Every (), [Y,I], 100)",
-      "PatternGeneral (Every (), [[K,Y],[N,O,H],[I]], 10)",
-      "PatternGeneral (Every (), [[N,O,H],[N,O,H],[I]], -300)"
+      "PatternFixed (True (), [K,I], 100)",
+      "PatternFixed (True (), [Y,I], 100)",
+      "PatternGeneral (True (), [[K,Y],[N,O,H],[I]], 10)",
+      "PatternGeneral (True (), [[N,O,H],[N,O,H],[I]], -300)"
    ]},
 ]
 ```
