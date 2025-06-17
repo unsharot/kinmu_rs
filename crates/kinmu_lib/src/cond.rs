@@ -22,17 +22,17 @@ pub enum Cond {
     And((Box<Cond>, Box<Cond>)),
 
     // 日付についての条件
-    NoBuffer,
+    Day(usize),
     DayInRange((usize, usize)),
+    DayInList(Vec<usize>),
+    NoBuffer,
     DayState(DayState),
     BeforeDayState(DayState),
-    Day(usize),
-    DayInList(Vec<usize>),
 
     // スタッフについての条件
+    Staff(usize),
     StaffInRange((usize, usize)),
     StaffWithAttribute((StaffAttributeName, i32)),
-    Staff(usize),
 }
 
 impl Cond {
@@ -47,8 +47,11 @@ impl Cond {
             Cond::And((cond1, cond2)) => {
                 cond1.eval(staff, day, sc, dc) && cond2.eval(staff, day, sc, dc)
             }
-            Cond::NoBuffer => dc.buffer_count <= day,
+
+            Cond::Day(d) => *d == day,
             Cond::DayInRange((day_start, day_end)) => *day_start <= day && day <= *day_end,
+            Cond::DayInList(ds) => ds.iter().any(|d| *d == day),
+            Cond::NoBuffer => dc.buffer_count <= day,
             Cond::DayState(ds) => dc.days[day] == *ds,
             Cond::BeforeDayState(ds) => {
                 if day + 1 >= dc.count {
@@ -57,15 +60,14 @@ impl Cond {
                     dc.days[day + 1] == *ds
                 }
             }
-            Cond::Day(d) => *d == day,
-            Cond::DayInList(ds) => ds.iter().any(|d| *d == day),
+
+            Cond::Staff(s) => *s == staff,
             Cond::StaffInRange((staff_start, staff_end)) => {
                 *staff_start <= staff && staff <= *staff_end
             }
             Cond::StaffWithAttribute((attribute, value)) => {
                 sc.get_attribute(staff, attribute) == *value
             }
-            Cond::Staff(s) => *s == staff,
         }
     }
 }
@@ -136,17 +138,19 @@ impl FromConfig for Cond {
             ("Not", p) => Ok(Cond::Not(Box::new(<Cond>::from_config(p)?))),
             ("Or", p) => Ok(Cond::Or(<(Box<Cond>, Box<Cond>)>::from_config(p)?)),
             ("And", p) => Ok(Cond::And(<(Box<Cond>, Box<Cond>)>::from_config(p)?)),
-            ("NoBuffer", _) => Ok(Cond::NoBuffer),
+
+            ("Day", p) => Ok(Cond::Day(<usize>::from_config(p)?)),
             ("DayInRange", p) => Ok(Cond::DayInRange(<(usize, usize)>::from_config(p)?)),
+            ("DayInList", p) => Ok(Cond::DayInList(<VecWrapper<usize>>::from_config(p)?.0)),
+            ("NoBuffer", _) => Ok(Cond::NoBuffer),
             ("DayState", p) => Ok(Cond::DayState(<DayState>::from_config(p)?)),
             ("BeforeDayState", p) => Ok(Cond::BeforeDayState(<DayState>::from_config(p)?)),
-            ("Day", p) => Ok(Cond::Day(<usize>::from_config(p)?)),
-            ("DayInList", p) => Ok(Cond::DayInList(<VecWrapper<usize>>::from_config(p)?.0)),
+
+            ("Staff", p) => Ok(Cond::Staff(<usize>::from_config(p)?)),
             ("StaffInRange", p) => Ok(Cond::StaffInRange(<(usize, usize)>::from_config(p)?)),
             ("StaffWithAttribute", p) => Ok(Cond::StaffWithAttribute(
                 <(StaffAttributeName, i32)>::from_config(p)?,
             )),
-            ("Staff", p) => Ok(Cond::Staff(<usize>::from_config(p)?)),
             (s, p) => Err(anyhow::anyhow!("Failed to parse Cond: {} {}", s, p)),
         }
     }
@@ -175,18 +179,18 @@ impl Check<StdScoreProp, Shift, ShiftState, DayState> for Cond {
             Cond::Or((c1, c2)) => c1.check(schedule_config).and(c2.check(schedule_config)),
             Cond::And((c1, c2)) => c1.check(schedule_config).and(c2.check(schedule_config)),
 
-            Cond::NoBuffer => Ok(()),
+            Cond::Day(_) => Ok(()),
             Cond::DayInRange(_) => Ok(()),
+            Cond::DayInList(_) => Ok(()),
+            Cond::NoBuffer => Ok(()),
             Cond::DayState(_) => Ok(()),
             Cond::BeforeDayState(_) => Ok(()),
-            Cond::Day(_) => Ok(()),
-            Cond::DayInList(_) => Ok(()),
 
+            Cond::Staff(_) => Ok(()),
             Cond::StaffInRange(_) => Ok(()),
             Cond::StaffWithAttribute((sa, _)) => {
                 StaffAttributeNameWrapper(sa).check(schedule_config)
             }
-            Cond::Staff(_) => Ok(()),
         }
         .with_context(|| format!("Cond {:?} の変換チェックに失敗しました", self))?;
         Ok(())

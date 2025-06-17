@@ -316,15 +316,15 @@ Condの詳細は以下の通り
 | Not                | Cond                      | 指定した条件を満たしていなければ有効とする                         |
 | Or                 | (Cond, Cond)              | 指定した2つのCondのどちらかを満たしていれば有効とする              |
 | And                | (Cond, Cond)              | 指定した2つのCondの両方を満たしていれば有効とする                  |
-| NoBuffer           | ()                        | バッファーでないなら有効                                           |
+| Day                | usize                     | 指定の日付のみ有効                                                 |
 | DayInRange         | (usize, usize)            | 指定した範囲の日付でないなら有効 日数はバッファーから0,1,2..と続く |
+| DayInList          | [usize]                   | 日付がリストに含まれるなら有効                                     |
+| NoBuffer           | ()                        | バッファーでないなら有効                                           |
 | DayState           | DayState                  | 指定の曜日なら有効                                                 |
 | BeforeDayState     | DayState                  | 指定の曜日の前日なら有効                                           |
-| Day                | usize                     | 指定の日付のみ有効                                                 |
-| DayInList          | [usize]                   | 日付がリストに含まれるなら有効                                     |
+| Staff              | usize                     | 指定した番号のスタッフなら有効                                     |
 | StaffInRange       | (usize, usize)            | 指定した範囲のスタッフなら有効                                     |
 | StaffWithAttribute | (StaffAttributeName, i32) | 指定した職員ごとのパラメータが指定した整数であるスタッフなら有効   |
-| Staff              | usize                     | 指定した番号のスタッフなら有効                                     |
 
 ```toml
 score_functions = [
