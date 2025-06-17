@@ -150,7 +150,7 @@ mod tests {
             .insert(String::from("I_alone_ok"), 0);
 
         let mut sp = StaffCountWithPremise::new((
-            CondWrapper::new(Cond::Every),
+            CondWrapper::new(Cond::True),
             Shift::I,
             1,
             CondWrapper::new(Cond::StaffWithAttribute((String::from("I_alone_ok"), 1))),
@@ -195,7 +195,7 @@ mod tests {
             .insert(String::from("I_alone_ok"), 0);
 
         let mut sp = StaffCountWithPremise::new((
-            CondWrapper::new(Cond::Every),
+            CondWrapper::new(Cond::True),
             Shift::I,
             1,
             CondWrapper::new(Cond::StaffWithAttribute((String::from("I_alone_ok"), 1))),

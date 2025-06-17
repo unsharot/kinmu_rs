@@ -109,7 +109,7 @@ mod tests {
         schedule_config.day.count = schedule[0].len();
         schedule_config.staff.count = schedule.len();
 
-        let mut sp = ShiftHalfBalance::new((CondWrapper::new(Cond::Every), Shift::I, 1.0));
+        let mut sp = ShiftHalfBalance::new((CondWrapper::new(Cond::True), Shift::I, 1.0));
 
         let score = sp.eval_mut(&schedule_config.staff, &schedule_config.day, &schedule);
 
@@ -128,7 +128,7 @@ mod tests {
         schedule_config.day.count = schedule[0].len();
         schedule_config.staff.count = schedule.len();
 
-        let mut sp = ShiftHalfBalance::new((CondWrapper::new(Cond::Every), Shift::I, 1.0));
+        let mut sp = ShiftHalfBalance::new((CondWrapper::new(Cond::True), Shift::I, 1.0));
 
         let score = sp.eval_mut(&schedule_config.staff, &schedule_config.day, &schedule);
 

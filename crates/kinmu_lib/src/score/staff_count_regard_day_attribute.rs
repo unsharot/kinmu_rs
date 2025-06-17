@@ -108,7 +108,7 @@ mod tests {
             .insert(String::from("n_staff_count"), vec![1, 2, 1, 1]);
 
         let mut sp = StaffCountRegardDayAttribute::new((
-            CondWrapper::new(Cond::Every),
+            CondWrapper::new(Cond::True),
             Shift::N,
             String::from("n_staff_count"),
             1.0,
@@ -136,7 +136,7 @@ mod tests {
             .insert(String::from("n_staff_count"), vec![1, 2, 1, 1]);
 
         let mut sp = StaffCountRegardDayAttribute::new((
-            CondWrapper::new(Cond::Every),
+            CondWrapper::new(Cond::True),
             Shift::N,
             String::from("n_staff_count"),
             1.0,

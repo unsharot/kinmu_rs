@@ -107,7 +107,7 @@ mod tests {
         schedule_config.day.count = schedule[0].len();
 
         let mut sp = PatternGeneral::new((
-            CondWrapper::new(Cond::Every),
+            CondWrapper::new(Cond::True),
             vec![
                 vec![Shift::N, Shift::O, Shift::H, Shift::A, Shift::K, Shift::Y],
                 vec![Shift::A],
@@ -136,7 +136,7 @@ mod tests {
         schedule_config.day.count = schedule[0].len();
 
         let mut sp = PatternGeneral::new((
-            CondWrapper::new(Cond::Every),
+            CondWrapper::new(Cond::True),
             {
                 use Shift::*;
                 vec![vec![N, O, H, A, K, Y], vec![A]]

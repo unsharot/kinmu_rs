@@ -118,7 +118,7 @@ mod tests {
             .insert(String::from("n_count"), 0);
 
         let mut sp = DayCountRegardStaffAttribute::new((
-            CondWrapper::new(Cond::Every),
+            CondWrapper::new(Cond::True),
             Shift::N,
             String::from("n_count"),
             1.0,
@@ -156,7 +156,7 @@ mod tests {
             .insert(String::from("n_count"), 0);
 
         let mut sp = DayCountRegardStaffAttribute::new((
-            CondWrapper::new(Cond::Every),
+            CondWrapper::new(Cond::True),
             Shift::N,
             String::from("n_count"),
             1.0,

@@ -88,7 +88,7 @@ mod tests {
         schedule_config.staff.count = schedule.len();
         schedule_config.staff.ng_list.push((0, 1));
 
-        let mut sp = NGPair::new((CondWrapper::new(Cond::Every), Shift::I, 1.0));
+        let mut sp = NGPair::new((CondWrapper::new(Cond::True), Shift::I, 1.0));
 
         let score = sp.eval_mut(&schedule_config.staff, &schedule_config.day, &schedule);
 
@@ -109,7 +109,7 @@ mod tests {
         schedule_config.staff.ng_list.push((0, 1));
         schedule_config.staff.ng_list.push((0, 1));
 
-        let mut sp = NGPair::new((CondWrapper::new(Cond::Every), Shift::I, 1.0));
+        let mut sp = NGPair::new((CondWrapper::new(Cond::True), Shift::I, 1.0));
 
         let score = sp.eval_mut(&schedule_config.staff, &schedule_config.day, &schedule);
 

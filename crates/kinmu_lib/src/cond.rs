@@ -15,29 +15,29 @@ use std::fmt;
 pub enum Cond {
     // 基本条件
     #[default]
-    Every,
+    True,
     Not(Box<Cond>),
     Or((Box<Cond>, Box<Cond>)),
     And((Box<Cond>, Box<Cond>)),
 
     // 日付についての条件
-    DayExceptBuffer,
+    NoBuffer,
     DayInRange((usize, usize)),
-    ParticularDayState(DayState),
+    DayState(DayState),
     BeforeDayState(DayState),
-    ParticularDay(usize),
-    DayList(Vec<usize>),
+    Day(usize),
+    DayInList(Vec<usize>),
 
     // スタッフについての条件
     StaffInRange((usize, usize)),
     StaffWithAttribute((StaffAttributeName, i32)),
-    ParticularStaff(usize),
+    Staff(usize),
 }
 
 impl Cond {
     pub fn eval(&self, staff: usize, day: usize, sc: &StaffConfig, dc: &DayConfig) -> bool {
         match self {
-            Cond::Every => true,
+            Cond::True => true,
             Cond::Not(cond) => !cond.eval(staff, day, sc, dc),
             Cond::Or((cond1, cond2)) => {
                 cond1.eval(staff, day, sc, dc) || cond2.eval(staff, day, sc, dc)
@@ -45,9 +45,9 @@ impl Cond {
             Cond::And((cond1, cond2)) => {
                 cond1.eval(staff, day, sc, dc) && cond2.eval(staff, day, sc, dc)
             }
-            Cond::DayExceptBuffer => dc.buffer_count <= day,
+            Cond::NoBuffer => dc.buffer_count <= day,
             Cond::DayInRange((day_start, day_end)) => *day_start <= day && day <= *day_end,
-            Cond::ParticularDayState(ds) => dc.days[day] == *ds,
+            Cond::DayState(ds) => dc.days[day] == *ds,
             Cond::BeforeDayState(ds) => {
                 if day + 1 >= dc.count {
                     false
@@ -55,15 +55,15 @@ impl Cond {
                     dc.days[day + 1] == *ds
                 }
             }
-            Cond::ParticularDay(d) => *d == day,
-            Cond::DayList(ds) => ds.iter().any(|d| *d == day),
+            Cond::Day(d) => *d == day,
+            Cond::DayInList(ds) => ds.iter().any(|d| *d == day),
             Cond::StaffInRange((staff_start, staff_end)) => {
                 *staff_start <= staff && staff <= *staff_end
             }
             Cond::StaffWithAttribute((attribute, value)) => {
                 sc.get_attribute(staff, attribute) == *value
             }
-            Cond::ParticularStaff(s) => *s == staff,
+            Cond::Staff(s) => *s == staff,
         }
     }
 }
@@ -129,21 +129,21 @@ impl FromConfig for Cond {
         anyhow::ensure!(words.len() >= 2, "Needs 2 fields, but not enough.");
         anyhow::ensure!(2 >= words.len(), "Needs 2 fields, but too much given.");
         match (words[0], words[1]) {
-            ("Every", _) => Ok(Cond::Every),
+            ("True", _) => Ok(Cond::True),
             ("Not", p) => Ok(Cond::Not(Box::new(<Cond>::from_config(p)?))),
             ("Or", p) => Ok(Cond::Or(<(Box<Cond>, Box<Cond>)>::from_config(p)?)),
             ("And", p) => Ok(Cond::And(<(Box<Cond>, Box<Cond>)>::from_config(p)?)),
-            ("DayExceptBuffer", _) => Ok(Cond::DayExceptBuffer),
+            ("NoBuffer", _) => Ok(Cond::NoBuffer),
             ("DayInRange", p) => Ok(Cond::DayInRange(<(usize, usize)>::from_config(p)?)),
-            ("ParticularDayState", p) => Ok(Cond::ParticularDayState(<DayState>::from_config(p)?)),
+            ("DayState", p) => Ok(Cond::DayState(<DayState>::from_config(p)?)),
             ("BeforeDayState", p) => Ok(Cond::BeforeDayState(<DayState>::from_config(p)?)),
-            ("ParticularDay", p) => Ok(Cond::ParticularDay(<usize>::from_config(p)?)),
-            ("DayList", p) => Ok(Cond::DayList(<VecWrapper<usize>>::from_config(p)?.0)),
+            ("Day", p) => Ok(Cond::Day(<usize>::from_config(p)?)),
+            ("DayInList", p) => Ok(Cond::DayInList(<VecWrapper<usize>>::from_config(p)?.0)),
             ("StaffInRange", p) => Ok(Cond::StaffInRange(<(usize, usize)>::from_config(p)?)),
             ("StaffWithAttribute", p) => Ok(Cond::StaffWithAttribute(
                 <(StaffAttributeName, i32)>::from_config(p)?,
             )),
-            ("ParticularStaff", p) => Ok(Cond::ParticularStaff(<usize>::from_config(p)?)),
+            ("Staff", p) => Ok(Cond::Staff(<usize>::from_config(p)?)),
             (s, p) => Err(anyhow::anyhow!("Failed to parse Cond: {} {}", s, p)),
         }
     }
@@ -166,23 +166,23 @@ impl FromConfig for CondWrapper {
 impl Check<StdScoreProp, Shift, ShiftState, DayState> for Cond {
     fn check(&self, schedule_config: &ScheduleConfig) -> anyhow::Result<()> {
         match self {
-            Cond::Every => Ok(()),
+            Cond::True => Ok(()),
             Cond::Not(c) => c.check(schedule_config),
             Cond::Or((c1, c2)) => c1.check(schedule_config).and(c2.check(schedule_config)),
             Cond::And((c1, c2)) => c1.check(schedule_config).and(c2.check(schedule_config)),
 
-            Cond::DayExceptBuffer => Ok(()),
+            Cond::NoBuffer => Ok(()),
             Cond::DayInRange(_) => Ok(()),
-            Cond::ParticularDayState(_) => Ok(()),
+            Cond::DayState(_) => Ok(()),
             Cond::BeforeDayState(_) => Ok(()),
-            Cond::ParticularDay(_) => Ok(()),
-            Cond::DayList(_) => Ok(()),
+            Cond::Day(_) => Ok(()),
+            Cond::DayInList(_) => Ok(()),
 
             Cond::StaffInRange(_) => Ok(()),
             Cond::StaffWithAttribute((sa, _)) => {
                 StaffAttributeNameWrapper(sa).check(schedule_config)
             }
-            Cond::ParticularStaff(_) => Ok(()),
+            Cond::Staff(_) => Ok(()),
         }
         .with_context(|| format!("Cond {:?} の変換チェックに失敗しました", self))?;
         Ok(())

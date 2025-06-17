@@ -360,11 +360,11 @@ mod tests {
 
     #[test]
     fn parse_japanese() {
-        let s = "(DayExceptBuffer (), I, 夜勤, 1000)";
+        let s = "(NoBuffer (), I, 夜勤, 1000)";
         assert_eq!(
             <(String, String, String, i32)>::from_config(s).unwrap(),
             (
-                String::from("DayExceptBuffer ()"),
+                String::from("NoBuffer ()"),
                 String::from("I"),
                 String::from("夜勤"),
                 1000

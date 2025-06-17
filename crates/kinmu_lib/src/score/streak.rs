@@ -101,7 +101,7 @@ mod tests {
         schedule_config.staff.count = schedule.len();
 
         let mut sp = Streak::new((
-            CondWrapper::new(Cond::Every),
+            CondWrapper::new(Cond::True),
             vec![Shift::K, Shift::Y],
             2,
             -1.0,
@@ -125,7 +125,7 @@ mod tests {
         schedule_config.staff.count = schedule.len();
 
         let mut sp = Streak::new((
-            CondWrapper::new(Cond::Every),
+            CondWrapper::new(Cond::True),
             vec![Shift::K, Shift::Y],
             2,
             -1.0,

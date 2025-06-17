@@ -252,11 +252,11 @@ mod tests {
 
     #[test]
     fn score_prop_test() {
-        let s = "PatternGeneral (Every (), [[N,O,H], [O,H], [K, Y]], 123)";
+        let s = "PatternGeneral (True (), [[N,O,H], [O,H], [K, Y]], 123)";
         println!("{:?}", StdScoreProp::from_config(s).unwrap());
         assert_eq!(
             StdScoreProp::PatternGeneral(PatternGeneral::new((
-                CondWrapper::new(Cond::Every),
+                CondWrapper::new(Cond::True),
                 vec![
                     vec![Shift::N, Shift::O, Shift::H],
                     vec![Shift::O, Shift::H],

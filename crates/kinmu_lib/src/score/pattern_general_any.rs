@@ -116,7 +116,7 @@ mod tests {
         schedule_config.staff.count = 1;
 
         let mut sp = PatternGeneralAny::new((
-            CondWrapper::new(Cond::DayExceptBuffer),
+            CondWrapper::new(Cond::NoBuffer),
             vec![vec![Shift::K, Shift::Y], vec![Shift::K, Shift::Y]],
             -1000.0,
         ));
@@ -142,7 +142,7 @@ mod tests {
         schedule_config.staff.count = 1;
 
         let mut sp = PatternGeneralAny::new((
-            CondWrapper::new(Cond::Every),
+            CondWrapper::new(Cond::True),
             vec![vec![Shift::K, Shift::Y], vec![Shift::K, Shift::Y]],
             -1000.0,
         ));
