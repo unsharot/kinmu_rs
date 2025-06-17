@@ -16,6 +16,7 @@ pub enum Cond {
     // 基本条件
     #[default]
     True,
+    False,
     Not(Box<Cond>),
     Or((Box<Cond>, Box<Cond>)),
     And((Box<Cond>, Box<Cond>)),
@@ -38,6 +39,7 @@ impl Cond {
     pub fn eval(&self, staff: usize, day: usize, sc: &StaffConfig, dc: &DayConfig) -> bool {
         match self {
             Cond::True => true,
+            Cond::False => false,
             Cond::Not(cond) => !cond.eval(staff, day, sc, dc),
             Cond::Or((cond1, cond2)) => {
                 cond1.eval(staff, day, sc, dc) || cond2.eval(staff, day, sc, dc)
@@ -130,6 +132,7 @@ impl FromConfig for Cond {
         anyhow::ensure!(2 >= words.len(), "Needs 2 fields, but too much given.");
         match (words[0], words[1]) {
             ("True", _) => Ok(Cond::True),
+            ("False", _) => Ok(Cond::False),
             ("Not", p) => Ok(Cond::Not(Box::new(<Cond>::from_config(p)?))),
             ("Or", p) => Ok(Cond::Or(<(Box<Cond>, Box<Cond>)>::from_config(p)?)),
             ("And", p) => Ok(Cond::And(<(Box<Cond>, Box<Cond>)>::from_config(p)?)),
@@ -167,6 +170,7 @@ impl Check<StdScoreProp, Shift, ShiftState, DayState> for Cond {
     fn check(&self, schedule_config: &ScheduleConfig) -> anyhow::Result<()> {
         match self {
             Cond::True => Ok(()),
+            Cond::False => Ok(()),
             Cond::Not(c) => c.check(schedule_config),
             Cond::Or((c1, c2)) => c1.check(schedule_config).and(c2.check(schedule_config)),
             Cond::And((c1, c2)) => c1.check(schedule_config).and(c2.check(schedule_config)),
