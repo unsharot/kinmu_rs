@@ -27,7 +27,7 @@ impl Fill<StdScoreProp, Shift, ShiftState, DayState> for StdFill {
         match name {
             "no_fill" => Ok(no_fill(schedule_config, &mut rng)),
             "fill_noh" => Ok(fill_noh(schedule_config, &mut rng)),
-            "fill_safe_iak" => Ok(fill_safe_iak(schedule_config, &mut rng)),
+            "fill_iak_safe" => Ok(fill_iak_safe(schedule_config, &mut rng)),
             _ => Err(anyhow::anyhow!("Failed to parse fill function {}", name)),
         }
     }
@@ -140,7 +140,7 @@ fn add_random<R: Rng>(
 /// Absoluteなら埋めない
 /// schedule_configは夜勤の数(IDayCount)と公休の数(KDayCount)を持つ必要がある
 /// 夜勤か公休の数が自由度を超える場合、panicを起こす
-fn fill_safe_iak<R: Rng>(schedule_config: &ScheduleConfig, rng: &mut R) -> Schedule {
+fn fill_iak_safe<R: Rng>(schedule_config: &ScheduleConfig, rng: &mut R) -> Schedule {
     let mut schedule = schedule_config.day.requested_schedule.clone();
     for r in 0..schedule_config.staff.count {
         let mut r_count = 0;
