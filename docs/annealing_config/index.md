@@ -32,11 +32,13 @@ seed = 6554
 焼きなましの更新に用いる更新関数を指定します。
 更新関数は以下の通りです。
 
-- update4: N,O,HをN,O,Hのうちのランダムな要素に入れ替えます。
-- update5: 夜勤と公休をランダムに移動します。夜勤の数や公休の数は維持されます。
+- update_iaknoh_repeat: ランダムな枠をI,A,K,N,O,Hのうちのランダムな要素に入れ替えます。
+- update_iaknoh: ランダムな枠をI,A,K,N,O,Hのうちのランダムな要素に入れ替えます。希望により、変更が無効になる可能性があります。
+- update_noh_repeat: N,O,HをN,O,Hのうちのランダムな要素に入れ替えます。
+- update_iak_safe: 夜勤と公休をランダムに移動します。夜勤の数や公休の数は維持されます。
 
 ```toml
-update_function = "update5"
+update_function = "update_iak_safe"
 ```
 
 ## temp

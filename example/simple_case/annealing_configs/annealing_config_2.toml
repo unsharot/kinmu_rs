@@ -17,7 +17,7 @@ score_functions = [
 ]
 
 # 更新に用いる関数
-update_function = "update1"
+update_function = "update_iaknoh_repeat"
 
 # 焼きなましの温度を指定
 temp = {max = 10000, min = 0}

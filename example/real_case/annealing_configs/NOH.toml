@@ -66,6 +66,6 @@ score_functions = [
 
 ]
 
-update_function = "update4"
+update_function = "update_noh_repeat"
 
 temp = {max = 10000, min = 0}

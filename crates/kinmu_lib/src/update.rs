@@ -21,17 +21,17 @@ impl Update<StdScoreProp, Shift, ShiftState, DayState> for StdUpdate {
     ) -> anyhow::Result<Box<dyn FnMut(&Schedule, &mut R) -> Schedule + 'a>> {
         let schedule_state = &schedule_config.day.schedule_states;
         match name {
-            "update1" => Ok(Box::new(move |schedule, rng| {
-                update_randomly1(schedule_config, schedule_state, schedule, rng)
+            "update_iaknoh_repeat" => Ok(Box::new(move |schedule, rng| {
+                update_iaknoh_repeat(schedule_config, schedule_state, schedule, rng)
             })),
-            "update2" => Ok(Box::new(move |schedule, rng| {
-                update_randomly2(schedule_config, schedule_state, schedule, rng)
+            "update_iaknoh" => Ok(Box::new(move |schedule, rng| {
+                update_iaknoh(schedule_config, schedule_state, schedule, rng)
             })),
-            "update4" => Ok(Box::new(move |schedule, rng| {
-                update_randomly4(schedule_config, schedule_state, schedule, rng)
+            "update_noh_repeat" => Ok(Box::new(move |schedule, rng| {
+                update_noh_repeat(schedule_config, schedule_state, schedule, rng)
             })),
-            "update5" => Ok(Box::new(move |schedule, rng| {
-                update_randomly5(schedule_config, schedule_state, schedule, rng)
+            "update_iak_safe" => Ok(Box::new(move |schedule, rng| {
+                update_iak_safe(schedule_config, schedule_state, schedule, rng)
             })),
             _ => Err(anyhow::anyhow!(
                 "Failed to generate update function {}",
@@ -43,7 +43,7 @@ impl Update<StdScoreProp, Shift, ShiftState, DayState> for StdUpdate {
 
 /// ランダムな1つの枠をランダムな枠に変える
 /// Absoluteの場合繰り返す
-fn update_randomly1<R: Rng>(
+fn update_iaknoh_repeat<R: Rng>(
     schedule_config: &ScheduleConfig,
     schedule_state: &ScheduleState,
     schedule: &Schedule,
@@ -57,12 +57,12 @@ fn update_randomly1<R: Rng>(
             [Shift::N, Shift::K, Shift::I, Shift::A, Shift::O, Shift::H][rng.gen_range(0..6)];
         new_schedule
     } else {
-        update_randomly1(schedule_config, schedule_state, schedule, rng)
+        update_iaknoh_repeat(schedule_config, schedule_state, schedule, rng)
     }
 }
 
 /// ランダムな1つの枠をランダムな枠に変える
-fn update_randomly2<R: Rng>(
+fn update_iaknoh<R: Rng>(
     schedule_config: &ScheduleConfig,
     schedule_state: &ScheduleState,
     schedule: &Schedule,
@@ -79,7 +79,7 @@ fn update_randomly2<R: Rng>(
 }
 
 /// ランダムな1つの枠をN,O,Hのうちランダムな枠に変える Absoluteなら繰り返す
-fn update_randomly4<R: Rng>(
+fn update_noh_repeat<R: Rng>(
     schedule_config: &ScheduleConfig,
     schedule_state: &ScheduleState,
     schedule: &Schedule,
@@ -97,27 +97,26 @@ fn update_randomly4<R: Rng>(
         new_schedule[rx][ry] = [Shift::N, Shift::O, Shift::H][rng.gen_range(0..3)];
         new_schedule
     } else {
-        update_randomly4(schedule_config, schedule_state, schedule, rng)
+        update_noh_repeat(schedule_config, schedule_state, schedule, rng)
         // 合わない場合表を何個も生成することになる
         // 更新確率をpとすると、更新に必要な平均の呼び出し回数は1/p回なのでそれほど問題はない
         // むしろ何も更新せずに評価するほうが問題
     }
 }
 
-/*
-各行について
-1.  Iが入っていることを確認
-2.  ランダムなIを取り除き、Nを代わりに置く
-3.  孤立したAを取り除き、Nを代わりに置く
-4.  ランダムなKを取り除き、Nを代わりに置く
-5.  ランダムなNをIで置き換える
-6.  Aを必要なら追加する (適当なものを置き換える あらゆる可能性あり)
-7.  ランダムなNをKで置き換える
-8.  K,Iの数が変わっていないことを確かめる
-9.  Iの後にAが来ているか調べる
-10. Absoluteが動いていないか調べる
-*/
+// 各行について
+// 1.  Iが入っていることを確認
+// 2.  ランダムなIを取り除き、Nを代わりに置く
+// 3.  孤立したAを取り除き、Nを代わりに置く
+// 4.  ランダムなKを取り除き、Nを代わりに置く
+// 5.  ランダムなNをIで置き換える
+// 6.  Aを必要なら追加する (適当なものを置き換える あらゆる可能性あり)
+// 7.  ランダムなNをKで置き換える
+// 8.  K,Iの数が変わっていないことを確かめる
+// 9.  Iの後にAが来ているか調べる
+// 10. Absoluteが動いていないか調べる
 
+/// 指定したシフトが指定した行にいくつ含まれるか
 macro_rules! count_waku_row {
     ($shift:expr, $schedule_config: expr, $schedule:expr, $r:expr) => {{
         let mut count: isize = 0;
@@ -130,6 +129,7 @@ macro_rules! count_waku_row {
     }};
 }
 
+/// 指定したシフトをランダムにNに変える
 fn remove_random<R: Rng>(
     shift: Shift,
     schedule_config: &ScheduleConfig,
@@ -147,6 +147,7 @@ fn remove_random<R: Rng>(
     new_schedule[r][is[rnd]] = Shift::N;
 }
 
+/// ランダムなNを指定したシフトに変更する
 fn add_random<R: Rng>(
     shift: Shift,
     schedule_config: &ScheduleConfig,
@@ -164,6 +165,8 @@ fn add_random<R: Rng>(
     new_schedule[r][is[rnd]] = shift;
 }
 
+/// IAKが連続で出現しているなら0.0
+/// どこかで崩れているならその分ペナルティを返す
 fn iak_renzoku(
     schedule_config: &ScheduleConfig,
     schedule: &Schedule,
@@ -185,6 +188,7 @@ fn iak_renzoku(
     ans
 }
 
+/// Iの後に来ないAをNで置き換える
 fn remove_improper_a(schedule_config: &ScheduleConfig, new_schedule: &mut Schedule, r: usize) {
     for c in schedule_config.day.buffer_count..schedule_config.day.count {
         if new_schedule[r][c] == Shift::A && new_schedule[r][c - 1] != Shift::I {
@@ -193,6 +197,7 @@ fn remove_improper_a(schedule_config: &ScheduleConfig, new_schedule: &mut Schedu
     }
 }
 
+/// Iの後にAがない場合、それをAにする
 fn add_proper_a(schedule_config: &ScheduleConfig, new_schedule: &mut Schedule, r: usize) {
     for c in schedule_config.day.buffer_count..schedule_config.day.count {
         if new_schedule[r][c] != Shift::A && new_schedule[r][c - 1] == Shift::I {
@@ -203,7 +208,7 @@ fn add_proper_a(schedule_config: &ScheduleConfig, new_schedule: &mut Schedule, r
 
 /// IAKを破壊せずに入れ替える
 /// 前提として、Absolute以外はI,A,K,Nで、AbsoluteでないO,Hはないことが条件
-fn update_randomly5<R: Rng>(
+fn update_iak_safe<R: Rng>(
     schedule_config: &ScheduleConfig,
     schedule_state: &ScheduleState,
     schedule: &Schedule,

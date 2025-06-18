@@ -4,6 +4,6 @@ step_count = 10000
 
 score_functions = []
 
-update_function = "update5"
+update_function = "update_iak_safe"
 
 temp = {max = 0, min = 0}
