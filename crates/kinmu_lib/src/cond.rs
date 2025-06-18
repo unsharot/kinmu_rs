@@ -20,6 +20,8 @@ pub enum Cond {
     Not(Box<Cond>),
     Or((Box<Cond>, Box<Cond>)),
     And((Box<Cond>, Box<Cond>)),
+    Any(Vec<Cond>),
+    All(Vec<Cond>),
 
     // 日付についての条件
     Day(usize),
@@ -47,6 +49,8 @@ impl Cond {
             Cond::And((cond1, cond2)) => {
                 cond1.eval(staff, day, sc, dc) && cond2.eval(staff, day, sc, dc)
             }
+            Cond::Any(cs) => cs.iter().any(|c| c.eval(staff, day, sc, dc)),
+            Cond::All(cs) => cs.iter().all(|c| c.eval(staff, day, sc, dc)),
 
             Cond::Day(d) => *d == day,
             Cond::DayInRange((day_start, day_end)) => *day_start <= day && day <= *day_end,
@@ -138,6 +142,8 @@ impl FromConfig for Cond {
             ("Not", p) => Ok(Cond::Not(Box::new(<Cond>::from_config(p)?))),
             ("Or", p) => Ok(Cond::Or(<(Box<Cond>, Box<Cond>)>::from_config(p)?)),
             ("And", p) => Ok(Cond::And(<(Box<Cond>, Box<Cond>)>::from_config(p)?)),
+            ("Any", p) => Ok(Cond::Any(<VecWrapper<Cond>>::from_config(p)?.0)),
+            ("All", p) => Ok(Cond::All(<VecWrapper<Cond>>::from_config(p)?.0)),
 
             ("Day", p) => Ok(Cond::Day(<usize>::from_config(p)?)),
             ("DayInRange", p) => Ok(Cond::DayInRange(<(usize, usize)>::from_config(p)?)),
@@ -178,6 +184,8 @@ impl Check<StdScoreProp, Shift, ShiftState, DayState> for Cond {
             Cond::Not(c) => c.check(schedule_config),
             Cond::Or((c1, c2)) => c1.check(schedule_config).and(c2.check(schedule_config)),
             Cond::And((c1, c2)) => c1.check(schedule_config).and(c2.check(schedule_config)),
+            Cond::Any(cs) => cs.iter().try_for_each(|_| Ok(())),
+            Cond::All(cs) => cs.iter().try_for_each(|_| Ok(())),
 
             Cond::Day(_) => Ok(()),
             Cond::DayInRange(_) => Ok(()),
