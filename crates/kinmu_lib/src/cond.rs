@@ -222,6 +222,9 @@ mod tests {
 
     use super::*;
 
+    /// 表の全ての判定結果が同じになるようなCondにをテストする
+    /// propsはstaff_count, day_count, staff_config, day_configのタプル
+    /// propsは可読性のためにまとめた
     macro_rules! test_all {
         ($ans:expr,$cond:expr,$props:expr) => {
             for s in 0..$props.0 {
@@ -232,9 +235,9 @@ mod tests {
         };
     }
 
-    // 基本的なCondのテスト
+    /// 基本的なCondのテスト
     #[test]
-    fn test_cond() {
+    fn test_basic_cond() {
         let staff_count: usize = 2;
         let day_count: usize = 2;
         let sc = StaffConfig {
