@@ -26,19 +26,24 @@ impl Fill<StdScoreProp, Shift, ShiftState, DayState> for StdFill {
     ) -> anyhow::Result<Schedule> {
         match name {
             "no_fill" => Ok(no_fill(schedule_config, &mut rng)),
-            "fill1" => Ok(fill_randomly1(schedule_config, &mut rng)),
-            "fill2" => Ok(fill_randomly2(schedule_config, &mut rng)),
+            "fill_noh" => Ok(fill_noh(schedule_config, &mut rng)),
+            "fill_safe_iak" => Ok(fill_safe_iak(schedule_config, &mut rng)),
             _ => Err(anyhow::anyhow!("Failed to parse fill function {}", name)),
         }
     }
 }
 
+/// 表を埋めない
+/// 変更なし
 fn no_fill<R: Rng>(schedule_config: &ScheduleConfig, _rng: &mut R) -> Schedule {
     schedule_config.day.requested_schedule.clone()
 }
 
+/// 表をN, O, Hのいずれかでランダムに埋める
+/// Uになっている枠のみ埋める
+/// Absoluteなら埋めない
 #[allow(clippy::needless_range_loop)]
-fn fill_randomly1<R: Rng>(schedule_config: &ScheduleConfig, rng: &mut R) -> Schedule {
+fn fill_noh<R: Rng>(schedule_config: &ScheduleConfig, rng: &mut R) -> Schedule {
     let mut schedule = schedule_config.day.requested_schedule.clone();
     for r in 0..schedule_config.staff.count {
         for c in schedule_config.day.buffer_count..schedule_config.day.count {
@@ -52,17 +57,16 @@ fn fill_randomly1<R: Rng>(schedule_config: &ScheduleConfig, rng: &mut R) -> Sche
     schedule
 }
 
-/*
-fill2のアルゴリズム
-1.  Randomの場所をIAKのパターンで埋め、残りはNで埋める
-2.  指定されたIと今埋まっているIの差分を計算
-3.  余分なIをランダムに消す
-4.  孤立したAを消す
-5.  指定されたKと今埋まっているKの差分を計算
-6.  不足したKをランダムに足す
-7.  余分なKを孤立したものを優先にランダムに消す
-*/
+// fill2のアルゴリズム
+// 1. Randomの場所をIAKのパターンで埋め、残りはNで埋める
+// 2. 指定されたIと今埋まっているIの差分を計算
+// 3. 余分なIをランダムに消す
+// 4. 孤立したAを消す
+// 5. 指定されたKと今埋まっているKの差分を計算
+// 6. 不足したKをランダムに足す
+// 7. 余分なKを孤立したものを優先にランダムに消す
 
+/// 指定したシフトが指定した行にいくつ含まれるか
 macro_rules! count_waku_row {
     ($shift:expr, $schedule_config: expr, $schedule:expr, $r:expr) => {{
         let mut count = 0;
@@ -75,6 +79,7 @@ macro_rules! count_waku_row {
     }};
 }
 
+/// 指定したシフトをランダムにNに変える
 fn remove_random<R: Rng>(
     shift: Shift,
     schedule_config: &ScheduleConfig,
@@ -94,6 +99,9 @@ fn remove_random<R: Rng>(
     new_schedule[r][is[rnd]] = Shift::N;
 }
 
+/// 孤立したAをNで置き換える
+/// IAのパターンを守るため
+/// KAのようになっているAをKNに変える
 fn remove_improper_a(schedule_config: &ScheduleConfig, new_schedule: &mut Schedule, r: usize) {
     for c in schedule_config.day.buffer_count..schedule_config.day.count {
         if new_schedule[r][c] == Shift::A
@@ -105,6 +113,7 @@ fn remove_improper_a(schedule_config: &ScheduleConfig, new_schedule: &mut Schedu
     }
 }
 
+/// ランダムな場所に指定したシフトを追加する
 fn add_random<R: Rng>(
     shift: Shift,
     schedule_config: &ScheduleConfig,
@@ -124,7 +133,14 @@ fn add_random<R: Rng>(
     new_schedule[r][is[rnd]] = shift;
 }
 
-fn fill_randomly2<R: Rng>(schedule_config: &ScheduleConfig, rng: &mut R) -> Schedule {
+/// 適切な夜勤の数で表を埋める
+/// IAKの順番を守る
+/// 夜勤の数や公休の数は指定された数通りになる
+/// Uになっている枠のみ埋める
+/// Absoluteなら埋めない
+/// schedule_configは夜勤の数(IDayCount)と公休の数(KDayCount)を持つ必要がある
+/// 夜勤か公休の数が自由度を超える場合、panicを起こす
+fn fill_safe_iak<R: Rng>(schedule_config: &ScheduleConfig, rng: &mut R) -> Schedule {
     let mut schedule = schedule_config.day.requested_schedule.clone();
     for r in 0..schedule_config.staff.count {
         let mut r_count = 0;

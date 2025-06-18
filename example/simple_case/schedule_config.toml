@@ -65,7 +65,7 @@ attributes = [
 [fill]
 
 # fillに用いる関数
-function = "fill1"
+function = "fill_noh"
 
 # fillに用いる乱数シード値
 # 指定する場合、有効化する
