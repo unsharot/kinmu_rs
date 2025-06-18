@@ -213,3 +213,119 @@ impl Check<StdScoreProp, Shift, ShiftState, DayState> for CondWrapper {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::collections::HashMap;
+
+    use kinmu_model::{Staff, StaffAttributeNameIndexMap};
+
+    use super::*;
+
+    macro_rules! test_all {
+        ($ans:expr,$cond:expr,$props:expr) => {
+            for s in 0..$props.0 {
+                for d in 0..$props.1 {
+                    assert_eq!($ans, $cond.eval(s, d, &$props.2, &$props.3));
+                }
+            }
+        };
+    }
+
+    // 基本的なCondのテスト
+    #[test]
+    fn test_cond() {
+        let staff_count: usize = 2;
+        let day_count: usize = 2;
+        let sc = StaffConfig {
+            attribute_map: StaffAttributeNameIndexMap {
+                names: vec![String::from("職員A")],
+                name_to_index: HashMap::from([(String::from("職員A"), 0)]),
+            },
+            list: vec![Staff {
+                name: String::from("職員A"),
+                attributes: vec![],
+            }],
+            ng_list: vec![],
+            count: 1,
+        };
+        let dc = DayConfig {
+            count: 2,
+            buffer_count: 0,
+            days: vec![DayState::Holiday, DayState::Weekday],
+            requested_schedule: Default::default(),
+            schedule_states: Default::default(),
+            attributes: HashMap::new(),
+        };
+        let props = (staff_count, day_count, sc, dc);
+
+        // Trueのテスト
+        test_all!(true, Cond::True, props);
+
+        // Falseのテスト
+        test_all!(false, Cond::False, props);
+
+        // Notのテスト
+        test_all!(false, Cond::Not(Box::new(Cond::True)), props);
+        test_all!(true, Cond::Not(Box::new(Cond::False)), props);
+
+        // Orのテスト
+        test_all!(
+            true,
+            Cond::Or((Box::new(Cond::False), Box::new(Cond::True))),
+            props
+        );
+        test_all!(
+            false,
+            Cond::Or((Box::new(Cond::False), Box::new(Cond::False))),
+            props
+        );
+
+        // Andのテスト
+        test_all!(
+            false,
+            Cond::And((Box::new(Cond::False), Box::new(Cond::False))),
+            props
+        );
+        test_all!(
+            false,
+            Cond::And((Box::new(Cond::True), Box::new(Cond::False))),
+            props
+        );
+        test_all!(
+            true,
+            Cond::And((Box::new(Cond::True), Box::new(Cond::True))),
+            props
+        );
+
+        // Anyのテスト
+        test_all!(false, Cond::Any(vec![]), props);
+        test_all!(false, Cond::Any(vec![Cond::False]), props);
+        test_all!(true, Cond::Any(vec![Cond::True]), props);
+        test_all!(
+            true,
+            Cond::Any(vec![Cond::False, Cond::True, Cond::False]),
+            props
+        );
+        test_all!(
+            false,
+            Cond::Any(vec![Cond::False, Cond::False, Cond::False]),
+            props
+        );
+
+        // Allのテスト
+        test_all!(true, Cond::All(vec![]), props);
+        test_all!(false, Cond::All(vec![Cond::False]), props);
+        test_all!(true, Cond::All(vec![Cond::True]), props);
+        test_all!(
+            true,
+            Cond::All(vec![Cond::True, Cond::True, Cond::True]),
+            props
+        );
+        test_all!(
+            false,
+            Cond::All(vec![Cond::False, Cond::True, Cond::False]),
+            props
+        );
+    }
+}
