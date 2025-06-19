@@ -6,7 +6,7 @@ pub struct RawAnnealingConfig {
     pub seed: Option<u64>,
     pub score_functions: Vec<RawAnnealingScoreFunction>,
     pub update_function: String,
-    pub temp: RawTempKey,
+    pub temperature: RawTemperatureKey,
 }
 
 #[derive(Debug, serde::Deserialize)]
@@ -15,7 +15,7 @@ pub struct RawAnnealingScoreFunction {
 }
 
 #[derive(Debug, serde::Deserialize)]
-pub struct RawTempKey {
-    pub max: f32,
-    pub min: f32,
+pub struct RawTemperatureKey {
+    pub begin: f32,
+    pub end: f32,
 }

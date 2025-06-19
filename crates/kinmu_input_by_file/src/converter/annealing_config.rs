@@ -22,8 +22,8 @@ pub fn convert_annealing_config<SP: FromConfig + Clone>(
             .collect::<anyhow::Result<Vec<Vec<SP>>>>()?
             .concat(),
         update_func: config.update_function,
-        max_temp: config.temp.max,
-        min_temp: config.temp.min,
+        max_temp: config.temperature.begin,
+        min_temp: config.temperature.end,
     };
 
     Ok(ac)

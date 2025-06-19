@@ -115,4 +115,4 @@ score_functions = [
 
 update_function = "update_iak_safe"
 
-temp = {max = 10000, min = 0}
+temperature = {begin = 10000, end = 0}

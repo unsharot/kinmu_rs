@@ -6,4 +6,4 @@ score_functions = []
 
 update_function = "update_iak_safe"
 
-temp = {max = 0, min = 0}
+temperature = {begin = 0, end = 0}

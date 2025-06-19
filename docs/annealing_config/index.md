@@ -46,5 +46,5 @@ update_function = "update_iak_safe"
 序盤に許容するスコアの悪化幅を指定するとよいでしょう。
 
 ```toml
-temp = {max = 25, min = 0}
+temperature = {begin = 25, end = 0}
 ```
