@@ -262,9 +262,8 @@ score_functions = [
 "StaffCount (NoBuffer (), U, 0, 100000)",
 ],filter={low_pass=0}},
 
-# 実際の日付は 3,5,8,12
 {display_name = "職員Gが指定された日で夜勤しない", scores = [
-"StaffCount (And (Staff 6, DayInList [5,7,10,14]), I, 0, 10000)",
+"StaffCount (And (Staff 6, DayInList [3,5,8,12]), I, 0, 10000)",
 ],filter={low_pass=0}},
 
 ]

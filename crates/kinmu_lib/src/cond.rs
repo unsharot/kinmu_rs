@@ -52,9 +52,11 @@ impl Cond {
             Cond::Any(cs) => cs.iter().any(|c| c.eval(staff, day, sc, dc)),
             Cond::All(cs) => cs.iter().all(|c| c.eval(staff, day, sc, dc)),
 
-            Cond::Day(d) => *d == day,
-            Cond::DayInRange((day_start, day_end)) => *day_start <= day && day <= *day_end,
-            Cond::DayInList(ds) => ds.iter().any(|d| *d == day),
+            Cond::Day(d) => *d + dc.buffer_count + 1 == day,
+            Cond::DayInRange((day_start, day_end)) => {
+                *day_start + dc.buffer_count + 1 <= day && day <= *day_end + dc.buffer_count + 1
+            }
+            Cond::DayInList(ds) => ds.iter().any(|d| *d + dc.buffer_count + 1 == day),
             Cond::NoBuffer => dc.buffer_count <= day,
             Cond::DayState(ds) => dc.days[day] == *ds,
             Cond::BeforeDayState(ds) => {
