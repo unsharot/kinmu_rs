@@ -272,7 +272,7 @@ config_paths = [
 焼きなまし終了後、結果を表示する際に用いるスコアを列挙します。
 いくつかのスコアをまとめて、最終的に一つの値で表示します。
 display_nameには表示名、scoresにはスコアの名前と、そのスコアに用いるパラメータを任意の数指定します。
-filterは任意で、任意の有理数パラメータlow_passとhigh_passを持ちます。low_passが設定されている場合、まとめたスコアの計算結果が設定したスコアを越えるなら結果表示の際に横に`[warning]`と表示されます。
+warningは任意で、任意の有理数パラメータmin_passとmax_passを持ちます。min_passが設定されている場合、まとめたスコアの計算結果が設定したスコアを越えるなら結果表示の際に横に`[warning]`と表示されます。
 スコアは以下のとおりです。
 
 | Prop名                       | 引数の型                                    | 説明                                                                                                    |
@@ -333,7 +333,7 @@ score_functions = [
    {display_name = "夜勤の禁止パターン", scores = [
       "PatternGeneral (True (), [[I], [N,O,H,I,K,Y]], 1000)",
       "PatternGeneral (True (), [[A], [N,O,H,I,A]], 1000)"
-   ], filter = {low_pass = 1000}},
+   ], warning = {min_pass = 1000}},
    {display_name = "望ましいパターン", scores = [
       "PatternFixed (True (), [K,I], 100)",
       "PatternFixed (True (), [Y,I], 100)",
