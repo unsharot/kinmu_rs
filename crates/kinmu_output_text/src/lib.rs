@@ -118,13 +118,13 @@ where
                 model,
             );
             let mut ok = true;
-            if let Some(f) = &sf.filter {
-                if let Some(h) = f.high_pass {
+            if let Some(f) = &sf.warning {
+                if let Some(h) = f.max_pass {
                     if s < h {
                         ok = false;
                     }
                 }
-                if let Some(l) = f.low_pass {
+                if let Some(l) = f.min_pass {
                     if l < s {
                         ok = false;
                     }

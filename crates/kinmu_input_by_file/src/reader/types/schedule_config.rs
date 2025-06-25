@@ -66,11 +66,11 @@ pub struct RawResultTable {
 pub struct RawResultScoreFunction {
     pub display_name: String,
     pub scores: Vec<String>,
-    pub filter: Option<RawScoreFilter>,
+    pub warning: Option<RawScoreWarning>,
 }
 
 #[derive(Debug, serde::Deserialize)]
-pub struct RawScoreFilter {
-    pub low_pass: Option<Score>,
-    pub high_pass: Option<Score>,
+pub struct RawScoreWarning {
+    pub min_pass: Option<Score>,
+    pub max_pass: Option<Score>,
 }

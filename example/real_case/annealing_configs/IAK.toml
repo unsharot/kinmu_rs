@@ -39,11 +39,11 @@ score_functions = [
 
 {display_name = "2連休が必要", scores = [
 "PatternGeneralAny (True (), [[K,Y], [K,Y]], -1000)",
-], filter = {low_pass = -12000}},
+], warning = {min_pass = -12000}},
 
 {display_name = "2連休が必要(バッファーなし)", scores = [
 "PatternGeneralAny (NoBuffer (), [[K,Y], [K,Y]], -1000)",
-], filter = {low_pass = -12000}},
+], warning = {min_pass = -12000}},
 
 {display_name = "NG", scores = [
 "NGPair (NoBuffer (), I, 1000)",
@@ -55,7 +55,7 @@ score_functions = [
 
 {display_name = "夜勤のスタッフ数", scores = [
 "StaffCountRegardDayAttribute (NoBuffer (), I, IStaffCount, 100)",
-],filter={low_pass=140000}},
+],warning={min_pass=140000}},
 
 {display_name = "フロのスタッフ数", scores = [
 "StaffCount (And (NoBuffer (), DayState B), N, 5, 5)",
@@ -79,36 +79,36 @@ score_functions = [
 
 {display_name = "一人夜勤のチェック", scores = [
 "StaffCountWithPremise (NoBuffer (), I, 1, And (NoBuffer (), StaffWithAttribute (IAloneAbility, 1)), I, 1, 100)",
-],filter={low_pass=0}},
+],warning={min_pass=0}},
 
 {display_name = "フロ前に一人夜勤を入れない", scores = [
 "StaffCount (And (BeforeDayState B, NoBuffer ()), I, 2, 100)",
-],filter={low_pass=0}},
+],warning={min_pass=0}},
 
 {display_name = "OHできる人が2人いるか", scores = [
 "StaffCount (And (StaffWithAttribute (OHAbility, 1), NoBuffer ()), N, 2, 50)",
-],filter={low_pass=0}},
+],warning={min_pass=0}},
 
 {display_name = "同じペアに3回以上ならない", scores = [
 "NoSamePair (NoBuffer (), 3, I, 1000)",
-],filter={low_pass=0}},
+],warning={min_pass=0}},
 
 {display_name = "同じペアに2回以上ならない", scores = [
 "NoSamePair (NoBuffer (), 2, I, 500)",
-],filter={low_pass=0}},
+],warning={min_pass=0}},
 
 
 {display_name = "土日祝休みの人が土日祝休んでいるか", scores = [
 "StaffCount (And (StaffInRange (10, 12), DayState H), K, 3, 10000)",
-],filter={low_pass=0}},
+],warning={min_pass=0}},
 
 {display_name = "職員Lが3連勤に収まっているか", scores = [
 "Streak (Staff 11, [N], 4, 1000)",
-],filter={low_pass=0}},
+],warning={min_pass=0}},
 
 {display_name = "職員Gが指定された日で夜勤しない", scores = [
 "StaffCount (And (Staff 6, DayInList [3,5,8,12]), I, 0, 10000)",
-],filter={low_pass=0}},
+],warning={min_pass=0}},
 
 ]
 

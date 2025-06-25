@@ -24,14 +24,14 @@ pub struct ResultConfig<SP> {
 pub struct ScoreFunction<SP> {
     pub display_name: String,
     pub scores: Vec<SP>,
-    pub filter: Option<ScoreFilter>,
+    pub warning: Option<ScoreWarning>,
 }
 
-/// 結果で用いるスコアのフィルター
+/// 結果で用いるスコアの警告のしきい値
 #[derive(Clone, Debug, Default)]
-pub struct ScoreFilter {
-    pub low_pass: Option<Score>,
-    pub high_pass: Option<Score>,
+pub struct ScoreWarning {
+    pub min_pass: Option<Score>,
+    pub max_pass: Option<Score>,
 }
 
 /// スタッフに関するConfig

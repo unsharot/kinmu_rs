@@ -7,7 +7,7 @@ use anyhow::Context;
 use super::super::reader::types::{RawAttributeTable, RawScheduleConfig};
 use kinmu_model::{
     DayAttributeName, DayConfig, FillConfig, ResultConfig, Schedule, ScheduleConfig, ScheduleState,
-    ScoreFilter, ScoreFunction, Staff, StaffAttributeNameIndexMap, StaffConfig,
+    ScoreFunction, ScoreWarning, Staff, StaffAttributeNameIndexMap, StaffConfig,
 };
 
 use super::util::parser::*;
@@ -81,9 +81,9 @@ pub fn convert_schedule_config<SP: FromConfig, S: FromConfig + MapState<SS>, SS,
                             format!("Failed to parse score_function named {}", &sf.display_name)
                         })?,
                     display_name: sf.display_name,
-                    filter: sf.filter.map(|f| ScoreFilter {
-                        low_pass: f.low_pass,
-                        high_pass: f.high_pass,
+                    warning: sf.warning.map(|f| ScoreWarning {
+                        min_pass: f.min_pass,
+                        max_pass: f.max_pass,
                     }),
                 })
             })
