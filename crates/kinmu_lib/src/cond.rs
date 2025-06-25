@@ -52,11 +52,25 @@ impl Cond {
             Cond::Any(cs) => cs.iter().any(|c| c.eval(staff, day, sc, dc)),
             Cond::All(cs) => cs.iter().all(|c| c.eval(staff, day, sc, dc)),
 
-            Cond::Day(d) => *d + dc.buffer_count + 1 == day,
-            Cond::DayInRange((day_start, day_end)) => {
-                *day_start + dc.buffer_count + 1 <= day && day <= *day_end + dc.buffer_count + 1
+            Cond::Day(d) => {
+                // dはbufferを除いて1-indexedになっている
+                // このためbufferを含めた0-indexedに戻して比較
+                let di = *d + dc.buffer_count + 1;
+                di == day
             }
-            Cond::DayInList(ds) => ds.iter().any(|d| *d + dc.buffer_count + 1 == day),
+            Cond::DayInRange((day_start, day_end)) => {
+                // day_start, day_endはbufferを除いて1-indexedになっている
+                // このためbufferを含めた0-indexedに戻して比較
+                let di_start = *day_start + dc.buffer_count + 1;
+                let di_end = *day_end + dc.buffer_count + 1;
+                di_start <= day && day <= di_end
+            }
+            Cond::DayInList(ds) => ds.iter().any(|d| {
+                // dはbufferを除いて1-indexedになっている
+                // このためbufferを含めた0-indexedに戻して比較
+                let di = *d + dc.buffer_count + 1;
+                di == day
+            }),
             Cond::NoBuffer => dc.buffer_count <= day,
             Cond::DayState(ds) => dc.days[day] == *ds,
             Cond::BeforeDayState(ds) => {
