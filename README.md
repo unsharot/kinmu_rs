@@ -101,8 +101,8 @@ Windowsの場合、出力先の指定にパイプラインを用いると文字�
 HTMLの出力では、tableを用いて出力されます。結果を印刷したい場合に活用してください。
 
 ```sh
-# output.htmlにhtmlを出力します。
-# 出力されたファイルはブラウザで開いてください。
+# output.htmlにhtmlを出力
+# 出力されたファイルはブラウザで開く
 ./kinmu.exe --html -o output.html
 ```
 
@@ -252,11 +252,11 @@ use kinmu::macros::ScoreProp;
 use crate::your_module::YourSP;
 
 #[derive(ScoreProp)]
-// ScorePropに用いる型引数を指定します。
+// ScorePropに用いる型引数を指定
 #[score_prop(<Shift, ShiftState, DayState>)]
 enum NewScoreProp {
    Std(StdScoreProp),
-   // YourSPはScorePropを実装している必要があります。
+   // YourSPはScorePropを実装している必要がある
    New(YourSP),
 }
 ```
