@@ -347,4 +347,49 @@ mod tests {
             props
         );
     }
+
+    /// 日付に関するCondのテスト
+    #[test]
+    fn test_day_conds() {
+        let staff_count: usize = 1;
+        let day_count: usize = 6;
+        let sc = StaffConfig {
+            attribute_map: Default::default(),
+            list: Default::default(),
+            ng_list: Default::default(),
+            count: staff_count,
+        };
+        let dc = DayConfig {
+            count: day_count,
+            buffer_count: 3,
+            days: Default::default(),
+            requested_schedule: Default::default(),
+            schedule_states: Default::default(),
+            attributes: HashMap::new(),
+        };
+
+        // Dayがbufferを除いて1-indexedになっている
+        assert_eq!(Cond::Day(2).eval(0, 0, &sc, &dc), false);
+        assert_eq!(Cond::Day(2).eval(0, 1, &sc, &dc), false);
+        assert_eq!(Cond::Day(2).eval(0, 2, &sc, &dc), false);
+        assert_eq!(Cond::Day(2).eval(0, 3, &sc, &dc), false);
+        assert_eq!(Cond::Day(2).eval(0, 4, &sc, &dc), true);
+        assert_eq!(Cond::Day(2).eval(0, 5, &sc, &dc), false);
+
+        // DayInRangeがbufferを除いて1-indexedになっている
+        assert_eq!(Cond::DayInRange((1, 2)).eval(0, 0, &sc, &dc), false);
+        assert_eq!(Cond::DayInRange((1, 2)).eval(0, 1, &sc, &dc), false);
+        assert_eq!(Cond::DayInRange((1, 2)).eval(0, 2, &sc, &dc), false);
+        assert_eq!(Cond::DayInRange((1, 2)).eval(0, 3, &sc, &dc), true);
+        assert_eq!(Cond::DayInRange((1, 2)).eval(0, 4, &sc, &dc), true);
+        assert_eq!(Cond::DayInRange((1, 2)).eval(0, 5, &sc, &dc), false);
+
+        // DayInListがbufferを除いて1-indexedになっている
+        assert_eq!(Cond::DayInList(vec![1, 3]).eval(0, 0, &sc, &dc), false);
+        assert_eq!(Cond::DayInList(vec![1, 3]).eval(0, 1, &sc, &dc), false);
+        assert_eq!(Cond::DayInList(vec![1, 3]).eval(0, 2, &sc, &dc), false);
+        assert_eq!(Cond::DayInList(vec![1, 3]).eval(0, 3, &sc, &dc), true);
+        assert_eq!(Cond::DayInList(vec![1, 3]).eval(0, 4, &sc, &dc), false);
+        assert_eq!(Cond::DayInList(vec![1, 3]).eval(0, 5, &sc, &dc), true);
+    }
 }
