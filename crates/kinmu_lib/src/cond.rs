@@ -238,7 +238,7 @@ mod tests {
 
     use super::*;
 
-    /// 表の全ての判定結果が同じになるようなCondにをテストする
+    /// 表の全ての判定結果が同じになるようなCondをテストする
     /// propsはstaff_count, day_count, staff_config, day_configのタプル
     /// propsは可読性のためにまとめた
     macro_rules! test_all {
@@ -348,6 +348,16 @@ mod tests {
         );
     }
 
+    /// 最初の職員についてCondの結果が与えられたリストと一致するかテストする
+    /// 日付に依存するCondのテストのため
+    macro_rules! test_first_staff {
+        ($ans:expr,$cond:expr,$sc:expr,$dc:expr) => {
+            for d in 0..$dc.count {
+                assert_eq!($ans[d], $cond.eval(0, d, &$sc, &$dc));
+            }
+        };
+    }
+
     /// 日付に関するCondのテスト
     #[test]
     fn test_day_conds() {
@@ -369,27 +379,27 @@ mod tests {
         };
 
         // Dayがbufferを除いて1-indexedになっている
-        assert_eq!(Cond::Day(2).eval(0, 0, &sc, &dc), false);
-        assert_eq!(Cond::Day(2).eval(0, 1, &sc, &dc), false);
-        assert_eq!(Cond::Day(2).eval(0, 2, &sc, &dc), false);
-        assert_eq!(Cond::Day(2).eval(0, 3, &sc, &dc), false);
-        assert_eq!(Cond::Day(2).eval(0, 4, &sc, &dc), true);
-        assert_eq!(Cond::Day(2).eval(0, 5, &sc, &dc), false);
+        test_first_staff!(
+            [false, false, false, false, true, false],
+            Cond::Day(2),
+            sc,
+            dc
+        );
 
         // DayInRangeがbufferを除いて1-indexedになっている
-        assert_eq!(Cond::DayInRange((1, 2)).eval(0, 0, &sc, &dc), false);
-        assert_eq!(Cond::DayInRange((1, 2)).eval(0, 1, &sc, &dc), false);
-        assert_eq!(Cond::DayInRange((1, 2)).eval(0, 2, &sc, &dc), false);
-        assert_eq!(Cond::DayInRange((1, 2)).eval(0, 3, &sc, &dc), true);
-        assert_eq!(Cond::DayInRange((1, 2)).eval(0, 4, &sc, &dc), true);
-        assert_eq!(Cond::DayInRange((1, 2)).eval(0, 5, &sc, &dc), false);
+        test_first_staff!(
+            [false, false, false, true, true, false],
+            Cond::DayInRange((1, 2)),
+            sc,
+            dc
+        );
 
         // DayInListがbufferを除いて1-indexedになっている
-        assert_eq!(Cond::DayInList(vec![1, 3]).eval(0, 0, &sc, &dc), false);
-        assert_eq!(Cond::DayInList(vec![1, 3]).eval(0, 1, &sc, &dc), false);
-        assert_eq!(Cond::DayInList(vec![1, 3]).eval(0, 2, &sc, &dc), false);
-        assert_eq!(Cond::DayInList(vec![1, 3]).eval(0, 3, &sc, &dc), true);
-        assert_eq!(Cond::DayInList(vec![1, 3]).eval(0, 4, &sc, &dc), false);
-        assert_eq!(Cond::DayInList(vec![1, 3]).eval(0, 5, &sc, &dc), true);
+        test_first_staff!(
+            [false, false, false, true, false, true],
+            Cond::DayInList(vec![1, 3]),
+            sc,
+            dc
+        );
     }
 }
