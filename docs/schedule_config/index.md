@@ -327,6 +327,7 @@ Condの詳細は以下の通り
 | Staff              | usize                     | 指定した番号のスタッフなら有効                                         |
 | StaffInRange       | (usize, usize)            | 指定した範囲のスタッフなら有効                                         |
 | StaffWithAttribute | (StaffAttributeName, i32) | 指定した職員ごとのパラメータが指定した整数であるスタッフなら有効       |
+| StaffNamed         | String                    | 指定した文字列と名前が一致するスタッフなら有効                         |
 
 ```toml
 score_functions = [

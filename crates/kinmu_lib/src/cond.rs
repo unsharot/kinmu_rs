@@ -11,6 +11,7 @@ use anyhow::Context as _;
 use std::fmt;
 
 /// ScorePropに用いる条件を管理する型
+/// tupleを使うのはFromConfigの実装のため
 #[derive(Debug, PartialEq, Clone, Default)]
 pub enum Cond {
     // 基本条件
@@ -35,6 +36,7 @@ pub enum Cond {
     Staff(usize),
     StaffInRange((usize, usize)),
     StaffWithAttribute((StaffAttributeName, i32)),
+    StaffNamed(String),
 }
 
 impl Cond {
@@ -88,6 +90,7 @@ impl Cond {
             Cond::StaffWithAttribute((attribute, value)) => {
                 sc.get_attribute(staff, attribute) == *value
             }
+            Cond::StaffNamed(s) => *s == sc.list[staff].name,
         }
     }
 }
@@ -173,6 +176,7 @@ impl FromConfig for Cond {
             ("StaffWithAttribute", p) => Ok(Cond::StaffWithAttribute(
                 <(StaffAttributeName, i32)>::from_config(p)?,
             )),
+            ("StaffNamed", p) => Ok(Cond::StaffNamed(String::from_config(p)?)),
             (s, p) => Err(anyhow::anyhow!("Failed to parse Cond: {} {}", s, p)),
         }
     }
@@ -215,6 +219,7 @@ impl Check<StdScoreProp, Shift, ShiftState, DayState> for Cond {
             Cond::StaffWithAttribute((sa, _)) => {
                 StaffAttributeNameWrapper(sa).check(schedule_config)
             }
+            Cond::StaffNamed(_) => Ok(()),
         }
         .with_context(|| format!("Cond {:?} の変換チェックに失敗しました", self))?;
         Ok(())
