@@ -254,7 +254,7 @@ score_functions = [
 
 
 {display_name = "職員Lが3連勤に収まっているか", scores = [
-"Streak (Staff 11, [N], 4, 1000)",
+"Streak (StaffNamed 職員L, [N], 4, 1000)",
 ],warning={min_pass=0}},
 
 
@@ -263,7 +263,7 @@ score_functions = [
 ],warning={min_pass=0}},
 
 {display_name = "職員Gが指定された日で夜勤しない", scores = [
-"StaffCount (And (Staff 6, DayInList [3,5,8,12]), I, 0, 10000)",
+"StaffCount (And (StaffNamed 職員G, DayInList [3,5,8,12]), I, 0, 10000)",
 ],warning={min_pass=0}},
 
 ]
