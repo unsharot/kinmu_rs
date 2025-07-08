@@ -1,63 +1,8 @@
-//! 初めに勤務表を埋める関数のモジュール
-
-/*
-fill1はUをランダムな枠に
-fill2はIとKの数合わせてうまいこと埋める
-*/
-
-use super::{DayState, Schedule, ScheduleConfig, Shift, ShiftState, StdScoreProp};
-
-use kinmu_generator_with_annealing::Fill;
+use super::super::{Schedule, ScheduleConfig, Shift, ShiftState};
 
 use rand::Rng;
 
-/// 生成器で用いるFill関数のための型
-/// GeneratorWithAnnealingのFillを実装
-#[derive(Debug, Clone)]
-pub struct StdFill;
-
-/// Fillの実装
-impl Fill<StdScoreProp, Shift, ShiftState, DayState> for StdFill {
-    fn run<R: Rng>(
-        &self,
-        name: &str,
-        schedule_config: &ScheduleConfig,
-        mut rng: &mut R,
-    ) -> anyhow::Result<Schedule> {
-        match name {
-            "no_fill" => Ok(no_fill(schedule_config, &mut rng)),
-            "fill_noh" => Ok(fill_noh(schedule_config, &mut rng)),
-            "fill_iak_safe" => Ok(fill_iak_safe(schedule_config, &mut rng)),
-            _ => Err(anyhow::anyhow!("Failed to parse fill function {}", name)),
-        }
-    }
-}
-
-/// 表を埋めない
-/// 変更なし
-fn no_fill<R: Rng>(schedule_config: &ScheduleConfig, _rng: &mut R) -> Schedule {
-    schedule_config.day.requested_schedule.clone()
-}
-
-/// 表をN, O, Hのいずれかでランダムに埋める
-/// Uになっている枠のみ埋める
-/// Absoluteなら埋めない
-#[allow(clippy::needless_range_loop)]
-fn fill_noh<R: Rng>(schedule_config: &ScheduleConfig, rng: &mut R) -> Schedule {
-    let mut schedule = schedule_config.day.requested_schedule.clone();
-    for r in 0..schedule_config.staff.count {
-        for c in schedule_config.day.buffer_count..schedule_config.day.count {
-            if schedule_config.day.schedule_states[r][c] != ShiftState::Absolute
-                && schedule[r][c] == Shift::U
-            {
-                schedule[r][c] = [Shift::N, Shift::O, Shift::H][rng.gen_range(0..3)];
-            }
-        }
-    }
-    schedule
-}
-
-// fill2のアルゴリズム
+// fill_iak_safeのアルゴリズム
 // 1. Randomの場所をIAKのパターンで埋め、残りはNで埋める
 // 2. 指定されたIと今埋まっているIの差分を計算
 // 3. 余分なIをランダムに消す
@@ -140,7 +85,7 @@ fn add_random<R: Rng>(
 /// Absoluteなら埋めない
 /// schedule_configは夜勤の数(IDayCount)と公休の数(KDayCount)を持つ必要がある
 /// 夜勤か公休の数が自由度を超える場合、panicを起こす
-fn fill_iak_safe<R: Rng>(schedule_config: &ScheduleConfig, rng: &mut R) -> Schedule {
+pub fn fill_iak_safe<R: Rng>(schedule_config: &ScheduleConfig, rng: &mut R) -> Schedule {
     let mut schedule = schedule_config.day.requested_schedule.clone();
     for r in 0..schedule_config.staff.count {
         let mut r_count = 0;
