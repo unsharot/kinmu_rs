@@ -99,7 +99,7 @@ score_functions = [
 
 
 {display_name = "土日祝休みの人が土日祝休んでいるか", scores = [
-"StaffCount (And (StaffInRange (10, 12), DayState H), K, 3, 10000)",
+"StaffCount (And (Any [StaffNamed 職員K, StaffNamed 職員L, StaffNamed 職員M], DayState H), K, 3, 10000)",
 ],warning={min_pass=0}},
 
 {display_name = "職員Lが3連勤に収まっているか", scores = [
