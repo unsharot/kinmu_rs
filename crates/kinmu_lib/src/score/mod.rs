@@ -11,6 +11,7 @@ mod shift_dir_priority;
 mod shift_distance;
 mod shift_half_balance;
 mod shifts_balance;
+mod shifts_count_at_most;
 mod staff_count;
 mod staff_count_at_least;
 mod staff_count_regard_day_attribute;
@@ -28,6 +29,7 @@ use self::shift_dir_priority::ShiftDirPriority;
 use self::shift_distance::ShiftDistance;
 use self::shift_half_balance::ShiftHalfBalance;
 use self::shifts_balance::ShiftsBalance;
+use self::shifts_count_at_most::ShiftsCountAtMost;
 use self::staff_count::StaffCount;
 use self::staff_count_at_least::StaffCountAtLeast;
 use self::staff_count_regard_day_attribute::StaffCountRegardDayAttribute;
@@ -59,6 +61,7 @@ pub enum StdScoreProp {
     ShiftHalfBalance(ShiftHalfBalance),
     ShiftDirPriority(ShiftDirPriority),
     ShiftDistance(ShiftDistance),
+    ShiftsCountAtMost(ShiftsCountAtMost),
     DayCountRegardStaffAttribute(DayCountRegardStaffAttribute),
     StaffCountRegardDayAttribute(StaffCountRegardDayAttribute),
     StaffCount(StaffCount),
@@ -88,6 +91,9 @@ impl fmt::Display for StdScoreProp {
             StdScoreProp::ShiftDistance(p) => {
                 write!(f, "ShiftDistance {:?}", p)
             }
+            StdScoreProp::ShiftsCountAtMost(p) => {
+                write!(f, "ShiftsCountAtMost {:?}", p)
+            }
             StdScoreProp::DayCountRegardStaffAttribute(p) => {
                 write!(f, "DayCountRegardStaffAttribute {:?}", p)
             }
@@ -115,6 +121,7 @@ impl Check<StdScoreProp, Shift, ShiftState, DayState> for StdScoreProp {
             StdScoreProp::ShiftHalfBalance(p) => p.check(schedule_config),
             StdScoreProp::ShiftDirPriority(p) => p.check(schedule_config),
             StdScoreProp::ShiftDistance(p) => p.check(schedule_config),
+            StdScoreProp::ShiftsCountAtMost(p) => p.check(schedule_config),
             StdScoreProp::DayCountRegardStaffAttribute(p) => p.check(schedule_config),
             StdScoreProp::StaffCountRegardDayAttribute(p) => p.check(schedule_config),
             StdScoreProp::StaffCount(p) => p.check(schedule_config),
@@ -179,6 +186,11 @@ fn helper_sp(w1: &str, w2: &str) -> anyhow::Result<StdScoreProp> {
         ("ShiftDistance", p) => Ok(StdScoreProp::ShiftDistance(ShiftDistance::new(
             <(CondWrapper, Shift, Score)>::from_config(p)?,
         ))),
+        ("ShiftsCountAtMost", p) => Ok(StdScoreProp::ShiftsCountAtMost({
+            let (cw, VecWrapper(vs), i, s) =
+                <(CondWrapper, VecWrapper<Shift>, i32, Score)>::from_config(p)?;
+            ShiftsCountAtMost::new((cw, vs, i, s))
+        })),
         ("DayCountRegardStaffAttribute", p) => Ok(StdScoreProp::DayCountRegardStaffAttribute(
             DayCountRegardStaffAttribute::new(
                 <(CondWrapper, Shift, StaffAttributeName, Score)>::from_config(p)?,
