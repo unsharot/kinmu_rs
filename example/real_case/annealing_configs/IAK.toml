@@ -110,6 +110,14 @@ score_functions = [
 "StaffCount (And (StaffNamed 職員G, DayInList [3,5,8,12]), I, 0, 10000)",
 ],warning={min_pass=0}},
 
+{display_name = "職員Mが週3日勤務に収まっているか", scores = [
+"ShiftsCountAtMost (And (StaffNamed 職員M, DayInRange (1,6)),   [N], 2, 100)", # 初日はこれ
+"ShiftsCountAtMost (And (StaffNamed 職員M, DayInRange (7,13)),  [N], 3, 100)",
+"ShiftsCountAtMost (And (StaffNamed 職員M, DayInRange (14,20)), [N], 3, 100)",
+"ShiftsCountAtMost (And (StaffNamed 職員M, DayInRange (21,27)), [N], 3, 100)",
+"ShiftsCountAtMost (And (StaffNamed 職員M, DayInRange (28,31)), [N], 3, 100)",
+],warning={min_pass=0}},
+
 ]
 
 update_function = "update_iak_safe"

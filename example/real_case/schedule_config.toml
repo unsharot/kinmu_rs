@@ -72,7 +72,7 @@ requested_schedule = [
 "NKK                               ", # 職員J
 "KKN                               ", # 職員K 土日祝休み
 "KKN                               ", # 職員L 土日祝休み 4連勤以上不可
-"KKN                               ", # 職員M 土日祝休み
+"KKN                               ", # 職員M 土日祝休み 週3日まで勤務
 #HHWBW2MHHWBW2WHHWBW2WHHWBW2WHHWBW2
 #8901234567890123456789012345678901
 ]
@@ -264,6 +264,14 @@ score_functions = [
 
 {display_name = "職員Gが指定された日で夜勤しない", scores = [
 "StaffCount (And (StaffNamed 職員G, DayInList [3,5,8,12]), I, 0, 10000)",
+],warning={min_pass=0}},
+
+{display_name = "職員Mが週3日勤務に収まっているか", scores = [
+"ShiftsCountAtMost (And (StaffNamed 職員M, DayInRange (1,6)),   [N], 2, 100)", # 初日はこれ
+"ShiftsCountAtMost (And (StaffNamed 職員M, DayInRange (7,13)),  [N], 3, 100)",
+"ShiftsCountAtMost (And (StaffNamed 職員M, DayInRange (14,20)), [N], 3, 100)",
+"ShiftsCountAtMost (And (StaffNamed 職員M, DayInRange (21,27)), [N], 3, 100)",
+"ShiftsCountAtMost (And (StaffNamed 職員M, DayInRange (28,31)), [N], 3, 100)",
 ],warning={min_pass=0}},
 
 ]
