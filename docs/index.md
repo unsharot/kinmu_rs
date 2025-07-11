@@ -8,3 +8,6 @@
 
 ## [annealing_config](annealing_config/index.md)
 焼きなまし法で用いるパラメータを設定します。
+
+## [改造するには](to_modify/index.md)
+ソースコードを改変して利用する方法を説明します。
