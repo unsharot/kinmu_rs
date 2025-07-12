@@ -13,8 +13,9 @@ graph TD;
     schedule_config_2 -- annealing.config_paths --> annealing_config_2_2;
 ```
 
-
 ### [TOMLファイルの書き方](how_to_toml/index.md)
+設定ファイルの書き方の説明です。
+設定ファイルは全てここで説明する文法に従います。
 
 ### [main_config](main_config/index.md)
 呼び出すファイルを設定します。
