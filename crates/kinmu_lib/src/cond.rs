@@ -93,6 +93,112 @@ impl Cond {
             Cond::StaffNamed(s) => *s == sc.list[staff].name,
         }
     }
+
+    pub fn eval_day(&self, day: usize, _sc: &StaffConfig, dc: &DayConfig) -> Option<bool> {
+        match self {
+            Cond::True => Some(true),
+            Cond::False => Some(false),
+            Cond::Not(cond) => Some(!cond.eval_day(day, _sc, dc)?),
+            Cond::Or((cond1, cond2)) => {
+                Some(cond1.eval_day(day, _sc, dc)? || cond2.eval_day(day, _sc, dc)?)
+            }
+            Cond::And((cond1, cond2)) => {
+                Some(cond1.eval_day(day, _sc, dc)? && cond2.eval_day(day, _sc, dc)?)
+            }
+            Cond::Any(cs) => {
+                let mut b = false;
+                for c in cs {
+                    b |= c.eval_day(day, _sc, dc)?;
+                }
+                Some(b)
+            }
+            Cond::All(cs) => {
+                let mut b = true;
+                for c in cs {
+                    b &= c.eval_day(day, _sc, dc)?;
+                }
+                Some(b)
+            }
+
+            Cond::Day(d) => {
+                // dはbufferを除いて1-indexedになっている
+                // このためbufferを含めた0-indexedに戻して比較
+                let di = *d + dc.buffer_count - 1;
+                Some(di == day)
+            }
+            Cond::DayInRange((day_start, day_end)) => {
+                // day_start, day_endはbufferを除いて1-indexedになっている
+                // このためbufferを含めた0-indexedに戻して比較
+                let di_start = *day_start + dc.buffer_count - 1;
+                let di_end = *day_end + dc.buffer_count - 1;
+                Some(di_start <= day && day <= di_end)
+            }
+            Cond::DayInList(ds) => Some(ds.iter().any(|d| {
+                // dはbufferを除いて1-indexedになっている
+                // このためbufferを含めた0-indexedに戻して比較
+                let di = *d + dc.buffer_count - 1;
+                di == day
+            })),
+            Cond::NoBuffer => Some(dc.buffer_count <= day),
+            Cond::DayState(ds) => Some(dc.days[day] == *ds),
+            Cond::BeforeDayState(ds) => {
+                if day + 1 >= dc.count {
+                    Some(false)
+                } else {
+                    Some(dc.days[day + 1] == *ds)
+                }
+            }
+
+            Cond::Staff(_s) => None,
+            Cond::StaffInRange((_staff_start, _staff_end)) => None,
+            Cond::StaffWithAttribute((_attribute, _value)) => None,
+            Cond::StaffNamed(_s) => None,
+        }
+    }
+
+    pub fn eval_staff(&self, staff: usize, sc: &StaffConfig, _dc: &DayConfig) -> Option<bool> {
+        match self {
+            Cond::True => Some(true),
+            Cond::False => Some(false),
+            Cond::Not(cond) => Some(!cond.eval_staff(staff, sc, _dc)?),
+            Cond::Or((cond1, cond2)) => {
+                Some(cond1.eval_staff(staff, sc, _dc)? || cond2.eval_staff(staff, sc, _dc)?)
+            }
+            Cond::And((cond1, cond2)) => {
+                Some(cond1.eval_staff(staff, sc, _dc)? && cond2.eval_staff(staff, sc, _dc)?)
+            }
+            Cond::Any(cs) => {
+                let mut b = false;
+                for c in cs {
+                    b |= c.eval_staff(staff, sc, _dc)?;
+                }
+                Some(b)
+            }
+            Cond::All(cs) => {
+                let mut b = true;
+                for c in cs {
+                    b &= c.eval_staff(staff, sc, _dc)?;
+                }
+                Some(b)
+            }
+
+            Cond::Day(_d) => None,
+            Cond::DayInRange((_day_start, _day_end)) => None,
+            Cond::DayInList(_ds) => None,
+            Cond::NoBuffer => None,
+            Cond::DayState(_ds) => None,
+            Cond::BeforeDayState(_ds) => None,
+
+            Cond::Staff(s) => Some(*s == staff),
+            Cond::StaffInRange((staff_start, staff_end)) => {
+                Some(*staff_start <= staff && staff <= *staff_end)
+            }
+            Cond::StaffWithAttribute((attribute, value)) => {
+                Some(sc.get_attribute(staff, attribute) == *value)
+            }
+            Cond::StaffNamed(s) => Some(*s == sc.list[staff].name),
+        }
+    }
 }
 
 /// Condをメモ化して高速化するためのラッパー
@@ -100,6 +206,8 @@ impl Cond {
 pub struct CondWrapper {
     pub cond: Cond,
     memo: Vec<Vec<Option<bool>>>,
+    day_memo: Vec<Option<bool>>,
+    staff_memo: Vec<Option<bool>>,
 }
 
 impl CondWrapper {
@@ -107,6 +215,8 @@ impl CondWrapper {
         CondWrapper {
             cond,
             memo: <Vec<Vec<Option<bool>>>>::new(),
+            day_memo: <Vec<Option<bool>>>::new(),
+            staff_memo: <Vec<Option<bool>>>::new(),
         }
     }
 
