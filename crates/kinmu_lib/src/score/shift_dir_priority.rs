@@ -10,9 +10,15 @@ use kinmu_input_by_file::Check;
 use kinmu_model::{Score, ScoreProp};
 
 macro_rules! eval {
-    ($eval:ident, $self:expr, $staff_config:expr, $day_config:expr, $schedule:expr) => {{
+    ($eval:ident, $can_skip_staff:ident, $self:expr, $staff_config:expr, $day_config:expr, $schedule:expr) => {{
         let mut sum = 0.0;
         for staff in 0..$staff_config.count {
+            if $self
+                .cond
+                .$can_skip_staff(staff, $staff_config, $day_config)
+            {
+                continue;
+            }
             let mut is_valid = false;
             // 条件を満たすdayの中から中間を探す
             let mut len = 0;
@@ -65,7 +71,14 @@ impl ScoreProp<Shift, ShiftState, DayState> for ShiftDirPriority {
         day_config: &DayConfig,
         schedule: &Schedule,
     ) -> Score {
-        eval!(eval_mut, self, staff_config, day_config, schedule)
+        eval!(
+            eval_mut,
+            can_skip_staff_mut,
+            self,
+            staff_config,
+            day_config,
+            schedule
+        )
     }
 
     fn eval_immut(
@@ -74,7 +87,14 @@ impl ScoreProp<Shift, ShiftState, DayState> for ShiftDirPriority {
         day_config: &DayConfig,
         schedule: &Schedule,
     ) -> Score {
-        eval!(eval_immut, self, staff_config, day_config, schedule)
+        eval!(
+            eval_immut,
+            can_skip_staff_immut,
+            self,
+            staff_config,
+            day_config,
+            schedule
+        )
     }
 }
 

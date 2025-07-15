@@ -11,9 +11,12 @@ use kinmu_input_by_file::Check;
 use kinmu_model::{DayAttributeName, Score, ScoreProp};
 
 macro_rules! eval {
-    ($eval:ident, $self:expr, $staff_config:expr, $day_config:expr, $schedule:expr) => {{
+    ($eval:ident, $can_skip_day:ident, $self:expr, $staff_config:expr, $day_config:expr, $schedule:expr) => {{
         let mut sum = 0.0;
         for day in 0..$day_config.count {
+            if $self.cond.$can_skip_day(day, $staff_config, $day_config) {
+                continue;
+            }
             let mut is_valid = false;
             let mut count = 0;
             for staff in 0..$staff_config.count {
@@ -63,7 +66,14 @@ impl ScoreProp<Shift, ShiftState, DayState> for StaffCountRegardDayAttribute {
         day_config: &DayConfig,
         schedule: &Schedule,
     ) -> Score {
-        eval!(eval_mut, self, staff_config, day_config, schedule)
+        eval!(
+            eval_mut,
+            can_skip_day_mut,
+            self,
+            staff_config,
+            day_config,
+            schedule
+        )
     }
 
     fn eval_immut(
@@ -72,7 +82,14 @@ impl ScoreProp<Shift, ShiftState, DayState> for StaffCountRegardDayAttribute {
         day_config: &DayConfig,
         schedule: &Schedule,
     ) -> Score {
-        eval!(eval_immut, self, staff_config, day_config, schedule)
+        eval!(
+            eval_immut,
+            can_skip_day_immut,
+            self,
+            staff_config,
+            day_config,
+            schedule
+        )
     }
 }
 
