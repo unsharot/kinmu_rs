@@ -94,6 +94,9 @@ impl Cond {
         }
     }
 
+    /// この日付が全て有効ならSome(true)
+    /// この日付が全て無効ならSome(false)
+    /// どちらでもないならNone
     pub fn eval_day(&self, day: usize, _sc: &StaffConfig, dc: &DayConfig) -> Option<bool> {
         match self {
             Cond::True => Some(true),
@@ -156,6 +159,9 @@ impl Cond {
         }
     }
 
+    /// この職員が全て有効ならSome(true)
+    /// この職員が全て無効ならSome(false)
+    /// どちらでもないならNone
     pub fn eval_staff(&self, staff: usize, sc: &StaffConfig, _dc: &DayConfig) -> Option<bool> {
         match self {
             Cond::True => Some(true),
@@ -205,9 +211,18 @@ impl Cond {
 #[derive(PartialEq, Clone, Default)]
 pub struct CondWrapper {
     pub cond: Cond,
+    /// 未評価ならNone
+    /// 有効ならtrue
+    /// 無効ならfalse
     memo: Vec<Vec<Option<bool>>>,
-    day_memo: Vec<Option<bool>>,
-    staff_memo: Vec<Option<bool>>,
+    /// 未評価ならNone
+    /// 飛ばしていいならtrue
+    /// 飛ばしてダメならfalse
+    skip_day_memo: Vec<Option<bool>>,
+    /// 未評価ならNone
+    /// 飛ばしていいならtrue
+    /// 飛ばしてダメならfalse
+    skip_staff_memo: Vec<Option<bool>>,
 }
 
 impl CondWrapper {
@@ -215,8 +230,8 @@ impl CondWrapper {
         CondWrapper {
             cond,
             memo: <Vec<Vec<Option<bool>>>>::new(),
-            day_memo: <Vec<Option<bool>>>::new(),
-            staff_memo: <Vec<Option<bool>>>::new(),
+            skip_day_memo: <Vec<Option<bool>>>::new(),
+            skip_staff_memo: <Vec<Option<bool>>>::new(),
         }
     }
 
@@ -251,6 +266,82 @@ impl CondWrapper {
     /// メモを参照しないCondの評価
     pub fn eval_anyway(&self, staff: usize, day: usize, sc: &StaffConfig, dc: &DayConfig) -> bool {
         self.cond.eval(staff, day, sc, dc)
+    }
+
+    /// 日付をスキップできるか
+    /// メモを書き換える
+    /// 飛ばしていいならtrue
+    /// 飛ばしてダメならfalse
+    pub fn can_skip_day_mut(&mut self, day: usize, sc: &StaffConfig, dc: &DayConfig) -> bool {
+        // 初期化前なら初期化する
+        if self.skip_day_memo.is_empty() {
+            self.skip_day_memo = vec![None; dc.count];
+        }
+
+        match self.skip_day_memo[day] {
+            Some(ans) => ans,
+            // 未記入なら評価して記入
+            None => {
+                let ans = !self.cond.eval_day(day, sc, dc).unwrap_or(true);
+                self.skip_day_memo[day] = Some(ans);
+                ans
+            }
+        }
+    }
+
+    /// 日付をスキップできるか
+    /// メモは利用するが書き換えない
+    /// 飛ばしていいならfalse
+    /// 不確定かあれならtrue
+    pub fn can_skip_day_immut(&self, day: usize, sc: &StaffConfig, dc: &DayConfig) -> bool {
+        // 初期化前なら評価して返す
+        if self.skip_day_memo.is_empty() {
+            return !self.cond.eval_day(day, sc, dc).unwrap_or(true);
+        }
+
+        match self.skip_day_memo[day] {
+            Some(ans) => ans,
+            // 未記入なら評価して返す
+            None => !self.cond.eval_day(day, sc, dc).unwrap_or(true),
+        }
+    }
+
+    /// 職員をスキップできるか
+    /// メモを書き換える
+    /// 飛ばしていいならtrue
+    /// 飛ばしてダメならfalse
+    pub fn can_skip_staff_mut(&mut self, staff: usize, sc: &StaffConfig, dc: &DayConfig) -> bool {
+        // 初期化前なら初期化する
+        if self.skip_staff_memo.is_empty() {
+            self.skip_staff_memo = vec![None; sc.count];
+        }
+
+        match self.skip_staff_memo[staff] {
+            Some(ans) => ans,
+            // 未記入なら評価して記入
+            None => {
+                let ans = !self.cond.eval_staff(staff, sc, dc).unwrap_or(true);
+                self.skip_staff_memo[staff] = Some(ans);
+                ans
+            }
+        }
+    }
+
+    /// 職員をスキップできるか
+    /// メモは利用するが書き換えない
+    /// 飛ばしていいならfalse
+    /// 不確定かあれならtrue
+    pub fn can_skip_staff_immut(&self, staff: usize, sc: &StaffConfig, dc: &DayConfig) -> bool {
+        // 初期化前なら評価して返す
+        if self.skip_staff_memo.is_empty() {
+            return !self.cond.eval_staff(staff, sc, dc).unwrap_or(true);
+        }
+
+        match self.skip_staff_memo[staff] {
+            Some(ans) => ans,
+            // 未記入なら評価して返す
+            None => !self.cond.eval_staff(staff, sc, dc).unwrap_or(true),
+        }
     }
 }
 
@@ -516,5 +607,75 @@ mod tests {
             sc,
             dc
         );
+    }
+
+    /// CondWrapperの日付ごとの評価とメモ化のテスト
+    #[test]
+    fn test_condwrapper_skip_day() {
+        let staff_count: usize = 1;
+        let day_count: usize = 6;
+        let sc = StaffConfig {
+            attribute_map: Default::default(),
+            list: Default::default(),
+            ng_list: Default::default(),
+            count: staff_count,
+        };
+        let dc = DayConfig {
+            count: day_count,
+            buffer_count: 3,
+            days: Default::default(),
+            requested_schedule: Default::default(),
+            schedule_states: Default::default(),
+            attributes: HashMap::new(),
+        };
+
+        let mut cw = CondWrapper::new(Cond::DayInList(vec![1, 3]));
+
+        // メモを記入
+        assert_eq!(cw.can_skip_day_mut(0, &sc, &dc), true);
+        assert_eq!(cw.can_skip_day_mut(1, &sc, &dc), true);
+        assert_eq!(cw.can_skip_day_mut(2, &sc, &dc), true);
+        assert_eq!(cw.can_skip_day_mut(3, &sc, &dc), false);
+        assert_eq!(cw.can_skip_day_mut(4, &sc, &dc), true);
+        assert_eq!(cw.can_skip_day_mut(5, &sc, &dc), false);
+
+        // メモを利用
+        assert_eq!(cw.can_skip_day_immut(0, &sc, &dc), true);
+        assert_eq!(cw.can_skip_day_immut(1, &sc, &dc), true);
+        assert_eq!(cw.can_skip_day_immut(2, &sc, &dc), true);
+        assert_eq!(cw.can_skip_day_immut(3, &sc, &dc), false);
+        assert_eq!(cw.can_skip_day_immut(4, &sc, &dc), true);
+        assert_eq!(cw.can_skip_day_immut(5, &sc, &dc), false);
+    }
+
+    /// CondWrapperの職員ごとの評価とメモ化のテスト
+    #[test]
+    fn test_condwrapper_skip_staff() {
+        let staff_count: usize = 4;
+        let day_count: usize = 1;
+        let sc = StaffConfig {
+            attribute_map: Default::default(),
+            list: Default::default(),
+            ng_list: Default::default(),
+            count: staff_count,
+        };
+        let dc = DayConfig {
+            count: day_count,
+            buffer_count: 0,
+            days: Default::default(),
+            requested_schedule: Default::default(),
+            schedule_states: Default::default(),
+            attributes: HashMap::new(),
+        };
+
+        let mut cw = CondWrapper::new(Cond::Staff(0));
+
+        // メモを記入
+        assert_eq!(cw.can_skip_staff_mut(0, &sc, &dc), false);
+        assert_eq!(cw.can_skip_staff_mut(1, &sc, &dc), true);
+
+        // メモを利用
+        assert_eq!(cw.can_skip_staff_immut(0, &sc, &dc), false);
+        assert_eq!(cw.can_skip_staff_immut(1, &sc, &dc), true);
     }
 }
