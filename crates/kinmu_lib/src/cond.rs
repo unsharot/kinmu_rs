@@ -270,8 +270,8 @@ impl CondWrapper {
 
     /// 日付をスキップできるか
     /// メモを書き換える
-    /// 飛ばしていいならtrue
-    /// 飛ばしてダメならfalse
+    /// スキップできるならtrue
+    /// スキップできないならfalse
     pub fn can_skip_day_mut(&mut self, day: usize, sc: &StaffConfig, dc: &DayConfig) -> bool {
         // 初期化前なら初期化する
         if self.skip_day_memo.is_empty() {
@@ -291,8 +291,8 @@ impl CondWrapper {
 
     /// 日付をスキップできるか
     /// メモは利用するが書き換えない
-    /// 飛ばしていいならfalse
-    /// 不確定かあれならtrue
+    /// スキップできるならtrue
+    /// スキップできないならfalse
     pub fn can_skip_day_immut(&self, day: usize, sc: &StaffConfig, dc: &DayConfig) -> bool {
         // 初期化前なら評価して返す
         if self.skip_day_memo.is_empty() {
@@ -308,8 +308,8 @@ impl CondWrapper {
 
     /// 職員をスキップできるか
     /// メモを書き換える
-    /// 飛ばしていいならtrue
-    /// 飛ばしてダメならfalse
+    /// スキップできるならtrue
+    /// スキップできないならfalse
     pub fn can_skip_staff_mut(&mut self, staff: usize, sc: &StaffConfig, dc: &DayConfig) -> bool {
         // 初期化前なら初期化する
         if self.skip_staff_memo.is_empty() {
@@ -329,8 +329,8 @@ impl CondWrapper {
 
     /// 職員をスキップできるか
     /// メモは利用するが書き換えない
-    /// 飛ばしていいならfalse
-    /// 不確定かあれならtrue
+    /// スキップできるならtrue
+    /// スキップできないならfalse
     pub fn can_skip_staff_immut(&self, staff: usize, sc: &StaffConfig, dc: &DayConfig) -> bool {
         // 初期化前なら評価して返す
         if self.skip_staff_memo.is_empty() {
