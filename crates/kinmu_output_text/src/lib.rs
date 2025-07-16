@@ -254,7 +254,6 @@ where
 
     /// column_stats_shiftsのindexで指定した列の和を表示
     /// row_stats_shiftsのindexで指定したシフトの数を各列について出力
-    #[allow(clippy::needless_range_loop)]
     fn write_shift_count_columns<SP, SS, DS>(
         &mut self,
         index: usize,
@@ -269,6 +268,7 @@ where
         let mut max_length = 0;
         for c in 0..schedule_config.day.count {
             let mut sum = 0;
+            #[allow(clippy::needless_range_loop)]
             for r in 0..schedule_config.staff.count {
                 if schedule[r][c] == self.column_stats_shifts[index] {
                     sum += 1;
