@@ -1,18 +1,27 @@
+//! fill_iak_safeのモジュール
+//!
+//! ### アルゴリズム
+//! 1. K,Iの数が希望で出された数を越えないかチェックする
+//! 2. Randomの場所をIAKのパターンで埋め、残りはNで埋める
+//! 3. 指定されたIと今埋まっているIの差分を計算
+//! 4. 余分なIをランダムに消す
+//! 5. 孤立したAを消す
+//! 6. 指定されたKと今埋まっているKの差分を計算
+//! 7. 不足したKをランダムに足す
+//! 8. 余分なKを孤立したものを優先にランダムに消す
+
 use super::super::{Schedule, ScheduleConfig, Shift, ShiftState};
 
 use rand::Rng;
 
-// fill_iak_safeのアルゴリズム
-// 1. Randomの場所をIAKのパターンで埋め、残りはNで埋める
-// 2. 指定されたIと今埋まっているIの差分を計算
-// 3. 余分なIをランダムに消す
-// 4. 孤立したAを消す
-// 5. 指定されたKと今埋まっているKの差分を計算
-// 6. 不足したKをランダムに足す
-// 7. 余分なKを孤立したものを優先にランダムに消す
-
 /// 指定したシフトが指定した行にいくつ含まれるか
-macro_rules! count_waku_row {
+/// bufferは除いて数える
+///
+/// ### 例
+/// ```ignore
+/// let c = count_shift_row!(Shift::I, schedule_config, schedule, r);
+/// ```
+macro_rules! count_shift_row {
     ($shift:expr, $schedule_config: expr, $schedule:expr, $r:expr) => {{
         let mut count = 0;
         for i in $schedule_config.day.buffer_count..$schedule_config.day.count {
@@ -85,8 +94,46 @@ fn add_random<R: Rng>(
 /// Absoluteなら埋めない
 /// schedule_configは夜勤の数(IDayCount)と公休の数(KDayCount)を持つ必要がある
 /// 夜勤か公休の数が自由度を超える場合、panicを起こす
-pub fn fill_iak_safe<R: Rng>(schedule_config: &ScheduleConfig, rng: &mut R) -> Schedule {
+pub fn fill_iak_safe<R: Rng>(
+    schedule_config: &ScheduleConfig,
+    rng: &mut R,
+) -> anyhow::Result<Schedule> {
     let mut schedule = schedule_config.day.requested_schedule.clone();
+
+    // Kの数が超過していないかチェック
+    for r in 0..schedule_config.staff.count {
+        let c1 = count_shift_row!(Shift::K, schedule_config, schedule, r);
+        let c2 = schedule_config
+            .staff
+            .get_attribute(r, &"KDayCount".to_string());
+
+        if c1 > c2 {
+            // 超過
+            return Err(anyhow::anyhow!(
+                "希望で出したKの数({})が職員指定の数({})を超過しています",
+                c1,
+                c2
+            ));
+        }
+    }
+
+    // Iの数が超過していないかチェック
+    for r in 0..schedule_config.staff.count {
+        let c1 = count_shift_row!(Shift::I, schedule_config, schedule, r);
+        let c2 = schedule_config
+            .staff
+            .get_attribute(r, &"IDayCount".to_string());
+
+        if c1 > c2 {
+            // 超過
+            return Err(anyhow::anyhow!(
+                "希望で出したIの数({})が職員指定の数({})を超過しています",
+                c1,
+                c2
+            ));
+        }
+    }
+
     for r in 0..schedule_config.staff.count {
         let mut r_count = 0;
         for c in schedule_config.day.buffer_count..(schedule_config.day.count + 1) {
@@ -126,7 +173,7 @@ pub fn fill_iak_safe<R: Rng>(schedule_config: &ScheduleConfig, rng: &mut R) -> S
         }
 
         // Iの差分を計算
-        let i_dif = count_waku_row!(Shift::I, schedule_config, schedule, r)
+        let i_dif = count_shift_row!(Shift::I, schedule_config, schedule, r)
             - schedule_config
                 .staff
                 .get_attribute(r, &"IDayCount".to_string());
@@ -143,7 +190,7 @@ pub fn fill_iak_safe<R: Rng>(schedule_config: &ScheduleConfig, rng: &mut R) -> S
         let k_dif = schedule_config
             .staff
             .get_attribute(r, &"KDayCount".to_string())
-            - count_waku_row!(Shift::K, schedule_config, schedule, r);
+            - count_shift_row!(Shift::K, schedule_config, schedule, r);
 
         if k_dif > 0 {
             // 不足したKをランダムに足す
@@ -180,5 +227,5 @@ pub fn fill_iak_safe<R: Rng>(schedule_config: &ScheduleConfig, rng: &mut R) -> S
             }
         }
     }
-    schedule
+    Ok(schedule)
 }

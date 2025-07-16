@@ -35,7 +35,7 @@ impl Fill<StdScoreProp, Shift, ShiftState, DayState> for StdFill {
         match name {
             "no_fill" => Ok(no_fill(schedule_config, &mut rng)),
             "fill_noh" => Ok(fill_noh(schedule_config, &mut rng)),
-            "fill_iak_safe" => Ok(fill_iak_safe(schedule_config, &mut rng)),
+            "fill_iak_safe" => fill_iak_safe(schedule_config, &mut rng),
             _ => Err(anyhow::anyhow!("Failed to parse fill function {}", name)),
         }
     }
