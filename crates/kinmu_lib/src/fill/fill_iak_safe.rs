@@ -101,6 +101,7 @@ pub fn fill_iak_safe<R: Rng>(
     let mut schedule = schedule_config.day.requested_schedule.clone();
 
     // Kの数が超過していないかチェック
+    #[allow(clippy::needless_range_loop)]
     for r in 0..schedule_config.staff.count {
         let c1 = count_shift_row!(Shift::K, schedule_config, schedule, r);
         let c2 = schedule_config
@@ -118,6 +119,7 @@ pub fn fill_iak_safe<R: Rng>(
     }
 
     // Iの数が超過していないかチェック
+    #[allow(clippy::needless_range_loop)]
     for r in 0..schedule_config.staff.count {
         let c1 = count_shift_row!(Shift::I, schedule_config, schedule, r);
         let c2 = schedule_config
