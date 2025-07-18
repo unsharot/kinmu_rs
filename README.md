@@ -90,7 +90,7 @@ https://github.com/unsharot/kinmu_rs
 html形式での出力を行う機能もあります。
 
 ```sh
-./kinmu.exe --html -o output.html
+./kinmu.exe -l .\example\real_case\main_config.toml --html -o output.html
 ```
 
 ### 出力
