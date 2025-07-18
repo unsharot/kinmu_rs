@@ -98,7 +98,7 @@ fn main() -> io::Result<()> {
     };
 
     // html出力を選択
-    let output_html = matches.opt_present("html");
+    let use_html = matches.opt_present("html");
 
     // 実行
     match kinmu::core::run(
@@ -107,7 +107,7 @@ fn main() -> io::Result<()> {
         {
             use Shift::*;
             &mut OutputTextOrHTML::new(
-                output_html,
+                use_html,
                 &mut out,
                 use_color,
                 false,
@@ -117,7 +117,13 @@ fn main() -> io::Result<()> {
         },
     ) {
         Ok(_) => {}
-        Err(e) => writeln!(out, "{:?}", e)?,
+        Err(e) => {
+            if use_html {
+                writeln!(out, "<div style=\"white-space: pre-line;\">{:?}\n</div>", e)?
+            } else {
+                writeln!(out, "{:?}", e)?
+            }
+        }
     };
 
     Ok(())
