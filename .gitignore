@@ -1,2 +1,3 @@
-/target
-/config
+target/
+config/
+.cargo/
