@@ -42,7 +42,13 @@ where
     DS: FromConfig,
 {
     fn load_config(&mut self) -> anyhow::Result<MainConfig<SP, S, SS, DS>> {
-        let config_root_path = Path::new(self.main_config_path).parent().context("aa")?;
+        // configが格納されているフォルダのパス
+        let config_root_path = Path::new(self.main_config_path).parent().with_context(|| {
+            format!(
+                "[エラー] メインconfigのパスが不正です。ルートが存在しません。\n対象ファイル: {}",
+                self.main_config_path
+            )
+        })?;
 
         let raw_main = reader::read_main_config(self.main_config_path).with_context(|| {
             format!(
