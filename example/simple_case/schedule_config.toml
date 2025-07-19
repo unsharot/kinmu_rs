@@ -77,8 +77,8 @@ function = "fill_noh"
 
 # 焼きなましの設定ファイルのパス
 config_paths = [
-"example/simple_case/annealing_configs/annealing_config_1.toml",
-"example/simple_case/annealing_configs/annealing_config_2.toml",
+"annealing_configs/annealing_config_1.toml",
+"annealing_configs/annealing_config_2.toml",
 ]
 
 

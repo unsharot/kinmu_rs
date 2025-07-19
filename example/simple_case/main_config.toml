@@ -1,6 +1,6 @@
 # 勤務表の設定ファイルのパス
 schedule_config_paths = [
-"example/simple_case/schedule_config.toml",
+"schedule_config.toml",
 ]
 
 # スレッド数

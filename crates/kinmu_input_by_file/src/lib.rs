@@ -3,6 +3,7 @@
 //! また、ここで要求するtraitを定義
 
 use anyhow::Context;
+use std::path::Path;
 
 use kinmu_core::Input;
 use kinmu_model::MainConfig;
@@ -41,6 +42,8 @@ where
     DS: FromConfig,
 {
     fn load_config(&mut self) -> anyhow::Result<MainConfig<SP, S, SS, DS>> {
+        let config_root_path = Path::new(self.main_config_path).parent().context("aa")?;
+
         let raw_main = reader::read_main_config(self.main_config_path).with_context(|| {
             format!(
                 "[エラー] メインconfigの読み込みに失敗しました\n対象ファイル: {}\nヒント: デフォルト以外のファイルを指定する場合、引数でパスを指定してください",
@@ -52,10 +55,11 @@ where
             converter::convert_main_config(raw_main)?;
 
         for path in schedule_config_paths {
+            let path = config_root_path.join(path);
             let raw_schedule = reader::read_schedule_config(&path).with_context(|| {
                 format!(
                     "[エラー] 勤務表configの読み込みに失敗しました\n対象ファイル: {}",
-                    path,
+                    path.display(),
                 )
             })?;
             let annealing_config_paths = raw_schedule.annealing.config_paths.clone();
@@ -63,22 +67,23 @@ where
                 .with_context(|| {
                     format!(
                         "[エラー] 勤務表configの読み込みに失敗しました\n対象ファイル: {}",
-                        path,
+                        path.display(),
                     )
                 })?;
 
             for path in annealing_config_paths {
+                let path = config_root_path.join(path);
                 let raw_annealing = reader::read_annealing_config(&path).with_context(|| {
                     format!(
                         "[エラー] 焼きなましconfigの読み込みに失敗しました\n対象ファイル: {}",
-                        path,
+                        path.display(),
                     )
                 })?;
                 let converted_annealing = converter::convert_annealing_config(raw_annealing)
                     .with_context(|| {
                         anyhow::anyhow!(
                             "[エラー] 焼きなましconfigの読み込みに失敗しました\n対象ファイル: {}",
-                            path,
+                            path.display(),
                         )
                     })?;
                 converted_schedule

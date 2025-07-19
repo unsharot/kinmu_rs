@@ -93,9 +93,9 @@ function = "fill_iak_safe"
 [annealing]
 
 config_paths = [
-"./example/real_case/annealing_configs/random_walk.toml",
-"./example/real_case/annealing_configs/IAK.toml",
-"./example/real_case/annealing_configs/NOH.toml",
+"annealing_configs/random_walk.toml",
+"annealing_configs/IAK.toml",
+"annealing_configs/NOH.toml",
 ]
 
 
