@@ -3,12 +3,12 @@
 
 ## schedule_config_paths
 勤務表のconfigのパスを列挙します。
-絶対パスと現在のディレクトリからの相対パスの両方に対応しています。
+メインconfigが存在するフォルダからの相対パスを書いてください。
 
 ```toml
 schedule_config_paths = [
-   "./config/configW.toml",
-   "./config/configK.toml",
+   "configW.toml",
+   "configK.toml",
 ]
 ```
 

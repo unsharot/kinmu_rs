@@ -251,13 +251,13 @@ seed = 53
 ### config_paths
 焼きなましの設定ファイルのパスを指定します。
 焼きなましはここで列挙した順に行われます。
-絶対パスと現在のディレクトリからの相対パスの両方に対応しています。
+メインconfigが存在するフォルダからの相対パスを書いてください。
 
 ```toml
 config_paths = [
-   "./config/anconfigW/randomWalk.toml",
-   "./config/anconfigW/W1.toml",
-   "./config/anconfigW/W2.toml",
+   "anconfigW/randomWalk.toml",
+   "anconfigW/W1.toml",
+   "anconfigW/W2.toml",
 ]
 ```
 
