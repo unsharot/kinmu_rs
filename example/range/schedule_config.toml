@@ -1,0 +1,275 @@
+[staff]
+
+attributes = [
+"IAloneAbility", # 一人で夜勤ができるか
+"OHAbility", # 遅番,早番が可能か
+"KDayCount",
+"IDayCount",
+"ODayCount",
+"HDayCount",
+]
+
+list = [
+#              A1  A2  K    I    O    H           名前     番号
+{attributes = [1,  1,  8,   6,  -1,  -1], name = "職員A"}, #0
+{attributes = [1,  1,  8,   6,  -1,  -1], name = "職員B"}, #1
+{attributes = [1,  1,  8,   6,  -1,  -1], name = "職員C"}, #2
+{attributes = [1,  1,  8,   6,  -1,  -1], name = "職員D"}, #3
+{attributes = [1,  1,  9,   6,  -1,  -1], name = "職員E"}, #4
+{attributes = [1,  1,  9,   6,  -1,  -1], name = "職員F"}, #5
+{attributes = [1,  1,  9,   5,  -1,  -1], name = "職員G"}, #6
+{attributes = [0,  1,  9,   4,  -1,  -1], name = "職員H"}, #7
+{attributes = [0,  1,  9,   3,   2,   2], name = "職員I"}, #8
+{attributes = [0,  0,  8,   0,   0,   0], name = "職員J"}, #9
+{attributes = [0,  0,  10,  0,   0,   0], name = "職員K"}, #10
+{attributes = [0,  0,  15,  0,   0,   0], name = "職員L"}, #11
+{attributes = [0,  0,  20,  0,   0,   0], name = "職員M"}, #12
+]
+
+# O,Hは-1なら任意
+
+ng_list = [
+# 職員Aと職員Bは絶対に避けたい
+{from = 0, to = 1},
+{from = 0, to = 1},
+{from = 0, to = 1},
+{from = 0, to = 1},
+
+# 職員HのNG
+{from = 2, to = 7}, # 職員C
+{from = 3, to = 7}, # 職員D
+{from = 4, to = 7}, # 職員E
+{from = 5, to = 7}, # 職員F
+{from = 6, to = 7}, # 職員G
+]
+
+count = 13
+
+
+[day]
+
+day_count = 34
+# 3 + 31 = 34
+
+states = "HHWBW2MHHWBW2WHHHBW2WHHWBW2WHHWBW2"
+#         8901234567890123456789012345678901
+# 4日は祝日
+
+buffer_count = 3
+
+requested_schedule = [
+#HHWBW2MHHWBW2WHHWBW2WHHWBW2WHHWBW2
+#8901234567890123456789012345678901
+"IAK                 IAKK          ", # 職員A
+"NIAK                        Y     ", # 職員B
+"IAK                YY             ", # 職員C
+"NIAK         IAKY         K       ", # 職員D
+"KNIAK               IAKK          ", # 職員E
+"KNIAK                     IAK     ", # 職員F
+"AKK              KK               ", # 職員G
+"AKK          IAK                  ", # 職員H
+"KNN     IAK                       ", # 職員I
+"NKK                               ", # 職員J
+"KKN                               ", # 職員K 土日祝休み
+"KKN                               ", # 職員L 土日祝休み 4連勤以上不可
+"KKN                               ", # 職員M 土日祝休み 週3日まで勤務
+#HHWBW2MHHWBW2WHHWBW2WHHWBW2WHHWBW2
+#8901234567890123456789012345678901
+]
+
+
+attributes = [
+{name = "IStaffCount", values = [0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]},
+#                                8  9  0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5  6  7  8  9  0  1
+]
+
+[fill]
+
+function = "fill_iak_safe"
+
+# seed = 0
+
+
+[annealing]
+
+config_paths = [
+"annealing_configs/range.toml",
+]
+
+
+[result]
+
+score_functions = [
+{display_name = "IAK",scores = [
+"PatternGeneral (True (), [[I], [N,O,H,I,K,Y]], 50000)",
+"PatternGeneral (True (), [[A], [N,O,H,I,A]], 50000)",
+"PatternGeneral (True (), [[N,O,H,A,K,Y], [A]], 50000)"
+],warning = {min_pass = 0}},
+
+{display_name = "KIA", scores = [
+"PatternFixed (True (), [K,I], 100)",
+"PatternFixed (True (), [Y,I], 100)",
+]},
+
+{display_name = "KNIA", scores = [
+"PatternGeneral (True (), [[K,Y],[N,O,H],[I]], 10)",
+]},
+
+{display_name = "NNIA", scores = [
+"PatternGeneral (True (), [[N,O,H],[N,O,H],[I]], -300)",
+]},
+
+{display_name = "ON", scores = [
+"PatternFixed (True (), [O,N], 100)",
+]},
+
+{display_name = "NH", scores = [
+"PatternFixed (True (), [N,H], 1000)",
+]},
+
+{display_name = "OH", scores = [
+"PatternFixed (True (), [O,H], 2000)",
+]},
+
+{display_name = "4連勤", scores = [
+"Streak (True (), [N,O,H,I,A], 4, 200)",
+]},
+
+{display_name = "5連勤", scores = [
+"Streak (True (), [N,O,H,I,A], 5, 1000)",
+]},
+
+{display_name = "6連勤", scores = [
+"Streak (True (), [N,O,H,I,A], 6, 4000)",
+]},
+
+{display_name = "7連勤", scores = [
+"Streak (True (), [N,O,H,I,A], 7, 10000)",
+]},
+
+{display_name = "NG", scores = [
+"NGPair (NoBuffer (), I, 1000)",
+],warning={min_pass = 0}},
+
+{display_name = "2連休報酬", scores = [
+"Streak (True (), [K,Y], 2, -100)",
+]},
+
+{display_name = "2連休が必要", scores = [
+"PatternGeneralAny (True (), [[K,Y], [K,Y]], -1000)",
+], warning = {min_pass = -13000}},
+
+{display_name = "2連休が必要(バッファーなし)", scores = [
+"PatternGeneralAny (NoBuffer (), [[K,Y], [K,Y]], -1000)",
+], warning = {min_pass = -13000}},
+
+{display_name = "遅早のバランス", scores = [
+"ShiftsBalance (NoBuffer (), O, H, 3)",
+]},
+
+{display_name = "夜勤の前後のバランス", scores = [
+"ShiftHalfBalance (NoBuffer (), I, 10)",
+]},
+
+{display_name = "遅番の前後のバランス", scores = [
+"ShiftHalfBalance (NoBuffer (), O, 3)",
+]},
+
+{display_name = "早番の前後のバランス", scores = [
+"ShiftHalfBalance (NoBuffer (), H, 3)",
+]},
+
+{display_name = "公休の日数", scores = [
+"DayCountRegardStaffAttribute (NoBuffer (), K, KDayCount, 200)",
+],warning={min_pass=0}},
+
+{display_name = "夜勤の日数", scores = [
+"DayCountRegardStaffAttribute (NoBuffer (), I, IDayCount, 200)",
+],warning={min_pass=0}},
+
+{display_name = "遅番の日数", scores = [
+"DayCountRegardStaffAttribute (And (Not StaffWithAttribute (ODayCount, -1), NoBuffer ()), O, ODayCount, 100)",
+],warning={min_pass=0}},
+
+{display_name = "早番の日数", scores = [
+"DayCountRegardStaffAttribute (And (Not StaffWithAttribute (HDayCount, -1), NoBuffer ()), H, HDayCount, 100)",
+],warning={min_pass=0}},
+
+{display_name = "夜勤のスタッフ数", scores = [
+"StaffCountRegardDayAttribute (NoBuffer (), I, IStaffCount, 100)",
+],warning={min_pass=140000}},
+
+{display_name = "フロのスタッフ数", scores = [
+"StaffCount (And (NoBuffer (), DayState B), N, 3, 5)",
+]},
+
+{display_name = "フロ2のスタッフ数", scores = [
+"StaffCount (And (NoBuffer (), DayState 2), N, 1, 10)",
+]},
+
+{display_name = "平日のスタッフ数", scores = [
+"StaffCount (And (NoBuffer (), DayState W), N, 1, 10)",
+]},
+
+{display_name = "休日のスタッフ数", scores = [
+"StaffCount (And (NoBuffer (), DayState H), N, 1, 10)",
+]},
+
+{display_name = "計測のスタッフ数", scores = [
+"StaffCount (And (NoBuffer (), DayState M), N, 1, 10)",
+]},
+
+{display_name = "遅番のスタッフ数", scores = [
+"StaffCount (NoBuffer (), O, 1, 100)",
+],warning={min_pass=0}},
+
+{display_name = "早番のスタッフ数", scores = [
+"StaffCount (NoBuffer (), H, 1, 100)",
+],warning={min_pass=0}},
+
+
+{display_name = "一人夜勤のチェック", scores = [
+"StaffCountWithPremise (NoBuffer (), I, 1, And (NoBuffer (), StaffWithAttribute (IAloneAbility, 1)), I, 1, 100)",
+],warning={min_pass=0}},
+
+
+{display_name = "フロ前に一人夜勤を入れない", scores = [
+"StaffCount (And (BeforeDayState B, NoBuffer ()), I, 2, 100)",
+],warning={min_pass=0}},
+
+{display_name = "同じペアに3回以上ならない", scores = [
+"NoSamePair (NoBuffer (), 3, I, 1000)",
+],warning={min_pass=0}},
+
+{display_name = "同じペアに2回以上ならない", scores = [
+"NoSamePair (NoBuffer (), 2, I, 500)",
+],warning={min_pass=0}},
+
+
+{display_name = "土日祝休みの人が土日祝休んでいるか", scores = [
+"StaffCount (And (Any [StaffNamed 職員K, StaffNamed 職員L, StaffNamed 職員M], DayState H), K, 3, 10000)",
+],warning={min_pass=0}},
+
+
+{display_name = "職員Lが3連勤に収まっているか", scores = [
+"Streak (StaffNamed 職員L, [N], 4, 1000)",
+],warning={min_pass=0}},
+
+
+{display_name = "Undefのチェック", scores = [
+"StaffCount (NoBuffer (), U, 0, 100000)",
+],warning={min_pass=0}},
+
+{display_name = "職員Gが指定された日で夜勤しない", scores = [
+"StaffCount (And (StaffNamed 職員G, DayInList [3,5,8,12]), I, 0, 10000)",
+],warning={min_pass=0}},
+
+{display_name = "職員Mが週3日勤務に収まっているか", scores = [
+"ShiftsCountAtMost (And (StaffNamed 職員M, DayInRange (1,6)),   [N], 2, 100)", # 初日はこれ
+"ShiftsCountAtMost (And (StaffNamed 職員M, DayInRange (7,13)),  [N], 3, 100)",
+"ShiftsCountAtMost (And (StaffNamed 職員M, DayInRange (14,20)), [N], 3, 100)",
+"ShiftsCountAtMost (And (StaffNamed 職員M, DayInRange (21,27)), [N], 3, 100)",
+"ShiftsCountAtMost (And (StaffNamed 職員M, DayInRange (28,31)), [N], 3, 100)",
+],warning={min_pass=0}},
+
+]
