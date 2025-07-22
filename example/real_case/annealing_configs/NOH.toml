@@ -57,11 +57,11 @@ score_functions = [
 ],warning={min_pass=0}},
 
 {display_name = "遅番の日数", scores = [
-"DayCountRegardStaffAttribute (And (Not StaffWithAttribute (ODayCount, -1), NoBuffer ()), O, ODayCount, 100)",
+"StaffCountRegardStaffAttribute (And (Not StaffWithAttribute (ODayCount, -1), NoBuffer ()), O, ODayCount, 100)",
 ],warning={min_pass=0}},
 
 {display_name = "早番の日数", scores = [
-"DayCountRegardStaffAttribute (And (Not StaffWithAttribute (HDayCount, -1), NoBuffer ()), H, HDayCount, 100)",
+"StaffCountRegardStaffAttribute (And (Not StaffWithAttribute (HDayCount, -1), NoBuffer ()), H, HDayCount, 100)",
 ],warning={min_pass=0}},
 
 ]

@@ -277,25 +277,25 @@ display_nameには表示名、scoresにはスコアの名前と、そのスコ�
 warningは任意で、任意の有理数パラメータmin_passとmax_passを持ちます。min_passが設定されている場合、まとめたスコアの計算結果が設定したスコアを越えるなら結果表示の際に横に`[warning]`と表示されます。
 スコアは以下のとおりです。
 
-| Prop名                       | 引数の型                                    | 説明                                                                                                    |
-| :--------------------------- | :------------------------------------------ | :------------------------------------------------------------------------------------------------------ |
-| PatternGeneral               | (Cond, [[Shift]], Score)                    | 指定したシフトパターンが出現した場合のペナルティを指定                                                  |
-| PatternFixed                 | (Cond, [Shift], Score)                      | 指定したシフトパターンが出現した場合のペナルティを指定                                                  |
-| PatternGeneralAny            | (Cond, [[Shift]], Score)                    | 指定したシフトパターンが出現する職員ごとにペナルティを指定                                              |
-| PatternFixedAny              | (Cond, [Shift], Score)                      | 指定したシフトパターンが出現する職員ごとにペナルティを指定                                              |
-| Streak                       | (Cond, [Shift], i32, Score)                 | 指定したシフトが指定した回数連続した場合のペナルティを指定                                              |
-| ShiftsBalance                | (Cond, Shift, Shift, Score)                 | 指定した2つのシフトのバランスが悪い場合のペナルティを指定                                               |
-| ShiftHalfBalance             | (Cond, Shift, Score)                        | 指定したシフトが指定範囲の前半と後半でバランスが取れていない場合のペナルティを指定                      |
-| ShiftDirPriority             | (Cond, Shift, Score)                        | 指定したシフトが指定範囲の前後どちらにあるほうが良いか指定 指定スコアが正なら前を優先、負なら後ろを優先 |
-| ShiftDistance                | (Cond, Shift, Score)                        | 指定したシフトどうしの距離が離れていることによるペナルティを指定                                        |
-| ShiftsCountAtMost            | (Cond, [Shift], i32, Score)                 | 職員ごとの指定したシフトの数が指定した数より多いことによるペナルティを指定                              |
-| DayCountRegardStaffAttribute | (Cond, Shift, StaffAttributeName, Score)    | 職員ごとの指定したパラメータと指定したシフトの数の差によるペナルティを指定                              |
-| StaffCountRegardDayAttribute | (Cond, Shift, DayAttributeName, Score)      | 日付ごとの指定したパラメータと指定したシフトの数の差によるペナルティを指定                              |
-| StaffCount                   | (Cond, Shift, i32, Score)                   | 指定した値と指定したシフトの人数の差によるペナルティを指定                                              |
-| StaffCountAtLeast            | (Cond, Shift, i32, Score)                   | 指定した値に指定したシフトの人数が達していない場合のペナルティを指定                                    |
-| StaffCountWithPremise        | (Cond, Shift, i32, Cond, Shift, i32, Score) | 指定したシフトの人数を満たした日付に対して、指定した値と指定したシフトの人数の差によるペナルティを指定  |
-| NGPair                       | (Cond, Shift, Score)                        | NGに指定されたペアが指定したシフトで同じ日になる場合のペナルティを指定                                  |
-| NoSamePair                   | (Cond, i32, Shift, Score)                   | 指定したシフトで同じペアが指定回数以上ある場合のペナルティを指定                                        |
+| Prop名                         | 引数の型                                    | 説明                                                                                                    |
+| :----------------------------- | :------------------------------------------ | :------------------------------------------------------------------------------------------------------ |
+| PatternGeneral                 | (Cond, [[Shift]], Score)                    | 指定したシフトパターンが出現した場合のペナルティを指定                                                  |
+| PatternFixed                   | (Cond, [Shift], Score)                      | 指定したシフトパターンが出現した場合のペナルティを指定                                                  |
+| PatternGeneralAny              | (Cond, [[Shift]], Score)                    | 指定したシフトパターンが出現する職員ごとにペナルティを指定                                              |
+| PatternFixedAny                | (Cond, [Shift], Score)                      | 指定したシフトパターンが出現する職員ごとにペナルティを指定                                              |
+| Streak                         | (Cond, [Shift], i32, Score)                 | 指定したシフトが指定した回数連続した場合のペナルティを指定                                              |
+| ShiftsBalance                  | (Cond, Shift, Shift, Score)                 | 指定した2つのシフトのバランスが悪い場合のペナルティを指定                                               |
+| ShiftHalfBalance               | (Cond, Shift, Score)                        | 指定したシフトが指定範囲の前半と後半でバランスが取れていない場合のペナルティを指定                      |
+| ShiftDirPriority               | (Cond, Shift, Score)                        | 指定したシフトが指定範囲の前後どちらにあるほうが良いか指定 指定スコアが正なら前を優先、負なら後ろを優先 |
+| ShiftDistance                  | (Cond, Shift, Score)                        | 指定したシフトどうしの距離が離れていることによるペナルティを指定                                        |
+| ShiftsCountAtMost              | (Cond, [Shift], i32, Score)                 | 職員ごとの指定したシフトの数が指定した数より多いことによるペナルティを指定                              |
+| StaffCountRegardStaffAttribute | (Cond, Shift, StaffAttributeName, Score)    | 職員ごとの指定したパラメータと指定したシフトの数の差によるペナルティを指定                              |
+| StaffCountRegardDayAttribute   | (Cond, Shift, DayAttributeName, Score)      | 日付ごとの指定したパラメータと指定したシフトの数の差によるペナルティを指定                              |
+| StaffCount                     | (Cond, Shift, i32, Score)                   | 指定した値と指定したシフトの人数の差によるペナルティを指定                                              |
+| StaffCountAtLeast              | (Cond, Shift, i32, Score)                   | 指定した値に指定したシフトの人数が達していない場合のペナルティを指定                                    |
+| StaffCountWithPremise          | (Cond, Shift, i32, Cond, Shift, i32, Score) | 指定したシフトの人数を満たした日付に対して、指定した値と指定したシフトの人数の差によるペナルティを指定  |
+| NGPair                         | (Cond, Shift, Score)                        | NGに指定されたペアが指定したシフトで同じ日になる場合のペナルティを指定                                  |
+| NoSamePair                     | (Cond, i32, Shift, Score)                   | 指定したシフトで同じペアが指定回数以上ある場合のペナルティを指定                                        |
 
 型の詳細は以下の通り
 

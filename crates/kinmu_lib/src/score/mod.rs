@@ -18,7 +18,7 @@ mod staff_count_regard_day_attribute;
 mod staff_count_with_premise;
 mod streak;
 
-use self::day_count_regard_staff_attribute::DayCountRegardStaffAttribute;
+use self::day_count_regard_staff_attribute::StaffCountRegardStaffAttribute;
 use self::ng_pair::NGPair;
 use self::no_same_pair::NoSamePair;
 use self::pattern_fixed::PatternFixed;
@@ -62,7 +62,7 @@ pub enum StdScoreProp {
     ShiftDirPriority(ShiftDirPriority),
     ShiftDistance(ShiftDistance),
     ShiftsCountAtMost(ShiftsCountAtMost),
-    DayCountRegardStaffAttribute(DayCountRegardStaffAttribute),
+    StaffCountRegardStaffAttribute(StaffCountRegardStaffAttribute),
     StaffCountRegardDayAttribute(StaffCountRegardDayAttribute),
     StaffCount(StaffCount),
     StaffCountAtLeast(StaffCountAtLeast),
@@ -94,8 +94,8 @@ impl fmt::Display for StdScoreProp {
             StdScoreProp::ShiftsCountAtMost(p) => {
                 write!(f, "ShiftsCountAtMost {:?}", p)
             }
-            StdScoreProp::DayCountRegardStaffAttribute(p) => {
-                write!(f, "DayCountRegardStaffAttribute {:?}", p)
+            StdScoreProp::StaffCountRegardStaffAttribute(p) => {
+                write!(f, "StaffCountRegardStaffAttribute {:?}", p)
             }
             StdScoreProp::StaffCountRegardDayAttribute(p) => {
                 write!(f, "StaffCountRegardDayAttribute {:?}", p)
@@ -122,7 +122,7 @@ impl Check<StdScoreProp, Shift, ShiftState, DayState> for StdScoreProp {
             StdScoreProp::ShiftDirPriority(p) => p.check(schedule_config),
             StdScoreProp::ShiftDistance(p) => p.check(schedule_config),
             StdScoreProp::ShiftsCountAtMost(p) => p.check(schedule_config),
-            StdScoreProp::DayCountRegardStaffAttribute(p) => p.check(schedule_config),
+            StdScoreProp::StaffCountRegardStaffAttribute(p) => p.check(schedule_config),
             StdScoreProp::StaffCountRegardDayAttribute(p) => p.check(schedule_config),
             StdScoreProp::StaffCount(p) => p.check(schedule_config),
             StdScoreProp::StaffCountAtLeast(p) => p.check(schedule_config),
@@ -191,8 +191,8 @@ fn helper_sp(w1: &str, w2: &str) -> anyhow::Result<StdScoreProp> {
                 <(CondWrapper, VecWrapper<Shift>, i32, Score)>::from_config(p)?;
             ShiftsCountAtMost::new((cw, vs, i, s))
         })),
-        ("DayCountRegardStaffAttribute", p) => Ok(StdScoreProp::DayCountRegardStaffAttribute(
-            DayCountRegardStaffAttribute::new(
+        ("StaffCountRegardStaffAttribute", p) => Ok(StdScoreProp::StaffCountRegardStaffAttribute(
+            StaffCountRegardStaffAttribute::new(
                 <(CondWrapper, Shift, StaffAttributeName, Score)>::from_config(p)?,
             ),
         )),
