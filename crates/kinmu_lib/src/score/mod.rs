@@ -1,6 +1,5 @@
 //! スコアに関わる型の宣言
 
-mod day_count_regard_staff_attribute;
 mod ng_pair;
 mod no_same_pair;
 mod pattern_fixed;
@@ -15,10 +14,10 @@ mod shifts_count_at_most;
 mod staff_count;
 mod staff_count_at_least;
 mod staff_count_regard_day_attribute;
+mod staff_count_regard_staff_attribute;
 mod staff_count_with_premise;
 mod streak;
 
-use self::day_count_regard_staff_attribute::StaffCountRegardStaffAttribute;
 use self::ng_pair::NGPair;
 use self::no_same_pair::NoSamePair;
 use self::pattern_fixed::PatternFixed;
@@ -33,6 +32,7 @@ use self::shifts_count_at_most::ShiftsCountAtMost;
 use self::staff_count::StaffCount;
 use self::staff_count_at_least::StaffCountAtLeast;
 use self::staff_count_regard_day_attribute::StaffCountRegardDayAttribute;
+use self::staff_count_regard_staff_attribute::StaffCountRegardStaffAttribute;
 use self::staff_count_with_premise::StaffCountWithPremise;
 use self::streak::Streak;
 
