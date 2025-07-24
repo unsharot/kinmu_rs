@@ -40,14 +40,14 @@ macro_rules! eval {
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct StaffCountRegardStaffAttribute {
+pub struct ShiftCountRegardStaffAttribute {
     pub cond: CondWrapper,
     pub shift: Shift,
     pub attribute: StaffAttributeName,
     pub score: Score,
 }
 
-impl StaffCountRegardStaffAttribute {
+impl ShiftCountRegardStaffAttribute {
     pub fn new(
         (cond, shift, attribute, score): (CondWrapper, Shift, StaffAttributeName, Score),
     ) -> Self {
@@ -60,7 +60,7 @@ impl StaffCountRegardStaffAttribute {
     }
 }
 
-impl ScoreProp<Shift, ShiftState, DayState> for StaffCountRegardStaffAttribute {
+impl ScoreProp<Shift, ShiftState, DayState> for ShiftCountRegardStaffAttribute {
     fn eval_mut(
         &mut self,
         staff_config: &StaffConfig,
@@ -94,7 +94,7 @@ impl ScoreProp<Shift, ShiftState, DayState> for StaffCountRegardStaffAttribute {
     }
 }
 
-impl Check<StdScoreProp, Shift, ShiftState, DayState> for StaffCountRegardStaffAttribute {
+impl Check<StdScoreProp, Shift, ShiftState, DayState> for ShiftCountRegardStaffAttribute {
     fn check(&self, schedule_config: &ScheduleConfig) -> anyhow::Result<()> {
         self.cond
             .check(schedule_config)
@@ -137,7 +137,7 @@ mod tests {
             .name_to_index
             .insert(String::from("n_count"), 0);
 
-        let mut sp = StaffCountRegardStaffAttribute::new((
+        let mut sp = ShiftCountRegardStaffAttribute::new((
             CondWrapper::new(Cond::True),
             Shift::N,
             String::from("n_count"),
@@ -175,7 +175,7 @@ mod tests {
             .name_to_index
             .insert(String::from("n_count"), 0);
 
-        let mut sp = StaffCountRegardStaffAttribute::new((
+        let mut sp = ShiftCountRegardStaffAttribute::new((
             CondWrapper::new(Cond::True),
             Shift::N,
             String::from("n_count"),

@@ -6,6 +6,7 @@ mod pattern_fixed;
 mod pattern_fixed_any;
 mod pattern_general;
 mod pattern_general_any;
+mod shift_count_regard_staff_attribute;
 mod shift_dir_priority;
 mod shift_distance;
 mod shift_half_balance;
@@ -14,7 +15,6 @@ mod shifts_count_at_most;
 mod staff_count;
 mod staff_count_at_least;
 mod staff_count_regard_day_attribute;
-mod staff_count_regard_staff_attribute;
 mod staff_count_with_premise;
 mod streak;
 
@@ -24,6 +24,7 @@ use self::pattern_fixed::PatternFixed;
 use self::pattern_fixed_any::PatternFixedAny;
 use self::pattern_general::PatternGeneral;
 use self::pattern_general_any::PatternGeneralAny;
+use self::shift_count_regard_staff_attribute::ShiftCountRegardStaffAttribute;
 use self::shift_dir_priority::ShiftDirPriority;
 use self::shift_distance::ShiftDistance;
 use self::shift_half_balance::ShiftHalfBalance;
@@ -32,7 +33,6 @@ use self::shifts_count_at_most::ShiftsCountAtMost;
 use self::staff_count::StaffCount;
 use self::staff_count_at_least::StaffCountAtLeast;
 use self::staff_count_regard_day_attribute::StaffCountRegardDayAttribute;
-use self::staff_count_regard_staff_attribute::StaffCountRegardStaffAttribute;
 use self::staff_count_with_premise::StaffCountWithPremise;
 use self::streak::Streak;
 
@@ -83,7 +83,7 @@ pub enum StdScoreProp {
     ShiftsCountAtMost(ShiftsCountAtMost),
 
     /// 職員ごとの指定したパラメータと指定したシフトの数の差によるペナルティを指定
-    StaffCountRegardStaffAttribute(StaffCountRegardStaffAttribute),
+    ShiftCountRegardStaffAttribute(ShiftCountRegardStaffAttribute),
 
     /// 日付ごとの指定したパラメータと指定したシフトの数の差によるペナルティを指定
     StaffCountRegardDayAttribute(StaffCountRegardDayAttribute),
@@ -127,8 +127,8 @@ impl fmt::Display for StdScoreProp {
             StdScoreProp::ShiftsCountAtMost(p) => {
                 write!(f, "ShiftsCountAtMost {:?}", p)
             }
-            StdScoreProp::StaffCountRegardStaffAttribute(p) => {
-                write!(f, "StaffCountRegardStaffAttribute {:?}", p)
+            StdScoreProp::ShiftCountRegardStaffAttribute(p) => {
+                write!(f, "ShiftCountRegardStaffAttribute {:?}", p)
             }
             StdScoreProp::StaffCountRegardDayAttribute(p) => {
                 write!(f, "StaffCountRegardDayAttribute {:?}", p)
@@ -155,7 +155,7 @@ impl Check<StdScoreProp, Shift, ShiftState, DayState> for StdScoreProp {
             StdScoreProp::ShiftDirPriority(p) => p.check(schedule_config),
             StdScoreProp::ShiftDistance(p) => p.check(schedule_config),
             StdScoreProp::ShiftsCountAtMost(p) => p.check(schedule_config),
-            StdScoreProp::StaffCountRegardStaffAttribute(p) => p.check(schedule_config),
+            StdScoreProp::ShiftCountRegardStaffAttribute(p) => p.check(schedule_config),
             StdScoreProp::StaffCountRegardDayAttribute(p) => p.check(schedule_config),
             StdScoreProp::StaffCount(p) => p.check(schedule_config),
             StdScoreProp::StaffCountAtLeast(p) => p.check(schedule_config),
@@ -224,8 +224,8 @@ fn helper_sp(w1: &str, w2: &str) -> anyhow::Result<StdScoreProp> {
                 <(CondWrapper, VecWrapper<Shift>, i32, Score)>::from_config(p)?;
             ShiftsCountAtMost::new((cw, vs, i, s))
         })),
-        ("StaffCountRegardStaffAttribute", p) => Ok(StdScoreProp::StaffCountRegardStaffAttribute(
-            StaffCountRegardStaffAttribute::new(
+        ("ShiftCountRegardStaffAttribute", p) => Ok(StdScoreProp::ShiftCountRegardStaffAttribute(
+            ShiftCountRegardStaffAttribute::new(
                 <(CondWrapper, Shift, StaffAttributeName, Score)>::from_config(p)?,
             ),
         )),
