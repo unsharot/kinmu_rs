@@ -294,6 +294,7 @@ warningは任意で、任意の有理数パラメータmin_passとmax_passを持
 | StaffCount                     | (Cond, Shift, i32, Score)                   | 指定した値と指定したシフトの人数の差によるペナルティを指定                                              |
 | StaffCountAtLeast              | (Cond, Shift, i32, Score)                   | 指定した値に指定したシフトの人数が達していない場合のペナルティを指定                                    |
 | StaffCountWithPremise          | (Cond, Shift, i32, Cond, Shift, i32, Score) | 指定したシフトの人数を満たした日付に対して、指定した値と指定したシフトの人数の差によるペナルティを指定  |
+| StaffCountVariance             | (Cond, Shift, Score)                        | 指定したシフトの人数を日付ごとに見たときの分散によるペナルティを指定                                    |
 | NGPair                         | (Cond, Shift, Score)                        | NGに指定されたペアが指定したシフトで同じ日になる場合のペナルティを指定                                  |
 | NoSamePair                     | (Cond, i32, Shift, Score)                   | 指定したシフトで同じペアが指定回数以上ある場合のペナルティを指定                                        |
 

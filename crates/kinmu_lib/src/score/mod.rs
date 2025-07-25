@@ -15,6 +15,7 @@ mod shifts_count_at_most;
 mod staff_count;
 mod staff_count_at_least;
 mod staff_count_regard_day_attribute;
+mod staff_count_variance;
 mod staff_count_with_premise;
 mod streak;
 
@@ -33,6 +34,7 @@ use self::shifts_count_at_most::ShiftsCountAtMost;
 use self::staff_count::StaffCount;
 use self::staff_count_at_least::StaffCountAtLeast;
 use self::staff_count_regard_day_attribute::StaffCountRegardDayAttribute;
+use self::staff_count_variance::StaffCountVariance;
 use self::staff_count_with_premise::StaffCountWithPremise;
 use self::streak::Streak;
 
@@ -97,6 +99,9 @@ pub enum StdScoreProp {
     /// 指定したシフトの人数を満たした日付に対して、指定した値と指定したシフトの人数の差によるペナルティを指定
     StaffCountWithPremise(StaffCountWithPremise),
 
+    /// 指定したシフトの人数を日付ごとに見たときの分散によるペナルティを指定
+    StaffCountVariance(StaffCountVariance),
+
     /// NGに指定されたペアが指定したシフトで同じ日になる場合のペナルティを指定
     NGPair(NGPair),
 
@@ -136,6 +141,7 @@ impl fmt::Display for StdScoreProp {
             StdScoreProp::StaffCount(p) => write!(f, "StaffCount {:?}", p),
             StdScoreProp::StaffCountAtLeast(p) => write!(f, "StaffCountAtLeast {:?}", p),
             StdScoreProp::StaffCountWithPremise(p) => write!(f, "StaffCountWithPremise {:?}", p),
+            StdScoreProp::StaffCountVariance(p) => write!(f, "StaffCountVariance {:?}", p),
             StdScoreProp::NGPair(p) => write!(f, "NGPair {:?}", p),
             StdScoreProp::NoSamePair(p) => write!(f, "NoSamePair {:?}", p),
         }
@@ -160,6 +166,7 @@ impl Check<StdScoreProp, Shift, ShiftState, DayState> for StdScoreProp {
             StdScoreProp::StaffCount(p) => p.check(schedule_config),
             StdScoreProp::StaffCountAtLeast(p) => p.check(schedule_config),
             StdScoreProp::StaffCountWithPremise(p) => p.check(schedule_config),
+            StdScoreProp::StaffCountVariance(p) => p.check(schedule_config),
             StdScoreProp::NGPair(p) => p.check(schedule_config),
             StdScoreProp::NoSamePair(p) => p.check(schedule_config),
         }
@@ -250,6 +257,9 @@ fn helper_sp(w1: &str, w2: &str) -> anyhow::Result<StdScoreProp> {
                 <(CondWrapper, Shift, i32, CondWrapper, Shift, i32, Score)>::from_config(p)?,
             ),
         )),
+        ("StaffCountVariance", p) => Ok(StdScoreProp::StaffCountVariance(StaffCountVariance::new(
+            <(CondWrapper, Shift, Score)>::from_config(p)?,
+        ))),
         ("NGPair", p) => Ok(StdScoreProp::NGPair(NGPair::new(<(
             CondWrapper,
             Shift,
