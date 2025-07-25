@@ -30,11 +30,10 @@ macro_rules! eval {
             if is_valid {
                 let count_needed = $day_config.attributes.get(&$self.attribute).unwrap()[day];
                 let d = (count - count_needed).abs() as Score;
-                let a = d * $self.score;
-                sum += a * a;
+                sum += d * d;
             }
         }
-        sum
+        sum * $self.score
     }};
 }
 

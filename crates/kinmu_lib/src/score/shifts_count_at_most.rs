@@ -30,11 +30,10 @@ macro_rules! eval {
             if is_valid {
                 let count_border = $self.count;
                 let d = std::cmp::max(count - count_border, 0) as Score;
-                let a = d * $self.score;
-                sum += a * a;
+                sum += d * d;
             }
         }
-        sum
+        sum * $self.score
     }};
 }
 

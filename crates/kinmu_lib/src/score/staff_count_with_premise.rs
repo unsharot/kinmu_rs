@@ -44,12 +44,11 @@ macro_rules! eval {
                 }
                 if is_valid {
                     let d = (count2 - $self.count_main).abs() as Score;
-                    let a = d * $self.score;
-                    sum += a * a;
+                    sum += d * d;
                 }
             }
         }
-        sum
+        sum * $self.score
     }};
 }
 
