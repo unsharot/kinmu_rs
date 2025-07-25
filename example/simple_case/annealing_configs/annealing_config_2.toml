@@ -7,8 +7,8 @@ step_count = 10000
 
 # 焼きなましに用いるスコア関数
 score_functions = [
-  {display_name = "日勤", scores = ["StaffCount (NoBuffer (), N, 2, 100)"], warning = {min_pass = 1000}},
-  {display_name = "夜勤人数", scores = ["StaffCountRegardDayAttribute (NoBuffer (), I, 夜勤, 1000)"], warning = {min_pass = 1000}},
+  {display_name = "日勤", scores = ["StaffCount (NoBuffer (), N, 2, 10000)"], warning = {min_pass = 1000}},
+  {display_name = "夜勤人数", scores = ["StaffCountRegardDayAttribute (NoBuffer (), I, 夜勤, 1000000)"], warning = {min_pass = 1000}},
   {display_name = "夜勤制約", scores = [
     "PatternGeneral (True (), [[I], [N,O,H,I,K,Y]], 100000)",
     "PatternGeneral (True (), [[A], [N,O,H,I,A]], 100000)",

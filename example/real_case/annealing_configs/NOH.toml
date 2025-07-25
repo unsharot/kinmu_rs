@@ -17,51 +17,51 @@ score_functions = [
 ]},
 
 {display_name = "遅早のバランス", scores = [
-"ShiftsBalance (NoBuffer (), O, H, 3)",
+"ShiftsBalance (NoBuffer (), O, H, 9)",
 ]},
 
 {display_name = "遅番の前後のバランス", scores = [
-"ShiftHalfBalance (NoBuffer (), O, 3)",
+"ShiftHalfBalance (NoBuffer (), O, 9)",
 ]},
 
 {display_name = "早番の前後のバランス", scores = [
-"ShiftHalfBalance (NoBuffer (), H, 3)",
+"ShiftHalfBalance (NoBuffer (), H, 9)",
 ]},
 
 {display_name = "フロのスタッフ数", scores = [
-"StaffCount (And (NoBuffer (), DayState B), N, 3, 5)",
+"StaffCount (And (NoBuffer (), DayState B), N, 3, 25)",
 ]},
 
 {display_name = "フロ2のスタッフ数", scores = [
-"StaffCount (And (NoBuffer (), DayState 2), N, 1, 10)",
+"StaffCount (And (NoBuffer (), DayState 2), N, 1, 100)",
 ]},
 
 {display_name = "平日のスタッフ数", scores = [
-"StaffCount (And (NoBuffer (), DayState W), N, 1, 10)",
+"StaffCount (And (NoBuffer (), DayState W), N, 1, 100)",
 ]},
 
 {display_name = "休日のスタッフ数", scores = [
-"StaffCount (And (NoBuffer (), DayState H), N, 1, 10)",
+"StaffCount (And (NoBuffer (), DayState H), N, 1, 100)",
 ]},
 
 {display_name = "計測のスタッフ数", scores = [
-"StaffCount (And (NoBuffer (), DayState M), N, 1, 10)",
+"StaffCount (And (NoBuffer (), DayState M), N, 1, 100)",
 ]},
 
 {display_name = "遅番のスタッフ数", scores = [
-"StaffCount (NoBuffer (), O, 1, 100)",
+"StaffCount (NoBuffer (), O, 1, 10000)",
 ],warning={min_pass=0}},
 
 {display_name = "早番のスタッフ数", scores = [
-"StaffCount (NoBuffer (), H, 1, 100)",
+"StaffCount (NoBuffer (), H, 1, 10000)",
 ],warning={min_pass=0}},
 
 {display_name = "遅番の日数", scores = [
-"ShiftCountRegardStaffAttribute (And (Not StaffWithAttribute (ODayCount, -1), NoBuffer ()), O, ODayCount, 100)",
+"ShiftCountRegardStaffAttribute (And (Not StaffWithAttribute (ODayCount, -1), NoBuffer ()), O, ODayCount, 10000)",
 ],warning={min_pass=0}},
 
 {display_name = "早番の日数", scores = [
-"ShiftCountRegardStaffAttribute (And (Not StaffWithAttribute (HDayCount, -1), NoBuffer ()), H, HDayCount, 100)",
+"ShiftCountRegardStaffAttribute (And (Not StaffWithAttribute (HDayCount, -1), NoBuffer ()), H, HDayCount, 10000)",
 ],warning={min_pass=0}},
 
 ]

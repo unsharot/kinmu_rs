@@ -50,43 +50,43 @@ score_functions = [
 ]},
 
 {display_name = "夜勤の前後のバランス", scores = [
-"ShiftHalfBalance (NoBuffer (), I, 10)",
+"ShiftHalfBalance (NoBuffer (), I, 100)",
 ]},
 
 {display_name = "夜勤のスタッフ数", scores = [
-"StaffCountRegardDayAttribute (NoBuffer (), I, IStaffCount, 100)",
+"StaffCountRegardDayAttribute (NoBuffer (), I, IStaffCount, 10000)",
 ],warning={min_pass=140000}},
 
 {display_name = "フロのスタッフ数", scores = [
-"StaffCount (And (NoBuffer (), DayState B), N, 5, 5)",
+"StaffCount (And (NoBuffer (), DayState B), N, 5, 25)",
 ]},
 
 {display_name = "フロ2のスタッフ数", scores = [
-"StaffCount (And (NoBuffer (), DayState 2), N, 3, 10)",
+"StaffCount (And (NoBuffer (), DayState 2), N, 3, 100)",
 ]},
 
 {display_name = "平日のスタッフ数", scores = [
-"StaffCount (And (NoBuffer (), DayState W), N, 3, 10)",
+"StaffCount (And (NoBuffer (), DayState W), N, 3, 100)",
 ]},
 
 {display_name = "休日のスタッフ数", scores = [
-"StaffCount (And (NoBuffer (), DayState H), N, 3, 10)",
+"StaffCount (And (NoBuffer (), DayState H), N, 3, 100)",
 ]},
 
 {display_name = "計測のスタッフ数", scores = [
-"StaffCount (And (NoBuffer (), DayState M), N, 3, 10)",
+"StaffCount (And (NoBuffer (), DayState M), N, 3, 100)",
 ]},
 
 {display_name = "一人夜勤のチェック", scores = [
-"StaffCountWithPremise (NoBuffer (), I, 1, And (NoBuffer (), StaffWithAttribute (IAloneAbility, 1)), I, 1, 100)",
+"StaffCountWithPremise (NoBuffer (), I, 1, And (NoBuffer (), StaffWithAttribute (IAloneAbility, 1)), I, 1, 10000)",
 ],warning={min_pass=0}},
 
 {display_name = "フロ前に一人夜勤を入れない", scores = [
-"StaffCount (And (BeforeDayState B, NoBuffer ()), I, 2, 100)",
+"StaffCount (And (BeforeDayState B, NoBuffer ()), I, 2, 10000)",
 ],warning={min_pass=0}},
 
 {display_name = "OHできる人が2人いるか", scores = [
-"StaffCount (And (StaffWithAttribute (OHAbility, 1), NoBuffer ()), N, 2, 50)",
+"StaffCount (And (StaffWithAttribute (OHAbility, 1), NoBuffer ()), N, 2, 2500)",
 ],warning={min_pass=0}},
 
 {display_name = "同じペアに3回以上ならない", scores = [
@@ -99,7 +99,7 @@ score_functions = [
 
 
 {display_name = "土日祝休みの人が土日祝休んでいるか", scores = [
-"StaffCount (And (Any [StaffNamed 職員K, StaffNamed 職員L, StaffNamed 職員M], DayState H), K, 3, 10000)",
+"StaffCount (And (Any [StaffNamed 職員K, StaffNamed 職員L, StaffNamed 職員M], DayState H), K, 3, 100000000)",
 ],warning={min_pass=0}},
 
 {display_name = "職員Lが3連勤に収まっているか", scores = [
@@ -107,15 +107,15 @@ score_functions = [
 ],warning={min_pass=0}},
 
 {display_name = "職員Gが指定された日で夜勤しない", scores = [
-"StaffCount (And (StaffNamed 職員G, DayInList [3,5,8,12]), I, 0, 10000)",
+"StaffCount (And (StaffNamed 職員G, DayInList [3,5,8,12]), I, 0, 100000000)",
 ],warning={min_pass=0}},
 
 {display_name = "職員Mが週3日勤務に収まっているか", scores = [
-"ShiftsCountAtMost (And (StaffNamed 職員M, DayInRange (1,6)),   [N], 2, 100)", # 初日はこれ
-"ShiftsCountAtMost (And (StaffNamed 職員M, DayInRange (7,13)),  [N], 3, 100)",
-"ShiftsCountAtMost (And (StaffNamed 職員M, DayInRange (14,20)), [N], 3, 100)",
-"ShiftsCountAtMost (And (StaffNamed 職員M, DayInRange (21,27)), [N], 3, 100)",
-"ShiftsCountAtMost (And (StaffNamed 職員M, DayInRange (28,31)), [N], 3, 100)",
+"ShiftsCountAtMost (And (StaffNamed 職員M, DayInRange (1,6)),   [N], 2, 10000)", # 初日はこれ
+"ShiftsCountAtMost (And (StaffNamed 職員M, DayInRange (7,13)),  [N], 3, 10000)",
+"ShiftsCountAtMost (And (StaffNamed 職員M, DayInRange (14,20)), [N], 3, 10000)",
+"ShiftsCountAtMost (And (StaffNamed 職員M, DayInRange (21,27)), [N], 3, 10000)",
+"ShiftsCountAtMost (And (StaffNamed 職員M, DayInRange (28,31)), [N], 3, 10000)",
 ],warning={min_pass=0}},
 
 ]
