@@ -33,7 +33,7 @@ pub enum Cond {
     BeforeDayState(DayState),
 
     // スタッフについての条件
-    Staff(usize),
+    StaffID(usize),
     StaffInRange((usize, usize)),
     StaffWithAttribute((StaffAttributeName, i32)),
     StaffNamed(String),
@@ -83,7 +83,7 @@ impl Cond {
                 }
             }
 
-            Cond::Staff(s) => *s == staff,
+            Cond::StaffID(s) => *s == staff,
             Cond::StaffInRange((staff_start, staff_end)) => {
                 *staff_start <= staff && staff <= *staff_end
             }
@@ -152,7 +152,7 @@ impl Cond {
                 }
             }
 
-            Cond::Staff(_s) => None,
+            Cond::StaffID(_s) => None,
             Cond::StaffInRange((_staff_start, _staff_end)) => None,
             Cond::StaffWithAttribute((_attribute, _value)) => None,
             Cond::StaffNamed(_s) => None,
@@ -195,7 +195,7 @@ impl Cond {
             Cond::DayState(_ds) => None,
             Cond::BeforeDayState(_ds) => None,
 
-            Cond::Staff(s) => Some(*s == staff),
+            Cond::StaffID(s) => Some(*s == staff),
             Cond::StaffInRange((staff_start, staff_end)) => {
                 Some(*staff_start <= staff && staff <= *staff_end)
             }
@@ -372,7 +372,7 @@ impl FromConfig for Cond {
             ("DayState", p) => Ok(Cond::DayState(<DayState>::from_config(p)?)),
             ("BeforeDayState", p) => Ok(Cond::BeforeDayState(<DayState>::from_config(p)?)),
 
-            ("Staff", p) => Ok(Cond::Staff(<usize>::from_config(p)?)),
+            ("StaffID", p) => Ok(Cond::StaffID(<usize>::from_config(p)?)),
             ("StaffInRange", p) => Ok(Cond::StaffInRange(<(usize, usize)>::from_config(p)?)),
             ("StaffWithAttribute", p) => Ok(Cond::StaffWithAttribute(
                 <(StaffAttributeName, i32)>::from_config(p)?,
@@ -415,7 +415,7 @@ impl Check<StdScoreProp, Shift, ShiftState, DayState> for Cond {
             Cond::DayState(_) => Ok(()),
             Cond::BeforeDayState(_) => Ok(()),
 
-            Cond::Staff(_) => Ok(()),
+            Cond::StaffID(_) => Ok(()),
             Cond::StaffInRange(_) => Ok(()),
             Cond::StaffWithAttribute((sa, _)) => {
                 StaffAttributeNameWrapper(sa).check(schedule_config)
@@ -668,7 +668,7 @@ mod tests {
             attributes: HashMap::new(),
         };
 
-        let mut cw = CondWrapper::new(Cond::Staff(0));
+        let mut cw = CondWrapper::new(Cond::StaffID(0));
 
         // メモを記入
         assert_eq!(cw.can_skip_staff_mut(0, &sc, &dc), false);

@@ -328,7 +328,7 @@ Condの詳細は以下の通り
 | NoBuffer           | ()                        | バッファーでないなら有効                                               |
 | DayState           | DayState                  | 指定の曜日なら有効                                                     |
 | BeforeDayState     | DayState                  | 指定の曜日の前日なら有効                                               |
-| Staff              | usize                     | 指定した番号のスタッフなら有効                                         |
+| StaffID            | usize                     | 指定した番号のスタッフなら有効                                         |
 | StaffInRange       | (usize, usize)            | 指定した範囲のスタッフなら有効                                         |
 | StaffWithAttribute | (StaffAttributeName, i32) | 指定した職員ごとのパラメータが指定した整数であるスタッフなら有効       |
 | StaffNamed         | String                    | 指定した文字列と名前が一致するスタッフなら有効                         |
