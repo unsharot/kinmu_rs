@@ -3,10 +3,11 @@
 
 mod seed;
 
+use kinmu_annealing::Update;
 use kinmu_core::Generator;
 use kinmu_model::{
     eval_scores_mut, AnnealingConfig, Answer, FillConfig, MainConfig, Schedule, ScheduleConfig,
-    ScoreProp,
+    ScheduleState, ScoreProp,
 };
 
 use std::thread;
@@ -41,7 +42,7 @@ where
     SS: Clone + std::marker::Send + 'static,
     DS: Clone + std::marker::Send + 'static,
     F: Fill<SP, S, SS, DS> + Clone + std::marker::Send + 'static,
-    U: Update<SP, S, SS, DS> + Clone + std::marker::Send + 'static,
+    U: Update<Schedule<S>> + Clone + std::marker::Send + 'static,
 {
     fn run(
         &mut self,
@@ -63,7 +64,7 @@ where
     SS: Clone + std::marker::Send + 'static,
     DS: Clone + std::marker::Send + 'static,
     F: Fill<SP, S, SS, DS> + Clone + std::marker::Send + 'static,
-    U: Update<SP, S, SS, DS> + Clone + std::marker::Send + 'static,
+    U: Update<Schedule<S>> + Clone + std::marker::Send + 'static,
 {
     let thread_count = config.thread_count.unwrap_or(1);
 
@@ -93,7 +94,7 @@ where
     SS: Clone + std::marker::Send + 'static,
     DS: Clone + std::marker::Send + 'static,
     F: Fill<SP, S, SS, DS> + Clone + std::marker::Send + 'static,
-    U: Update<SP, S, SS, DS> + Clone + std::marker::Send + 'static,
+    U: Update<Schedule<S>> + Clone + std::marker::Send + 'static,
 {
     let start = Instant::now();
 
@@ -139,7 +140,7 @@ where
     SP: ScoreProp<S, SS, DS>,
     S: Clone,
     F: Fill<SP, S, SS, DS>,
-    U: Update<SP, S, SS, DS>,
+    U: Update<Schedule<S>> + Clone,
 {
     let mut model = fill.run(
         &fill_config.name,
@@ -160,7 +161,7 @@ where
             score,
             &model,
             ac.step,
-            update.generate(&ac.update_func, &schedule_config)?,
+            &update,
             |m| {
                 eval_scores_mut(
                     &mut ac.score_props,
@@ -191,13 +192,10 @@ pub trait Fill<SP, S, SS, DS> {
     ) -> anyhow::Result<Schedule<S>>;
 }
 
-/// GeneratorWithAnnealingで用いるUpdateの共通のふるまい
-#[allow(clippy::type_complexity)]
-pub trait Update<SP, S, SS, DS> {
-    /// 名前とScheduleConfigからクロージャーを生成
-    fn generate<'a, R: Rng>(
-        &self,
-        name: &str,
-        schedule_config: &'a ScheduleConfig<SP, S, SS, DS>,
-    ) -> anyhow::Result<Box<dyn FnMut(&Schedule<S>, &mut R) -> Schedule<S> + 'a>>;
+pub trait LoadUpdate<SP, S, SS, DS> {
+    fn load_update(
+        &mut self,
+        schedule_config: ScheduleConfig<SP, S, SS, DS>,
+        schedule_state: ScheduleState<SS>,
+    );
 }

@@ -156,6 +156,7 @@ name = "kinmu_lib"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "kinmu_annealing",
  "kinmu_generator_with_annealing",
  "kinmu_input_by_file",
  "kinmu_macros",

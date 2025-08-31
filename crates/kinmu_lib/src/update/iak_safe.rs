@@ -1,8 +1,28 @@
 use super::super::{Schedule, ScheduleConfig, ScheduleState, Shift, ShiftState};
 
+use kinmu_annealing::Update;
 use kinmu_model::Score;
 
 use rand::Rng;
+
+#[derive(Debug, Clone)]
+pub struct IAKSafe {
+    pub schedule_config: ScheduleConfig,
+    pub schedule_state: ScheduleState,
+}
+
+// Wrapperが持った法がよさそう
+// CondWrapperみたいなイメージで、Wrapperがschedule_config,stateもつ
+// だからUpdateWrapperになるかな？
+// あとScorePropトレイトみたいなのも追加したほうがいい
+// modelでScoreProp宣言されてるけど上位である意味はあるのか？
+// -> 下である必要がないから上でいいんじゃね？ 頻繁に変わらないし
+
+impl Update<Schedule> for IAKSafe {
+    fn run<R: Rng>(&self, schedule: &Schedule, rng: &mut R) -> Schedule {
+        update_iak_safe(&self.schedule_config, &self.schedule_state, schedule, rng)
+    }
+}
 
 // 各行について
 // 1.  Iが入っていることを確認
@@ -108,7 +128,7 @@ fn add_proper_a(schedule_config: &ScheduleConfig, new_schedule: &mut Schedule, r
 
 /// IAKを破壊せずに入れ替える
 /// 前提として、Absolute以外はI,A,K,Nで、AbsoluteでないO,Hはないことが条件
-pub fn update_iak_safe<R: Rng>(
+fn update_iak_safe<R: Rng>(
     schedule_config: &ScheduleConfig,
     schedule_state: &ScheduleState,
     schedule: &Schedule,

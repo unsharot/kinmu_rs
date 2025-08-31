@@ -10,8 +10,12 @@ use rand::Rng;
 /// ```
 /// use rand::Rng;
 ///
-/// fn updatef<R: Rng>(x: &f32, rng: &mut R) -> f32 {
-///    x + rng.gen::<f32>() / 100.0
+/// struct UpdateRandom;
+///
+/// impl kinmu_annealing::Update<f32> for UpdateRandom {
+///     fn run<R: Rng>(&self, x: &f32, rng: &mut R) -> f32 {
+///         x + rng.gen::<f32>() / 100.0
+///     }
 /// }
 ///
 /// fn evalf(x: &f32) -> f32 {
@@ -25,7 +29,7 @@ use rand::Rng;
 ///     10000.0,
 ///     &0.0,
 ///     100000,
-///     updatef,
+///     &UpdateRandom,
 ///     evalf,
 ///     10.0,
 ///     0.0,
@@ -39,7 +43,7 @@ pub fn run<M, S, U, E, T, P, R>(
     initial_score: S,
     initial_model: &M,
     step_count: u32,
-    mut update: U,
+    update: &U,
     mut eval: E,
     temp_max: f32,
     temp_min: f32,
@@ -50,7 +54,7 @@ pub fn run<M, S, U, E, T, P, R>(
 where
     M: Clone,
     S: std::cmp::PartialOrd + Copy,
-    U: FnMut(&M, &mut R) -> M,
+    U: Update<M>,
     E: FnMut(&M) -> S,
     T: FnMut(f32, f32, u32, u32) -> f32,
     P: FnMut(S, S, f32) -> f32,
@@ -65,7 +69,7 @@ where
     let mut temp;
 
     for loop_value in 0..step_count {
-        let next_model = update(&current_model, rng);
+        let next_model = update.run(&current_model, rng);
         let next_score = eval(&next_model);
 
         temp = temp_func(temp_max, temp_min, step_count, loop_value);
@@ -85,6 +89,10 @@ where
     }
 
     (best_score, best_model)
+}
+
+pub trait Update<M> {
+    fn run<R: Rng>(&self, model: &M, rng: &mut R) -> M;
 }
 
 /// 標準の温度関数
